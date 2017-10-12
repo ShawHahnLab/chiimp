@@ -41,7 +41,7 @@ histogram <- function(samp, stacked=TRUE, main=NULL) {
     ylim <- range(heights$TotalCount)
     heights.loci <- with(samp, {
       samp %>%
-      subset(Locus != "") %>%
+      subset(MatchingLocus != "") %>%
       dplyr::group_by(Length) %>%
       dplyr::summarize(TotalCount = sum(Count))
     })
@@ -62,7 +62,7 @@ histogram <- function(samp, stacked=TRUE, main=NULL) {
     # Stack counts for individual sequences for the locus-labeled cases.  If any
     # rows have the attribute "Flag" set to true, color them separately.
     for (len in unique(samp$Length)) {
-      idx <- with(samp, Length == len & Locus != "")
+      idx <- with(samp, Length == len & MatchingLocus != "")
       chunk <- samp[idx, ]
       if (nrow(chunk) < 1)
         next
