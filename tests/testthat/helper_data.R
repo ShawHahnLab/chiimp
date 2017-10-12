@@ -68,7 +68,9 @@ simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
   seqs[idx] <- paste0(attrs$Primer, make.seq_junk(10), attrs$ReversePrimer)
   ## TODO add contam
   ## TODO munge up the reads a bit
-  ## TODO shuffle vector
+
+  ## Shuffle vector
+  seqs <- sample(seqs)
   return(seqs)
 }
 

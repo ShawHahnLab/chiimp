@@ -1,6 +1,9 @@
-check.seqs1A_summary <- function(sample.summary, count.locus=4500) {
-  expect_equal(names(sample.summary), sample.summary.cols)
-  with(sample.summary, {
+check.seqs1A_summary <- function(data,
+                                 count.locus=4500,
+                                 allele1.count=2803,
+                                 allele2.count=1300) {
+  expect_equal(names(data), sample.summary.cols)
+  with(data, {
     expect_equal(Allele1Seq,
                  gsub("[\n ]*", "",
                      "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
@@ -13,9 +16,9 @@ check.seqs1A_summary <- function(sample.summary, count.locus=4500) {
                       ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
                       TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
                       AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-    expect_equal(Allele1Count, 2803)
+    expect_equal(Allele1Count, allele1.count)
     expect_equal(Allele1Length, 162)
-    expect_equal(Allele2Count, 1300)
+    expect_equal(Allele2Count, allele2.count)
     expect_equal(Allele2Length, 194)
     expect_equal(Homozygous, FALSE)
     expect_equal(Stutter, FALSE)
@@ -56,9 +59,12 @@ test_that("summarize.sample handles empty sequences in input sample data", {
   sample.data <- analyze.sample(seqs, locus_attrs, 3)
   sample.summary <- summarize.sample(sample.data, "A")
   # Nothing should change in the output, except that we zeroed out 90 reads that
-  # would otherwise get counted (the other 10 were already set to off-target
+  # would otherwise get counted (the rest were already set to off-target
   # junk during setup).
-  check.seqs1A_summary(sample.summary, count.locus = 4410)
+  check.seqs1A_summary(sample.summary,
+                       count.locus = 4414,
+                       allele1.count = 2748,
+                       allele2.count = 1276)
 })
 
 test_that("summarize.sample marks stutter removal", {
@@ -75,14 +81,21 @@ test_that("summarize.sample counts prominent sequences", {
   sample.data.empty    <- analyze.sample(c(), locus_attrs, 3)
   sample.summary.empty <- summarize.sample(sample.data.empty, "B")
 
-  expect_equal(sample.summary.1B$ProminentSeqs,    1)
+  expect_equal(sample.summary.1B$ProminentSeqs,    3)
   expect_equal(sample.summary.2B$ProminentSeqs,    4)
-  expect_equal(sample.summary.3B$ProminentSeqs,    3)
+  expect_equal(sample.summary.3B$ProminentSeqs,    1)
   expect_equal(sample.summary.empty$ProminentSeqs, 0)
-  # TODO check cases where Stutter == TRUE
+  # Despite having stutter-y peaks the first two did not have a potential allele
+  # removed, so Stutter == FALSE.  The third had stutter large enough to look
+  # like an allele so it was removed.  The last one was empty so there was
+  # nothing to have stutter from.
+  expect_equal(sample.summary.1B$Stutter,    FALSE)
+  expect_equal(sample.summary.2B$Stutter,    FALSE)
+  expect_equal(sample.summary.3B$Stutter,    TRUE)
+  expect_equal(sample.summary.empty$Stutter, FALSE)
 })
 
-test_that("summarize.sample ignores low-count samples", {
+test_that("summarize.sample rejects low-count samples", {
   fail("feature not yet implemented")
   # Here we should check that the filtered-counts-thresholding (not yet
   # implemented!) is applied.
