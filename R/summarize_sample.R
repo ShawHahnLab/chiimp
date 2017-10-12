@@ -5,7 +5,8 @@
 #'
 #' Converts a full STR sample data frame into a concise list of consistent
 #' attributes, suitable for binding together across samples for a dataset.  At
-#' this stage the summary is prepared for a single specific locus.
+#' this stage the summary is prepared for a single specific locus, in contrast
+#' to \code{analyze.sample}.
 #'
 #' @details
 #' Entries in the returned list:
@@ -35,21 +36,24 @@
 #' @return list of attributes describing the sample.
 #'
 #' @export
-summarize.sample <- function(sample.data, locus.name, fraction.min = 0.05) {
+summarize.sample <- function(sample.data, locus.name, fraction.min=0.05) {
   # extract sample data entries that meet all criteria for a potential allele
   idx <- which(with(sample.data,
                 MatchingLocus == locus.name &
                 MotifMatch &
                 LengthMatch))
   chunk <- sample.data[idx, ]
+  # Note that counts.locus is more restrictive than the total counts of all
+  # entries with MatchingLocus equal to the given locus name, since idx includes
+  # the extra checks above.
   count.total <- sum(sample.data$Count)
   count.locus <- sum(chunk$Count)
   # Threshold potential alleles at minimum count
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-  # Remove stutter, if present
+  # Remove stutter, if present.
   stutter <- FALSE
-  if (any(!is.na(chunk$Stutter))) {
-    chunk <- chunk[is.na(chunk$Stutter), ]
+  if (!is.na(chunk[2, "Stutter"])) {
+    chunk <- chunk[-2, ]
     stutter <- TRUE
   }
 
