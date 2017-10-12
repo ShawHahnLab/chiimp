@@ -10,6 +10,15 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
 locus_attrs <- read.table(txt.locus_attrs, header = T, row.names = 1, stringsAsFactors = F)
 close(txt.locus_attrs)
 
+sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
+                      "LengthMatch", "Stutter", "FractionOfTotal",
+                      "FractionOfLocus")
+sample.summary.cols <- c("Allele1Seq", "Allele1Count",
+                         "Allele1Length", "Allele2Seq",
+                         "Allele2Count", "Allele2Length",
+                         "Homozygous", "Stutter", "CountTotal",
+                         "CountLocus", "ProminentSeqs")
+
 make.seq_junk <- function(N) {
   nucleotides <- c("A", "T", "C", "G")
   vapply(runif(N, min = 1, max = 20), function(L)
@@ -65,8 +74,7 @@ simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
 
 simulate.set <- function(locus_attrs) {
   seqs <- lapply(rownames(locus_attrs), function(n) {
-    s <- simulate.seqs(n, locus_attrs)
-    s
+    simulate.seqs(n, locus_attrs)
   })
   names(seqs) <- rownames(locus_attrs)
   return(seqs)

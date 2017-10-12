@@ -14,10 +14,8 @@ test_that("analyze.sample tabulates sequences", {
 
 test_that("analyze.sample handles completely emtpy input vector", {
   sample.data <- analyze.sample(c(), locus_attrs, 3)
-  cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
-            "LengthMatch", "Stutter", "FractionOfTotal", "FractionOfLocus")
   expect_equal(nrow(sample.data), 0)
-  expect_equal(colnames(sample.data), cols)
+  expect_equal(colnames(sample.data), sample.data.cols)
 })
 
 test_that("analyze.sample handles empty sequences", {
