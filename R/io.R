@@ -1,6 +1,5 @@
 # Save and load data.
 
-# TODO add to test list: invalid column/row names in text file.
 #' Load table of locus attributes
 #'
 #' Load a tab-separated table of locus attributes to use for analysis.
