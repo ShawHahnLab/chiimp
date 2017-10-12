@@ -13,3 +13,12 @@ test_that("summarize.sample handles empty sequences in input sample data", {
 test_that("summarize.sample marks stutter removal", {
   fail("test not yet implemented")
 })
+
+test_that("summarize.sample counts prominent sequences", {
+  fail("test not yet implemented")
+})
+
+
+test_that("summarize.sample ignores low-count samples", {
+  fail("test not yet implemented")
+})
