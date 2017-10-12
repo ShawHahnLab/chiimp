@@ -49,16 +49,19 @@ summarize.sample <- function(sample.data, locus.name, fraction.min = 0.05) {
   # Remove stutter, if present
   stutter <- FALSE
   if (any(!is.na(chunk$Stutter))) {
-    chunk <- chunk[!chunk$Stutter, ]
+    chunk <- chunk[is.na(chunk$Stutter), ]
     stutter <- TRUE
   }
+
+  # TODO enforce count limit after all filtering
+
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent.seqs <- nrow(chunk)
   # Take top to remaining entries as the two alleles and keep selected
   # attributes.
   attr.names <- c("Seq", "Count", "Length")
-allele1 <- chunk[1, attr.names]
+  allele1 <- chunk[1, attr.names]
   allele2 <- chunk[2, attr.names]
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
