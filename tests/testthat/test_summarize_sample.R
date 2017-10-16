@@ -68,7 +68,26 @@ test_that("summarize.sample handles empty sequences in input sample data", {
 })
 
 test_that("summarize.sample marks stutter removal", {
-  fail("test not yet implemented")
+  sample.data <- analyze.sample(seqs3$A, locus_attrs, 3)
+  sample.summary <- summarize.sample(sample.data, "A")
+  with(sample.summary, {
+    expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
+                                    "TAGATAGATAGATAGATAGATAGATAGATA",
+                                    "GATAGATAGATAGATAGATAGATAGATAGA",
+                                    "TAGATAGATAGATAGATAGATAGATAGATA",
+                                    "GATAGATAGATAGATAGATAGATAGATAGA",
+                                    "TAGACACAGTTGTGTGAGCCAGTC"))
+    expect_equal(Allele1Count, 3971)
+    expect_equal(Allele1Length, 174)
+    expect_equal(Allele2Seq, as.character(NA))
+    expect_equal(Allele2Count, as.integer(NA))
+    expect_equal(Allele2Length, as.integer(NA))
+    expect_equal(Homozygous, TRUE)
+    expect_equal(Stutter, TRUE)
+    expect_equal(CountTotal, 5000)
+    expect_equal(CountLocus, 4500)
+    expect_equal(ProminentSeqs, 1)
+  })
 })
 
 test_that("summarize.sample counts prominent sequences", {
@@ -96,7 +115,23 @@ test_that("summarize.sample counts prominent sequences", {
 })
 
 test_that("summarize.sample rejects low-count samples", {
-  fail("feature not yet implemented")
-  # Here we should check that the filtered-counts-thresholding (not yet
-  # implemented!) is applied.
+  sample.data <- analyze.sample(seqs1$A, locus_attrs, 3)
+  # Here we check that the filtered-counts-thresholding is applied, by forcing
+  # the counts to a low number.  This should still report some stats but should
+  # leave out the allele1/allele2 information.
+  sample.data$Count <- sample.data$Count/100
+  sample.summary <- summarize.sample(sample.data, "A")
+  with(sample.summary, {
+    expect_equal(Allele1Seq, as.character(NA))
+    expect_equal(Allele1Count, as.integer(NA))
+    expect_equal(Allele1Length, as.integer(NA))
+    expect_equal(Allele2Seq, as.character(NA))
+    expect_equal(Allele2Count, as.integer(NA))
+    expect_equal(Allele2Length, as.integer(NA))
+    expect_equal(Homozygous, FALSE)
+    expect_equal(Stutter, FALSE)
+    expect_equal(CountTotal, 50)
+    expect_equal(CountLocus, 45)
+    expect_equal(ProminentSeqs, 3)
+  })
 })
