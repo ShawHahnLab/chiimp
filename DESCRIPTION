@@ -12,6 +12,7 @@ Imports:
   dplyr (>= 0.7.4),
   magrittr (>= 1.5),
   parallel (>= 3.2.3),
+  pheatmap (>= 1.0.8),
   stringr (>= 1.2.0)
 RoxygenNote: 6.0.1
 Suggests: testthat
