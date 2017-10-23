@@ -1,14 +1,13 @@
-# simulated data for testing
+# simulated data for testing ----------------------------------------------
 
-txt.locus_attrs <- textConnection(
-"Locus   LengthMin  LengthMax    LengthBuffer   Motif   Primer                  ReversePrimer
+txt.locus_attrs <- "Locus   LengthMin  LengthMax    LengthBuffer   Motif   Primer                  ReversePrimer
 A        131        179          20             TAGA    TATCACTGGTGTTAGTCCTCTG  CACAGTTGTGTGAGCCAGTC
 B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    TAGGAGCCTGTGGTCCTGTT
 1        232        270          20             TATC    ACAGTCAAGAATAACTGCCC    CTGTGGCTCAAAAGCTGAAT
-2        218        337          20             TCCA    TTGTCTCCCCAGTTGCTA      TCTGTCATAAACCGTCTGCA
-")
-locus_attrs <- read.table(txt.locus_attrs, header = T, row.names = 1, stringsAsFactors = F)
-close(txt.locus_attrs)
+2        218        337          20             TCCA    TTGTCTCCCCAGTTGCTA      TCTGTCATAAACCGTCTGCA"
+f.locus_attrs <- textConnection(txt.locus_attrs)
+locus_attrs <- read.table(f.locus_attrs, header = T, row.names = 1, stringsAsFactors = F)
+close(f.locus_attrs)
 
 sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
                       "LengthMatch", "Stutter", "FractionOfTotal",
