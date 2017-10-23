@@ -6,6 +6,8 @@
 # labels for known alleles? ("180a," "180b," etc.)
 # identification of individuals?
 
+# Genotype and Attribute Tables -------------------------------------------
+
 # Tabulate genotypes across loci.  Which attributes will actually be used for
 # the table is configurable.
 summarize.genotypes <- function(dataset.summary,
@@ -33,6 +35,7 @@ summarize.genotypes <- function(dataset.summary,
                        c(1,2),
                        sep = '_')
   colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
+  rownames(tbl) <- make.rownames(tbl)
   tbl
 }
 
@@ -52,6 +55,10 @@ summarize.attribute <- function(dataset.summary, attrib, repeats = 2) {
   tbl
 }
 
+
+# Distances ---------------------------------------------------------------
+
+
 # Create a distance matrix for every combination of individuals in the
 # supplied dataset results summary.
 make.dist_mat <- function(dataset.summary,
@@ -68,7 +75,7 @@ make.dist_mat <- function(dataset.summary,
   # https://stackoverflow.com/a/5598824/6073858
   dist.mat <- distances
   class(dist.mat) <- "dist"
-  attr(dist.mat, "Labels") <- tbl$Sample
+  attr(dist.mat, "Labels") <- rownames(tbl)
   attr(dist.mat, "Size") <- nrow(tbl)
   attr(dist.mat, "Diag") <- attr(dist.mat, "Upper") <- FALSE
   dist.mat <- as.matrix(dist.mat)
@@ -77,14 +84,50 @@ make.dist_mat <- function(dataset.summary,
   diag(dist.mat) <- apply(tbl, 1, function(row) {
     calc.genotype.distance(row[-(1:2)], row[-(1:2)])
   })
+  # This all ends up being pretty roundabout.  Should I instead use outer() or
+  # something to build the matrix?
   dist.mat
 }
 
-# TODO update this to consider re-arranged alleles.
+
+# TODO: work with either allele direction
+# for test: test symmetry
 calc.genotype.distance <- function(g1, g2, na.reject = TRUE) {
+  # Valid matches are either at the index in g2 or one less, to match either
+  # allele.  So for each position in g2 minus its index that will be -1 or 0.
+  #m <- if (na.reject) match(g1, g2, incomparables = NA) else match(g1, g2)
+  #sum(! (m - seq_along(g2)) %in% -1:0)
   if (na.reject) {
     g1[is.na(g1)] <- -1
     g2[is.na(g2)] <- -2
   }
   sum(g1 != g2, na.rm = T)
+}
+
+
+# Alignments --------------------------------------------------------------
+
+
+# create a list of alignments across observed alleles, with one alignment per
+# locus and one sequence per allele.
+# TODO support dereplication, either here or separately.
+align.alleles <- function(dataset.summary) {
+  chunks <- split(dataset.summary, dataset.summary$Locus)
+  lapply(chunks, function(chunk) {
+    alleles <- chunk[, c("Allele1Seq", "Allele2Seq")]
+    a1 <- as.character(alleles[,1])
+    a2 <- as.character(alleles[,2])
+    a2 <- ifelse(is.na(a2), a1, a2)
+    names(a1) <- paste(rownames(alleles), 1, sep="_")
+    names(a2) <- paste(rownames(alleles), 2, sep="_")
+    a <- c(a1, a2)
+    a[is.na(a)] <- '-'
+    # TODO make this safer.  if msa(...) crashes sink() won't get called.
+    sink('/dev/null')
+    alignments <- msa::msaClustalW(a,
+                                   type="dna",
+                                   substitutionMatrix = 'clustalw')
+    sink()
+    alignments
+  })
 }
