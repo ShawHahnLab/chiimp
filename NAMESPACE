@@ -3,5 +3,7 @@
 export(analyze.sample)
 export(histogram)
 export(load.locus_attrs)
+export(load.seqs)
+export(prepare.dataset)
 export(summarize.sample)
 importFrom(magrittr,"%>%")
