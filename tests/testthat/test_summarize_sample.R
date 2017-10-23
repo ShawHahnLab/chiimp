@@ -1,3 +1,5 @@
+# util --------------------------------------------------------------------
+
 check.seqs1A_summary <- function(data,
                                  count.locus=4500,
                                  allele1.count=2803,
@@ -27,6 +29,8 @@ check.seqs1A_summary <- function(data,
     expect_equal(ProminentSeqs, 3)
   })
 }
+
+# test summarize.sample ---------------------------------------------------
 
 test_that("summarize.sample summarizes sample attributes", {
   sample.data <- analyze.sample(seqs1$A, locus_attrs, 3)
@@ -134,4 +138,13 @@ test_that("summarize.sample rejects low-count samples", {
     expect_equal(CountLocus, 45)
     expect_equal(ProminentSeqs, 3)
   })
+})
+
+test_that("summarize.sample warns of missing locus name", {
+  # summarize.sample() should be able to tell if an invalid (as per the earlier
+  # processing) locus name is given, because it won't be in the levels of the
+  # MatchingLocus factor of the data frame from analyze.sample().  I think this
+  # would only come about when locus names given by prepare.dataset() don't
+  # match what's in locus_attrs.
+  fail("test not yet implemented")
 })
