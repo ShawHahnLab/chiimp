@@ -25,7 +25,8 @@ histogram <- function(samp, stacked=TRUE, main=NULL, locus.name=NULL, sample.sum
   col.labeled     <- "#999999"
   border.labled   <- "#000000"
   # Locus-labeled and matching all allele conditions
-  col.filtered    <- "#FF6666"
+  #col.filtered    <- "#FF6666"
+  col.filtered    <- "#FFDDDD"
   border.filtered <- "#990000"
   # Sequences matching alleles in sample.summary
   col.allele      <- "#FF0000"
@@ -33,7 +34,7 @@ histogram <- function(samp, stacked=TRUE, main=NULL, locus.name=NULL, sample.sum
   lwd <- 5
 
   if (missing(locus.name)) {
-    cts <- subset(sample.data, MatchingLocus != "") %>%
+    cts <- subset(samp, MatchingLocus != "") %>%
       dplyr::group_by(MatchingLocus) %>%
       dplyr::summarize(Count=sum(Count))
     cts <- cts[order(cts$Count, decreasing = T), ]
@@ -101,7 +102,7 @@ histogram <- function(samp, stacked=TRUE, main=NULL, locus.name=NULL, sample.sum
         if(is.na(allele_match)) allele_match <- F
         # Is the sequence an exact match for an identified allele?
         is_allele <- chunk[n, 'Seq'] %in%
-          sample.summary[c('Allele1Seq', 'Allele2Seq')]
+          as.character(unlist(sample.summary[c('Allele1Seq', 'Allele2Seq')]))
         # Color each rectangle according to its category as defined by the
         # above.  The default will be the locus-labeled colors.
         col <- col.labeled
@@ -113,7 +114,7 @@ histogram <- function(samp, stacked=TRUE, main=NULL, locus.name=NULL, sample.sum
           col <- col.filtered
           col.border <- border.filtered
         }
-        polygon(x, y, col = col, border = col.border)
+        polygon(x, y, col = col, border = col.border, lwd=0.5)
       }
     }
   }
@@ -143,21 +144,22 @@ make.dist_scale <- function(n) {
 }
 
 plot.dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
-                          dist.display_thresh=round(num.alleles*2/3)) {
+                          dist.display_thresh=round(num.alleles*2/3),
+                          ...) {
   labels <- matrix(character(length(dist_mat)), nrow=nrow(dist_mat))
   idx <- dist_mat <= dist.display_thresh
   labels[idx] <- dist_mat[idx]
-  #idx.diag <- (0:(nrow(dist_mat)-1))*(nrow(dist_mat)+1) + 1
-  #labels[idx.diag] <- ''
   diag(labels) <- ''
   dist_scale <- make.dist_scale(num.alleles)
   color <- rgb(red=1, green=dist_scale, blue=dist_scale)
 
-  pheatmap::pheatmap(dist_mat,
+  vals <- dist_mat
+  pheatmap::pheatmap(vals,
            color = color,
            display_numbers = labels,
            treeheight_row = 0,
            breaks = 0:num.alleles,
            clustering_distance_rows = as.dist(dist_mat),
-           clustering_distance_cols = as.dist(dist_mat))
+           clustering_distance_cols = as.dist(dist_mat),
+           ...)
 }
