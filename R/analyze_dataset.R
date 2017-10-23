@@ -1,7 +1,7 @@
 # Analyze all samples in a dataset.
 
-# parallel execution of analyze.sample and summarize.sample
-# binding sample summaries together in data frame
+# These functions handle parallel execution of analyze.sample and
+# summarize.sample and the binding sample summaries together in a data frame.
 
 analyze.dataset <- function(dataset,
                             locus_attrs,
