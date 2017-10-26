@@ -138,3 +138,31 @@ test_that("align.alleles produces per-allele alignments", {
                  sort(c(n1, n2)))
   })
 })
+
+test_that("align.alleles works for empty sequences", {
+  # Empty sequences should be handled automatically before the msa function is
+  # called.
+  with(results_summary_data, {
+    # Empty out one entry for locus A
+    idx <- results$summary$Locus == "A"
+    results$summary[idx[1], "Allele1Seq"] <- NA
+    results$summary[idx[1], "Allele2Seq"] <- NA
+    # Locus A's alignment should be OK, just with one stub entry
+    alignments <- align.alleles(results$summary)
+    expect_true(any(grepl('-', as.character(alignments$A))))
+  })
+})
+
+test_that("align.alleles works for empty sequence sets", {
+  # Completely empty sequence lists for a given locus are a special case; for
+  # those we should just get "NA" for the whole entry.
+  with(results_summary_data, {
+    # Empty out all sequences for locus A
+    idx <- results$summary$Locus == "A"
+    results$summary[idx, "Allele1Seq"] <- NA
+    results$summary[idx, "Allele2Seq"] <- NA
+    # This should still work, just with NA for A's alignment
+    alignments <- align.alleles(results$summary)
+    expect_equal(alignments$A, NULL)
+  })
+})
