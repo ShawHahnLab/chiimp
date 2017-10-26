@@ -57,7 +57,9 @@ prepare.dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
   data$Filename <- seq_files
   # order by locus/sample/replicate
   data <- data[with(data, order(Locus, Sample, Replicate)), ]
-  data$Replicate <- ifelse(data$Replicate == "", NA, data$Replicate)
+  data$Replicate <- ifelse(data$Replicate == "",
+                           NA,
+                           as.integer(as.character(data$Replicate)))
   #data$Locus <- ifelse(data$Locus == "", NA, data$Locus)
   rownames(data) <- make.rownames(data)
   return(data)
@@ -82,6 +84,68 @@ load.seqs <- function(fp.seqs) {
   loadfunc(fp.seqs)$seq
 }
 
+#' Save alignments to FASTA files
+#'
+#' Take a list of alignments, one per locus, and save each to a separate fasta
+#' file in a specified directory.  If any of the per-locus alignment objects is
+#' NA it will be skipped.
+#'
+#' @param alignments list of MSA alignment objects.  The name of each alignment
+#'   will be used for its filename.
+#' @param dp output directory path.
+#'
+#' @export
+save.alignments <- function(alignments, dp) {
+    if (!dir.exists(dp))
+      dir.create(dp, recursive = TRUE)
+    invisible(lapply(names(alignments), function(loc) {
+      if(!is.null(alignments[[loc]])) {
+        dna <- as.character(alignments[[loc]])
+        fp <-file.path(dp, paste0(loc, '.fasta'))
+        dnar::write.fa(names = names(dna),
+                 dna = dna,
+                 fileName = fp)
+      }
+    }))
+}
+
+#' Save alignment visualizations to image files
+#'
+#' Take a list of alignments, one per locus, and save a plot of each to a
+#' separate image file in a specified directory.  If any of the per-locus
+#' alignment objects is NA it will be skipped.
+#'
+#' @param alignments list of MSA alignment objects.  The name of each alignment
+#'   will be used for its filename.
+#' @param dp output directory path.
+#' @param image.func name of function to call for saving each image.
+#' @param width integer width of image.
+#' @param height integer height of image.
+#' @param res integer resolution of image in PPI.
+#' @param ... additional arguments to \code{image.func}.
+#'
+#' @export
+save.alignment_images <- function(alignments, dp, image.func="png",
+                                  width=1600, height=1200, res=150) {
+  if (!dir.exists(dp))
+    dir.create(dp, recursive = TRUE)
+  invisible(lapply(names(alignments), function(loc) {
+    if(!is.null(alignments[[loc]])) {
+      fp <- file.path(dp, paste(loc, image.func, sep='.'))
+      img.call <- call(image.func,
+                       fp,
+                       width = width,
+                       height = height,
+                       res = res)
+      eval(img.call)
+      plot.alignment(alignments[[loc]],
+                     main = paste('Alignment for Locus', loc))
+      dev.off()
+
+    }
+  }))
+}
+
 # create unique rownames for the given data frame, using whichever sample
 # metadata columns are available.
 make.rownames <- function(data) {
@@ -91,5 +155,9 @@ make.rownames <- function(data) {
   cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
     !all(is.na(data[,x]))
   }) )]
-  make.unique(do.call(paste, c(data[, cols.idx, drop=F], sep='-')))
+  data.names <- data[, cols.idx, drop=F]
+  make.unique(sapply(1:nrow(data.names), function(nr) {
+    entries <- lapply((data.names[nr, !is.na(data.names[nr, ])]), as.character)
+    do.call(paste, as.list(c(entries, sep='-')))
+  }))
 }
