@@ -30,7 +30,8 @@ load.locus_attrs <- function(fp.locus_attrs, ...) {
 #'
 #' @param directory location to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.
-#' @param ord integer vector giving order of fields in filenames.
+#' @param ord integer vector giving order of fields (replicate/sample/locus) in
+#'   filenames.
 #'
 #' @return data frame of metadata for all files found
 #'
@@ -57,7 +58,7 @@ prepare.dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
   # order by locus/sample/replicate
   data <- data[with(data, order(Locus, Sample, Replicate)), ]
   data$Replicate <- ifelse(data$Replicate == "", NA, data$Replicate)
-  data$Locus <- ifelse(data$Locus == "", NA, data$Locus)
+  #data$Locus <- ifelse(data$Locus == "", NA, data$Locus)
   rownames(data) <- make.rownames(data)
   return(data)
 }

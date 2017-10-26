@@ -3,6 +3,23 @@
 # These functions handle parallel execution of analyze.sample and
 # summarize.sample and the binding sample summaries together in a data frame.
 
+#' Analyze all samples in a dataset
+#'
+#' Load all samples for a given dataset and produce a list of processed samples
+#' and a summary data frame showing each sample's summary row-by-row.
+#'
+#' @param dataset data frame of sample details as produced by
+#'   \code{prepare.dataset}.
+#' @param locus_attrs data frame of locus attributes as produced by
+#'   \code{load.locus_attrs}.
+#' @param num.cores integer number of CPU cores to use in parallel for sample
+#'   analysis.
+#' @param summary.function function to use when summarizing each sample's full
+#'   details into the standard attributes.
+#'
+#' @return list of results
+#'
+#' @export
 analyze.dataset <- function(dataset,
                             locus_attrs,
                             num.cores=max(1,

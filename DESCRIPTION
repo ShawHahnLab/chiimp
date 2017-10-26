@@ -12,6 +12,7 @@ Imports:
   dplyr (>= 0.7.4),
   magrittr (>= 1.5),
   msa (>= 1.2.1),
+  openssl (>= 0.9.6),
   parallel (>= 3.2.3),
   pheatmap (>= 1.0.8),
   stringr (>= 1.2.0)

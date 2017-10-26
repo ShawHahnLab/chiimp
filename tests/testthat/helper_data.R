@@ -89,3 +89,24 @@ seqs1 <- simulate.set(locus_attrs)
 seqs2 <- simulate.set(locus_attrs)
 seqs3 <- simulate.set(locus_attrs)
 set.seed(NULL)
+# 3 samples, then loci
+seqs <- list('1' = seqs1, '2' = seqs2, '3' = seqs3)
+
+# TODO support replicates
+write_seqs <- function(seq_sets,
+                       outdir,
+                       fmt="%s-%s.fasta") {
+  if (! dir.exists(outdir))
+    dir.create(outdir, recursive = TRUE)
+  for(sn in names(seq_sets)) {
+    for (ln in names(seq_sets[[sn]])) {
+      fp <- file.path(outdir, sprintf(fmt, sn, ln))
+      n <- names(seq_sets[[sn]][[ln]])
+      if(is.null(n))
+        n <- seq_along(seq_sets[[sn]][[ln]])
+      dnar::write.fa(names = n,
+                     dna = seq_sets[[sn]][[ln]],
+                     fileName = fp)
+    }
+  }
+}
