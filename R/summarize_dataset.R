@@ -48,11 +48,9 @@ summarize.dataset <- function(results, genotypes.known=NULL) {
 summarize.genotypes <- function(results_summary,
                                 vars=c('Allele1Seq', 'Allele2Seq')) {
   combo <- results_summary[, c('Sample', 'Replicate', 'Locus', vars)]
+  combo[, vars[1]] <- as.character(combo[, vars[1]])
+  combo[, vars[2]] <- as.character(combo[, vars[2]])
   # Repeat alleles for homozygous cases
-  if (class(combo[, vars[1]]) == 'factor')
-    combo[, vars[1]] <- as.character(combo[, vars[1]])
-  if (class(combo[, vars[2]]) == 'factor')
-    combo[, vars[2]] <- as.character(combo[, vars[2]])
   combo[, vars[2]] <- ifelse(results_summary$Homozygous,
                              combo[, vars[1]],
                              combo[, vars[2]])
@@ -72,8 +70,10 @@ summarize.genotypes <- function(results_summary,
                               paste0(combo[, vars[2]], '*'),
                               combo[, vars[2]])
   # Reshape into wide table
-  tbl <- reshape(combo, v.names = vars, idvar = 'Sample',
+  combo$ID <- paste(combo$Sample, combo$Replicate, sep='-')
+  tbl <- reshape(combo, v.names = vars, idvar = 'ID',
                  timevar = 'Locus', direction = 'wide')
+  tbl <- tbl[, -3]
   allele_cols <- paste(rep(as.character(unique(combo$Locus)), each=2),
                        c(1,2),
                        sep = '_')
@@ -265,14 +265,21 @@ align.alleles <- function(results_summary, derep=TRUE, ...) {
     names(a1) <- paste(rownames(alleles), 1, sep="_")
     names(a2) <- paste(rownames(alleles), 2, sep="_")
     a <- c(a1, a2)
+    # If there are no sequences, skip the alignment and record NA for this
+    # locus.  (The msa function doesn't do this sort of checking itself,
+    # apparently.
+    if (all(is.na(a)))
+      return(NULL)
+    # If there are any other missing sequences, put a stub in place so msa still
+    # runs without complaints.
     a[is.na(a)] <- '-'
+    # Dereplicate identical sequences, if specified
     if (derep) {
       tbl <- table(a)
       n <- unname(tbl)
       a <- names(tbl)
       names(a) <- paste(nchar(a), n,sep='_')
     }
-
     # TODO make this safer.  if msa(...) crashes sink() won't get called.  Use
     # tryCatch?
     sink('/dev/null')
