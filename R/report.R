@@ -1,5 +1,7 @@
 # Handle report generation and plotting.  No real processing should happen here.
 
+# TODO support some kind of "pagination" across loci to handle cases with many
+# loci.
 
 # Tables ------------------------------------------------------------------
 
@@ -14,25 +16,38 @@
 #' @param allele.names optional data frame of custom allele names.  If present
 #'   the columns "Sequence" and "Name" will be used to map exact sequences to
 #'   custom names.
+#'   @param hash.len number of characters of the sequence has to include when
+#'     auto-generating allele names.  If set to zero the hash suffix is not
+#'     included.
 #'   @param ... additional arguments to \code{summarize.genotypes}.
 #'
 #' @return data frame showing summary of genotypes.
 #'
 #' @export
-report.genotypes <- function(dataset.summary, allele.names=NULL, ...) {
+report.genotypes <- function(dataset.summary,
+                             allele.names=NULL,
+                             hash.len=6,
+                             ...) {
   tbl <- summarize.genotypes(dataset.summary, ...)
   # Name each entry in the table with either a custom or auto-generated short
   # name.
   make.allele_name <- function(data) {
-    if (is.character(data))
-      paste(nchar(data),
-            substr(openssl::md5(tbl[i, j]), 1, 6),
-            sep = "-")
-    else
+    if (is.character(data)) {
+      if(hash.len > 0) {
+        paste(nchar(data),
+              substr(openssl::md5(tbl[i, j]), 1, 6),
+              sep = "-")
+      } else {
+        nchar(data)
+      }
+    } else {
       data
+    }
   }
   for (j in 3:ncol(tbl)) {
     for (i in 1:nrow(tbl)) {
+      if(is.na(tbl[i, j]))
+        next
       row <- match(tbl[i, j], allele.names[, "Seq"])
       n <- as.character(allele.names[row, "Name"])
       if (is.na(n) || length(n) == 0)
@@ -180,6 +195,37 @@ histogram <- function(samp,
   }
 }
 
+# if include.blanks = TRUE then we should have a full count of all alleles when
+# adding up the numbers on the extra axis labels.
+plot.alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
+  # Convert to character and remove blanks if specified
+  if (is.character(alignment))
+    seqs <- alignment
+  else
+    seqs <- as.character(alignment)
+  if (! include.blanks)
+    seqs <- seqs[grep('^-+$', seqs, invert = TRUE)]
+  # Create grouping factor using sequence length (just strip out the gap
+  # character to get the original length back).
+  groups <- factor(paste('  ', nchar(gsub('-', '', seqs)), 'bp'))
+  par(mar = c(5, 5, 4, 5))
+  dnaplotr::plotDNA(seqs,
+                    groups = groups,
+                    ...)
+  # Add faint lines between all sequences
+  for(i in seq_along(seqs))
+    abline(h=i+0.5, col=rgb(0.5, 0.5, 0.5, 0.5))
+  # Add a label for every unique sequence, using the names of the supplied
+  # sequences
+  if (missing(labels))
+    labels <- sapply(strsplit(names(seqs), '_'), '[', 2)
+  axis(4,
+       at = 1:length(seqs),
+       labels = labels,
+       tick = F,
+       padj = -2.5,
+       cex.axis=0.6)
+}
 
 # Distance Matrices -------------------------------------------------------
 
@@ -227,17 +273,22 @@ plot.dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 #'   summary values on top of the heatmap cells (default: allele lengths).
 #' @param color vector of colors passed to \code{pheatmap}.
 #' @param breaks vector of breakpoints passed to \code{pheatmap}.
+#' @param ... additional arguments to \code{pheatmap}.
 #'
 #' @export
 plot.heatmap <- function(results_summary,
                          attribute,
                          label.by = c('Allele1Length', 'Allele2Length'),
                          color=c("white", "pink"),
-                         breaks=NA) {
+                         breaks=NA,
+                         ...) {
   tbl <- summarize.attribute(results_summary, attribute)
   data <- tbl[, -(1:2)] + 0
   tbl.labels <- summarize.genotypes(results_summary, vars = label.by)
   labels <- tbl.labels[, -(1:2)]
+  data[is.na(labels)] <- NA
+  labels[is.na(labels)] <- ''
+
   if (min(data,na.rm=T) == max(data, na.rm=T))
     breaks <- c(max(data))
   pheatmap::pheatmap(data,
@@ -245,7 +296,8 @@ plot.heatmap <- function(results_summary,
                      cluster_cols = F,
                      display_numbers = labels,
                      breaks = breaks,
-                     color = color)
+                     color = color,
+                     ...)
 }
 
 #' Plot heatmap of suspected PCR stutter
@@ -261,7 +313,10 @@ plot.heatmap <- function(results_summary,
 #'
 #' @export
 plot.heatmap.stutter <- function(results_summary, ...) {
-  plot.heatmap(results_summary, "Stutter", ...)
+  plot.heatmap(results_summary,
+               "Stutter",
+               legend = FALSE,
+               ...)
 }
 
 #' Plot heatmap of homozygous samples
@@ -276,7 +331,10 @@ plot.heatmap.stutter <- function(results_summary, ...) {
 #'
 #' @export
 plot.heatmap.homozygous <- function(results_summary, ...) {
-  plot.heatmap(results_summary, "Homozygous", ...)
+  plot.heatmap(results_summary,
+               "Homozygous",
+               legend = FALSE,
+               ...)
 }
 
 #' Plot heatmap of samples with multiple prominent sequences
@@ -295,12 +353,19 @@ plot.heatmap.prominent_seqs <- function(results_summary, ...) {
   # Create a color ramp going from white for 0, 1, or 2 prominent seqs, and
   # shades of red for higher numbers.
   color_func <- colorRampPalette(c("white", "red"))
-  colors <- color_func(max(8, max(results_summary$ProminentSeqs)+1))
-  # white for 0 - 2
-  colors[1:3] <- rep(rgb(1,1,1), 3)
-  # truncate to actual number of peaks
-  colors <- colors[1:max(results_summary$ProminentSeqs) + 1]
-  plot.heatmap(results_summary, "ProminentSeqs", color = colors, ...)
+  ps <- results_summary[!is.na(results_summary$Allele1Seq), "ProminentSeqs"]
+  # Deep red will only be used if somehow there are a whole lot of extra
+  # sequences (say, 8); otherwise it should just go up to a pink color.
+  colors <- color_func(max(8, max(ps)+1))
+  # Stay white for 0 - 2
+  colors[1:3] <- rep(colors[1], 3)
+  # Truncate to actual number of peaks
+  colors <- colors[1:max(ps) + 1]
+  plot.heatmap(results_summary,
+               "ProminentSeqs",
+               color = colors,
+               breaks = 0:(length(colors)),
+               ...)
 }
 
 #' Plot heatmap of proportion of allele sequence counts
