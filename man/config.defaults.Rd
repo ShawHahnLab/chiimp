@@ -3,7 +3,7 @@
 \docType{data}
 \name{config.defaults}
 \alias{config.defaults}
-\title{Default Microsatellite Configuration}
+\title{Default microsatellite configuration}
 \format{An object of class \code{list} of length 9.}
 \usage{
 config.defaults

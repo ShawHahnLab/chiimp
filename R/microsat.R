@@ -1,7 +1,7 @@
 # Run a full microsatellite analysis and handle configuration and command-line
 # execution.
 
-#' Default Microsatellite Configuration
+#' Default microsatellite configuration
 #'
 #' The entries in this list show the build-time configuration defaults for all
 #' aspects of the microsatellite analysis.  These can be overridden by passing a
@@ -27,7 +27,7 @@ config.defaults <- list(
   dp.output.alignment_images="alignment-images",
   dp.output.processed_samples="processed-samples")
 
-#' Perform a full microsatellite Analysis
+#' Perform a full microsatellite analysis
 #'
 #' Given a list of configuration options, run all aspects of a microsatellite
 #' analysis, and save the corresponding output files.
@@ -59,6 +59,17 @@ full_analysis <- function(config) {
   })
 }
 
+#' Handle full microsatellite analysis from command-line
+#'
+#' Read configuration from command-line arguments and run \code{full_analysis}.
+#'
+#' @param args optional character vector of arguments to use rather than those
+#'   detected with \code{commandArgs}.
+#'
+#' @return list of results, with the full configuration list included as
+#'   "config."
+#'
+#' @export
 main <- function(args=NULL) {
   if (missing(args))
     args <- commandArgs(trailingOnly = TRUE)

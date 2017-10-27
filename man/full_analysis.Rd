@@ -2,7 +2,7 @@
 % Please edit documentation in R/microsat.R
 \name{full_analysis}
 \alias{full_analysis}
-\title{Perform a full microsatellite Analysis}
+\title{Perform a full microsatellite analysis}
 \usage{
 full_analysis(config)
 }
