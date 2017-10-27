@@ -1,16 +1,16 @@
-# test analyze.dataset ----------------------------------------------------
+# test analyze_dataset ----------------------------------------------------
 
 # Cases to cover: fastq, fasta, fasta.gz, fastq.gz, multiplex, ...?
 # At this point we should have all the basics covered, and can cover the further
 # analysis in summarize_dataset.
 
-test_that("analyze.dataset processes samples correctly", {
-  # The general case for analyze.dataset
+test_that("analyze_dataset processes samples correctly", {
+  # The general case for analyze_dataset
   data.dir <- tempfile()
   write_seqs(seqs, data.dir)
-  # prepare.dataset tested separately in test_io.R
-  dataset <- prepare.dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
-  results <- analyze.dataset(dataset, locus_attrs)
+  # prepare_dataset tested separately in test_io.R
+  dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+  results <- analyze_dataset(dataset, locus_attrs)
   with(results, {
     # These should just match what we fed in via dataset.
     expect_equal(summary$Filename,  dataset$Filename)
@@ -42,12 +42,12 @@ test_that("analyze.dataset processes samples correctly", {
 
 })
 
-test_that("analyze.dataset runs single-threaded", {
-  # analyze.dataset should run properly with num.cores=1 (just slower).
+test_that("analyze_dataset runs single-threaded", {
+  # analyze_dataset should run properly with num.cores=1 (just slower).
   fail("test not yet implemented")
 })
 
-test_that("analyze.dataset warns of missing loci", {
+test_that("analyze_dataset warns of missing loci", {
   # If there are locus names in dataset$Locus that are not present in the
   # rownames of locus_attrs, it should throw a warning.
   fail("test not yet implemented")

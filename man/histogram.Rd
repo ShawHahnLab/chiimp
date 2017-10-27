@@ -20,7 +20,7 @@ corresponds to the count for that exact sequence.}
 locus with the highest matched counts will be used.}
 
 \item{sample.summary}{summary data frame as prepared by
-\code{summarize.sample}}
+\code{summarize_sample}}
 }
 \description{
 Given a processed STR sample, plot a histogram of counts per sequence length.

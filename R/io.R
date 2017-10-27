@@ -6,7 +6,18 @@
 locus_attrs_cols <- c("LengthMin", "LengthMax", "LengthBuffer", "Motif",
                       "Primer", "ReversePrimer")
 
-load.config <- function(fp.config) {
+
+#' Load configuration file
+#'
+#' Load a YAML-formatted text file of configuration options for microsatellite
+#' analysis.  This is currently just a wrapper around \code{yaml.load()}.
+#'
+#' @param fp.config path to configuration file.
+#'
+#' @return list of configuration options
+#'
+#' @export
+load_config <- function(fp.config) {
   if (is.na(fp.config))
     return(list())
   text <- readChar(fp.config, file.info(fp.config)$size)
@@ -23,7 +34,7 @@ load.config <- function(fp.config) {
 #' @return data frame of locus attributes
 #'
 #' @export
-load.locus_attrs <- function(fp.locus_attrs, ...) {
+load_locus_attrs <- function(fp.locus_attrs, ...) {
   data <- read.table(fp.locus_attrs, header = T, row.names = 1, sep='\t', ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
@@ -46,7 +57,7 @@ load.locus_attrs <- function(fp.locus_attrs, ...) {
 #' @return data frame of metadata for all files found
 #'
 #' @export
-prepare.dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
+prepare_dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
   # get all matching filenames and extract substrings
   seq_files <- list.files(path = directory,
                           pattern = pattern,
@@ -71,7 +82,7 @@ prepare.dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
                            NA,
                            as.integer(as.character(data$Replicate)))
   #data$Locus <- ifelse(data$Locus == "", NA, data$Locus)
-  rownames(data) <- make.rownames(data)
+  rownames(data) <- make_rownames(data)
   return(data)
 }
 
@@ -86,7 +97,7 @@ prepare.dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
 #' @return vector of sequences
 #'
 #' @export
-load.seqs <- function(fp.seqs) {
+load_seqs <- function(fp.seqs) {
   if (length(grep("q$", fp.seqs)) || length(grep("q.gz$", fp.seqs)))
     loadfunc <- dnar::read.fastq
   else
@@ -98,15 +109,15 @@ load.seqs <- function(fp.seqs) {
 
 #' Save dataset summary to text file
 #'
-#' Save the dataset summary produced by \code{analyze.dataset} to the specified
+#' Save the dataset summary produced by \code{analyze_dataset} to the specified
 #' file path in CSV format.
 #'
 #' @param results_summary summary data frame as produced by
-#'   \code{analyze.dataset}.
+#'   \code{analyze_dataset}.
 #' @param fp output file path.
 #'
 #' @export
-save.results_summary <- function(results_summary, fp) {
+save_results_summary <- function(results_summary, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
   write.csv(results_summary, fp, na = "")
@@ -114,17 +125,17 @@ save.results_summary <- function(results_summary, fp) {
 
 #' Save identified alleles to FASTA files
 #'
-#' Take the alleles identified by \code{analyze.dataset} in the summary data
+#' Take the alleles identified by \code{analyze_dataset} in the summary data
 #' frame and save each entry to a separate FASTA file.  Samples identified as
 #' homozygous will have one sequence written rather than two.  Entries with no
 #' identified alleles will be skipped.
 #'
 #' @param results_summary summary data frame as produced by
-#'   \code{analyze.dataset}.
+#'   \code{analyze_dataset}.
 #' @param dp output directory path to use for all files.
 #'
 #' @export
-save.allele_seqs <- function(results_summary, dp) {
+save_allele_seqs <- function(results_summary, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   results_summary$.row <- rownames(results_summary)
@@ -155,15 +166,15 @@ save.allele_seqs <- function(results_summary, dp) {
 
 #' Save per-sample processed data to text files
 #'
-#' Save each per-sample data frame produced by \code{analyze.dataset} to a
+#' Save each per-sample data frame produced by \code{analyze_dataset} to a
 #' separate file in the specified directory path, in CSV format.
 #'
 #' @param results_data list of per-sample data frames as produced by
-#'   \code{analyze.dataset}.
+#'   \code{analyze_dataset}.
 #' @param dp output directory path to use for all files.
 #'
 #' @export
-save.sample_data <- function(results_data, dp) {
+save_sample_data <- function(results_data, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
@@ -183,7 +194,7 @@ save.sample_data <- function(results_data, dp) {
 #' @param dp output directory path.
 #'
 #' @export
-save.alignments <- function(alignments, dp) {
+save_alignments <- function(alignments, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(alignments), function(loc) {
@@ -213,7 +224,7 @@ save.alignments <- function(alignments, dp) {
 #' @param ... additional arguments to \code{image.func}.
 #'
 #' @export
-save.alignment_images <- function(alignments, dp, image.func="png",
+save_alignment_images <- function(alignments, dp, image.func="png",
                                   width=1600, height=1200, res=150) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
@@ -226,7 +237,7 @@ save.alignment_images <- function(alignments, dp, image.func="png",
                        height = height,
                        res = res)
       eval(img.call)
-      plot.alignment(alignments[[loc]],
+      plot_alignment(alignments[[loc]],
                      main = paste('Alignment for Locus', loc))
       dev.off()
 
@@ -236,14 +247,14 @@ save.alignment_images <- function(alignments, dp, image.func="png",
 
 #' Save sample distance matrix to text file
 #'
-#' Save the inter-sample distance matrix produced by \code{summarize.dataset} to
+#' Save the inter-sample distance matrix produced by \code{summarize_dataset} to
 #' the specified file path in CSV format.
 #'
-#' @param dist_mat matrix produced by \code{summarize.dataset}.
+#' @param dist_mat matrix produced by \code{summarize_dataset}.
 #' @param fp output file path.
 #'
 #' @export
-save.dist_mat <- function(dist_mat, fp) {
+save_dist_mat <- function(dist_mat, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
   write.csv(dist_mat, fp)
@@ -254,7 +265,7 @@ save.dist_mat <- function(dist_mat, fp) {
 
 # create unique rownames for the given data frame, using whichever sample
 # metadata columns are available.
-make.rownames <- function(data) {
+make_rownames <- function(data) {
   cols.names <- c("Sample", "Replicate", "Locus")
   cols.idx <- match(cols.names, colnames(data))
   cols.idx <- cols.idx[!is.na(cols.idx)]

@@ -35,7 +35,7 @@
 #' @return data frame of dereplicated sequences with added annotations.
 #'
 #' @export
-analyze.sample <- function(seqs, locus_attrs, nrepeats) {
+analyze_sample <- function(seqs, locus_attrs, nrepeats) {
   # Dereplicate sequences
   tbl <- table(seqs)
   count <- as.integer(tbl)
@@ -51,15 +51,15 @@ analyze.sample <- function(seqs, locus_attrs, nrepeats) {
   rownames(data) <- NULL
   # Label rows with the apparent locus by checking primer sequences.  Note that
   # this uses the first matching locus for each row.
-  data$MatchingLocus <- find.matching.primer(data, locus_attrs)
+  data$MatchingLocus <- find_matching_primer(data, locus_attrs)
   # Label rows where the sequence content matches the matching locus" repeat
   # motif.
-  data$MotifMatch <- check.motif(data, locus_attrs, nrepeats)
+  data$MotifMatch <- check_motif(data, locus_attrs, nrepeats)
   # Label rows where the sequence length matches the matching locus" length
   # range.
-  data$LengthMatch <- check.length(data, locus_attrs)
+  data$LengthMatch <- check_length(data, locus_attrs)
   # Label rows that look like PCR stutter of other rows.
-  data$Stutter <- find.stutter(data, locus_attrs)
+  data$Stutter <- find_stutter(data, locus_attrs)
   # Add columns for the proportion of counts out of the total and out of those
   # for the matching locus.  This way this information is preserved even in
   # subsets of the original sample data.
@@ -82,7 +82,7 @@ analyze.sample <- function(seqs, locus_attrs, nrepeats) {
 #' @param locus_attrs data frame of attributes for loci to look for.
 #'
 #' @return factor of locus names corresponding the matched primer sequences.
-find.matching.primer <- function(sample.data, locus_attrs) {
+find_matching_primer <- function(sample.data, locus_attrs) {
   # Separately check each primer.  Is there a slicker way to do this all at
   # once?
   matches <- do.call(cbind, lapply(rownames(locus_attrs), function(locus_name) {
@@ -107,7 +107,7 @@ find.matching.primer <- function(sample.data, locus_attrs) {
 #'   match.
 #'
 #' @return logical vector indicating where repeats were observed.
-check.motif <- function(sample.data, locus_attrs, nrepeats) {
+check_motif <- function(sample.data, locus_attrs, nrepeats) {
   with(sample.data, {
     motif <- locus_attrs[MatchingLocus, "Motif"]
     # this is kind of awful.  clean this up somehow.
@@ -127,7 +127,7 @@ check.motif <- function(sample.data, locus_attrs, nrepeats) {
 #'
 #' @return logical vector specifying, for each entry, if the sequence is within
 #'   the matching locus" expected length range.
-check.length <- function(sample.data, locus_attrs) {
+check_length <- function(sample.data, locus_attrs) {
   with(sample.data, {
     Lmin <- locus_attrs[MatchingLocus, "LengthMin"]
     Lmax <- locus_attrs[MatchingLocus, "LengthMax"]
@@ -156,7 +156,7 @@ check.length <- function(sample.data, locus_attrs) {
 #'
 #' @return integer vector specifying, for each entry, what other entry may have
 #'   produced each entry as a stutter band.
-find.stutter <- function(sample.data, locus_attrs,
+find_stutter <- function(sample.data, locus_attrs,
                          count.ratio_max = 1 / 3,
                          count.min = 10) {
 

@@ -1,4 +1,4 @@
-# test load.locus_attrs ---------------------------------------------------
+# test load_locus_attrs ---------------------------------------------------
 
 # Take a version of the raw locus_attrs text from helper_data.R, save it to a
 # temporary file in TSV format, and return the path.
@@ -8,11 +8,11 @@ write_locus_attrs <- function(txt) {
   fp
 }
 
-test_that("load.locus_attrs parses locus details", {
+test_that("load_locus_attrs parses locus details", {
   # Write the raw text to a temp file, read it back in, and verify that the data
   # structure matches the predefined one.
   fp <- write_locus_attrs(txt.locus_attrs)
-  locus_attrs_test <- load.locus_attrs(fp)
+  locus_attrs_test <- load_locus_attrs(fp)
   file.remove(fp)
   expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
   expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
@@ -21,13 +21,13 @@ test_that("load.locus_attrs parses locus details", {
   expect_true(all(locus_attrs == locus_attrs_test))
 })
 
-test_that("load.locus_attrs handles missing column names", {
+test_that("load_locus_attrs handles missing column names", {
   # It should throw a warning if one of the expected columns is missing, and
   # then proceed.  The other columns should still match up.
   txt.wrong <- gsub('LengthMin', 'length_min', txt.locus_attrs)
   fp <- write_locus_attrs(txt.wrong)
   expect_warning({
-    locus_attrs_test <- load.locus_attrs(fp)
+    locus_attrs_test <- load_locus_attrs(fp)
   })
   file.remove(fp)
   expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
@@ -37,20 +37,20 @@ test_that("load.locus_attrs handles missing column names", {
   expect_true(all(locus_attrs == locus_attrs_test))
 })
 
-# test prepare.dataset ----------------------------------------------------
+# test prepare_dataset ----------------------------------------------------
 
-test_that("prepare.dataset parses file paths", {
+test_that("prepare_dataset parses file paths", {
   fail("test not yet implemented")
 })
 
-test_that("prepare.dataset works on nested directories", {
+test_that("prepare_dataset works on nested directories", {
   fail("test not yet implemented")
 })
 
-test_that("prepare.dataset handles different field ordering", {
+test_that("prepare_dataset handles different field ordering", {
   fail("test not yet implemented")
 })
 
-test_that("prepare.dataset handles broken patterns", {
+test_that("prepare_dataset handles broken patterns", {
   fail("test not yet implemented")
 })

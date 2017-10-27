@@ -30,17 +30,17 @@ check.seqs1A_summary <- function(data,
   })
 }
 
-# test summarize.sample ---------------------------------------------------
+# test summarize_sample ---------------------------------------------------
 
-test_that("summarize.sample summarizes sample attributes", {
-  sample.data <- analyze.sample(seqs1$A, locus_attrs, 3)
-  sample.summary <- summarize.sample(sample.data, "A")
+test_that("summarize_sample summarizes sample attributes", {
+  sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
+  sample.summary <- summarize_sample(sample.data, "A")
   check.seqs1A_summary(sample.summary)
 })
 
-test_that("summarize.sample handles completely emtpy input sample data", {
-  sample.data <- analyze.sample(c(), locus_attrs, 3)
-  sample.summary <- summarize.sample(sample.data, "A")
+test_that("summarize_sample handles completely emtpy input sample data", {
+  sample.data <- analyze_sample(c(), locus_attrs, 3)
+  sample.summary <- summarize_sample(sample.data, "A")
   expect_equal(names(sample.summary), sample.summary.cols)
   with(sample.summary, {
     expect_equal(Allele1Seq, as.character(NA))
@@ -57,11 +57,11 @@ test_that("summarize.sample handles completely emtpy input sample data", {
   })
 })
 
-test_that("summarize.sample handles empty sequences in input sample data", {
+test_that("summarize_sample handles empty sequences in input sample data", {
   seqs <- seqs1$A
   seqs[1:100] <- "" # empty out a segment of the vector
-  sample.data <- analyze.sample(seqs, locus_attrs, 3)
-  sample.summary <- summarize.sample(sample.data, "A")
+  sample.data <- analyze_sample(seqs, locus_attrs, 3)
+  sample.summary <- summarize_sample(sample.data, "A")
   # Nothing should change in the output, except that we zeroed out 90 reads that
   # would otherwise get counted (the rest were already set to off-target
   # junk during setup).
@@ -71,9 +71,9 @@ test_that("summarize.sample handles empty sequences in input sample data", {
                        allele2.count = 1276)
 })
 
-test_that("summarize.sample marks stutter removal", {
-  sample.data <- analyze.sample(seqs3$A, locus_attrs, 3)
-  sample.summary <- summarize.sample(sample.data, "A")
+test_that("summarize_sample marks stutter removal", {
+  sample.data <- analyze_sample(seqs3$A, locus_attrs, 3)
+  sample.summary <- summarize_sample(sample.data, "A")
   with(sample.summary, {
     expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
                                     "TAGATAGATAGATAGATAGATAGATAGATA",
@@ -94,15 +94,15 @@ test_that("summarize.sample marks stutter removal", {
   })
 })
 
-test_that("summarize.sample counts prominent sequences", {
-  sample.data.1B       <- analyze.sample(seqs1$B, locus_attrs, 3)
-  sample.summary.1B    <- summarize.sample(sample.data.1B, "B")
-  sample.data.2B       <- analyze.sample(seqs2$B, locus_attrs, 3)
-  sample.summary.2B    <- summarize.sample(sample.data.2B, "B")
-  sample.data.3B       <- analyze.sample(seqs3$B, locus_attrs, 3)
-  sample.summary.3B    <- summarize.sample(sample.data.3B, 'B')
-  sample.data.empty    <- analyze.sample(c(), locus_attrs, 3)
-  sample.summary.empty <- summarize.sample(sample.data.empty, "B")
+test_that("summarize_sample counts prominent sequences", {
+  sample.data.1B       <- analyze_sample(seqs1$B, locus_attrs, 3)
+  sample.summary.1B    <- summarize_sample(sample.data.1B, "B")
+  sample.data.2B       <- analyze_sample(seqs2$B, locus_attrs, 3)
+  sample.summary.2B    <- summarize_sample(sample.data.2B, "B")
+  sample.data.3B       <- analyze_sample(seqs3$B, locus_attrs, 3)
+  sample.summary.3B    <- summarize_sample(sample.data.3B, 'B')
+  sample.data.empty    <- analyze_sample(c(), locus_attrs, 3)
+  sample.summary.empty <- summarize_sample(sample.data.empty, "B")
 
   expect_equal(sample.summary.1B$ProminentSeqs,    3)
   expect_equal(sample.summary.2B$ProminentSeqs,    4)
@@ -118,13 +118,13 @@ test_that("summarize.sample counts prominent sequences", {
   expect_equal(sample.summary.empty$Stutter, FALSE)
 })
 
-test_that("summarize.sample rejects low-count samples", {
-  sample.data <- analyze.sample(seqs1$A, locus_attrs, 3)
+test_that("summarize_sample rejects low-count samples", {
+  sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
   # Here we check that the filtered-counts-thresholding is applied, by forcing
   # the counts to a low number.  This should still report some stats but should
   # leave out the allele1/allele2 information.
   sample.data$Count <- sample.data$Count/100
-  sample.summary <- summarize.sample(sample.data, "A")
+  sample.summary <- summarize_sample(sample.data, "A")
   with(sample.summary, {
     expect_equal(Allele1Seq, as.character(NA))
     expect_equal(Allele1Count, as.integer(NA))
@@ -140,10 +140,10 @@ test_that("summarize.sample rejects low-count samples", {
   })
 })
 
-test_that("summarize.sample warns of missing locus name", {
-  # summarize.sample() should be able to tell if an invalid (as per the earlier
+test_that("summarize_sample warns of missing locus name", {
+  # summarize_sample() should be able to tell if an invalid (as per the earlier
   # processing) locus name is given, because it won't be in the levels of the
-  # MatchingLocus factor of the data frame from analyze.sample().  I think this
+  # MatchingLocus factor of the data frame from analyze_sample().  I think this
   # would only come about when locus names given by prepare.dataset() don't
   # match what's in locus_attrs.
   fail("test not yet implemented")

@@ -11,7 +11,7 @@
 
 #' Add further summaries to analyzed dataset
 #'
-#' Take a results list as produced by \code{analyze.dataset} and add additional
+#' Take a results list as produced by \code{analyze_dataset} and add additional
 #' entries for inter-sample and inter-locus analyses:
 #'
 #' @details
@@ -23,7 +23,7 @@
 #' @md
 #'
 #' @param results list containing summary data frame and sample-specific data
-#'   frames as produced by \code{analyze.dataset}.
+#'   frames as produced by \code{analyze_dataset}.
 #' @param genotypes.known optional data frame of known genotypes that should be
 #'   compared to the observed genotypes in the results.  If provided
 #'   dist_mat_known will be present in the output.
@@ -31,11 +31,11 @@
 #' @return expanded list with additional summaries.
 #'
 #' @export
-summarize.dataset <- function(results, genotypes.known=NULL) {
-  results$alignments <- align.alleles(results$summary)
-  results$dist_mat <- make.dist_mat(results$summary)
+summarize_dataset <- function(results, genotypes.known=NULL) {
+  results$alignments <- align_alleles(results$summary)
+  results$dist_mat <- make_dist_mat(results$summary)
   if (!missing(genotypes.known)) {
-    results$dist_mat_known <- make.dist_mat_known(results$summary,
+    results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
   }
   return(results)
@@ -45,7 +45,7 @@ summarize.dataset <- function(results, genotypes.known=NULL) {
 
 # Tabulate genotypes across loci.  Which attributes will actually be used for
 # the table is configurable.
-summarize.genotypes <- function(results_summary,
+summarize_genotypes <- function(results_summary,
                                 vars=c('Allele1Seq', 'Allele2Seq')) {
   combo <- results_summary[, c('Sample', 'Replicate', 'Locus', vars)]
   combo[, vars[1]] <- as.character(combo[, vars[1]])
@@ -78,14 +78,14 @@ summarize.genotypes <- function(results_summary,
                        c(1,2),
                        sep = '_')
   colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
-  rownames(tbl) <- make.rownames(tbl)
+  rownames(tbl) <- make_rownames(tbl)
   tbl
 }
 
 # tabulate an arbitrary attribute across loci, assuming repeats by two for the
 # alleles.  (use this for color-coding summary heatmaps on top of the attribute
 # values, like Homozgyous or ProminentSeqs.)
-summarize.attribute <- function(results_summary, attrib, repeats = 2) {
+summarize_attribute <- function(results_summary, attrib, repeats = 2) {
   attrib_rep <- rep(attrib, repeats)
   combo <- results_summary[, c('Sample', 'Replicate', 'Locus', attrib_rep)]
   combo$ID <- paste(combo$Sample, combo$Replicate, sep='-')
@@ -99,7 +99,7 @@ summarize.attribute <- function(results_summary, attrib, repeats = 2) {
                        1:repeats,
                        sep = '_')
   colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
-  rownames(tbl) <- make.rownames(tbl)
+  rownames(tbl) <- make_rownames(tbl)
   tbl
 }
 
@@ -113,7 +113,7 @@ summarize.attribute <- function(results_summary, attrib, repeats = 2) {
 #'
 #' Compare the genotype of each sample to each other sample in a given results
 #' summary data frame, and create a between-sample distance matrix.  This will
-#' be a symmetric matrix, unlike what \code{make.dist_mat_known} produces.
+#' be a symmetric matrix, unlike what \code{make_dist_mat_known} produces.
 #'
 #' @param results_summary cross-sample summary data frame
 #' @param dist.func function to calculate inter-sample distances.  Should take
@@ -123,9 +123,9 @@ summarize.attribute <- function(results_summary, attrib, repeats = 2) {
 #' @return matrix of cross-sample distance values
 #'
 #' @export
-make.dist_mat <- function(results_summary,
-                          dist.func=calc.genotype.distance) {
-  tbl <- summarize.genotypes(results_summary)
+make_dist_mat <- function(results_summary,
+                          dist.func=calc_genotype_distance) {
+  tbl <- summarize_genotypes(results_summary)
   # The entire vector covers all combinations of rows in tbl, filling in a
   # triangle of what would be a distance matrix.
   distances <- combn(nrow(tbl), 2,
@@ -169,15 +169,15 @@ make.dist_mat <- function(results_summary,
 #'   genotypes.known on rows and samples on columns.
 #'
 #' @export
-make.dist_mat_known <- function(results_summary,
+make_dist_mat_known <- function(results_summary,
                                 genotypes.known,
-                                dist.func=calc.genotype.distance) {
-  tbl <- summarize.genotypes(results_summary)
+                                dist.func=calc_genotype_distance) {
+  tbl <- summarize_genotypes(results_summary)
   genotypes.known$Replicate <- NA
   genotypes.known$Sample <- genotypes.known$Name
   genotypes.known$Homozygous <- as.character(genotypes.known$Allele1Seq) ==
     as.character(genotypes.known$Allele2Seq)
-  tbl.known <- summarize.genotypes(genotypes.known)
+  tbl.known <- summarize_genotypes(genotypes.known)
   distances <- outer(rownames(tbl),
                      rownames(tbl.known),
                      function(nr, nr.known) {
@@ -205,7 +205,7 @@ make.dist_mat_known <- function(results_summary,
 #' @return numeric distance score for the pair of input genotypes.
 #'
 #' @export
-calc.genotype.distance <- function(g1, g2, na.reject = TRUE) {
+calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   g1 <- unlist(g1)
   g2 <- unlist(g2)
   if (length(g1)%%2 != 0 || length(g2)%%2 != 0) {
@@ -255,7 +255,7 @@ calc.genotype.distance <- function(g1, g2, na.reject = TRUE) {
 #' @return list of MSA alignment objects, one per locus.
 #'
 #' @export
-align.alleles <- function(results_summary, derep=TRUE, ...) {
+align_alleles <- function(results_summary, derep=TRUE, ...) {
   chunks <- split(results_summary, results_summary$Locus)
   lapply(chunks, function(chunk) {
     alleles <- chunk[, c("Allele1Seq", "Allele2Seq")]

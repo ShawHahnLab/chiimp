@@ -1,6 +1,11 @@
 # Run a full microsatellite analysis and handle configuration and command-line
 # execution.
 
+#' Analyze Microsatellites
+#'
+#' Analyze DNA microsatellites in high-throughput sequencing datasets.
+"_PACKAGE"
+
 #' Default microsatellite configuration
 #'
 #' The entries in this list show the build-time configuration defaults for all
@@ -30,12 +35,15 @@ config.defaults <- list(
   dp.output.alignment_images="alignment-images",
   dp.output.processed_samples="processed-samples",
   dp.output.allele_seqs="allele-sequences",
-  # Report generation
+  # Report generation settings
   report=TRUE,
+  report.echo=FALSE,
   report.sections = c(genotypes  = TRUE,
                       distances  = TRUE,
                       flags      = TRUE,
-                      alignments = TRUE))
+                      alignments = TRUE),
+  # Other settings
+  verbose=TRUE)
 
 #' Perform a full microsatellite analysis
 #'
@@ -51,32 +59,45 @@ config.defaults <- list(
 #' @export
 full_analysis <- function(config) {
   # Overaly explicit configuration onto the default settings
-  config_full <- modifyList(config.defaults, config)
-  with(config_full, {
-    dataset <- prepare.dataset(dp.data, pattern)
-    locus_attrs <- load.locus_attrs(fp.locus_attrs)
-    results <- analyze.dataset(dataset, locus_attrs)
-    results <- summarize.dataset(results)
-    save.results_summary(results$summary, file.path(dp.output, fp.output.summary))
-    save.alignments(results$alignments, file.path(dp.output, dp.output.alignments))
-    save.alignment_images(results$alignments, file.path(dp.output, dp.output.alignment_images))
-    save.sample_data(results$data, file.path(dp.output, dp.output.processed_samples))
-    save.allele_seqs(results$summary, file.path(dp.output, dp.output.allele_seqs))
-    save.dist_mat(results$dist_mat, file.path(dp.output, fp.output.dist_mat))
+  config.full <- modifyList(config.defaults, config)
+
+  # Make output path absolute
+  config.full$dp.output <-
+    if (substr(config.full$dp.output, 1, 1) != .Platform$file.sep) {
+      file.path(normalizePath('.'), config.full$dp.output)
+    } else {
+      config.full$dp.output
+    }
+
+  with(config.full, {
+    if (verbose) logmsg(paste("Loading dataset from", dp.data, "..."))
+    dataset <- prepare_dataset(dp.data, pattern)
+    if (verbose)
+      logmsg(paste("Loading locus attributes from", fp.locus_attrs, "..."))
+    locus_attrs <- load_locus_attrs(fp.locus_attrs)
+    if (verbose) logmsg("Analyzing samples...")
+    results <- analyze_dataset(dataset, locus_attrs)
+    if (verbose) logmsg("Summarizing results...")
+    results <- summarize_dataset(results)
+    results$config <- config.full
+    if (verbose) logmsg("Saving output files...")
+    save_results_summary(results$summary, file.path(dp.output, fp.output.summary))
+    save_alignments(results$alignments, file.path(dp.output, dp.output.alignments))
+    save_alignment_images(results$alignments, file.path(dp.output, dp.output.alignment_images))
+    save_sample_data(results$data, file.path(dp.output, dp.output.processed_samples))
+    save_allele_seqs(results$summary, file.path(dp.output, dp.output.allele_seqs))
+    save_dist_mat(results$dist_mat, file.path(dp.output, fp.output.dist_mat))
     if (report) {
-      fp.report.in <- system.file("report.Rmd", package="microsat")
-      fp.report.out <-
-        if (substr(dp.output, 1, 1) != .Platform$file.sep)
-          file.path(normalizePath('.'), dp.output, fp.report)
-        else
-          file.path(dp.output, fp.report)
+      if (verbose) logmsg("Creating report...")
+      fp.report.in <- system.file("report", "report.Rmd", package="microsat")
+      fp.report.out <- file.path(dp.output, fp.report)
       if (!dir.exists(dirname(fp.report.out)))
         dir.create(dirname(fp.report.out), recursive = TRUE)
       rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out)
     }
     # TODO histograms
     # TODO locus performance
-    results$config <- config_full
+    if (verbose) logmsg("Done.")
     return(results)
   })
 }
@@ -98,6 +119,10 @@ main <- function(args=NULL) {
   p <- argparser::arg_parser("Identify microsatellite alleles fasta/fastq files")
   p <- argparser::add_argument(p, "config", help = "configuration file path")
   args_parsed <- argparser::parse_args(p, args)
-  config <- load.config(args_parsed$config)
+  config <- load_config(args_parsed$config)
   full_analysis(config)
+}
+
+logmsg <- function(msg) {
+  cat(paste0(msg, "\n"), file="/dev/stderr")
 }

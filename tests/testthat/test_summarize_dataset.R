@@ -1,8 +1,8 @@
 prepare_for_summary <- function() {
   data.dir <- tempfile()
   write_seqs(seqs, data.dir)
-  dataset <- prepare.dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
-  results <- analyze.dataset(dataset, locus_attrs)
+  dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+  results <- analyze_dataset(dataset, locus_attrs)
   lapply(dataset$Filename, file.remove)
   file.remove(data.dir)
   return(list(dataset=dataset, results=results))
@@ -10,24 +10,24 @@ prepare_for_summary <- function() {
 
 results_summary_data <- prepare_for_summary()
 
-# test_summarize.dataset --------------------------------------------------
+# test_summarize_dataset --------------------------------------------------
 
-test_that("summarize.dataset produces additional summaries", {
+test_that("summarize_dataset produces additional summaries", {
   # Just a general check of the overall process and binding these results
   # together in a list; more rigorous checks are below since those are public
   # functions too.
   with(results_summary_data, {
-    results_mod <- summarize.dataset(results)
+    results_mod <- summarize_dataset(results)
     expect_equal(names(results_mod),
                  c(names(results), c("alignments", "dist_mat")))
   })
 })
 
-# test_make.dist_mat ------------------------------------------------------
+# test_make_dist_mat ------------------------------------------------------
 
-test_that("make.dist_mat produces a valid distance matrix", {
+test_that("make_dist_mat produces a valid distance matrix", {
   with(results_summary_data, {
-    dist_mat <- make.dist_mat(results$summary)
+    dist_mat <- make_dist_mat(results$summary)
     # row and column names should both be equal to the sample identifiers
     samps <- levels(dataset$Sample)
     expect_equal(rownames(dist_mat), samps)
@@ -42,42 +42,42 @@ test_that("make.dist_mat produces a valid distance matrix", {
   })
 })
 
-test_that("make.dist_mat_known produces sample-to-individual distance matrix", {
+test_that("make_dist_mat_known produces sample-to-individual distance matrix", {
   fail("test not yet implemented")
 })
 
-# test_calc.genotype.distance ---------------------------------------------
+# test_calc_genotype_distance ---------------------------------------------
 
-test_that("calc.genotype.distance scores genotypes correctly", {
+test_that("calc_genotype_distance scores genotypes correctly", {
   g1 <- c(5, 10, 200, 204, 37, 37, 180, 184, 190, 190)
   g2 <- c(5,  5, 204, 208, 37, 39, 176, 180, 190, 190)
-  d <- calc.genotype.distance(g1, g2)
+  d <- calc_genotype_distance(g1, g2)
   expect_equal(d, 4)
 })
 
-test_that("calc.genotype.distance handles multiple data types", {
+test_that("calc_genotype_distance handles multiple data types", {
   # As written it should work with character, numeric, whatever-- it just uses
   # the != operator.
   g.num <- c(1,2,3,4)
   g.alpha <- c('a', 'b', 'c', 'd')
-  d <- calc.genotype.distance(g.num, g.alpha)
-  d.num <- calc.genotype.distance(g.num, g.num)
-  d.alpha <- calc.genotype.distance(g.alpha, g.alpha)
+  d <- calc_genotype_distance(g.num, g.alpha)
+  d.num <- calc_genotype_distance(g.num, g.num)
+  d.alpha <- calc_genotype_distance(g.alpha, g.alpha)
   expect_equal(d, 4)
   expect_equal(d.num, 0)
   expect_equal(d.alpha, 0)
 })
 
-test_that("calc.genotype.distance is commutative", {
+test_that("calc_genotype_distance is commutative", {
   g1 <- c(5, 10, 200, 204, 37, 37, 180, 184, 190, 190)
   g2 <- c(5,  5, 204, 208, 37, 39, 176, 180, 190, 190)
-  d.fwd <- calc.genotype.distance(g1, g2)
-  d.rev <- calc.genotype.distance(g2, g1)
+  d.fwd <- calc_genotype_distance(g1, g2)
+  d.rev <- calc_genotype_distance(g2, g1)
   expect_equal(d.fwd, 4)
   expect_equal(d.rev, 4)
 })
 
-test_that("calc.genotype.distance handles NA entries", {
+test_that("calc_genotype_distance handles NA entries", {
   g1 <- c(5,   5, 200, 204, 37, 39)
   g2 <- c(NA, NA, 204, 208, 37, 37)
   g3 <- c(NA, NA, 200, 204, 37, 39)
@@ -85,33 +85,33 @@ test_that("calc.genotype.distance handles NA entries", {
   # The two NA entries will by default count towards the distance whether the
   # other genotype has an NA there or not.  If na.reject is FALSE, NAs are
   # treated like any other entry.
-  d12 <- calc.genotype.distance(g1, g2)
-  d12.na <- calc.genotype.distance(g1, g2, na.reject = FALSE)
-  d23 <- calc.genotype.distance(g2, g3)
-  d23.na <- calc.genotype.distance(g2, g3, na.reject = FALSE)
+  d12 <- calc_genotype_distance(g1, g2)
+  d12.na <- calc_genotype_distance(g1, g2, na.reject = FALSE)
+  d23 <- calc_genotype_distance(g2, g3)
+  d23.na <- calc_genotype_distance(g2, g3, na.reject = FALSE)
   expect_equal(d12,    4)
   expect_equal(d12.na, 2)
   expect_equal(d23,    4)
   expect_equal(d23.na, 2)
 })
 
-test_that("calc.genotype.distance invalid genotype lengths", {
+test_that("calc_genotype_distance invalid genotype lengths", {
   # These are valid but not the same length
   g1 <- c(5,   5, 200, 204)
   g2 <- c(NA, NA, 204, 208, 37, 39)
   # This has an odd length
   g3 <- c(NA, NA, 204, 208, 37)
 
-  expect_warning(calc.genotype.distance(g1, g2))
-  expect_warning(calc.genotype.distance(g3, g3))
+  expect_warning(calc_genotype_distance(g1, g2))
+  expect_warning(calc_genotype_distance(g3, g3))
 })
 
 
-# test_align.alleles ------------------------------------------------------
+# test_align_alleles ------------------------------------------------------
 
-test_that("align.alleles produces sequence alignments", {
+test_that("align_alleles produces sequence alignments", {
   with(results_summary_data, {
-    alignments <- align.alleles(results$summary)
+    alignments <- align_alleles(results$summary)
     expect_equal(names(alignments), levels(results$summary$Locus))
     expect_equal(names(as.character(alignments[["A"]])),
                  c("182_1", "194_1", "178_1", "174_2", "162_1"))
@@ -126,11 +126,11 @@ test_that("align.alleles produces sequence alignments", {
   })
 })
 
-test_that("align.alleles produces per-allele alignments", {
+test_that("align_alleles produces per-allele alignments", {
   # By default the allele sequences are dereplicated and then aligned, but this
   # tests the other option.
   with(results_summary_data, {
-    alignments <- align.alleles(results$summary, derep = FALSE)
+    alignments <- align_alleles(results$summary, derep = FALSE)
     expect_equal(names(alignments), levels(results$summary$Locus))
     n1 <- paste(rownames(subset(results$summary, Locus == "A")), 1, sep='_')
     n2 <- paste(rownames(subset(results$summary, Locus == "A")), 2, sep='_')
@@ -139,7 +139,7 @@ test_that("align.alleles produces per-allele alignments", {
   })
 })
 
-test_that("align.alleles works for empty sequences", {
+test_that("align_alleles works for empty sequences", {
   # Empty sequences should be handled automatically before the msa function is
   # called.
   with(results_summary_data, {
@@ -148,12 +148,12 @@ test_that("align.alleles works for empty sequences", {
     results$summary[idx[1], "Allele1Seq"] <- NA
     results$summary[idx[1], "Allele2Seq"] <- NA
     # Locus A's alignment should be OK, just with one stub entry
-    alignments <- align.alleles(results$summary)
+    alignments <- align_alleles(results$summary)
     expect_true(any(grepl('-', as.character(alignments$A))))
   })
 })
 
-test_that("align.alleles works for empty sequence sets", {
+test_that("align_alleles works for empty sequence sets", {
   # Completely empty sequence lists for a given locus are a special case; for
   # those we should just get "NA" for the whole entry.
   with(results_summary_data, {
@@ -162,7 +162,7 @@ test_that("align.alleles works for empty sequence sets", {
     results$summary[idx, "Allele1Seq"] <- NA
     results$summary[idx, "Allele2Seq"] <- NA
     # This should still work, just with NA for A's alignment
-    alignments <- align.alleles(results$summary)
+    alignments <- align_alleles(results$summary)
     expect_equal(alignments$A, NULL)
   })
 })
