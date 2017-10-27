@@ -96,15 +96,74 @@ load.seqs <- function(fp.seqs) {
 
 # Output Saving -----------------------------------------------------------
 
-
-
+#' Save dataset summary to text file
+#'
+#' Save the dataset summary produced by \code{analyze.dataset} to the specified
+#' file path in CSV format.
+#'
+#' @param results_summary summary data frame as produced by
+#'   \code{analyze.dataset}.
+#' @param fp output file path.
+#'
+#' @export
 save.results_summary <- function(results_summary, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
   write.csv(results_summary, fp, na = "")
 }
 
-save.all_sample_data <- function(results_data, dp) {
+#' Save identified alleles to FASTA files
+#'
+#' Take the alleles identified by \code{analyze.dataset} in the summary data
+#' frame and save each entry to a separate FASTA file.  Samples identified as
+#' homozygous will have one sequence written rather than two.  Entries with no
+#' identified alleles will be skipped.
+#'
+#' @param results_summary summary data frame as produced by
+#'   \code{analyze.dataset}.
+#' @param dp output directory path to use for all files.
+#'
+#' @export
+save.allele_seqs <- function(results_summary, dp) {
+  if (!dir.exists(dp))
+    dir.create(dp, recursive = TRUE)
+  results_summary$.row <- rownames(results_summary)
+  invisible(apply(results_summary, 1, function(r) {
+    seqs <- r[c("Allele1Seq", "Allele2Seq")]
+    # Ignore NA entries, and skip this sample if there are no sequences
+    seqs <- seqs[!is.na(seqs)]
+    if (length(seqs)==0)
+      return()
+    # Create sequence names with a unique ID based on the sample and some other
+    # stats for convenience
+    seq.names <- sapply(seq_along(seqs), function(i) {
+      seq.id <- paste(r[".row"], i, sep = "_")
+      a.len <- r[paste0("Allele", i, "Length")]
+      a.cts <- r[paste0("Allele", i, "Count")]
+      seq.extra <- paste(paste0(a.len, 'bp'),
+                         paste0("allele/locus/total=",
+                                paste(as.integer(a.cts),
+                                      as.integer(r["CountLocus"]),
+                                      as.integer(r["CountTotal"]),
+                                      sep = "/")))
+      paste(seq.id, seq.extra)
+    })
+    fp <- file.path(dp, paste0(r[".row"], ".fasta"))
+    dnar::write.fa(seq.names, seqs, fp)
+  }))
+}
+
+#' Save per-sample processed data to text files
+#'
+#' Save each per-sample data frame produced by \code{analyze.dataset} to a
+#' separate file in the specified directory path, in CSV format.
+#'
+#' @param results_data list of per-sample data frames as produced by
+#'   \code{analyze.dataset}.
+#' @param dp output directory path to use for all files.
+#'
+#' @export
+save.sample_data <- function(results_data, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {

@@ -25,7 +25,8 @@ config.defaults <- list(
   fp.output.summary="summary.csv",
   dp.output.alignments="alignments",
   dp.output.alignment_images="alignment-images",
-  dp.output.processed_samples="processed-samples")
+  dp.output.processed_samples="processed-samples",
+  dp.output.allele_seqs="allele-sequences")
 
 #' Perform a full microsatellite analysis
 #'
@@ -50,11 +51,13 @@ full_analysis <- function(config) {
     save.results_summary(results$summary, file.path(dp.output, fp.output.summary))
     save.alignments(results$alignments, file.path(dp.output, dp.output.alignments))
     save.alignment_images(results$alignments, file.path(dp.output, dp.output.alignment_images))
-    save.all_sample_data(results$data, file.path(dp.output, dp.output.processed_samples))
-    results$config <- config_full
+    save.sample_data(results$data, file.path(dp.output, dp.output.processed_samples))
+    save.allele_seqs(results$summary, file.path(dp.output, dp.output.allele_seqs))
     # TODO histograms
     # TODO locus performance
     # TODO alleles as fasta files
+    # TODO dist_mat
+    results$config <- config_full
     return(results)
   })
 }
