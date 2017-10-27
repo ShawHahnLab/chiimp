@@ -7,7 +7,9 @@
 load.locus_attrs(fp.locus_attrs, ...)
 }
 \arguments{
-\item{fp.locus_attrs}{path to text file}
+\item{fp.locus_attrs}{path to text file.}
+
+\item{...}{additional arguments passed to \code{read.table}.}
 }
 \value{
 data frame of locus attributes

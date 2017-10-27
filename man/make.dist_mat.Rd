@@ -9,7 +9,7 @@ make.dist_mat(results_summary, dist.func = calc.genotype.distance)
 \arguments{
 \item{results_summary}{cross-sample summary data frame}
 
-\item{dist_func}{function to calculate inter-sample distances.  Should take
+\item{dist.func}{function to calculate inter-sample distances.  Should take
 two vectors, one for each genotype, with two values per locus corresponding
 to the two alleles.}
 }

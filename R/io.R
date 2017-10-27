@@ -17,7 +17,8 @@ load.config <- function(fp.config) {
 #'
 #' Load a tab-separated table of locus attributes to use for analysis.
 #'
-#' @param fp.locus_attrs path to text file
+#' @param fp.locus_attrs path to text file.
+#' @param ... additional arguments passed to \code{read.table}.
 #'
 #' @return data frame of locus attributes
 #'

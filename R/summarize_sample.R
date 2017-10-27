@@ -89,11 +89,14 @@ summarize.sample.by_length <- function (sample.data, locus.name,
   chunk <- sample.data[idx, ]
   count.total <- sum(sample.data$Count)
   count.locus <- sum(chunk$Count)
-  chunk <- chunk %>%
-    dplyr::group_by(Length, MatchingLocus, MotifMatch, LengthMatch) %>%
-    dplyr::summarize(Count = sum(Count),
-                     Seq = first(Seq),
-                     Stutter = first(Stutter))
+  chunk <- with(chunk, {
+         chunk %>%
+         dplyr::group_by(Length, MatchingLocus, MotifMatch, LengthMatch) %>%
+           dplyr::summarize(Count = sum(Count),
+                            Seq = first(Seq),
+                            Stutter = first(Stutter))
+       })
+
   chunk <- chunk[order(chunk$Count, decreasing = T), ]
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
   stutter <- FALSE

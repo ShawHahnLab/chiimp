@@ -116,7 +116,7 @@ summarize.attribute <- function(results_summary, attrib, repeats = 2) {
 #' be a symmetric matrix, unlike what \code{make.dist_mat_known} produces.
 #'
 #' @param results_summary cross-sample summary data frame
-#' @param dist_func function to calculate inter-sample distances.  Should take
+#' @param dist.func function to calculate inter-sample distances.  Should take
 #'   two vectors, one for each genotype, with two values per locus corresponding
 #'   to the two alleles.
 #'
@@ -161,7 +161,7 @@ make.dist_mat <- function(results_summary,
 #' @param genotypes.known data frame of known genotypes, with one row per
 #'   individual per locus, and columns "Name", "Locus", "Allele1Seq",
 #'   "Allele2Seq".
-#' @param dist_func function to calculate inter-sample distances.  Should take
+#' @param dist.func function to calculate inter-sample distances.  Should take
 #'   two vectors, one for each genotype, with two values per locus corresponding
 #'   to the two alleles.
 #'

@@ -4,18 +4,20 @@
 \alias{report.genotypes}
 \title{Create genotype summary table}
 \usage{
-report.genotypes(dataset.summary, allele.names = NULL, hash.len = 6, ...)
+report.genotypes(results_summary, allele.names = NULL, hash.len = 6, ...)
 }
 \arguments{
+\item{results_summary}{data frame as produced by \code{analyze.dataset}.}
+
 \item{allele.names}{optional data frame of custom allele names.  If present
 the columns "Sequence" and "Name" will be used to map exact sequences to
-custom names.
-@param hash.len number of characters of the sequence has to include when
-  auto-generating allele names.  If set to zero the hash suffix is not
-  included.
-@param ... additional arguments to \code{summarize.genotypes}.}
+custom names.}
 
-\item{results}{summary data frame as produced by \code{analyze.dataset}.}
+\item{hash.len}{number of characters of the sequence has to include when
+auto-generating allele names.  If set to zero the hash suffix is not
+included.}
+
+\item{...}{additional arguments to \code{summarize.genotypes}.}
 }
 \value{
 data frame showing summary of genotypes.

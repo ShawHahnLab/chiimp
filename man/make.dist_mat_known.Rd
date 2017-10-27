@@ -14,7 +14,7 @@ make.dist_mat_known(results_summary, genotypes.known,
 individual per locus, and columns "Name", "Locus", "Allele1Seq",
 "Allele2Seq".}
 
-\item{dist_func}{function to calculate inter-sample distances.  Should take
+\item{dist.func}{function to calculate inter-sample distances.  Should take
 two vectors, one for each genotype, with two values per locus corresponding
 to the two alleles.}
 }
