@@ -270,9 +270,8 @@ align.alleles <- function(results_summary, derep=TRUE, ...) {
     # apparently.
     if (all(is.na(a)))
       return(NULL)
-    # If there are any other missing sequences, put a stub in place so msa still
-    # runs without complaints.
-    a[is.na(a)] <- '-'
+    # Turn NAs into empty strings
+    a[is.na(a)] <- ''
     # Dereplicate identical sequences, if specified
     if (derep) {
       tbl <- table(a)
@@ -280,6 +279,9 @@ align.alleles <- function(results_summary, derep=TRUE, ...) {
       a <- names(tbl)
       names(a) <- paste(nchar(a), n,sep='_')
     }
+    # If there are any other missing sequences, put a stub in place so msa still
+    # runs without complaints.
+    a[a==''] <- '-'
     # TODO make this safer.  if msa(...) crashes sink() won't get called.  Use
     # tryCatch?
     sink('/dev/null')
