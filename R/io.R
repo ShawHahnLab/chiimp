@@ -234,6 +234,21 @@ save.alignment_images <- function(alignments, dp, image.func="png",
   }))
 }
 
+#' Save sample distance matrix to text file
+#'
+#' Save the inter-sample distance matrix produced by \code{summarize.dataset} to
+#' the specified file path in CSV format.
+#'
+#' @param dist_mat matrix produced by \code{summarize.dataset}.
+#' @param fp output file path.
+#'
+#' @export
+save.dist_mat <- function(dist_mat, fp) {
+  if (!dir.exists(dirname(fp)))
+    dir.create(dirname(fp), recursive = TRUE)
+  write.csv(dist_mat, fp)
+}
+
 
 # Misc --------------------------------------------------------------------
 
