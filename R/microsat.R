@@ -20,13 +20,22 @@ config.defaults <- list(
   dp.data="str-data",
   pattern="(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
   ord=c(1, 2, 3),
-  dp.output="str-results",
   fp.locus_attrs="locus_attrs.tsv",
+  dp.output="str-results",
+  # Names for files and subdirectories under dp.output
   fp.output.summary="summary.csv",
+  fp.report="report.html",
+  fp.output.dist_mat="sample-distances.csv",
   dp.output.alignments="alignments",
   dp.output.alignment_images="alignment-images",
   dp.output.processed_samples="processed-samples",
-  dp.output.allele_seqs="allele-sequences")
+  dp.output.allele_seqs="allele-sequences",
+  # Report generation
+  report=TRUE,
+  report.sections = c(genotypes  = TRUE,
+                      distances  = TRUE,
+                      flags      = TRUE,
+                      alignments = TRUE))
 
 #' Perform a full microsatellite analysis
 #'
@@ -53,10 +62,20 @@ full_analysis <- function(config) {
     save.alignment_images(results$alignments, file.path(dp.output, dp.output.alignment_images))
     save.sample_data(results$data, file.path(dp.output, dp.output.processed_samples))
     save.allele_seqs(results$summary, file.path(dp.output, dp.output.allele_seqs))
+    save.dist_mat(results$dist_mat, file.path(dp.output, fp.output.dist_mat))
+    if (report) {
+      fp.report.in <- system.file("report.Rmd", package="microsat")
+      fp.report.out <-
+        if (substr(dp.output, 1, 1) != .Platform$file.sep)
+          file.path(normalizePath('.'), dp.output, fp.report)
+        else
+          file.path(dp.output, fp.report)
+      if (!dir.exists(dirname(fp.report.out)))
+        dir.create(dirname(fp.report.out), recursive = TRUE)
+      rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out)
+    }
     # TODO histograms
     # TODO locus performance
-    # TODO alleles as fasta files
-    # TODO dist_mat
     results$config <- config_full
     return(results)
   })
@@ -77,7 +96,7 @@ main <- function(args=NULL) {
   if (missing(args))
     args <- commandArgs(trailingOnly = TRUE)
   p <- argparser::arg_parser("Identify microsatellite alleles fasta/fastq files")
-  p <- argparser::add_argument("config", help = "configuration file path")
+  p <- argparser::add_argument(p, "config", help = "configuration file path")
   args_parsed <- argparser::parse_args(p, args)
   config <- load.config(args_parsed$config)
   full_analysis(config)
