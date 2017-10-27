@@ -8,6 +8,8 @@ License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
+  argparser (>= 0.4),
+  dnaplotr (>= 0.1),
   dnar (>= 0.1),
   dplyr (>= 0.7.4),
   magrittr (>= 1.5),
@@ -15,6 +17,7 @@ Imports:
   openssl (>= 0.9.6),
   parallel (>= 3.2.3),
   pheatmap (>= 1.0.8),
-  stringr (>= 1.2.0)
+  stringr (>= 1.2.0),
+  yaml (>= 2.1.14)
 RoxygenNote: 6.0.1
 Suggests: testthat

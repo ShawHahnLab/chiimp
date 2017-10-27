@@ -1,8 +1,17 @@
 # Save and load data.
 
+# Load Inputs -------------------------------------------------------------
+
 # Expected column names for locus_attrs
 locus_attrs_cols <- c("LengthMin", "LengthMax", "LengthBuffer", "Motif",
                       "Primer", "ReversePrimer")
+
+load.config <- function(fp.config) {
+  if (is.na(fp.config))
+    return(list())
+  text <- readChar(fp.config, file.info(fp.config)$size)
+  yaml::yaml.load(text)
+}
 
 #' Load table of locus attributes
 #'
@@ -84,6 +93,25 @@ load.seqs <- function(fp.seqs) {
   loadfunc(fp.seqs)$seq
 }
 
+# Output Saving -----------------------------------------------------------
+
+
+
+save.results_summary <- function(results_summary, fp) {
+  if (!dir.exists(dirname(fp)))
+    dir.create(dirname(fp), recursive = TRUE)
+  write.csv(results_summary, fp, na = "")
+}
+
+save.all_sample_data <- function(results_data, dp) {
+  if (!dir.exists(dp))
+    dir.create(dp, recursive = TRUE)
+  invisible(lapply(names(results_data), function(n) {
+    fp <- file.path(dp, paste0(n, '.csv'))
+    write.csv(results_data[[n]], fp, na = "", quote = FALSE)
+  }))
+}
+
 #' Save alignments to FASTA files
 #'
 #' Take a list of alignments, one per locus, and save each to a separate fasta
@@ -96,17 +124,17 @@ load.seqs <- function(fp.seqs) {
 #'
 #' @export
 save.alignments <- function(alignments, dp) {
-    if (!dir.exists(dp))
-      dir.create(dp, recursive = TRUE)
-    invisible(lapply(names(alignments), function(loc) {
-      if(!is.null(alignments[[loc]])) {
-        dna <- as.character(alignments[[loc]])
-        fp <-file.path(dp, paste0(loc, '.fasta'))
-        dnar::write.fa(names = names(dna),
-                 dna = dna,
-                 fileName = fp)
-      }
-    }))
+  if (!dir.exists(dp))
+    dir.create(dp, recursive = TRUE)
+  invisible(lapply(names(alignments), function(loc) {
+    if(!is.null(alignments[[loc]])) {
+      dna <- as.character(alignments[[loc]])
+      fp <-file.path(dp, paste0(loc, '.fasta'))
+      dnar::write.fa(names = names(dna),
+                     dna = dna,
+                     fileName = fp)
+    }
+  }))
 }
 
 #' Save alignment visualizations to image files
@@ -146,6 +174,9 @@ save.alignment_images <- function(alignments, dp, image.func="png",
   }))
 }
 
+
+# Misc --------------------------------------------------------------------
+
 # create unique rownames for the given data frame, using whichever sample
 # metadata columns are available.
 make.rownames <- function(data) {
@@ -161,3 +192,4 @@ make.rownames <- function(data) {
     do.call(paste, as.list(c(entries, sep='-')))
   }))
 }
+
