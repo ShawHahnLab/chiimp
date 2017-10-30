@@ -39,7 +39,7 @@
 #' @return list of attributes describing the sample.
 #'
 #' @export
-summarize_sample <- function(sample.data, locus.name, fraction.min=0.05, counts.min=500) {
+summarize_sample <- function(sample.data, locus.name, fraction.min, counts.min) {
   # extract sample data entries that meet all criteria for a potential allele
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]

@@ -16,6 +16,12 @@
 #'   analysis.
 #' @param summary.function function to use when summarizing each sample's full
 #'   details into the standard attributes.
+#' @param fraction.min numeric threshold for the minimum proportion of counts a
+#'   given entry must have, compared to the total matching all criteria for that
+#'   locus, to be considered as a potential allele.
+#' @param counts.min numeric threshold for the minimum number of counts that
+#'   must be present, in total across entries passing all filters, for potential
+#'   alleles to be considered.
 #'
 #' @return list of results
 #'
@@ -24,11 +30,17 @@ analyze_dataset <- function(dataset,
                             locus_attrs,
                             num.cores=max(1,
                                 as.integer(parallel::detectCores() / 2) - 1),
-                            summary.function=summarize_sample) {
+                            summary.function=summarize_sample,
+                            nrepeats,
+                            fraction.min,
+                            counts.min) {
   analyze.entry <- function(entry) {
     seqs <- load_seqs(entry["Filename"])
-    sample.data <- analyze_sample(seqs, locus_attrs, 3)
-    sample.summary <- summary.function(sample.data, entry["Locus"])
+    sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
+    sample.summary <- summary.function(sample.data,
+                                       entry["Locus"],
+                                       fraction.min,
+                                       counts.min)
     return(list(summary = sample.summary, data = sample.data))
   }
   if (num.cores > 1) {

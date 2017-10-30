@@ -34,7 +34,7 @@
 summarize_dataset <- function(results, genotypes.known=NULL) {
   results$alignments <- align_alleles(results$summary)
   results$dist_mat <- make_dist_mat(results$summary)
-  if (!missing(genotypes.known)) {
+  if (!missing(genotypes.known) & !is.null(genotypes.known)) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
   }
@@ -173,10 +173,13 @@ make_dist_mat_known <- function(results_summary,
                                 genotypes.known,
                                 dist.func=calc_genotype_distance) {
   tbl <- summarize_genotypes(results_summary)
+  # Kludgy workaround to make summarize_genotypes handle a different sort of
+  # data frame
   genotypes.known$Replicate <- NA
   genotypes.known$Sample <- genotypes.known$Name
-  genotypes.known$Homozygous <- as.character(genotypes.known$Allele1Seq) ==
-    as.character(genotypes.known$Allele2Seq)
+  genotypes.known <- genotypes.known[, -match("Name",
+                                              colnames(genotypes.known))]
+  genotypes.known$Homozygous <- is.na(as.character(genotypes.known$Allele2Seq))
   tbl.known <- summarize_genotypes(genotypes.known)
   distances <- outer(rownames(tbl),
                      rownames(tbl.known),
@@ -187,6 +190,9 @@ make_dist_mat_known <- function(results_summary,
                                          tbl.known[row[2], -(1:2)])
                              })
   })
+  rownames(distances) <- rownames(tbl)
+  colnames(distances) <- rownames(tbl.known)
+  distances
 }
 
 #' Calculate distance between two genotypes

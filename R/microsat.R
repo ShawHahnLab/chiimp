@@ -18,6 +18,7 @@
 #'   * ord: order of fields in the input filename pattern
 #'   * dp.output: directory path for saving output data
 #'   * fp.locus_attrs: file path to locus attributes TSV file
+#'   * fp.genotypes.known: file path to known genotypes TSV file
 #' @md
 #'
 #' @export
@@ -26,22 +27,29 @@ config.defaults <- list(
   pattern="(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
   ord=c(1, 2, 3),
   fp.locus_attrs="locus_attrs.tsv",
+  fp.genotypes.known=NULL,
   dp.output="str-results",
   # Names for files and subdirectories under dp.output
   fp.output.summary="summary.csv",
   fp.report="report.html",
   fp.output.dist_mat="sample-distances.csv",
+  dp.output.histograms="histograms",
   dp.output.alignments="alignments",
   dp.output.alignment_images="alignment-images",
   dp.output.processed_samples="processed-samples",
   dp.output.allele_seqs="allele-sequences",
+  # Sample genotyping settings
+  sample_analysis = list(nrepeats = 3),
+  sample_summary = list(fraction.min = 0.05,
+                        counts.min = 500),
   # Report generation settings
   report=TRUE,
   report.echo=FALSE,
-  report.sections = c(genotypes  = TRUE,
-                      distances  = TRUE,
-                      flags      = TRUE,
-                      alignments = TRUE),
+  report.sections = list(genotypes       = TRUE,
+                         identifications = TRUE,
+                         distances       = TRUE,
+                         flags           = TRUE,
+                         alignments      = TRUE),
   # Other settings
   verbose=TRUE)
 
@@ -69,18 +77,29 @@ full_analysis <- function(config) {
       config.full$dp.output
     }
 
+  config.full$report.sections$identifications <-
+    ! is.null(config.full$fp.genotypes.known) &&
+    config.full$report.sections$identifications
+
   with(config.full, {
-    if (verbose) logmsg(paste("Loading dataset from", dp.data, "..."))
+    if (verbose) logmsg(paste0("Loading dataset from ", dp.data, "..."))
     dataset <- prepare_dataset(dp.data, pattern)
     if (verbose)
-      logmsg(paste("Loading locus attributes from", fp.locus_attrs, "..."))
+      logmsg(paste0("Loading locus attributes from ", fp.locus_attrs, "..."))
     locus_attrs <- load_locus_attrs(fp.locus_attrs)
     if (verbose) logmsg("Analyzing samples...")
-    results <- analyze_dataset(dataset, locus_attrs)
+    results <- analyze_dataset(dataset, locus_attrs,
+                               nrepeats = sample_analysis$nrepeats,
+                               fraction.min = sample_summary$fraction.min,
+                               counts.min = sample_summary$counts.min)
     if (verbose) logmsg("Summarizing results...")
-    results <- summarize_dataset(results)
+    genotypes.known <- NULL
+    if (!is.null(fp.genotypes.known))
+      genotypes.known <- load_genotypes(fp.genotypes.known)
+    results <- summarize_dataset(results, genotypes.known)
     results$config <- config.full
     if (verbose) logmsg("Saving output files...")
+    save_histograms(results, file.path(dp.output, dp.output.histograms))
     save_results_summary(results$summary, file.path(dp.output, fp.output.summary))
     save_alignments(results$alignments, file.path(dp.output, dp.output.alignments))
     save_alignment_images(results$alignments, file.path(dp.output, dp.output.alignment_images))
@@ -95,7 +114,6 @@ full_analysis <- function(config) {
         dir.create(dirname(fp.report.out), recursive = TRUE)
       rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out)
     }
-    # TODO histograms
     # TODO locus performance
     if (verbose) logmsg("Done.")
     return(results)
