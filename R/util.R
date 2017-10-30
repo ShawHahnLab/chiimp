@@ -15,3 +15,18 @@ make_rownames <- function(data) {
     do.call(paste, as.list(c(entries, sep='-')))
   }))
 }
+
+# Autogenerate a short name for a sequence using sequence length and content.
+make_allele_name <- function(data, hash.len=6) {
+  if (is.character(data)) {
+    if(hash.len > 0) {
+      paste(nchar(data),
+            substr(openssl::md5(tbl[i, j]), 1, hash.len),
+            sep = "-")
+    } else {
+      nchar(data)
+    }
+  } else {
+    as.character(data)
+  }
+}

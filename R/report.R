@@ -31,19 +31,6 @@ report_genotypes <- function(results_summary,
   tbl <- summarize_genotypes(results_summary, ...)
   # Name each entry in the table with either a custom or auto-generated short
   # name.
-  make.allele_name <- function(data) {
-    if (is.character(data)) {
-      if(hash.len > 0) {
-        paste(nchar(data),
-              substr(openssl::md5(tbl[i, j]), 1, 6),
-              sep = "-")
-      } else {
-        nchar(data)
-      }
-    } else {
-      data
-    }
-  }
   for (j in 3:ncol(tbl)) {
     for (i in 1:nrow(tbl)) {
       if(is.na(tbl[i, j]))
@@ -51,7 +38,7 @@ report_genotypes <- function(results_summary,
       row <- match(tbl[i, j], allele.names[, "Seq"])
       n <- as.character(allele.names[row, "Name"])
       if (is.na(n) || length(n) == 0)
-        n <- make.allele_name(tbl[i, j])
+        n <- make_allele_name(tbl[i, j], hash.len)
       tbl[i, j] <- n
     }
   }
