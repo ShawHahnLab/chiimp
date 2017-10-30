@@ -114,7 +114,6 @@ full_analysis <- function(config) {
         dir.create(dirname(fp.report.out), recursive = TRUE)
       rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out)
     }
-    # TODO locus performance
     if (verbose) logmsg("Done.")
     return(results)
   })
