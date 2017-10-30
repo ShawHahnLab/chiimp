@@ -225,10 +225,6 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
     g2 <- g2[1:min(length(g1), length(g2))]
   }
 
-  # Valid matches are either at the index in g2 or one less, to match either
-  # allele.  So for each position in g2 minus its index that will be -1 or 0.
-  #m <- if (na.reject) match(g1, g2, incomparables = NA) else match(g1, g2)
-  #sum(! (m - seq_along(g2)) %in% -1:0)
   if (na.reject) {
     g1[is.na(g1)] <- -1
     g2[is.na(g2)] <- -2
@@ -237,11 +233,8 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   alleles2 <- matrix(g2, ncol = 2, byrow = TRUE)
   alleles <- cbind(alleles1, alleles2)
   alleles
-  # TODO this mis-counts things like c(1,1) versus c(1,2).  Maybe just go back
-  # to the forward/reverse check from before.
   sum(apply(alleles, 1, function(row) min(sum(row[1:2] != row[3:4], na.rm=T),
                                           sum(row[2:1] != row[3:4]), na.rm=T) ))
-  #sum(g1 != g2, na.rm = T)
 }
 
 
