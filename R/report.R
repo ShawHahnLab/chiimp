@@ -74,9 +74,142 @@ report_attribute <- function(dataset.summary, attrib, ...) {
 
 # Plots -------------------------------------------------------------------
 
-#' Plot histogram of STR sample
+#' Plot basic histogram of STR sample
 #'
 #' Given a processed STR sample, plot a histogram of counts per sequence length.
+#'
+#' @param samp data frame of dereplicated sequences.
+#' @param main title of the plot.
+#' @param locus.name name of the locus to match alleles for.  If unspecified the
+#'   locus with the highest matched counts will be used.
+#' @param sample.summary summary data frame as prepared by
+#'   \code{summarize_sample}
+#'
+#' @export
+#' @importFrom magrittr "%>%"
+histogram <- function(samp,
+                      main="Number of Reads by Sequence Length",
+                      locus.name=NULL,
+                      sample.summary=NULL,
+                      cutoff_fraction=0.05,
+                      xlim=range(samp$Length)) {
+
+  ## Define colors and other plot parameters
+  col.unlabeled   <- "#000000" # The non-locus sequences
+  # Locus-labeled and matching all allele conditions
+  col.filtered    <- "#FFAAAA"
+  border.filtered <- "#990000"
+  # Sequences matching alleles in sample.summary
+  col.allele      <- "#FF0000"
+  border.allele   <- "#FF0000"
+  # Line showing threshold for allele calls
+  col.cutoff <- rgb(0, 0, 0, 0.5)
+  # Shaded region for filtered sequences
+  col.region <- rgb(0, 0, 0, 30, maxColorValue = 255)
+  lwd <- 5
+
+  ## If there were no sequences at all, don't bother plotting.
+  if (nrow(samp) == 0)
+    return(NULL)
+
+  ## Group sequences by length
+  heights <- with(samp, {
+    samp %>%
+    dplyr::group_by(Length) %>%
+    dplyr::summarize(TotalCount = sum(Count))
+  })
+  ymax <- max(heights$TotalCount)
+
+  # Plot bars for all counts
+  xlim <- range(heights$Length)
+  ylim <- range(heights$TotalCount)
+  plot(heights$Length,
+       heights$TotalCount,
+       type = "h",
+       xlim = xlim,
+       ylim = ylim,
+       main = main,
+       col = col.unlabeled,
+       xlab = "Length (nt)",
+       ylab = "Sequence Count",
+       lwd = lwd,
+       lend = 1)
+
+  # If no locus name was given, take whatever locus showed the highest counts.
+  if (missing(locus.name)) {
+    cts <- with(samp, {
+      subset(samp, MatchingLocus != "") %>%
+        dplyr::group_by(MatchingLocus) %>%
+        dplyr::summarize(Count=sum(Count))
+    })
+    cts <- cts[order(cts$Count, decreasing = T), ]
+    locus.name <- if (nrow(cts)>1) {
+      as.character(cts[[1, 'MatchingLocus']])
+    } else {
+      NA
+    }
+  }
+
+  # Define subset of sample data that matches all locus conditions
+  samp.filt <- subset(samp, MatchingLocus == locus.name &
+                        MotifMatch &
+                        LengthMatch)
+
+  # Just the matching sequences, if there are any.
+  if (nrow(samp.filt) > 0) {
+    heights.filt <- with(samp.filt,{
+      samp.filt %>%
+        dplyr::group_by(Length) %>%
+        dplyr::summarize(TotalCount = sum(Count))
+    })
+    points(heights.filt$Length,
+           heights.filt$TotalCount,
+           type = "h",
+           col = col.filtered,
+           lwd = lwd,
+           lend = 1)
+    # Shade the domain of the filtered data in gray
+    xlim.filt <- range(samp.filt$Length)
+    polygon(x = rep(xlim.filt, each=2),
+            y = c(0, ymax, ymax, 0),
+            col = col.region,
+            border = NA)
+    # Draw a line to mark the cutoff value for what's considered a prominent
+    # count
+    cutoff <- cutoff_fraction*sum(samp.filt$Count)
+    abline(h = cutoff, col = col.cutoff)
+  }
+
+  # Draw bars for the exact allele sequences identified
+  if (!is.null(sample.summary)) {
+    pts.x <- c(sample.summary$Allele1Length, sample.summary$Allele2Length)
+    pts.y <- c(sample.summary$Allele1Count, sample.summary$Allele2Count)
+    pts.x <- pts.x[!is.na(pts.x)]
+    pts.y <- pts.y[!is.na(pts.y)]
+    if (length(pts.x) > 0)
+      points(pts.x,
+             pts.y,
+             type = "h",
+             col = col.allele,
+             lwd = lwd,
+             lend = 1)
+  }
+
+  # Legend
+  legend(x='topright', bty='n',
+         legend=c("Original",
+                  "Filtered",
+                  "Called Alleles",
+                  "Unique Seq. Threshold"),
+         col=c(col.unlabeled, col.filtered, col.allele, col.cutoff),
+         pch=c(15, 15, 15, NA),
+         lty=c(NA, NA, NA, 1))
+}
+
+#' Plot advanced histogram of STR sample
+#'
+#' Given a processed STR sample, plot a histogram of counts per unique sequence.
+#' This is a more complicated version of \code{histogram}.
 #'
 #' @param samp data frame of dereplicated sequences.
 #' @param stacked should bars be stacked together to add up to the total count
@@ -90,7 +223,7 @@ report_attribute <- function(dataset.summary, attrib, ...) {
 #'
 #' @export
 #' @importFrom magrittr "%>%"
-histogram <- function(samp,
+histogram2 <- function(samp,
                       stacked=TRUE,
                       main=NULL,
                       locus.name=NULL,
