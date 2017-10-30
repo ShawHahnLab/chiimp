@@ -34,13 +34,15 @@ check.seqs1A_summary <- function(data,
 
 test_that("summarize_sample summarizes sample attributes", {
   sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
-  sample.summary <- summarize_sample(sample.data, "A")
+  sample.summary <- summarize_sample(sample.data, "A",
+                                     fraction.min = 0.05, counts.min = 500)
   check.seqs1A_summary(sample.summary)
 })
 
 test_that("summarize_sample handles completely emtpy input sample data", {
   sample.data <- analyze_sample(c(), locus_attrs, 3)
-  sample.summary <- summarize_sample(sample.data, "A")
+  sample.summary <- summarize_sample(sample.data, "A",
+                                     fraction.min = 0.05, counts.min = 500)
   expect_equal(names(sample.summary), sample.summary.cols)
   with(sample.summary, {
     expect_equal(Allele1Seq, as.character(NA))
@@ -61,7 +63,8 @@ test_that("summarize_sample handles empty sequences in input sample data", {
   seqs <- seqs1$A
   seqs[1:100] <- "" # empty out a segment of the vector
   sample.data <- analyze_sample(seqs, locus_attrs, 3)
-  sample.summary <- summarize_sample(sample.data, "A")
+  sample.summary <- summarize_sample(sample.data, "A",
+                                     fraction.min = 0.05, counts.min = 500)
   # Nothing should change in the output, except that we zeroed out 90 reads that
   # would otherwise get counted (the rest were already set to off-target
   # junk during setup).
@@ -73,7 +76,8 @@ test_that("summarize_sample handles empty sequences in input sample data", {
 
 test_that("summarize_sample marks stutter removal", {
   sample.data <- analyze_sample(seqs3$A, locus_attrs, 3)
-  sample.summary <- summarize_sample(sample.data, "A")
+  sample.summary <- summarize_sample(sample.data, "A",
+                                     fraction.min = 0.05, counts.min = 500)
   with(sample.summary, {
     expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
                                     "TAGATAGATAGATAGATAGATAGATAGATA",
@@ -96,13 +100,17 @@ test_that("summarize_sample marks stutter removal", {
 
 test_that("summarize_sample counts prominent sequences", {
   sample.data.1B       <- analyze_sample(seqs1$B, locus_attrs, 3)
-  sample.summary.1B    <- summarize_sample(sample.data.1B, "B")
+  sample.summary.1B    <- summarize_sample(sample.data.1B, "B",
+                                         fraction.min = 0.05, counts.min = 500)
   sample.data.2B       <- analyze_sample(seqs2$B, locus_attrs, 3)
-  sample.summary.2B    <- summarize_sample(sample.data.2B, "B")
+  sample.summary.2B    <- summarize_sample(sample.data.2B, "B",
+                                         fraction.min = 0.05, counts.min = 500)
   sample.data.3B       <- analyze_sample(seqs3$B, locus_attrs, 3)
-  sample.summary.3B    <- summarize_sample(sample.data.3B, 'B')
+  sample.summary.3B    <- summarize_sample(sample.data.3B, 'B',
+                                         fraction.min = 0.05, counts.min = 500)
   sample.data.empty    <- analyze_sample(c(), locus_attrs, 3)
-  sample.summary.empty <- summarize_sample(sample.data.empty, "B")
+  sample.summary.empty <- summarize_sample(sample.data.empty, "B",
+                                         fraction.min = 0.05, counts.min = 500)
 
   expect_equal(sample.summary.1B$ProminentSeqs,    3)
   expect_equal(sample.summary.2B$ProminentSeqs,    4)
@@ -124,7 +132,8 @@ test_that("summarize_sample rejects low-count samples", {
   # the counts to a low number.  This should still report some stats but should
   # leave out the allele1/allele2 information.
   sample.data$Count <- sample.data$Count/100
-  sample.summary <- summarize_sample(sample.data, "A")
+  sample.summary <- summarize_sample(sample.data, "A",
+                                     fraction.min = 0.05, counts.min = 500)
   with(sample.summary, {
     expect_equal(Allele1Seq, as.character(NA))
     expect_equal(Allele1Count, as.integer(NA))

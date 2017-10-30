@@ -10,7 +10,8 @@ test_that("analyze_dataset processes samples correctly", {
   write_seqs(seqs, data.dir)
   # prepare_dataset tested separately in test_io.R
   dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
-  results <- analyze_dataset(dataset, locus_attrs)
+  results <- analyze_dataset(dataset, locus_attrs, fraction.min = 0.05,
+                             counts.min = 500, nrepeats = 3)
   with(results, {
     # These should just match what we fed in via dataset.
     expect_equal(summary$Filename,  dataset$Filename)
