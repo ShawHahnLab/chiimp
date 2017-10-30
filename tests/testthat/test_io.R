@@ -40,17 +40,17 @@ test_that("load_locus_attrs handles missing column names", {
 # test prepare_dataset ----------------------------------------------------
 
 test_that("prepare_dataset parses file paths", {
-  fail("test not yet implemented")
+  skip("test not yet implemented")
 })
 
 test_that("prepare_dataset works on nested directories", {
-  fail("test not yet implemented")
+  skip("test not yet implemented")
 })
 
 test_that("prepare_dataset handles different field ordering", {
-  fail("test not yet implemented")
+  skip("test not yet implemented")
 })
 
 test_that("prepare_dataset handles broken patterns", {
-  fail("test not yet implemented")
+  skip("test not yet implemented")
 })

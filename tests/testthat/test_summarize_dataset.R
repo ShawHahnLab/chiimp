@@ -43,7 +43,7 @@ test_that("make_dist_mat produces a valid distance matrix", {
 })
 
 test_that("make_dist_mat_known produces sample-to-individual distance matrix", {
-  fail("test not yet implemented")
+  skip("test not yet implemented")
 })
 
 # test_calc_genotype_distance ---------------------------------------------
