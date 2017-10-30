@@ -45,7 +45,6 @@ analyze_dataset <- function(dataset,
   }
   if (num.cores > 1) {
     # Set up the cluster and export requried names.
-    cluster <- parallel::makeCluster(num.cores)
     cluster_names <- c("locus_attrs",
                        "load_seqs",
                        "summarize_sample",
@@ -55,12 +54,16 @@ analyze_dataset <- function(dataset,
                        "check_motif",
                        "find_stutter",
                        "check_length")
+    cluster <- parallel::makeCluster(num.cores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
     parallel::clusterExport(cluster, cluster_names)
-    # Load, analyze, and summarize each sample across the cluster.
-    raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry)
-    parallel::stopCluster(cluster)
+    tryCatch({
+      # Load, analyze, and summarize each sample across the cluster.
+      raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry)
+    }, finally = {
+      parallel::stopCluster(cluster)
+    })
   } else {
     raw.results <- apply(dataset, 1, analyze.entry)
   }

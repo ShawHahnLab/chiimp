@@ -281,14 +281,17 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
     # If there are any other missing sequences, put a stub in place so msa still
     # runs without complaints.
     a[a==''] <- '-'
-    # TODO make this safer.  if msa(...) crashes sink() won't get called.  Use
-    # tryCatch?
-    sink('/dev/null')
-    alignments <- msa::msaClustalW(a,
-                                   type="dna",
-                                   substitutionMatrix = 'clustalw',
-                                   ...)
-    sink()
+    # msa() generates a bunch of text on standard output and I can't see any
+    # options to turn that off.  Using a workaround here.
+    tryCatch({
+      sink('/dev/null')
+      alignments <- msa::msaClustalW(a,
+                                     type="dna",
+                                     substitutionMatrix = 'clustalw',
+                                     ...)
+    }, finally = {
+      sink()
+    })
     alignments
   })
 }
