@@ -5,7 +5,7 @@
 \title{Save alignment visualizations to image files}
 \usage{
 save_alignment_images(alignments, dp, image.func = "png", width = 1600,
-  height = 1200, res = 150)
+  height = 1200, res = 150, ...)
 }
 \arguments{
 \item{alignments}{list of MSA alignment objects.  The name of each alignment

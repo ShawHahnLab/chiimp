@@ -2,17 +2,14 @@
 % Please edit documentation in R/report.R
 \name{histogram}
 \alias{histogram}
-\title{Plot histogram of STR sample}
+\title{Plot basic histogram of STR sample}
 \usage{
-histogram(samp, stacked = TRUE, main = NULL, locus.name = NULL,
-  sample.summary = NULL)
+histogram(samp, main = "Number of Reads by Sequence Length",
+  locus.name = NULL, sample.summary = NULL, cutoff_fraction = 0.05,
+  xlim = range(samp$Length))
 }
 \arguments{
 \item{samp}{data frame of dereplicated sequences.}
-
-\item{stacked}{should bars be stacked together to add up to the total count
-for each length?  Otherwise they will be overlaid, so each bar height only
-corresponds to the count for that exact sequence.}
 
 \item{main}{title of the plot.}
 
