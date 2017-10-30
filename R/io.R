@@ -6,6 +6,9 @@
 locus_attrs_cols <- c("LengthMin", "LengthMax", "LengthBuffer", "Motif",
                       "Primer", "ReversePrimer")
 
+# Exepcted column names for genotypes.known
+genotypes_cols <- c("Name", "Locus", "Allele1Seq", "Allele2Seq")
+
 
 #' Load configuration file
 #'
@@ -41,6 +44,28 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
     warning(paste("Missing columns in locus_attrs table:",
                   locus_attrs_cols[col.missing]))
   }
+  data
+}
+
+#' Load table of genotypes
+#'
+#' Load a comman-separated table of genotypes, one pair of alleles per row.
+#'
+#' @param fp path to text file.
+#' @param ... additional arguments passed to \code{read.table}.
+#'
+#' @return data frame of genotypes
+#'
+#' @export
+load_genotypes <- function(fp, ...) {
+  data <- read.table(fp, header = T, sep=',', colClasses = "character",
+                     na.strings = "", ...)
+  col.missing <- is.na(match(genotypes_cols, colnames(data)))
+  if (any(col.missing)) {
+    warning(paste("Missing columns in genotypes table:",
+                  genotypes_cols[col.missing]))
+  }
+  rownames(data) <- make_rownames(data)
   data
 }
 
@@ -221,7 +246,6 @@ save_alignments <- function(alignments, dp) {
 #' @param width integer width of image.
 #' @param height integer height of image.
 #' @param res integer resolution of image in PPI.
-#' @param ... additional arguments to \code{image.func}.
 #'
 #' @export
 save_alignment_images <- function(alignments, dp, image.func="png",
@@ -242,6 +266,39 @@ save_alignment_images <- function(alignments, dp, image.func="png",
       dev.off()
 
     }
+  }))
+}
+
+#' Save sequence histogram visualizations to image files
+#'
+#' Take a full results list and save a histogram of each sample to a separate
+#' image file in a specified directory.
+#'
+#' @param results list of results as created by \code{analyze.dataset}.
+#' @param dp output directory path.
+#' @param image.func name of function to call for saving each image.
+#' @param width integer width of image.
+#' @param height integer height of image.
+#' @param res integer resolution of image in PPI.
+#'
+#' @export
+save_histograms <- function(results, dp, image.func="png",
+                            width=1600, height=1200, res=150) {
+  if (!dir.exists(dp))
+    dir.create(dp, recursive = TRUE)
+  invisible(lapply(names(results$data), function(entry) {
+    fp <- file.path(dp, paste(entry, image.func, sep='.'))
+    img.call <- call(image.func,
+                     fp,
+                     width = width,
+                     height = height,
+                     res = res)
+    eval(img.call)
+    histogram(results$data[[entry]],
+              locus.name = as.character(results$summary[entry, "Locus"]),
+              sample.summary = results$summary[entry, ],
+              main = entry)
+    dev.off()
   }))
 }
 
@@ -266,7 +323,7 @@ save_dist_mat <- function(dist_mat, fp) {
 # create unique rownames for the given data frame, using whichever sample
 # metadata columns are available.
 make_rownames <- function(data) {
-  cols.names <- c("Sample", "Replicate", "Locus")
+  cols.names <- c("Sample", "Name", "Replicate", "Locus")
   cols.idx <- match(cols.names, colnames(data))
   cols.idx <- cols.idx[!is.na(cols.idx)]
   cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
