@@ -1,0 +1,5 @@
+## Identification with Known Genotypes
+
+```{r identifications}
+# TODO summarize in table the most likely identities per sample
+```

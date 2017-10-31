@@ -1,0 +1,69 @@
+## Counts per Locus
+
+```{r contamination, results='asis'}
+
+# maximum number of rows in a given chunked heatmap
+max.rows <- 30
+
+# Create table of counts of sequences that match each possible locus across 
+# samples.  Only include loci we expect from the metadata, rather than any known
+# in locus_attrs.
+.levels <- match(rownames(locus_attrs), results$summary$Locus)
+.levels <- results$summary$Locus[.levels[!is.na(.levels)]]
+tbl <- do.call(rbind, lapply(results$data, function(d) {
+                d$MatchingLocus <- factor(d$MatchingLocus,
+                                          levels = .levels)
+                sapply(split(d$Count, d$MatchingLocus), sum)
+              }))
+
+# Order rows to match the order in locus_attrs.  Ideally this should already be 
+# consistent (but it isn't).
+ord.loc <- order(match(results$summary$Locus, rownames(locus_attrs)))
+tbl <- tbl[ord.loc, ]
+
+# Make some extra columns for total sequences and sequences matching the 
+# expected locus.  Bind these to the original data to force the heatmap to use a
+# uniform scale.
+cols.match <- results$summary[rownames(tbl), "Locus"]
+tbl.anno <- data.frame(Total=rowSums(tbl),
+                       Matching=sapply(seq_along(cols.match),
+                          function(i) tbl[i, as.character(cols.match[i])]))
+tbl <- cbind(tbl.anno, tbl)
+
+# Switch to log scale
+tbl[tbl==0] <- NA
+tbl <- log10(tbl)
+
+# Count samples per locus, for breaking big heatmaps into smaller chunks but not
+# splitting loci
+tbl.loci <- table(results$summary$Locus)
+tbl.loci <- tbl.loci[match(rownames(locus_attrs), names(tbl.loci))]
+tbl.loci <- tbl.loci[!is.na(tbl.loci)]
+
+# Break loci into chunks to keep heatmap sizes reasonable
+loci.chunked <- split(names(tbl.loci), floor(cumsum(tbl.loci)/max.rows))
+
+# Break on powers of ten (since we already log10'd above)
+breaks <- 0:ceiling(max(tbl, na.rm=T))
+color <- viridis::viridis(max(breaks))
+
+# Draw each heatmap across chunks of loci.  Written to assume there will be
+# multiple but this should work fine even if there's only one.
+for (loci in loci.chunked) {
+  idx <- results$summary$Locus %in% loci
+  idx.row <- rownames(results$summary)[idx]
+  heading <- if (length(loci) > 1) {
+    paste("Samples for Loci", loci[1], "-", loci[length(loci)])
+  } else {
+    paste("Samples for Locus", loci[1])
+  }
+  if (length(loci.chunked) > 1)
+    cat(paste0("\n\n### ", heading, "\n\n"))
+  pheatmap::pheatmap(tbl[rownames(tbl) %in% idx.row, ],
+                    cluster_rows = F,
+                    cluster_cols = F,
+                    gaps_col = c(1,2),
+                    color = color,
+                    breaks = breaks) 
+}
+```

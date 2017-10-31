@@ -33,6 +33,7 @@ config.defaults <- list(
   fp.output.summary="summary.csv",
   fp.report="report.html",
   fp.output.dist_mat="sample-distances.csv",
+  fp.output.rds=NULL,
   dp.output.histograms="histograms",
   dp.output.alignments="alignments",
   dp.output.alignment_images="alignment-images",
@@ -45,11 +46,15 @@ config.defaults <- list(
   # Report generation settings
   report=TRUE,
   report.echo=FALSE,
+  report.title="Microsatellite Report",
+  report.hash_len=6,
+  report.locus_chunks=NULL,
   report.sections = list(genotypes       = TRUE,
                          identifications = TRUE,
                          distances       = TRUE,
                          flags           = TRUE,
-                         alignments      = TRUE),
+                         alignments      = TRUE,
+                         contamination   = TRUE),
   # Other settings
   verbose=TRUE)
 
@@ -77,6 +82,7 @@ full_analysis <- function(config) {
       config.full$dp.output
     }
 
+  # Only show identifications if a known genotypes table was supplied
   config.full$report.sections$identifications <-
     ! is.null(config.full$fp.genotypes.known) &&
     config.full$report.sections$identifications
@@ -106,13 +112,17 @@ full_analysis <- function(config) {
     save_sample_data(results$data, file.path(dp.output, dp.output.processed_samples))
     save_allele_seqs(results$summary, file.path(dp.output, dp.output.allele_seqs))
     save_dist_mat(results$dist_mat, file.path(dp.output, fp.output.dist_mat))
+    if (!is.null(fp.output.rds))
+      saveRDS(results, file.path(dp.output, fp.output.rds))
     if (report) {
       if (verbose) logmsg("Creating report...")
       fp.report.in <- system.file("report", "report.Rmd", package="microsat")
       fp.report.out <- file.path(dp.output, fp.report)
       if (!dir.exists(dirname(fp.report.out)))
         dir.create(dirname(fp.report.out), recursive = TRUE)
-      rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out)
+      pandoc_args <- c(paste0("--metadata=title:\"", report.title, "\""))
+      rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
+                        output_options = list(pandoc_args = pandoc_args))
     }
     if (verbose) logmsg("Done.")
     return(results)

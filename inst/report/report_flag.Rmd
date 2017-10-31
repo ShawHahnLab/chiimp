@@ -1,0 +1,34 @@
+## Flagged Values
+
+### Possible PCR Stutter
+
+```{r report.stutter}
+plot_heatmap_stutter(results$summary)
+```
+
+### More than Two Prominent Sequences
+
+These tables are color-coded to show samples with more than two prominent 
+sequences. Cases with more than two could imply contamination or excessive
+PCR stutter.
+
+```{r report.peaks}
+plot_heatmap_prominent_seqs(results$summary)
+```
+
+### Residual Reads from Other Sequnces
+
+These tables are color-coded by the proportion of locus-matching reads 
+represented by the called alleles per sample, running from red for 0% to white 
+for 100%.  The proportion is calculated for both alleles and color-coded with
+the same color for both.
+
+```{r report.prop}
+plot_heatmap_proportions(results$summary)
+```
+
+### Possible Homozygous Samples
+
+```{r report.homozygous}
+plot_heatmap_homozygous(results$summary)
+```

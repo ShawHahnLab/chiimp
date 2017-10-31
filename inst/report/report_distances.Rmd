@@ -1,0 +1,5 @@
+## Distance Matrix
+
+```{r distances}
+plot_dist_mat(results$dist_mat)
+```

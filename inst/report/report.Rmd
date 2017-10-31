@@ -1,0 +1,27 @@
+---
+output:
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = report.echo, fig.width = 8, fig.height = 8)
+```
+
+```{r child="report_genotypes.Rmd", eval=report.sections[["genotypes"]]}
+```
+
+```{r child="report_identifications.Rmd", eval=report.sections[["identifications"]]}
+```
+
+```{r child="report_distances.Rmd", eval=report.sections[["distances"]]}
+```
+
+```{r child="report_flag.Rmd", eval=report.sections[["flags"]]}
+```
+
+```{r child="report_alignments.Rmd", eval=report.sections[["alignments"]]}
+```
+
+```{r child="report_contamination.Rmd", eval=report.sections[["contamination"]]}
+```

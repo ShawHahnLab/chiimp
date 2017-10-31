@@ -1,0 +1,30 @@
+## Genotype Summary
+
+```{r genotypes, results='asis'}
+
+kable.genotypes <- function(data) {
+  bootstrap_options <- c("striped", "hover", "condensed")
+  k <- knitr::kable(data, row.names = FALSE, format = "html")
+  kableExtra::kable_styling(k,
+                            bootstrap_options = bootstrap_options,
+                            full_width = F)
+}
+
+tbl <- report_genotypes(results$summary, locus_attrs = locus_attrs,
+                        hash.len = report.hash_len)
+if (!is.null(report.locus_chunks)) {
+  prefix <- match(c("Sample", "Replicate"), colnames(tbl))
+  prefix <- prefix[!is.na(prefix)]
+  for(chunk_name in names(report.locus_chunks)) {
+    locus_cols <- paste(rep(report.locus_chunks[[chunk_name]], each=2),
+                        c(1,2),
+                        sep='_')
+    m <- match(locus_cols, colnames(tbl))
+    m <- m[!is.na(m)]
+    cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
+    cat(kable.genotypes(tbl[, c(prefix, m)]))
+  }
+} else {
+ cat(kable.genotypes(tbl))
+}
+```
