@@ -1,0 +1,6 @@
+---
+ 
+dp.data: '~/data/str-dataset'
+pattern: 'Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+)_.*\.fastq$'
+dp.output: 'str-results'
+fp.locus_attrs: '~/analysis/locus_attrs.tsv'
