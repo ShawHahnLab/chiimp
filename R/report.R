@@ -26,9 +26,16 @@
 #' @export
 report_genotypes <- function(results_summary,
                              allele.names=NULL,
+                             locus_attrs=NULL,
                              hash.len=6,
                              ...) {
   tbl <- summarize_genotypes(results_summary, ...)
+  # At this point there are columns for sample, replicate, and then the loci.
+  # If locus_attrs was given reorder the loci columns correspondingly.
+  if (!missing(locus_attrs)) {
+    locus_order <- order(match(colnames(tbl)[-(1:2)], rownames(locus_attrs)))
+    tbl <- tbl[, c(1:2, 2+locus_order)]
+  }
   # Name each entry in the table with either a custom or auto-generated short
   # name.
   for (j in 3:ncol(tbl)) {
