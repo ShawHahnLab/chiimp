@@ -78,6 +78,7 @@ summarize_genotypes <- function(results_summary,
                        c(1,2),
                        sep = '_')
   colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
+  tbl <- tbl[order_entries(tbl), ]
   rownames(tbl) <- make_rownames(tbl)
   tbl
 }
@@ -99,6 +100,7 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
                        1:repeats,
                        sep = '_')
   colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
+  tbl <- tbl[order_entries(tbl), ]
   rownames(tbl) <- make_rownames(tbl)
   tbl
 }

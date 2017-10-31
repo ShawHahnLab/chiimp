@@ -101,12 +101,11 @@ prepare_dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
   # build a data frame with filename as row name
   data <- do.call(data.frame, seq_file_attrs)
   data$Filename <- seq_files
-  # order by locus/sample/replicate
-  data <- data[with(data, order(Locus, Sample, Replicate)), ]
   data$Replicate <- ifelse(data$Replicate == "",
                            NA,
                            as.integer(as.character(data$Replicate)))
-  #data$Locus <- ifelse(data$Locus == "", NA, data$Locus)
+  # order by locus/sample/replicate
+  data <- data[order_entries(data), ]
   rownames(data) <- make_rownames(data)
   return(data)
 }

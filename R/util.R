@@ -30,3 +30,15 @@ make_allele_name <- function(data, hash.len=6) {
     as.character(data)
   }
 }
+
+# Return an order for the rows of the given data frame, using whichever sample
+# metadata columns are available.  Treat sample identifiers as integers
+# primarily but resolve further by character sorting.
+order_entries <- function(data) {
+  items <- list(data$Locus,
+                as.integer(gsub("[^0-9]+", "", data$Sample)),
+                data$Sample,
+                data$Replicate)
+  items <- items[!sapply(items, is.null)]
+  do.call(order, items)
+}
