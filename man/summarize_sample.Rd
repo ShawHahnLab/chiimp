@@ -4,8 +4,7 @@
 \alias{summarize_sample}
 \title{Summarize a processed STR sample}
 \usage{
-summarize_sample(sample.data, locus.name, fraction.min = 0.05,
-  counts.min = 500)
+summarize_sample(sample.data, locus.name, fraction.min, counts.min)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by

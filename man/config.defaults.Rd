@@ -4,7 +4,7 @@
 \name{config.defaults}
 \alias{config.defaults}
 \title{Default microsatellite configuration}
-\format{An object of class \code{list} of length 17.}
+\format{An object of class \code{list} of length 23.}
 \usage{
 config.defaults
 }
@@ -21,6 +21,7 @@ Notable Options:
 \item ord: order of fields in the input filename pattern
 \item dp.output: directory path for saving output data
 \item fp.locus_attrs: file path to locus attributes TSV file
+\item fp.genotypes.known: file path to known genotypes TSV file
 }
 }
 \keyword{datasets}

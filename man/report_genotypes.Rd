@@ -4,7 +4,8 @@
 \alias{report_genotypes}
 \title{Create genotype summary table}
 \usage{
-report_genotypes(results_summary, allele.names = NULL, hash.len = 6, ...)
+report_genotypes(results_summary, allele.names = NULL, locus_attrs = NULL,
+  hash.len = 6, ...)
 }
 \arguments{
 \item{results_summary}{data frame as produced by \code{analyze_dataset}.}

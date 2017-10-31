@@ -6,7 +6,7 @@
 \usage{
 analyze_dataset(dataset, locus_attrs, num.cores = max(1,
   as.integer(parallel::detectCores()/2) - 1),
-  summary.function = summarize_sample)
+  summary.function = summarize_sample, nrepeats, fraction.min, counts.min)
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
@@ -20,6 +20,14 @@ analysis.}
 
 \item{summary.function}{function to use when summarizing each sample's full
 details into the standard attributes.}
+
+\item{fraction.min}{numeric threshold for the minimum proportion of counts a
+given entry must have, compared to the total matching all criteria for that
+locus, to be considered as a potential allele.}
+
+\item{counts.min}{numeric threshold for the minimum number of counts that
+must be present, in total across entries passing all filters, for potential
+alleles to be considered.}
 }
 \value{
 list of results

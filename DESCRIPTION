@@ -12,6 +12,8 @@ Imports:
   dnaplotr (>= 0.1),
   dnar (>= 0.1),
   dplyr (>= 0.7.4),
+  kableExtra (>= 0.2.1.9000),
+  knitr (>= 1.16),
   magrittr (>= 1.5),
   msa (>= 1.2.1),
   openssl (>= 0.9.6),

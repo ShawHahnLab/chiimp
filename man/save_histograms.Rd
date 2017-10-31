@@ -5,7 +5,7 @@
 \title{Save sequence histogram visualizations to image files}
 \usage{
 save_histograms(results, dp, image.func = "png", width = 1600,
-  height = 1200, res = 150, ...)
+  height = 1200, res = 150)
 }
 \arguments{
 \item{results}{list of results as created by \code{analyze.dataset}.}
@@ -19,8 +19,6 @@ save_histograms(results, dp, image.func = "png", width = 1600,
 \item{height}{integer height of image.}
 
 \item{res}{integer resolution of image in PPI.}
-
-\item{...}{additional arguments to \code{image.func}.}
 }
 \description{
 Take a full results list and save a histogram of each sample to a separate
