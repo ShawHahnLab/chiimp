@@ -98,7 +98,6 @@ prepare_dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
   # filename as the first column, then whatever order the attrs are in
   n <- c("Filename", "Replicate", "Sample", "Locus")
   names(seq_file_attrs) <- n[c(1, 1 + ord)]
-  # build a data frame with filename as row name
   data <- do.call(data.frame, seq_file_attrs)
   data$Filename <- seq_files
   data$Replicate <- ifelse(data$Replicate == "",
