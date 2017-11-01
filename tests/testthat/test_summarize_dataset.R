@@ -3,7 +3,7 @@ prepare_for_summary <- function() {
   write_seqs(seqs, data.dir)
   dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
   results <- analyze_dataset(dataset, locus_attrs, fraction.min = 0.05,
-                             counts.min = 500, nrepeats = 3)
+                             counts.min = 500, nrepeats = 3, num.cores = 1)
   lapply(dataset$Filename, file.remove)
   file.remove(data.dir)
   return(list(dataset=dataset, results=results))

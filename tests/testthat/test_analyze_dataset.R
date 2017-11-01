@@ -4,14 +4,23 @@
 # At this point we should have all the basics covered, and can cover the further
 # analysis in summarize_dataset.
 
+# Currently if I try to run analyze_dataset with the parallel package the tests
+# fail when run under R CMD check but work fine when run interactively.  For now
+# I'm just sticking with num.cores = 1 here and in test_summarize_dataset.R to
+# avoid calling parallel:: functions.
+# Possibly relevant:
+#  * https://github.com/r-lib/testthat/issues/602
+#  * https://github.com/hadley/devtools/issues/1526
+#  * https://github.com/r-lib/testthat/issues/86
+
 test_that("analyze_dataset processes samples correctly", {
-  # The general case for analyze_dataset
+  # The general case for analyze_dataset.
   data.dir <- tempfile()
   write_seqs(seqs, data.dir)
   # prepare_dataset tested separately in test_io.R
   dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
   results <- analyze_dataset(dataset, locus_attrs, fraction.min = 0.05,
-                             counts.min = 500, nrepeats = 3)
+                             counts.min = 500, nrepeats = 3, num.cores = 1)
   with(results, {
     # These should just match what we fed in via dataset.
     expect_equal(summary$Filename,  dataset$Filename)

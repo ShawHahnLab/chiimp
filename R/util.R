@@ -21,7 +21,7 @@ make_allele_name <- function(data, hash.len=6) {
   if (is.character(data)) {
     if(hash.len > 0) {
       paste(nchar(data),
-            substr(openssl::md5(tbl[i, j]), 1, hash.len),
+            substr(openssl::md5(data), 1, hash.len),
             sep = "-")
     } else {
       nchar(data)

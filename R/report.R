@@ -1,8 +1,5 @@
 # Handle report generation and plotting.  No real processing should happen here.
 
-# TODO support some kind of "pagination" across loci to handle cases with many
-# loci.
-
 # Tables ------------------------------------------------------------------
 
 #' Create genotype summary table
@@ -16,6 +13,9 @@
 #' @param allele.names optional data frame of custom allele names.  If present
 #'   the columns "Sequence" and "Name" will be used to map exact sequences to
 #'   custom names.
+#' @param locus_attrs optional locus attributes data frame as produced by
+#'   \code{load_locus_attrs}.  Used to order locus columns in the returned data
+#'   frame.
 #' @param hash.len number of characters of the sequence has to include when
 #'   auto-generating allele names.  If set to zero the hash suffix is not
 #'   included.
@@ -78,6 +78,9 @@ report_attribute <- function(dataset.summary, attrib, ...) {
 #'   locus with the highest matched counts will be used.
 #' @param sample.summary summary data frame as prepared by
 #'   \code{summarize_sample}
+#' @param cutoff_fraction numeric threshold for the fraction of locus-matching
+#'   counts needed to call an allele.
+#' @param xlim numeric range for x-axis.
 #'
 #' @export
 #' @importFrom magrittr "%>%"
@@ -145,9 +148,10 @@ histogram <- function(samp,
   }
 
   # Define subset of sample data that matches all locus conditions
-  samp.filt <- subset(samp, MatchingLocus == locus.name &
-                        MotifMatch &
-                        LengthMatch)
+  samp.filt <- with(samp,
+                 subset(samp, MatchingLocus == locus.name &
+                              MotifMatch &
+                              LengthMatch))
 
   # Just the matching sequences, if there are any.
   if (nrow(samp.filt) > 0) {
@@ -521,4 +525,38 @@ plot_heatmap_proportions <- function(results_summary, ...) {
                color = colors,
                breaks = breaks,
                ...)
+}
+
+
+# Markdown ----------------------------------------------------------------
+
+# convenience function for post-processing report_genotypes() output
+kable_genotypes <- function(data) {
+  bootstrap_options <- c("striped", "hover", "condensed")
+  k <- knitr::kable(data, row.names = FALSE, format = "html")
+  kableExtra::kable_styling(k,
+                            bootstrap_options = bootstrap_options,
+                            full_width = F)
+}
+
+# Write markdown tables to standard output for report_genotypes()
+rmd_kable_genotypes <- function(results, locus_attrs, hash.len, locus_chunks) {
+  tbl <- report_genotypes(results$summary,
+                          locus_attrs = locus_attrs,
+                          hash.len = hash.len)
+  if (!is.null(locus_chunks)) {
+    prefix <- match(c("Sample", "Replicate"), colnames(tbl))
+    prefix <- prefix[!is.na(prefix)]
+    for(chunk_name in names(locus_chunks)) {
+      locus_cols <- paste(rep(locus_chunks[[chunk_name]], each=2),
+                          c(1,2),
+                          sep='_')
+      m <- match(locus_cols, colnames(tbl))
+      m <- m[!is.na(m)]
+      cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
+      cat(kable_genotypes(tbl[, c(prefix, m)]))
+    }
+  } else {
+    cat(kable_genotypes(tbl))
+  }
 }

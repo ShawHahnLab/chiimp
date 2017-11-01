@@ -2,6 +2,8 @@
 
 ```{r contamination, results='asis'}
 
+# TODO move this into report.R
+
 # maximum number of rows in a given chunked heatmap
 max.rows <- 30
 
