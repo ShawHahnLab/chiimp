@@ -1,0 +1,9 @@
+# https://docs.travis-ci.com/user/languages/r
+language: r
+r:
+	- oldrel
+	- release
+	- devel
+	# Include Bioconductor for msa
+	- bioc-devel
+cache: packages
