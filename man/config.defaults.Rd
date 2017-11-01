@@ -3,17 +3,20 @@
 \docType{data}
 \name{config.defaults}
 \alias{config.defaults}
-\title{Default microsatellite configuration}
-\format{An object of class \code{list} of length 23.}
+\title{Analyze Microsatellites}
+\format{An object of class \code{list} of length 24.}
 \usage{
 config.defaults
 }
 \description{
+Analyze DNA microsatellites in high-throughput sequencing datasets.
+Default microsatellite configuration
+}
+\details{
 The entries in this list show the build-time configuration defaults for all
 aspects of the microsatellite analysis.  These can be overridden by passing a
 list to \code{full_analysis} with entries of the same names.
-}
-\details{
+
 Notable Options:
 \itemize{
 \item dp.data: directory path to input sequence files

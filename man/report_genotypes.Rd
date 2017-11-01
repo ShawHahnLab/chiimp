@@ -14,6 +14,10 @@ report_genotypes(results_summary, allele.names = NULL, locus_attrs = NULL,
 the columns "Sequence" and "Name" will be used to map exact sequences to
 custom names.}
 
+\item{locus_attrs}{optional locus attributes data frame as produced by
+\code{load_locus_attrs}.  Used to order locus columns in the returned data
+frame.}
+
 \item{hash.len}{number of characters of the sequence has to include when
 auto-generating allele names.  If set to zero the hash suffix is not
 included.}

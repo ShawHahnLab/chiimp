@@ -21,6 +21,9 @@ analysis.}
 \item{summary.function}{function to use when summarizing each sample's full
 details into the standard attributes.}
 
+\item{nrepeats}{number of repeats of each locus' motif to require for a
+match.}
+
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that
 locus, to be considered as a potential allele.}
