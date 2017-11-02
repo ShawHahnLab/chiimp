@@ -3,3 +3,4 @@
 ^\.travis.yml$
 environment.yml
 setup.sh
+README.md
