@@ -22,5 +22,8 @@ Imports:
   rmarkdown (>= 1.6),
   stringr (>= 1.2.0),
   yaml (>= 2.1.14)
+Remotes:
+  github::sherrillmix/dnar,
+  github::sherrillmix/dnaplotr
 RoxygenNote: 6.0.1
 Suggests: testthat
