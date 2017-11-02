@@ -69,10 +69,10 @@ load_genotypes <- function(fp, ...) {
   data
 }
 
+# TODO rewrite this mess!
 #' Load table of locus attributes
 #'
 #' Load a tab-separated table of locus attributes to use for analysis.
-#' TODO rewrite this mess!
 #'
 #' @param directory location to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.

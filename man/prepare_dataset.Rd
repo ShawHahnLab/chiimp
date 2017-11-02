@@ -19,5 +19,4 @@ data frame of metadata for all files found
 }
 \description{
 Load a tab-separated table of locus attributes to use for analysis.
-TODO rewrite this mess!
 }
