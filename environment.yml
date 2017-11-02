@@ -1,0 +1,17 @@
+# Anaconda environment setup file
+# https://conda.io/docs/user-guide/tasks/manage-environments.html
+name: microsat
+channels:
+- defaults
+dependencies:
+  - r
+  - r-devtools
+  - r-dplyr
+  - r-knitr
+  - r-magrittr
+  - r-openssl
+  - r-roxygen2
+  - r-rmarkdown
+  - r-stringr
+  - r-testthat
+  - r-yaml
