@@ -1,6 +1,4 @@
 #!/usr/bin/env Rscript
 
-#library(microsat)
-devtools::load_all('~/dev/microsat')
-# TODO document pandoc dependency at OS-level.
+library(microsat)
 results <- microsat::main()
