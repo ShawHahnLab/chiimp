@@ -143,7 +143,7 @@ load_seqs <- function(fp.seqs) {
 save_results_summary <- function(results_summary, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  write.csv(results_summary, fp, na = "")
+  utils::write.csv(results_summary, fp, na = "")
 }
 
 #' Save identified alleles to FASTA files
@@ -202,7 +202,7 @@ save_sample_data <- function(results_data, dp) {
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
     fp <- file.path(dp, paste0(n, '.csv'))
-    write.csv(results_data[[n]], fp, na = "", quote = FALSE)
+    utils::write.csv(results_data[[n]], fp, na = "", quote = FALSE)
   }))
 }
 
@@ -261,7 +261,7 @@ save_alignment_images <- function(alignments, dp, image.func="png",
       eval(img.call)
       plot_alignment(alignments[[loc]],
                      main = paste('Alignment for Locus', loc))
-      dev.off()
+      grDevices::dev.off()
 
     }
   }))
@@ -296,7 +296,7 @@ save_histograms <- function(results, dp, image.func="png",
               locus.name = as.character(results$summary[entry, "Locus"]),
               sample.summary = results$summary[entry, ],
               main = entry)
-    dev.off()
+    grDevices::dev.off()
   }))
 }
 
@@ -312,5 +312,5 @@ save_histograms <- function(results, dp, image.func="png",
 save_dist_mat <- function(dist_mat, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  write.csv(dist_mat, fp)
+  utils::write.csv(dist_mat, fp)
 }
