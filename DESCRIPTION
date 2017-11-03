@@ -12,6 +12,8 @@ Imports:
   dnaplotr (>= 0.1),
   dnar (>= 0.1),
   dplyr (>= 0.7.4),
+  graphics (>= 3.2.3),
+  grDevices (>= 3.2.3),
   kableExtra (>= 0.2.1.9000),
   knitr (>= 1.16),
   magrittr (>= 1.5),
@@ -20,7 +22,9 @@ Imports:
   parallel (>= 3.2.3),
   pheatmap (>= 1.0.8),
   rmarkdown (>= 1.6),
+  stats (>= 3.2.3),
   stringr (>= 1.2.0),
+  utils (>= 3.2.3),
   yaml (>= 2.1.14)
 Remotes:
   github::sherrillmix/dnar,

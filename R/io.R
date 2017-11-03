@@ -38,7 +38,11 @@ load_config <- function(fp.config) {
 #'
 #' @export
 load_locus_attrs <- function(fp.locus_attrs, ...) {
-  data <- read.table(fp.locus_attrs, header = T, row.names = 1, sep='\t', ...)
+  data <- utils::read.table(fp.locus_attrs,
+                            header = T,
+                            row.names = 1,
+                            sep="\t",
+                            ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in locus_attrs table:",
@@ -58,7 +62,7 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 #'
 #' @export
 load_genotypes <- function(fp, ...) {
-  data <- read.table(fp, header = T, sep=',', colClasses = "character",
+  data <- utils::read.table(fp, header = T, sep=',', colClasses = "character",
                      na.strings = "", ...)
   col.missing <- is.na(match(genotypes_cols, colnames(data)))
   if (any(col.missing)) {
@@ -143,7 +147,7 @@ load_seqs <- function(fp.seqs) {
 save_results_summary <- function(results_summary, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  write.csv(results_summary, fp, na = "")
+  utils::write.csv(results_summary, fp, na = "")
 }
 
 #' Save identified alleles to FASTA files
@@ -202,7 +206,7 @@ save_sample_data <- function(results_data, dp) {
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
     fp <- file.path(dp, paste0(n, '.csv'))
-    write.csv(results_data[[n]], fp, na = "", quote = FALSE)
+    utils::write.csv(results_data[[n]], fp, na = "", quote = FALSE)
   }))
 }
 
@@ -261,7 +265,7 @@ save_alignment_images <- function(alignments, dp, image.func="png",
       eval(img.call)
       plot_alignment(alignments[[loc]],
                      main = paste('Alignment for Locus', loc))
-      dev.off()
+      grDevices::dev.off()
 
     }
   }))
@@ -296,7 +300,7 @@ save_histograms <- function(results, dp, image.func="png",
               locus.name = as.character(results$summary[entry, "Locus"]),
               sample.summary = results$summary[entry, ],
               main = entry)
-    dev.off()
+    grDevices::dev.off()
   }))
 }
 
@@ -312,5 +316,5 @@ save_histograms <- function(results, dp, image.func="png",
 save_dist_mat <- function(dist_mat, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  write.csv(dist_mat, fp)
+  utils::write.csv(dist_mat, fp)
 }

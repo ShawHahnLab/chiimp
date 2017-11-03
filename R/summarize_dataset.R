@@ -73,7 +73,7 @@ summarize_genotypes <- function(results_summary,
                               combo[, vars[2]])
   # Reshape into wide table
   combo$ID <- paste(combo$Sample, combo$Replicate, sep='-')
-  tbl <- reshape(combo, v.names = vars, idvar = 'ID',
+  tbl <- stats::reshape(combo, v.names = vars, idvar = 'ID',
                  timevar = 'Locus', direction = 'wide')
   tbl <- tbl[, -3]
   allele_cols <- paste(rep(as.character(unique(combo$Locus)), each=2),
@@ -107,7 +107,7 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
   combo <- results_summary[, c('Sample', 'Replicate', 'Locus', attrib_rep)]
   combo$ID <- paste(combo$Sample, combo$Replicate, sep='-')
   # reshape into wide table
-  tbl <- reshape(combo,
+  tbl <- stats::reshape(combo,
                  v.names = make.names(attrib_rep, unique = T),
                  idvar = 'ID',
                  timevar = 'Locus', direction = 'wide')
@@ -146,7 +146,7 @@ make_dist_mat <- function(results_summary,
   tbl <- summarize_genotypes(results_summary)
   # The entire vector covers all combinations of rows in tbl, filling in a
   # triangle of what would be a distance matrix.
-  distances <- combn(nrow(tbl), 2,
+  distances <- utils::combn(nrow(tbl), 2,
         function(nr) {
           dist.func(tbl[nr[1], -(1:2)],
                     tbl[nr[2], -(1:2)])

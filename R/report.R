@@ -134,9 +134,9 @@ histogram <- function(samp,
   col.allele      <- "#FF0000"
   border.allele   <- "#FF0000"
   # Line showing threshold for allele calls
-  col.cutoff <- rgb(0, 0, 0, 0.5)
+  col.cutoff <- grDevices::rgb(0, 0, 0, 0.5)
   # Shaded region for filtered sequences
-  col.region <- rgb(0, 0, 0, 30, maxColorValue = 255)
+  col.region <- grDevices::rgb(0, 0, 0, 30, maxColorValue = 255)
   lwd <- 5
 
   ## If there were no sequences at all, don't bother plotting.
@@ -154,7 +154,7 @@ histogram <- function(samp,
   # Plot bars for all counts
   xlim <- range(heights$Length)
   ylim <- range(heights$TotalCount)
-  plot(heights$Length,
+  graphics::plot(heights$Length,
        heights$TotalCount,
        type = "h",
        xlim = xlim,
@@ -194,7 +194,7 @@ histogram <- function(samp,
         dplyr::group_by(Length) %>%
         dplyr::summarize(TotalCount = sum(Count))
     })
-    points(heights.filt$Length,
+    graphics::points(heights.filt$Length,
            heights.filt$TotalCount,
            type = "h",
            col = col.filtered,
@@ -202,14 +202,14 @@ histogram <- function(samp,
            lend = 1)
     # Shade the domain of the filtered data in gray
     xlim.filt <- range(samp.filt$Length)
-    polygon(x = rep(xlim.filt, each=2),
+    graphics::polygon(x = rep(xlim.filt, each=2),
             y = c(0, ymax, ymax, 0),
             col = col.region,
             border = NA)
     # Draw a line to mark the cutoff value for what's considered a prominent
     # count
     cutoff <- cutoff_fraction*sum(samp.filt$Count)
-    abline(h = cutoff, col = col.cutoff)
+    graphics::abline(h = cutoff, col = col.cutoff)
   }
 
   # Draw bars for the exact allele sequences identified
@@ -219,7 +219,7 @@ histogram <- function(samp,
     pts.x <- pts.x[!is.na(pts.x)]
     pts.y <- pts.y[!is.na(pts.y)]
     if (length(pts.x) > 0)
-      points(pts.x,
+      graphics::points(pts.x,
              pts.y,
              type = "h",
              col = col.allele,
@@ -228,7 +228,7 @@ histogram <- function(samp,
   }
 
   # Legend
-  legend(x='topright', bty='n',
+  graphics::legend(x='topright', bty='n',
          legend=c("Original",
                   "Filtered",
                   "Called Alleles",
@@ -309,7 +309,7 @@ histogram2 <- function(samp,
     })
 
     # Plot histogram of total counts, gray in background
-    plot(heights$Length,
+    graphics::plot(heights$Length,
          heights$TotalCount,
          type = "h",
          xlim = xlim,
@@ -356,7 +356,7 @@ histogram2 <- function(samp,
           col <- col.filtered
           col.border <- border.filtered
         }
-        polygon(x, y, col = col, border = col.border, lwd=0.5)
+        graphics::polygon(x, y, col = col, border = col.border, lwd=0.5)
       }
     }
   }
@@ -375,18 +375,18 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   # Create grouping factor using sequence length (just strip out the gap
   # character to get the original length back).
   groups <- factor(paste('  ', nchar(gsub('-', '', seqs)), 'bp'))
-  par(mar = c(5, 5, 4, 5))
+  graphics::par(mar = c(5, 5, 4, 5))
   dnaplotr::plotDNA(seqs,
                     groups = groups,
                     ...)
   # Add faint lines between all sequences
   for(i in seq_along(seqs))
-    abline(h=i+0.5, col=rgb(0.5, 0.5, 0.5, 0.5))
+    graphics::abline(h=i+0.5, col=grDevices::rgb(0.5, 0.5, 0.5, 0.5))
   # Add a label for every unique sequence, using the names of the supplied
   # sequences
   if (missing(labels))
     labels <- sapply(strsplit(names(seqs), '_'), '[', 2)
-  axis(4,
+  graphics::axis(4,
        at = 1:length(seqs),
        labels = labels,
        tick = F,
@@ -410,7 +410,7 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
   labels[idx] <- dist_mat[idx]
   diag(labels) <- ''
   dist_scale <- make.dist_scale(num.alleles)
-  color <- rgb(red=1, green=dist_scale, blue=dist_scale)
+  color <- grDevices::rgb(red=1, green=dist_scale, blue=dist_scale)
 
   vals <- dist_mat
   pheatmap::pheatmap(vals,
@@ -418,8 +418,8 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
            display_numbers = labels,
            treeheight_row = 0,
            breaks = 0:num.alleles,
-           clustering_distance_rows = as.dist(dist_mat),
-           clustering_distance_cols = as.dist(dist_mat),
+           clustering_distance_rows = stats::as.dist(dist_mat),
+           clustering_distance_cols = stats::as.dist(dist_mat),
            ...)
 }
 
@@ -519,7 +519,7 @@ plot_heatmap_homozygous <- function(results_summary, ...) {
 plot_heatmap_prominent_seqs <- function(results_summary, ...) {
   # Create a color ramp going from white for 0, 1, or 2 prominent seqs, and
   # shades of red for higher numbers.
-  color_func <- colorRampPalette(c("white", "red"))
+  color_func <- grDevices::colorRampPalette(c("white", "red"))
   ps <- results_summary[!is.na(results_summary$Allele1Seq), "ProminentSeqs"]
   # Deep red will only be used if somehow there are a whole lot of extra
   # sequences (say, 8); otherwise it should just go up to a pink color.
@@ -551,7 +551,7 @@ plot_heatmap_proportions <- function(results_summary, ...) {
   cts <- results_summary[, c('Allele1Count', 'Allele2Count')]
   prop.counted <- rowSums(cts, na.rm=T)/results_summary$CountLocus
   results_summary$ProportionCounted <- prop.counted
-  color_func <- colorRampPalette(c("red", "white"))
+  color_func <- grDevices::colorRampPalette(c("red", "white"))
   breaks <- seq(0, 1, 0.001)
   colors <- color_func(length(breaks) - 1)
   plot_heatmap(results_summary,

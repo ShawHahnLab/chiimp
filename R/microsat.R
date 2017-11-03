@@ -74,7 +74,7 @@ config.defaults <- list(
 #' @export
 full_analysis <- function(config) {
   # Overaly explicit configuration onto the default settings
-  config.full <- modifyList(config.defaults, config)
+  config.full <- utils::modifyList(config.defaults, config)
 
   # Make output path absolute
   config.full$dp.output <-
