@@ -38,7 +38,11 @@ load_config <- function(fp.config) {
 #'
 #' @export
 load_locus_attrs <- function(fp.locus_attrs, ...) {
-  data <- read.table(fp.locus_attrs, header = T, row.names = 1, sep='\t', ...)
+  data <- utils::read.table(fp.locus_attrs,
+                            header = T,
+                            row.names = 1,
+                            sep="\t",
+                            ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in locus_attrs table:",
@@ -58,7 +62,7 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 #'
 #' @export
 load_genotypes <- function(fp, ...) {
-  data <- read.table(fp, header = T, sep=',', colClasses = "character",
+  data <- utils::read.table(fp, header = T, sep=',', colClasses = "character",
                      na.strings = "", ...)
   col.missing <- is.na(match(genotypes_cols, colnames(data)))
   if (any(col.missing)) {

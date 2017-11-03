@@ -146,7 +146,7 @@ make_dist_mat <- function(results_summary,
   tbl <- summarize_genotypes(results_summary)
   # The entire vector covers all combinations of rows in tbl, filling in a
   # triangle of what would be a distance matrix.
-  distances <- combn(nrow(tbl), 2,
+  distances <- utils::combn(nrow(tbl), 2,
         function(nr) {
           dist.func(tbl[nr[1], -(1:2)],
                     tbl[nr[2], -(1:2)])

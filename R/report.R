@@ -375,7 +375,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   # Create grouping factor using sequence length (just strip out the gap
   # character to get the original length back).
   groups <- factor(paste('  ', nchar(gsub('-', '', seqs)), 'bp'))
-  par(mar = c(5, 5, 4, 5))
+  graphics::par(mar = c(5, 5, 4, 5))
   dnaplotr::plotDNA(seqs,
                     groups = groups,
                     ...)
@@ -386,7 +386,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   # sequences
   if (missing(labels))
     labels <- sapply(strsplit(names(seqs), '_'), '[', 2)
-  axis(4,
+  graphics::axis(4,
        at = 1:length(seqs),
        labels = labels,
        tick = F,
@@ -418,8 +418,8 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
            display_numbers = labels,
            treeheight_row = 0,
            breaks = 0:num.alleles,
-           clustering_distance_rows = as.dist(dist_mat),
-           clustering_distance_cols = as.dist(dist_mat),
+           clustering_distance_rows = stats::as.dist(dist_mat),
+           clustering_distance_cols = stats::as.dist(dist_mat),
            ...)
 }
 
