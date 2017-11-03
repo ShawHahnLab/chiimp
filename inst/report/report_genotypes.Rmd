@@ -1,6 +1,6 @@
 ## Genotype Summary
 
-```{r genotypes, results='asis'}
+```{r genotypes, results="asis"}
 rmd_kable_genotypes(results,
                     locus_attrs,
                     report.hash_len,

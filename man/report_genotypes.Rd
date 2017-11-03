@@ -4,12 +4,10 @@
 \alias{report_genotypes}
 \title{Create genotype summary table}
 \usage{
-report_genotypes(results_summary, allele.names = NULL, locus_attrs = NULL,
-  hash.len = 6, ...)
+report_genotypes(tbl, allele.names = NULL, locus_attrs = NULL,
+  hash.len = 6)
 }
 \arguments{
-\item{results_summary}{data frame as produced by \code{analyze_dataset}.}
-
 \item{allele.names}{optional data frame of custom allele names.  If present
 the columns "Sequence" and "Name" will be used to map exact sequences to
 custom names.}
@@ -22,7 +20,7 @@ frame.}
 auto-generating allele names.  If set to zero the hash suffix is not
 included.}
 
-\item{...}{additional arguments to \code{summarize_genotypes}.}
+\item{tbl.genotypes}{data frame as produced by \code{summarize_genotypes}.}
 }
 \value{
 data frame showing summary of genotypes.

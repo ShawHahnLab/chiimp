@@ -37,6 +37,8 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
   if (!missing(genotypes.known) & !is.null(genotypes.known)) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
+    results$closest_matches <- find_closest_matches(results$dist_mat_known)
+    results$genotypes.known <- genotypes.known
   }
   return(results)
 }
@@ -81,6 +83,20 @@ summarize_genotypes <- function(results_summary,
   tbl <- tbl[order_entries(tbl), ]
   rownames(tbl) <- make_rownames(tbl)
   tbl
+}
+
+summarize_genotypes_known <- function(genotypes.known, tbl.genotypes=NULL) {
+  # Kludgy workaround to make summarize_genotypes handle a different sort of
+  # data frame
+  genotypes.known$Replicate <- NA
+  genotypes.known$Sample <- genotypes.known$Name
+  genotypes.known <- genotypes.known[, -match("Name",
+                                              colnames(genotypes.known))]
+  genotypes.known$Homozygous <- is.na(as.character(genotypes.known$Allele2Seq))
+  tbl.known <- summarize_genotypes(genotypes.known)
+  if (!missing(tbl.genotypes))
+    tbl.known <- tbl.known[, colnames(tbl.genotypes)]
+  tbl.known
 }
 
 # tabulate an arbitrary attribute across loci, assuming repeats by two for the
@@ -175,14 +191,7 @@ make_dist_mat_known <- function(results_summary,
                                 genotypes.known,
                                 dist.func=calc_genotype_distance) {
   tbl <- summarize_genotypes(results_summary)
-  # Kludgy workaround to make summarize_genotypes handle a different sort of
-  # data frame
-  genotypes.known$Replicate <- NA
-  genotypes.known$Sample <- genotypes.known$Name
-  genotypes.known <- genotypes.known[, -match("Name",
-                                              colnames(genotypes.known))]
-  genotypes.known$Homozygous <- is.na(as.character(genotypes.known$Allele2Seq))
-  tbl.known <- summarize_genotypes(genotypes.known)
+  tbl.known <- summarize_genotypes_known(genotypes.known, tbl)
   distances <- outer(rownames(tbl),
                      rownames(tbl.known),
                      function(nr, nr.known) {
@@ -237,6 +246,34 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   alleles
   sum(apply(alleles, 1, function(row) min(sum(row[1:2] != row[3:4], na.rm=T),
                                           sum(row[2:1] != row[3:4]), na.rm=T) ))
+}
+
+#' Find closest matches in distance matrix
+#'
+#' Given a distance matrix with samples on rows and names on columns, return a
+#' list of vectors with the closest-matching names for each sample.
+#'
+#' @param dist_mat matrix of distance values.
+#' @param range optional numeric for distances to each set of names, from the
+#'   minimum distance per sample.
+#' @param maximum optional numeric maximum value for any distance
+#'
+#' @return list of named vectors containing distances for each sample.
+#'
+#' @export
+find_closest_matches <- function(dist_mat, range=2, maximum=8) {
+  entries <- lapply(1:nrow(dist_mat), function(nr) {
+    m <- min(dist_mat[nr, ])
+    nearby <- dist_mat[nr, dist_mat[nr, ] < m + range &
+                         dist_mat[nr, ] < maximum, drop=F]
+    nearby <- nearby[1, order(nearby), drop=F]
+    nm <- colnames(nearby)
+    nearby <- nearby[1, ]
+    names(nearby) <- nm
+    nearby
+  })
+  names(entries) <- rownames(dist_mat)
+  entries
 }
 
 

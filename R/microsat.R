@@ -47,6 +47,8 @@ config.defaults <- list(
   report=TRUE,
   report.echo=FALSE,
   report.title="Microsatellite Report",
+  report.dist_range=2,
+  report.dist_max=8,
   report.hash_len=6,
   report.locus_chunks=NULL,
   report.sections = list(genotypes       = TRUE,
@@ -89,7 +91,7 @@ full_analysis <- function(config) {
 
   with(config.full, {
     if (verbose) logmsg(paste0("Loading dataset from ", dp.data, "..."))
-    dataset <- prepare_dataset(dp.data, pattern)
+    dataset <- prepare_dataset(dp.data, pattern, ord)
     if (verbose)
       logmsg(paste0("Loading locus attributes from ", fp.locus_attrs, "..."))
     locus_attrs <- load_locus_attrs(fp.locus_attrs)
@@ -98,6 +100,7 @@ full_analysis <- function(config) {
                                nrepeats = sample_analysis$nrepeats,
                                fraction.min = sample_summary$fraction.min,
                                counts.min = sample_summary$counts.min)
+    results$locus_attrs <- locus_attrs
     if (verbose) logmsg("Summarizing results...")
     genotypes.known <- NULL
     if (!is.null(fp.genotypes.known))
