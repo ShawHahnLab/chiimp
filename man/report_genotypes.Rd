@@ -5,7 +5,7 @@
 \title{Create genotype summary table}
 \usage{
 report_genotypes(tbl, allele.names = NULL, locus_attrs = NULL,
-  hash.len = 6)
+  hash.len = 6, na.replicates = "")
 }
 \arguments{
 \item{tbl}{data frame as produced by \code{summarize_genotypes}.}
@@ -21,6 +21,9 @@ frame.}
 \item{hash.len}{number of characters of the sequence has to include when
 auto-generating allele names.  If set to zero the hash suffix is not
 included.}
+
+\item{na.replicates}{text to replace NA entries with for the Replicates
+column.}
 }
 \value{
 data frame showing summary of genotypes.
