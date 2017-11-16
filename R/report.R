@@ -19,6 +19,8 @@
 #' @param hash.len number of characters of the sequence has to include when
 #'   auto-generating allele names.  If set to zero the hash suffix is not
 #'   included.
+#' @param na.replicates text to replace NA entries with for the Replicates
+#'     column.
 #'
 #' @return data frame showing summary of genotypes.
 #'
@@ -26,7 +28,8 @@
 report_genotypes <- function(tbl,
                              allele.names=NULL,
                              locus_attrs=NULL,
-                             hash.len=6) {
+                             hash.len=6,
+                             na.replicates="") {
   # At this point there are columns for sample, replicate, and then the loci.
   # If locus_attrs was given reorder the loci columns correspondingly.
   if (!missing(locus_attrs)) {
@@ -49,7 +52,9 @@ report_genotypes <- function(tbl,
   # If we have no replicates drop that column
   if (all(is.na(tbl$Replicate)))
     tbl <- tbl[, -2]
-  # Blank out NA values
+  else
+    tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
+  # Blank out any remaining NA values
   tbl[is.na(tbl)] <- ''
   tbl
 }
@@ -412,6 +417,9 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
   dist_scale <- make.dist_scale(num.alleles)
   color <- grDevices::rgb(red=1, green=dist_scale, blue=dist_scale)
 
+  # Scale font size automatically between min and max values
+  fontsize = min(16, max(4, 17 - 0.11*nrow(dist_mat)))
+  
   vals <- dist_mat
   pheatmap::pheatmap(vals,
            color = color,
@@ -420,6 +428,7 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
            breaks = 0:num.alleles,
            clustering_distance_rows = stats::as.dist(dist_mat),
            clustering_distance_cols = stats::as.dist(dist_mat),
+           fontsize = fontsize,
            ...)
 }
 
@@ -590,21 +599,32 @@ k_row_spec <- function(k, idx.rows, ...) {
 }
 
 # convenience function for post-processing report_genotypes() output
-kable_genotypes <- function(data) {
+kable_genotypes <- function(data, group_samples=FALSE) {
   bootstrap_options <- c("striped", "hover", "condensed")
   k <- knitr::kable(data, row.names = FALSE, format = "html")
-  kableExtra::kable_styling(k,
-                            bootstrap_options = bootstrap_options,
-                            full_width = F)
+  k <- kableExtra::kable_styling(k,
+                                 bootstrap_options = bootstrap_options,
+                                 full_width = F)
+  # Group rows by sample.  Assumes they're ordered already.
+  if (group_samples) {
+    grouping <- as.logical(c(1, diff(as.integer(factor(data$Sample)))))
+    names(grouping) <- paste("Sample", data$Sample)
+    data$Sample <- NULL
+    k <- k_group_rows(k, grouping)
+  }
+  k
 }
 
 # Write markdown tables to standard output for report_genotypes()
 rmd_kable_genotypes <- function(results, locus_attrs, hash.len,
-                                locus_chunks=NULL) {
+                                na.replicates="",
+                                locus_chunks=NULL,
+                                group_samples=FALSE) {
   tbl.g <- summarize_genotypes(results$summary)
   tbl <- report_genotypes(tbl.g,
                           locus_attrs = locus_attrs,
-                          hash.len = hash.len)
+                          hash.len = hash.len,
+                          na.replicates = na.replicates)
   if (!is.null(locus_chunks)) {
     prefix <- match(c("Sample", "Replicate"), colnames(tbl))
     prefix <- prefix[!is.na(prefix)]
@@ -615,10 +635,10 @@ rmd_kable_genotypes <- function(results, locus_attrs, hash.len,
       m <- match(locus_cols, colnames(tbl))
       m <- m[!is.na(m)]
       cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
-      cat(kable_genotypes(tbl[, c(prefix, m)]))
+      cat(kable_genotypes(tbl[, c(prefix, m)]), group_samples = group_samples)
     }
   } else {
-    cat(kable_genotypes(tbl))
+    cat(kable_genotypes(tbl, group_samples = group_samples))
   }
 }
 

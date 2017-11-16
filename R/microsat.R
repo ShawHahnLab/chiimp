@@ -29,35 +29,52 @@ config.defaults <- list(
   fp.locus_attrs="locus_attrs.tsv",
   fp.genotypes.known=NULL,
   dp.output="str-results",
-  # Names for files and subdirectories under dp.output
-  fp.output.summary="summary.csv",
-  fp.report="report.html",
-  fp.output.dist_mat="sample-distances.csv",
-  fp.output.rds=NULL,
-  dp.output.histograms="histograms",
-  dp.output.alignments="alignments",
-  dp.output.alignment_images="alignment-images",
-  dp.output.processed_samples="processed-samples",
-  dp.output.allele_seqs="allele-sequences",
-  # Sample genotyping settings
+  ## Names for files and subdirectories under dp.output
+  fp.output.summary="summary.csv",  # Dataset summary table
+  fp.report="report.html",  # Report document
+  fp.output.dist_mat="sample-distances.csv",  # Sample-to-sample distances
+  fp.output.rds=NULL,  # Data file to save results to
+  dp.output.histograms="histograms",  # Read count by length histograms
+  dp.output.alignments="alignments",  # Sequence alignments across alleles
+  dp.output.alignment_images="alignment-images",  # Visualizations of alignments
+  dp.output.processed_samples="processed-samples",  # Sample data tables
+  dp.output.allele_seqs="allele-sequences",  # FASTA sequences for alleles
+  ## Sample genotyping settings
   sample_analysis = list(nrepeats = 3),
   sample_summary = list(fraction.min = 0.05,
                         counts.min = 500),
-  # Report generation settings
+  ## Report generation settings
+  # Should a report be generated?
   report=TRUE,
+  # Should the code executed in the report generation be included in the report?
   report.echo=FALSE,
+  # Title at top of the report.
   report.title="Microsatellite Report",
+  # Length of suffix on automated allele names in tables.
+  report.hash_len=6,
+  # List of vectors of locus names to use to break up tables into reasonable
+  # sizes and/or order locus names explicitly.
+  report.locus_chunks=NULL,
+  # Group together genotype table rows by sample?
+  report.group_samples=FALSE,
+  # Text to use for NA entries in Replicates column of tables (i.e. Pooled)
+  report.na.replicates="",
+  # Parameters controlling how identifications are reported: dist_range is how 
+  # closeby (to the closest case) the next-nearest individuals must be to be 
+  # listed as similar to a sample, and dist_max is the maximum distance for a
+  # given individual to be listed.
   report.dist_range=2,
   report.dist_max=8,
-  report.hash_len=6,
-  report.locus_chunks=NULL,
+  # Sub-sections of the report that can be excluded by overriding these with
+  # FALSE.
   report.sections = list(genotypes       = TRUE,
                          identifications = TRUE,
                          distances       = TRUE,
                          flags           = TRUE,
                          alignments      = TRUE,
                          contamination   = TRUE),
-  # Other settings
+  ## Other settings
+  # Print status messages to standard error.
   verbose=TRUE)
 
 #' Perform a full microsatellite analysis
