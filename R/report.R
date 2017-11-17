@@ -601,17 +601,18 @@ k_row_spec <- function(k, idx.rows, ...) {
 # convenience function for post-processing report_genotypes() output
 kable_genotypes <- function(data, group_samples=FALSE) {
   bootstrap_options <- c("striped", "hover", "condensed")
-  k <- knitr::kable(data, row.names = FALSE, format = "html")
-  k <- kableExtra::kable_styling(k,
-                                 bootstrap_options = bootstrap_options,
-                                 full_width = F)
   # Group rows by sample.  Assumes they're ordered already.
   if (group_samples) {
     grouping <- as.logical(c(1, diff(as.integer(factor(data$Sample)))))
     names(grouping) <- paste("Sample", data$Sample)
     data$Sample <- NULL
-    k <- k_group_rows(k, grouping)
   }
+  k <- knitr::kable(data, row.names = FALSE, format = "html")
+  k <- kableExtra::kable_styling(k,
+                                 bootstrap_options = bootstrap_options,
+                                 full_width = F)
+  if (group_samples)
+    k <- k_group_rows(k, grouping)
   k
 }
 
@@ -635,7 +636,7 @@ rmd_kable_genotypes <- function(results, locus_attrs, hash.len,
       m <- match(locus_cols, colnames(tbl))
       m <- m[!is.na(m)]
       cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
-      cat(kable_genotypes(tbl[, c(prefix, m)]), group_samples = group_samples)
+      cat(kable_genotypes(tbl[, c(prefix, m)], group_samples = group_samples))
     }
   } else {
     cat(kable_genotypes(tbl, group_samples = group_samples))
