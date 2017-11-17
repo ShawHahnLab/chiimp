@@ -59,7 +59,8 @@ summarize_sample <- function(sample.data, locus.name, fraction.min, counts.min) 
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent.seqs <- nrow(chunk)
-  # enforce count limit after all filtering
+  # enforce count limit after all filtering (but before stutter removal or
+  # fraction thresholding)
   if (count.locus < counts.min) {
     chunk <- chunk[0, ]
   }
