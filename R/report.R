@@ -11,11 +11,8 @@
 #'
 #' @param tbl data frame as produced by \code{summarize_genotypes}.
 #' @param allele.names optional data frame of custom allele names.  If present
-#'   the columns "Sequence" and "Name" will be used to map exact sequences to
-#'   custom names.
-#' @param locus_attrs optional locus attributes data frame as produced by
-#'   \code{load_locus_attrs}.  Used to order locus columns in the returned data
-#'   frame.
+#'   the columns "Seq" and "Name" will be used to map exact sequences to custom
+#'   names.
 #' @param hash.len number of characters of the sequence has to include when
 #'   auto-generating allele names.  If set to zero the hash suffix is not
 #'   included.
@@ -27,15 +24,9 @@
 #' @export
 report_genotypes <- function(tbl,
                              allele.names=NULL,
-                             locus_attrs=NULL,
                              hash.len=6,
                              na.replicates="") {
   # At this point there are columns for sample, replicate, and then the loci.
-  # If locus_attrs was given reorder the loci columns correspondingly.
-  if (!missing(locus_attrs)) {
-    locus_order <- order(match(colnames(tbl)[-(1:2)], rownames(locus_attrs)))
-    tbl <- tbl[, c(1:2, 2+locus_order)]
-  }
   # Name each entry in the table with either a custom or auto-generated short
   # name.
   for (j in 3:ncol(tbl)) {
@@ -56,14 +47,6 @@ report_genotypes <- function(tbl,
     tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
   # Blank out any remaining NA values
   tbl[is.na(tbl)] <- ''
-  tbl
-}
-
-report_attribute <- function(dataset.summary, attrib, ...) {
-  tbl <- summarize_attribute(dataset.summary, attrib, ...)
-  # If we have no replicates drop that column
-  if (all(is.na(tbl$Replicate)))
-    tbl <- tbl[, -2]
   tbl
 }
 
@@ -103,6 +86,29 @@ report_idents <- function(results, closest, hash.len) {
   tbl.combo <- tbl.combo[idx, ]
   tbl.combo$Distance[is.na(tbl.combo$Distance)] <- ""
   return(tbl.combo)
+}
+
+# Report the read counts matching (by primer) each locus per sample.
+report_cts_per_locus <- function(results) {
+  # Create table of counts of sequences that match each possible locus across
+  # samples.  Only include loci we expect from the metadata, rather than any
+  # known in locus_attrs.
+  .levels <- match(rownames(results$locus_attrs), results$summary$Locus)
+  .levels <- results$summary$Locus[.levels[!is.na(.levels)]]
+  tbl <- do.call(rbind, lapply(results$data, function(d) {
+    d$MatchingLocus <- factor(d$MatchingLocus,
+                              levels = .levels)
+    sapply(split(d$Count, d$MatchingLocus), sum)
+  }))
+  # Make some extra columns for total sequences and sequences matching the
+  # expected locus.  Bind these to the original data to force the heatmap to use
+  # a uniform scale.
+  cols.match <- results$summary[rownames(tbl), "Locus"]
+  tbl.anno <- data.frame(Total=rowSums(tbl),
+                         Matching=sapply(seq_along(cols.match),
+                                         function(i) tbl[i, as.character(cols.match[i])]))
+  tbl <- cbind(tbl.anno, tbl)
+  tbl
 }
 
 # Plots -------------------------------------------------------------------
@@ -419,7 +425,7 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 
   # Scale font size automatically between min and max values
   fontsize = min(16, max(4, 17 - 0.11*nrow(dist_mat)))
-  
+
   vals <- dist_mat
   pheatmap::pheatmap(vals,
            color = color,
@@ -442,9 +448,8 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 #' plot a heatmap of the values for that attribute, with sample identifiers on
 #' rows and loci on columns.  The attribute will be coerced to numeric.
 #'
-#' @param results_summary cross-sample summary data frame as produced by
-#'   \code{analyze_dataset}.
-#' @param attribute character name of column in results_summary to use.
+#' @param results combined results list
+#' @param attribute character name of column in results$summary to use.
 #' @param label.by vector of column names to use when writing the genotype
 #'   summary values on top of the heatmap cells (default: allele lengths).
 #' @param color vector of colors passed to \code{pheatmap}.
@@ -452,15 +457,15 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 #' @param ... additional arguments to \code{pheatmap}.
 #'
 #' @export
-plot_heatmap <- function(results_summary,
+plot_heatmap <- function(results,
                          attribute,
                          label.by = c('Allele1Length', 'Allele2Length'),
                          color=c("white", "pink"),
                          breaks=NA,
                          ...) {
-  tbl <- summarize_attribute(results_summary, attribute)
+  tbl <- summarize_attribute(results$summary, attribute)
   data <- tbl[, -(1:2)] + 0
-  tbl.labels <- summarize_genotypes(results_summary, vars = label.by)
+  tbl.labels <- summarize_genotypes(results$summary, vars = label.by)
   labels <- tbl.labels[, -(1:2)]
   data[is.na(labels)] <- NA
   labels[is.na(labels)] <- ''
@@ -483,13 +488,12 @@ plot_heatmap <- function(results_summary,
 #' ignored due to suspected PCR stutter, with sample identifiers on rows and
 #' loci on columns.
 #'
-#' @param results_summary cross-sample summary data frame as produced by
-#'   \code{analyze_dataset}.
+#' @param results combined results list
 #' @param ... additional arguments passed to \code{plot_heatmap}.
 #'
 #' @export
-plot_heatmap_stutter <- function(results_summary, ...) {
-  plot_heatmap(results_summary,
+plot_heatmap_stutter <- function(results, ...) {
+  plot_heatmap(results,
                "Stutter",
                legend = FALSE,
                ...)
@@ -501,13 +505,12 @@ plot_heatmap_stutter <- function(results_summary, ...) {
 #' \code{analyze_dataset}, plot a heatmap showing which samples appear
 #' homozygous, with sample identifiers on rows and loci on columns.
 #'
-#' @param results_summary cross-sample summary data frame as produced by
-#'   \code{analyze_dataset}.
+#' @param results combined results list
 #' @param ... additional arguments passed to \code{plot_heatmap}.
 #'
 #' @export
-plot_heatmap_homozygous <- function(results_summary, ...) {
-  plot_heatmap(results_summary,
+plot_heatmap_homozygous <- function(results, ...) {
+  plot_heatmap(results,
                "Homozygous",
                legend = FALSE,
                ...)
@@ -520,16 +523,15 @@ plot_heatmap_homozygous <- function(results_summary, ...) {
 #' prominent sequences in their analysis output, with sample identifiers on rows
 #' and loci on columns.
 #'
-#' @param results_summary cross-sample summary data frame as produced by
-#'   \code{analyze_dataset}.
+#' @param results combined results list
 #' @param ... additional arguments passed to \code{plot_heatmap}.
 #'
 #' @export
-plot_heatmap_prominent_seqs <- function(results_summary, ...) {
+plot_heatmap_prominent_seqs <- function(results, ...) {
   # Create a color ramp going from white for 0, 1, or 2 prominent seqs, and
   # shades of red for higher numbers.
   color_func <- grDevices::colorRampPalette(c("white", "red"))
-  ps <- results_summary[!is.na(results_summary$Allele1Seq), "ProminentSeqs"]
+  ps <- results$summary[!is.na(results$summary$Allele1Seq), "ProminentSeqs"]
   # Deep red will only be used if somehow there are a whole lot of extra
   # sequences (say, 8); otherwise it should just go up to a pink color.
   colors <- color_func(max(8, max(ps)+1))
@@ -537,7 +539,7 @@ plot_heatmap_prominent_seqs <- function(results_summary, ...) {
   colors[1:3] <- rep(colors[1], 3)
   # Truncate to actual number of peaks
   colors <- colors[1:max(ps) + 1]
-  plot_heatmap(results_summary,
+  plot_heatmap(results,
                "ProminentSeqs",
                color = colors,
                breaks = 0:(length(colors)),
@@ -551,19 +553,18 @@ plot_heatmap_prominent_seqs <- function(results_summary, ...) {
 #' sequences for the identified alleles versus all matching sequences, with
 #' sample identifiers on rows and loci on columns.
 #'
-#' @param results_summary cross-sample summary data frame as produced by
-#'   \code{analyze_dataset}.
+#' @param results combined results list
 #' @param ... additional arguments passed to \code{plot_heatmap}.
 #'
 #' @export
-plot_heatmap_proportions <- function(results_summary, ...) {
-  cts <- results_summary[, c('Allele1Count', 'Allele2Count')]
-  prop.counted <- rowSums(cts, na.rm=T)/results_summary$CountLocus
-  results_summary$ProportionCounted <- prop.counted
+plot_heatmap_proportions <- function(results, ...) {
+  cts <- results$summary[, c('Allele1Count', 'Allele2Count')]
+  prop.counted <- rowSums(cts, na.rm=T)/results$summary$CountLocus
+  results$summary$ProportionCounted <- prop.counted
   color_func <- grDevices::colorRampPalette(c("red", "white"))
   breaks <- seq(0, 1, 0.001)
   colors <- color_func(length(breaks) - 1)
-  plot_heatmap(results_summary,
+  plot_heatmap(results,
                'ProportionCounted',
                color = colors,
                breaks = breaks,
@@ -617,13 +618,14 @@ kable_genotypes <- function(data, group_samples=FALSE) {
 }
 
 # Write markdown tables to standard output for report_genotypes()
-rmd_kable_genotypes <- function(results, locus_attrs, hash.len,
+rmd_kable_genotypes <- function(results, hash.len,
+                                allele.names=NULL,
                                 na.replicates="",
                                 locus_chunks=NULL,
                                 group_samples=FALSE) {
   tbl.g <- summarize_genotypes(results$summary)
   tbl <- report_genotypes(tbl.g,
-                          locus_attrs = locus_attrs,
+                          allele.names = allele.names,
                           hash.len = hash.len,
                           na.replicates = na.replicates)
   if (!is.null(locus_chunks)) {
@@ -677,4 +679,46 @@ rmd_kable_idents <- function(results, hash.len, range, maximum, locus_chunks=NUL
                                   maximum = maximum)
   tbl.combo <- report_idents(results, closest, hash.len)
   kable_idents(tbl.combo, closest)
+}
+
+# Make chunked heatmaps for the counts-per-locus table.
+# max.rows: maximum number of rows in a given chunked heatmap
+rmd_plot_cts_per_locus <- function(results,
+                                   max.rows=30,
+                                   heading_prefix="###") {
+  tbl <- report_cts_per_locus(results)
+  # Switch to log scale
+  tbl[tbl==0] <- NA
+  tbl <- log10(tbl)
+  # Count samples per locus, for breaking big heatmaps into smaller chunks but
+  # not splitting loci
+  tbl.loci <- table(results$summary$Locus)
+  tbl.loci <- tbl.loci[match(rownames(results$locus_attrs),
+                             names(tbl.loci))]
+  tbl.loci <- tbl.loci[!is.na(tbl.loci)]
+  # Break loci into chunks to keep heatmap sizes reasonable
+  loci.chunked <- split(names(tbl.loci),
+                        floor(cumsum(tbl.loci)/max.rows))
+  # Break on powers of ten (since we already log10'd above)
+  breaks <- 0:ceiling(max(tbl, na.rm=T))
+  color <- viridis::viridis(max(breaks))
+  # Draw each heatmap across chunks of loci.  Written to assume there will be
+  # multiple but this should work fine even if there's only one.
+  for (loci in loci.chunked) {
+    idx <- results$summary$Locus %in% loci
+    idx.row <- rownames(results$summary)[idx]
+    heading <- if (length(loci) > 1) {
+      paste("Samples for Loci", loci[1], "-", loci[length(loci)])
+    } else {
+      paste("Samples for Locus", loci[1])
+    }
+    if (length(loci.chunked) > 1)
+      cat(paste0("\n\n", heading_prefix, " ", heading, "\n\n"))
+    pheatmap::pheatmap(tbl[rownames(tbl) %in% idx.row, ],
+                       cluster_rows = F,
+                       cluster_cols = F,
+                       gaps_col = c(1,2),
+                       color = color,
+                       breaks = breaks)
+  }
 }

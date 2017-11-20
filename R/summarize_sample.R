@@ -1,4 +1,5 @@
-# Create a summary list for a single sample, targeting a single locus.
+# Create a summary list for a single sample, targeting a single locus.  See
+# summarize_sample below for the entries in the returned list.
 
 
 #' Summarize a processed STR sample
@@ -76,6 +77,32 @@ summarize_sample <- function(sample.data, locus.name, fraction.min, counts.min) 
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
                            Stutter = stutter,
+                           CountTotal = count.total,
+                           CountLocus = count.locus,
+                           ProminentSeqs = prominent.seqs))
+  return(sample.summary)
+}
+
+# Like summarize_sample above, but skips allele_match and stutter removal.
+summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
+                                   counts.min) {
+  chunk <- sample.data[as.character(sample.data$MatchingLocus) == locus.name, ]
+  count.total <- sum(sample.data$Count)
+  count.locus <- sum(chunk$Count)
+  chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
+  prominent.seqs <- nrow(chunk)
+  if (count.locus < counts.min) {
+    chunk <- chunk[0, ]
+  }
+  attr.names <- c("Seq", "Count", "Length")
+  allele1 <- chunk[1, attr.names]
+  allele2 <- chunk[2, attr.names]
+  colnames(allele1) <- paste0("Allele1", colnames(allele1))
+  colnames(allele2) <- paste0("Allele2", colnames(allele2))
+  homozygous <- nrow(chunk) == 1
+  sample.summary <- c(allele1, allele2,
+                      list(Homozygous = homozygous,
+                           Stutter = NA,
                            CountTotal = count.total,
                            CountLocus = count.locus,
                            ProminentSeqs = prominent.seqs))

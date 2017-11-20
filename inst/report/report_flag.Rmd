@@ -3,7 +3,7 @@
 ### Possible PCR Stutter
 
 ```{r report.stutter}
-plot_heatmap_stutter(results$summary)
+plot_heatmap_stutter(results)
 ```
 
 ### More than Two Prominent Sequences
@@ -13,7 +13,7 @@ sequences. Cases with more than two could imply contamination or excessive
 PCR stutter.
 
 ```{r report.peaks}
-plot_heatmap_prominent_seqs(results$summary)
+plot_heatmap_prominent_seqs(results)
 ```
 
 ### Residual Reads from Other Sequnces
@@ -24,11 +24,11 @@ for 100%.  The proportion is calculated for both alleles and color-coded with
 the same color for both.
 
 ```{r report.prop}
-plot_heatmap_proportions(results$summary)
+plot_heatmap_proportions(results)
 ```
 
 ### Possible Homozygous Samples
 
 ```{r report.homozygous}
-plot_heatmap_homozygous(results$summary)
+plot_heatmap_homozygous(results)
 ```

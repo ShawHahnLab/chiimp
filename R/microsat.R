@@ -27,6 +27,7 @@ config.defaults <- list(
   pattern="(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
   ord=c(1, 2, 3),
   fp.locus_attrs="locus_attrs.tsv",
+  fp.allele.names=NULL,
   fp.genotypes.known=NULL,
   dp.output="str-results",
   ## Names for files and subdirectories under dp.output
@@ -59,8 +60,8 @@ config.defaults <- list(
   report.group_samples=FALSE,
   # Text to use for NA entries in Replicates column of tables (i.e. Pooled)
   report.na.replicates="",
-  # Parameters controlling how identifications are reported: dist_range is how 
-  # closeby (to the closest case) the next-nearest individuals must be to be 
+  # Parameters controlling how identifications are reported: dist_range is how
+  # closeby (to the closest case) the next-nearest individuals must be to be
   # listed as similar to a sample, and dist_max is the maximum distance for a
   # given individual to be listed.
   report.dist_range=2,
@@ -117,6 +118,10 @@ full_analysis <- function(config) {
                                nrepeats = sample_analysis$nrepeats,
                                fraction.min = sample_summary$fraction.min,
                                counts.min = sample_summary$counts.min)
+    ord <- order(match(dataset$Locus, rownames(locus_attrs)),
+                 order_entries(dataset))
+    results$summary <- results$summary[ord, ]
+    results$data <- results$data[ord]
     results$locus_attrs <- locus_attrs
     if (verbose) logmsg("Summarizing results...")
     genotypes.known <- NULL
@@ -136,16 +141,22 @@ full_analysis <- function(config) {
       saveRDS(results, file.path(dp.output, fp.output.rds))
     if (report) {
       if (verbose) logmsg("Creating report...")
-      fp.report.in <- system.file("report", "report.Rmd", package="microsat")
-      fp.report.out <- file.path(dp.output, fp.report)
-      if (!dir.exists(dirname(fp.report.out)))
-        dir.create(dirname(fp.report.out), recursive = TRUE)
-      pandoc_args <- c(paste0("--metadata=title:\"", report.title, "\""))
-      rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
-                        output_options = list(pandoc_args = pandoc_args))
+      render_report(results, config)
     }
     if (verbose) logmsg("Done.")
     return(results)
+  })
+}
+
+render_report <- function(results, config) {
+  with(config, {
+    fp.report.in <- system.file("report", "report.Rmd", package="microsat")
+    fp.report.out <- file.path(dp.output, fp.report)
+    if (!dir.exists(dirname(fp.report.out)))
+      dir.create(dirname(fp.report.out), recursive = TRUE)
+    pandoc_args <- c(paste0("--metadata=title:\"", report.title, "\""))
+    rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
+                      output_options = list(pandoc_args = pandoc_args))
   })
 }
 

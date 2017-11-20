@@ -4,11 +4,10 @@
 \alias{plot_heatmap_homozygous}
 \title{Plot heatmap of homozygous samples}
 \usage{
-plot_heatmap_homozygous(results_summary, ...)
+plot_heatmap_homozygous(results, ...)
 }
 \arguments{
-\item{results_summary}{cross-sample summary data frame as produced by
-\code{analyze_dataset}.}
+\item{results}{combined results list}
 
 \item{...}{additional arguments passed to \code{plot_heatmap}.}
 }

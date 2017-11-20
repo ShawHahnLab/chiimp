@@ -4,19 +4,15 @@
 \alias{report_genotypes}
 \title{Create genotype summary table}
 \usage{
-report_genotypes(tbl, allele.names = NULL, locus_attrs = NULL,
-  hash.len = 6, na.replicates = "")
+report_genotypes(tbl, allele.names = NULL, hash.len = 6,
+  na.replicates = "")
 }
 \arguments{
 \item{tbl}{data frame as produced by \code{summarize_genotypes}.}
 
 \item{allele.names}{optional data frame of custom allele names.  If present
-the columns "Sequence" and "Name" will be used to map exact sequences to
-custom names.}
-
-\item{locus_attrs}{optional locus attributes data frame as produced by
-\code{load_locus_attrs}.  Used to order locus columns in the returned data
-frame.}
+the columns "Seq" and "Name" will be used to map exact sequences to custom
+names.}
 
 \item{hash.len}{number of characters of the sequence has to include when
 auto-generating allele names.  If set to zero the hash suffix is not

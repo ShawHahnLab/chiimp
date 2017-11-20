@@ -4,14 +4,13 @@
 \alias{plot_heatmap}
 \title{Render heatmap of STR attribute across samples and loci}
 \usage{
-plot_heatmap(results_summary, attribute, label.by = c("Allele1Length",
+plot_heatmap(results, attribute, label.by = c("Allele1Length",
   "Allele2Length"), color = c("white", "pink"), breaks = NA, ...)
 }
 \arguments{
-\item{results_summary}{cross-sample summary data frame as produced by
-\code{analyze_dataset}.}
+\item{results}{combined results list}
 
-\item{attribute}{character name of column in results_summary to use.}
+\item{attribute}{character name of column in results$summary to use.}
 
 \item{label.by}{vector of column names to use when writing the genotype
 summary values on top of the heatmap cells (default: allele lengths).}

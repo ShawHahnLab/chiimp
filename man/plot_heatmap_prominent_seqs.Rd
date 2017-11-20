@@ -4,11 +4,10 @@
 \alias{plot_heatmap_prominent_seqs}
 \title{Plot heatmap of samples with multiple prominent sequences}
 \usage{
-plot_heatmap_prominent_seqs(results_summary, ...)
+plot_heatmap_prominent_seqs(results, ...)
 }
 \arguments{
-\item{results_summary}{cross-sample summary data frame as produced by
-\code{analyze_dataset}.}
+\item{results}{combined results list}
 
 \item{...}{additional arguments passed to \code{plot_heatmap}.}
 }
