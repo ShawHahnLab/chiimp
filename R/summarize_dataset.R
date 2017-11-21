@@ -52,7 +52,9 @@ summarize_genotypes <- function(results_summary,
   # Re-order to put shorter alleles first, if we've been called with vars for
   # integers (otherwise we're just sorting text)
   if (is.character(combo[[vars[1]]])) {
-    idx <- nchar(combo[[vars[1]]]) > nchar(combo[[vars[2]]])
+    idx <- nchar(combo[[vars[1]]]) > nchar(combo[[vars[2]]]) |
+            ( nchar(combo[[vars[1]]]) == nchar(combo[[vars[2]]]) &
+              combo[[vars[1]]] > combo[[vars[2]]] )
   } else {
     idx <- combo[[vars[1]]] > combo[[vars[2]]]
   }
