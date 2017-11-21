@@ -70,15 +70,7 @@ analyze_dataset <- function(dataset,
                          summary.function = summary.function)
   }
   # Recombined results into a summary data frame and a list of full sample data.
-  results <- tidy_analyzed_dataset(dataset, raw.results)
-  # Reorder entries and levels to match locus_attrs.
-  ord <- order(match(dataset$Locus, rownames(locus_attrs)),
-               order_entries(dataset))
-  results$summary <- results$summary[ord, ]
-  results$data <- results$data[ord]
-  results$locus_attrs <- locus_attrs
-  levels(results$summary$Locus) <- rownames(locus_attrs)
-  results
+  tidy_analyzed_dataset(dataset, raw.results)
 }
 
 # rearrange the pairs of sample summary / sample data objects into a single

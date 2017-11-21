@@ -122,6 +122,13 @@ full_analysis <- function(config) {
                                fraction.min = sample_summary$fraction.min,
                                counts.min = sample_summary$counts.min,
                                summary.function = sample_summary_func)
+    # Reorder entries and levels to match locus_attrs.
+    ord <- order(match(dataset$Locus, rownames(locus_attrs)),
+                 order_entries(dataset))
+    results$summary <- results$summary[ord, ]
+    results$data <- results$data[ord]
+    results$locus_attrs <- locus_attrs
+    levels(results$summary$Locus) <- rownames(locus_attrs)
     if (verbose) logmsg("Summarizing results...")
     genotypes.known <- NULL
     if (!is.null(fp.genotypes.known))
