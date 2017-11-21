@@ -62,7 +62,8 @@ analyze_dataset <- function(dataset,
       # Load, analyze, and summarize each sample across the cluster.
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
                                         summary.function = summary.function)
-    }, finally = {
+    },
+    finally = {
       parallel::stopCluster(cluster)
     })
   } else {

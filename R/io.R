@@ -43,7 +43,7 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
   data <- utils::read.table(fp.locus_attrs,
                             header = T,
                             row.names = 1,
-                            sep="\t",
+                            sep = "\t",
                             ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
@@ -57,16 +57,16 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 #'
 #' Load a tab-separated table of allele names for use in reporting.
 #'
-#' @param fp.allele.names path to text file.
+#' @param fp path to text file.
 #' @param ... additional arguments passed to \code{read.table}.
 #'
 #' @return data frame of allele names
 #'
 #' @export
-load_allele_names <- function(fp.allele.names, ...) {
-  data <- utils::read.table(fp.allele.names,
+load_allele_names <- function(fp, ...) {
+  data <- utils::read.table(fp,
                             header = T,
-                            sep="\t",
+                            sep = "\t",
                             ...)
   col.missing <- is.na(match(allele_names_cols, colnames(data)))
   if (any(col.missing)) {
@@ -87,7 +87,7 @@ load_allele_names <- function(fp.allele.names, ...) {
 #'
 #' @export
 load_genotypes <- function(fp, ...) {
-  data <- utils::read.table(fp, header = T, sep=',', colClasses = "character",
+  data <- utils::read.table(fp, header = T, sep = ",", colClasses = "character",
                      na.strings = "", ...)
   col.missing <- is.na(match(genotypes_cols, colnames(data)))
   if (any(col.missing)) {
@@ -120,7 +120,7 @@ prepare_dataset <- function(directory, pattern, ord = c(1, 2, 3)) {
                           include.dirs = FALSE)
   seq_file_attrs <- stringr::str_match_all(seq_files, pattern)
   # transpose so the list is grouped by filename/attribute rather than
-  # entry-by-entry
+  # entry by entry.
   seq_file_attrs <- lapply(seq(length(seq_file_attrs[[1]])), function(y) {
       unlist(lapply(seq_file_attrs, "[", y))
     })
@@ -195,7 +195,7 @@ save_allele_seqs <- function(results_summary, dp) {
     seqs <- r[c("Allele1Seq", "Allele2Seq")]
     # Ignore NA entries, and skip this sample if there are no sequences
     seqs <- seqs[!is.na(seqs)]
-    if (length(seqs)==0)
+    if (length(seqs) == 0)
       return()
     # Create sequence names with a unique ID based on the sample and some other
     # stats for convenience
@@ -203,7 +203,7 @@ save_allele_seqs <- function(results_summary, dp) {
       seq.id <- paste(r[".row"], i, sep = "_")
       a.len <- r[paste0("Allele", i, "Length")]
       a.cts <- r[paste0("Allele", i, "Count")]
-      seq.extra <- paste(paste0(a.len, 'bp'),
+      seq.extra <- paste(paste0(a.len, "bp"),
                          paste0("allele/locus/total=",
                                 paste(as.integer(a.cts),
                                       as.integer(r["CountLocus"]),
@@ -230,7 +230,7 @@ save_sample_data <- function(results_data, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
-    fp <- file.path(dp, paste0(n, '.csv'))
+    fp <- file.path(dp, paste0(n, ".csv"))
     utils::write.csv(results_data[[n]], fp, na = "", quote = FALSE)
   }))
 }
@@ -250,9 +250,9 @@ save_alignments <- function(alignments, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(alignments), function(loc) {
-    if(!is.null(alignments[[loc]])) {
+    if (!is.null(alignments[[loc]])) {
       dna <- as.character(alignments[[loc]])
-      fp <-file.path(dp, paste0(loc, '.fasta'))
+      fp <- file.path(dp, paste0(loc, ".fasta"))
       dnar::write.fa(names = names(dna),
                      dna = dna,
                      fileName = fp)
@@ -280,8 +280,8 @@ save_alignment_images <- function(alignments, dp, image.func="png",
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(alignments), function(loc) {
-    if(!is.null(alignments[[loc]])) {
-      fp <- file.path(dp, paste(loc, image.func, sep='.'))
+    if (!is.null(alignments[[loc]])) {
+      fp <- file.path(dp, paste(loc, image.func, sep = "."))
       img.call <- call(image.func,
                        fp,
                        width = width,
@@ -289,7 +289,7 @@ save_alignment_images <- function(alignments, dp, image.func="png",
                        res = res)
       eval(img.call)
       plot_alignment(alignments[[loc]],
-                     main = paste('Alignment for Locus', loc))
+                     main = paste("Alignment for Locus", loc))
       grDevices::dev.off()
 
     }
@@ -314,7 +314,7 @@ save_histograms <- function(results, dp, image.func="png",
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results$data), function(entry) {
-    fp <- file.path(dp, paste(entry, image.func, sep='.'))
+    fp <- file.path(dp, paste(entry, image.func, sep = "."))
     img.call <- call(image.func,
                      fp,
                      width = width,

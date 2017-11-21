@@ -4,10 +4,10 @@
 \alias{load_allele_names}
 \title{Load table of known allele names}
 \usage{
-load_allele_names(fp.allele.names, ...)
+load_allele_names(fp, ...)
 }
 \arguments{
-\item{fp.allele.names}{path to text file.}
+\item{fp}{path to text file.}
 
 \item{...}{additional arguments passed to \code{read.table}.}
 }

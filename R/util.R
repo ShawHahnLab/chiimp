@@ -7,19 +7,19 @@ make_rownames <- function(data) {
   cols.idx <- match(cols.names, colnames(data))
   cols.idx <- cols.idx[!is.na(cols.idx)]
   cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
-    !all(is.na(data[,x]))
+    !all(is.na(data[, x]))
   }) )]
-  data.names <- data[, cols.idx, drop=F]
+  data.names <- data[, cols.idx, drop = F]
   make.unique(sapply(1:nrow(data.names), function(nr) {
-    entries <- lapply((data.names[nr, !is.na(data.names[nr, ])]), as.character)
-    do.call(paste, as.list(c(entries, sep='-')))
+    entries <- lapply(data.names[nr, !is.na(data.names[nr, ])], as.character)
+    do.call(paste, as.list(c(entries, sep = "-")))
   }))
 }
 
 # Autogenerate a short name for a sequence using sequence length and content.
 make_allele_name <- function(data, hash.len=6) {
   if (is.character(data)) {
-    if(hash.len > 0) {
+    if (hash.len > 0) {
       paste(nchar(data),
             substr(openssl::md5(data), 1, hash.len),
             sep = "-")

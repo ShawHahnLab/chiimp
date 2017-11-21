@@ -31,7 +31,7 @@ report_genotypes <- function(tbl,
   # name.
   for (j in 3:ncol(tbl)) {
     for (i in 1:nrow(tbl)) {
-      if(is.na(tbl[i, j]))
+      if (is.na(tbl[i, j]))
         next
       row <- match(tbl[i, j], allele.names[, "Seq"])
       n <- as.character(allele.names[row, "Name"])
@@ -46,7 +46,7 @@ report_genotypes <- function(tbl,
   else
     tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
   # Blank out any remaining NA values
-  tbl[is.na(tbl)] <- ''
+  tbl[is.na(tbl)] <- ""
   tbl
 }
 
@@ -58,16 +58,20 @@ report_idents <- function(results, closest, hash.len) {
   # the samples themselves and group each set in a report table.
   tbl.closest <- do.call(rbind, lapply(names(closest), function(nm) {
     cbind(tbl.known[names(closest[[nm]]), ],
-          Distance=closest[[nm]],
-          Reference=nm)
+          Distance = closest[[nm]],
+          Reference = nm)
   }))
   # I should clean up these functions to avoid this sort of mess.
   tbl.closest$Name <- tbl.closest$Sample
   tbl.closest$Sample <- tbl.closest$Reference
   tbl.closest <- tbl.closest[, -match("Reference", colnames(tbl.closest))]
-  rownames(tbl.closest) <- paste(tbl.closest$Sample, tbl.closest$Name, sep='.')
+  rownames(tbl.closest) <- paste(tbl.closest$Sample,
+                                 tbl.closest$Name,
+                                 sep = ".")
 
-  tbl.ident <- report_genotypes(tbl.closest[, -match(c("Distance", "Name"), colnames(tbl.closest))], hash.len = hash.len)
+  tbl.ident <- report_genotypes(tbl.closest[, -match(c("Distance", "Name"),
+                                                     colnames(tbl.closest))],
+                                hash.len = hash.len)
   tbl.ident <- cbind(tbl.ident, tbl.closest[, c("Distance", "Name")])
 
   tbl.obs <- report_genotypes(tbl, hash.len = hash.len)
@@ -75,7 +79,7 @@ report_idents <- function(results, closest, hash.len) {
   # Set common columns and combine tables
   tbl.obs$Distance <- NA
   tbl.obs$Name <- ""
-  if( "Replicate" %in% colnames(tbl.obs))
+  if ("Replicate" %in% colnames(tbl.obs))
     tbl.ident$Replicate <- ""
   tbl.combo <- rbind(tbl.obs, tbl.ident)
 
@@ -114,13 +118,12 @@ histogram <- function(samp,
                       xlim=range(samp$Length)) {
 
   ## Define colors and other plot parameters
-  col.unlabeled   <- "#000000" # The non-locus sequences
+  # The non-locus sequences
+  col.unlabeled   <- "#000000"
   # Locus-labeled and matching all allele conditions
   col.filtered    <- "#FFAAAA"
-  border.filtered <- "#990000"
   # Sequences matching alleles in sample.summary
   col.allele      <- "#FF0000"
-  border.allele   <- "#FF0000"
   # Line showing threshold for allele calls
   col.cutoff <- grDevices::rgb(0, 0, 0, 0.5)
   # Shaded region for filtered sequences
@@ -159,11 +162,11 @@ histogram <- function(samp,
     cts <- with(samp, {
       subset(samp, MatchingLocus != "") %>%
         dplyr::group_by(MatchingLocus) %>%
-        dplyr::summarize(Count=sum(Count))
+        dplyr::summarize(Count = sum(Count))
     })
     cts <- cts[order(cts$Count, decreasing = T), ]
-    locus.name <- if (nrow(cts)>1) {
-      as.character(cts[[1, 'MatchingLocus']])
+    locus.name <- if (nrow(cts) > 1) {
+      as.character(cts[[1, "MatchingLocus"]])
     } else {
       NA
     }
@@ -177,7 +180,7 @@ histogram <- function(samp,
 
   # Just the matching sequences, if there are any.
   if (nrow(samp.filt) > 0) {
-    heights.filt <- with(samp.filt,{
+    heights.filt <- with(samp.filt, {
       samp.filt %>%
         dplyr::group_by(Length) %>%
         dplyr::summarize(TotalCount = sum(Count))
@@ -190,13 +193,13 @@ histogram <- function(samp,
            lend = 1)
     # Shade the domain of the filtered data in gray
     xlim.filt <- range(samp.filt$Length)
-    graphics::polygon(x = rep(xlim.filt, each=2),
+    graphics::polygon(x = rep(xlim.filt, each = 2),
             y = c(0, ymax, ymax, 0),
             col = col.region,
             border = NA)
     # Draw a line to mark the cutoff value for what's considered a prominent
     # count
-    cutoff <- cutoff_fraction*sum(samp.filt$Count)
+    cutoff <- cutoff_fraction * sum(samp.filt$Count)
     graphics::abline(h = cutoff, col = col.cutoff)
   }
 
@@ -216,14 +219,14 @@ histogram <- function(samp,
   }
 
   # Legend
-  graphics::legend(x='topright', bty='n',
-         legend=c("Original",
-                  "Filtered",
-                  "Called Alleles",
-                  "Unique Seq. Threshold"),
-         col=c(col.unlabeled, col.filtered, col.allele, col.cutoff),
-         pch=c(15, 15, 15, NA),
-         lty=c(NA, NA, NA, 1))
+  graphics::legend(x = "topright", bty = "n",
+         legend = c("Original",
+                    "Filtered",
+                    "Called Alleles",
+                    "Unique Seq. Threshold"),
+         col = c(col.unlabeled, col.filtered, col.allele, col.cutoff),
+         pch = c(15, 15, 15, NA),
+         lty = c(NA, NA, NA, 1))
 }
 
 #' Plot advanced histogram of STR sample
@@ -253,7 +256,6 @@ histogram2 <- function(samp,
   col.labeled     <- "#999999"
   border.labled   <- "#000000"
   # Locus-labeled and matching all allele conditions
-  #col.filtered    <- "#FF6666"
   col.filtered    <- "#FFDDDD"
   border.filtered <- "#990000"
   # Sequences matching alleles in sample.summary
@@ -265,10 +267,10 @@ histogram2 <- function(samp,
     cts <- with(samp, {
       subset(samp, MatchingLocus != "") %>%
         dplyr::group_by(MatchingLocus) %>%
-        dplyr::summarize(Count=sum(Count))
+        dplyr::summarize(Count = sum(Count))
     })
     cts <- cts[order(cts$Count, decreasing = T), ]
-    locus.name <- as.character(cts[[1, 'MatchingLocus']])
+    locus.name <- as.character(cts[[1, "MatchingLocus"]])
   }
 
   # TODO:
@@ -329,10 +331,10 @@ histogram2 <- function(samp,
                chunk[n, "Cumsum"] - chunk[n, "Count"])
         # Is the sequence matching all criteria for a candidate allele?
         am <- allele_match(chunk[n, ], locus.name)
-        if(is.na(am)) am <- F
+        if (is.na(am)) am <- F
         # Is the sequence an exact match for an identified allele?
-        is_allele <- chunk[n, 'Seq'] %in%
-          as.character(unlist(sample.summary[c('Allele1Seq', 'Allele2Seq')]))
+        is_allele <- chunk[n, "Seq"] %in%
+          as.character(unlist(sample.summary[c("Allele1Seq", "Allele2Seq")]))
         # Color each rectangle according to its category as defined by the
         # above.  The default will be the locus-labeled colors.
         col <- col.labeled
@@ -344,7 +346,7 @@ histogram2 <- function(samp,
           col <- col.filtered
           col.border <- border.filtered
         }
-        graphics::polygon(x, y, col = col, border = col.border, lwd=0.5)
+        graphics::polygon(x, y, col = col, border = col.border, lwd = 0.5)
       }
     }
   }
@@ -359,27 +361,27 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   else
     seqs <- as.character(alignment)
   if (! include.blanks)
-    seqs <- seqs[grep('^-+$', seqs, invert = TRUE)]
+    seqs <- seqs[grep("^-+$", seqs, invert = TRUE)]
   # Create grouping factor using sequence length (just strip out the gap
   # character to get the original length back).
-  groups <- factor(paste('  ', nchar(gsub('-', '', seqs)), 'bp'))
+  groups <- factor(paste("  ", nchar(gsub("-", "", seqs)), "bp"))
   graphics::par(mar = c(5, 5, 4, 5))
   dnaplotr::plotDNA(seqs,
                     groups = groups,
                     ...)
   # Add faint lines between all sequences
-  for(i in seq_along(seqs))
-    graphics::abline(h=i+0.5, col=grDevices::rgb(0.5, 0.5, 0.5, 0.5))
+  for (i in seq_along(seqs))
+    graphics::abline(h = i+0.5, col = grDevices::rgb(0.5, 0.5, 0.5, 0.5))
   # Add a label for every unique sequence, using the names of the supplied
   # sequences
   if (missing(labels))
-    labels <- sapply(strsplit(names(seqs), '_'), '[', 2)
+    labels <- sapply(strsplit(names(seqs), "_"), "[", 2)
   graphics::axis(4,
        at = 1:length(seqs),
        labels = labels,
        tick = F,
        padj = -2.5,
-       cex.axis=0.6)
+       cex.axis = 0.6)
 }
 
 # Distance Matrices -------------------------------------------------------
@@ -387,21 +389,21 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
 
 # A skewed 0 -> 1 scale for color-coding distance tables
 make.dist_scale <- function(n) {
-  ((0:n)/n)**(1/3)
+  ((0:n) / n) ** (1 / 3)
 }
 
 plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
-                          dist.display_thresh=round(num.alleles*2/3),
+                          dist.display_thresh=round(num.alleles * 2 / 3),
                           ...) {
-  labels <- matrix(character(length(dist_mat)), nrow=nrow(dist_mat))
+  labels <- matrix(character(length(dist_mat)), nrow = nrow(dist_mat))
   idx <- dist_mat <= dist.display_thresh
   labels[idx] <- dist_mat[idx]
-  diag(labels) <- ''
+  diag(labels) <- ""
   dist_scale <- make.dist_scale(num.alleles)
-  color <- grDevices::rgb(red=1, green=dist_scale, blue=dist_scale)
+  color <- grDevices::rgb(red = 1, green = dist_scale, blue = dist_scale)
 
   # Scale font size automatically between min and max values
-  fontsize = min(16, max(4, 17 - 0.11*nrow(dist_mat)))
+  fontsize <- min(16, max(4, 17 - 0.11 * nrow(dist_mat)))
 
   vals <- dist_mat
   pheatmap::pheatmap(vals,
@@ -436,7 +438,7 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 #' @export
 plot_heatmap <- function(results,
                          attribute,
-                         label.by = c('Allele1Length', 'Allele2Length'),
+                         label.by = c("Allele1Length", "Allele2Length"),
                          color=c("white", "pink"),
                          breaks=NA,
                          ...) {
@@ -445,12 +447,12 @@ plot_heatmap <- function(results,
   tbl.labels <- summarize_genotypes(results$summary, vars = label.by)
   labels <- tbl.labels[, -(1:2)]
   data[is.na(labels)] <- NA
-  labels[is.na(labels)] <- ''
+  labels[is.na(labels)] <- ""
 
   # Handle edge cases where all the values are the same and/or all NA
   if (all(is.na(data)))
-    data[,] <- 0
-  if (min(data,na.rm=T) == max(data, na.rm=T))
+    data[, ] <- 0
+  if (min(data, na.rm = T) == max(data, na.rm = T))
     breaks <- range(c(0, max(data), 1))
 
   pheatmap::pheatmap(data,
@@ -515,7 +517,7 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
   ps <- results$summary[!is.na(results$summary$Allele1Seq), "ProminentSeqs"]
   # Deep red will only be used if somehow there are a whole lot of extra
   # sequences (say, 8); otherwise it should just go up to a pink color.
-  colors <- color_func(max(8, max(ps)+1))
+  colors <- color_func(max(8, max(ps) + 1))
   # Stay white for 0 - 2
   colors[1:3] <- rep(colors[1], 3)
   # Truncate to actual number of peaks
@@ -539,14 +541,14 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
 #'
 #' @export
 plot_heatmap_proportions <- function(results, ...) {
-  cts <- results$summary[, c('Allele1Count', 'Allele2Count')]
-  prop.counted <- rowSums(cts, na.rm=T)/results$summary$CountLocus
+  cts <- results$summary[, c("Allele1Count", "Allele2Count")]
+  prop.counted <- rowSums(cts, na.rm = T) / results$summary$CountLocus
   results$summary$ProportionCounted <- prop.counted
   color_func <- grDevices::colorRampPalette(c("red", "white"))
   breaks <- seq(0, 1, 0.001)
   colors <- color_func(length(breaks) - 1)
   plot_heatmap(results,
-               'ProportionCounted',
+               "ProportionCounted",
                color = colors,
                breaks = breaks,
                ...)
@@ -563,9 +565,9 @@ k_group_rows <- function(k, grouping) {
   labels <- names(grouping)[idx]
   if (is.null(labels))
     labels <- seq_along(idx)
-  for(i in seq_along(idx)) {
+  for (i in seq_along(idx)) {
     start_row <- idx[i]
-    end_row <- idx[i+1] - 1
+    end_row <- idx[i + 1] - 1
     if (is.na(end_row))
       end_row <- length(grouping)
     k <- kableExtra::group_rows(k, labels[i], start_row, end_row)
@@ -612,10 +614,10 @@ rmd_kable_genotypes <- function(results, hash.len,
   if (!is.null(locus_chunks)) {
     prefix <- match(c("Sample", "Replicate"), colnames(tbl))
     prefix <- prefix[!is.na(prefix)]
-    for(chunk_name in names(locus_chunks)) {
-      locus_cols <- paste(rep(locus_chunks[[chunk_name]], each=2),
-                          c(1,2),
-                          sep='_')
+    for (chunk_name in names(locus_chunks)) {
+      locus_cols <- paste(rep(locus_chunks[[chunk_name]], each = 2),
+                          c(1, 2),
+                          sep = "_")
       m <- match(locus_cols, colnames(tbl))
       m <- m[!is.na(m)]
       cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
@@ -654,7 +656,8 @@ kable_idents <- function(tbl, closest) {
   k
 }
 
-rmd_kable_idents <- function(results, hash.len, range, maximum, locus_chunks=NULL) {
+rmd_kable_idents <- function(results, hash.len, range, maximum,
+                             locus_chunks=NULL) {
   closest <- find_closest_matches(results$dist_mat_known,
                                   range = range,
                                   maximum = maximum)
@@ -669,7 +672,7 @@ rmd_plot_cts_per_locus <- function(results,
                                    heading_prefix="###") {
   tbl <- results$cts_per_locus
   # Switch to log scale
-  tbl[tbl==0] <- NA
+  tbl[tbl == 0] <- NA
   tbl <- log10(tbl)
   # Count samples per locus, for breaking big heatmaps into smaller chunks but
   # not splitting loci
@@ -679,9 +682,9 @@ rmd_plot_cts_per_locus <- function(results,
   tbl.loci <- tbl.loci[!is.na(tbl.loci)]
   # Break loci into chunks to keep heatmap sizes reasonable
   loci.chunked <- split(names(tbl.loci),
-                        floor(cumsum(tbl.loci)/max.rows))
+                        floor(cumsum(tbl.loci) / max.rows))
   # Break on powers of ten (since we already log10'd above)
-  breaks <- 0:ceiling(max(tbl, na.rm=T))
+  breaks <- 0:ceiling(max(tbl, na.rm = T))
   color <- viridis::viridis(max(breaks))
   # Draw each heatmap across chunks of loci.  Written to assume there will be
   # multiple but this should work fine even if there's only one.
@@ -698,7 +701,7 @@ rmd_plot_cts_per_locus <- function(results,
     pheatmap::pheatmap(tbl[rownames(tbl) %in% idx.row, ],
                        cluster_rows = F,
                        cluster_cols = F,
-                       gaps_col = c(1,2),
+                       gaps_col = c(1, 2),
                        color = color,
                        breaks = breaks)
   }
@@ -707,7 +710,7 @@ rmd_plot_cts_per_locus <- function(results,
 # Insert image links to pre-rendered alignment images.
 rmd_alignments <- function(results, heading_prefix="###") {
   invisible(lapply(names(results$alignments), function(loc) {
-    cat(paste0("\n\n", heading_prefix," Locus ", loc, "\n\n"))
+    cat(paste0("\n\n", heading_prefix, " Locus ", loc, "\n\n"))
     if (is.null(results$alignments[[loc]])) {
       cat(paste0("No sequences to align for Locus ", loc, "."))
       return()

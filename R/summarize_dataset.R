@@ -41,8 +41,8 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
 # Tabulate genotypes across loci.  Which attributes will actually be used for
 # the table is configurable.
 summarize_genotypes <- function(results_summary,
-                                vars=c('Allele1Seq', 'Allele2Seq')) {
-  combo <- results_summary[, c('Sample', 'Replicate', 'Locus', vars)]
+                                vars=c("Allele1Seq", "Allele2Seq")) {
+  combo <- results_summary[, c("Sample", "Replicate", "Locus", vars)]
   combo[, vars[1]] <- as.character(combo[, vars[1]])
   combo[, vars[2]] <- as.character(combo[, vars[2]])
   # Repeat alleles for homozygous cases
@@ -64,17 +64,17 @@ summarize_genotypes <- function(results_summary,
   # short name (i.e. allele sequence length)
   combo[, vars[2]] <- ifelse( !(results_summary$Homozygous) &
                                 combo[, vars[1]] == combo[, vars[2]],
-                              paste0(combo[, vars[2]], '*'),
+                              paste0(combo[, vars[2]], "*"),
                               combo[, vars[2]])
   # Reshape into wide table
-  combo$ID <- paste(combo$Sample, combo$Replicate, sep='-')
-  tbl <- stats::reshape(combo, v.names = vars, idvar = 'ID',
-                 timevar = 'Locus', direction = 'wide')
+  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
+  tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
+                 timevar = "Locus", direction = "wide")
   tbl <- tbl[, -3]
-  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each=2),
-                       c(1,2),
-                       sep = '_')
-  colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
+  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = 2),
+                       c(1, 2),
+                       sep = "_")
+  colnames(tbl) <- c("Sample", "Replicate", allele_cols)
   tbl <- tbl[order_entries(tbl), ]
   rownames(tbl) <- make_rownames(tbl)
   tbl
@@ -99,18 +99,18 @@ summarize_genotypes_known <- function(genotypes.known, tbl.genotypes=NULL) {
 # values, like Homozgyous or ProminentSeqs.)
 summarize_attribute <- function(results_summary, attrib, repeats = 2) {
   attrib_rep <- rep(attrib, repeats)
-  combo <- results_summary[, c('Sample', 'Replicate', 'Locus', attrib_rep)]
-  combo$ID <- paste(combo$Sample, combo$Replicate, sep='-')
+  combo <- results_summary[, c("Sample", "Replicate", "Locus", attrib_rep)]
+  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
   # reshape into wide table
   tbl <- stats::reshape(combo,
                  v.names = make.names(attrib_rep, unique = T),
-                 idvar = 'ID',
-                 timevar = 'Locus', direction = 'wide')
+                 idvar = "ID",
+                 timevar = "Locus", direction = "wide")
   tbl <- tbl[, -3]
   allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = repeats),
                        1:repeats,
-                       sep = '_')
-  colnames(tbl) <- c('Sample', 'Replicate', allele_cols)
+                       sep = "_")
+  colnames(tbl) <- c("Sample", "Replicate", allele_cols)
   tbl <- tbl[order_entries(tbl), ]
   rownames(tbl) <- make_rownames(tbl)
   tbl
@@ -143,8 +143,8 @@ make_dist_mat <- function(results_summary,
   # triangle of what would be a distance matrix.
   distances <- utils::combn(nrow(tbl), 2,
         function(nr) {
-          dist.func(tbl[nr[1], -(1:2)],
-                    tbl[nr[2], -(1:2)])
+          dist.func(tbl[nr[1], - (1:2)],
+                    tbl[nr[2], - (1:2)])
         })
   # Trick from SO to funnel it through a dist object to get it into matrix form.
   # https://stackoverflow.com/a/5598824/6073858
@@ -157,7 +157,7 @@ make_dist_mat <- function(results_summary,
   # set the diagonal explicitly, since the distance function may possibly return
   # non-zero values for a distance between an entry and itself.
   diag(dist.mat) <- apply(tbl, 1, function(row) {
-    dist.func(row[-(1:2)], row[-(1:2)])
+    dist.func(row[- (1:2)], row[- (1:2)])
   })
   # This all ends up being pretty roundabout.  Should I instead use outer() or
   # something to build the matrix?
@@ -192,8 +192,8 @@ make_dist_mat_known <- function(results_summary,
                      function(nr, nr.known) {
                        apply(cbind(nr, nr.known), 1,
                              function(row) {
-                               dist.func(tbl[row[1], -(1:2)],
-                                         tbl.known[row[2], -(1:2)])
+                               dist.func(tbl[row[1], - (1:2)],
+                                         tbl.known[row[2], - (1:2)])
                              })
   })
   rownames(distances) <- rownames(tbl)
@@ -220,10 +220,10 @@ make_dist_mat_known <- function(results_summary,
 calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   g1 <- unlist(g1)
   g2 <- unlist(g2)
-  if (length(g1)%%2 != 0 || length(g2)%%2 != 0) {
+  if (length(g1) %% 2 != 0 || length(g2) %% 2 != 0) {
     warning("Odd length for input genotype; truncating.")
-    g1 <- g1[1:(length(g1)-length(g1)%%2)]
-    g2 <- g2[1:(length(g2)-length(g2)%%2)]
+    g1 <- g1[1:(length(g1) - length(g1) %% 2)]
+    g2 <- g2[1:(length(g2) - length(g2) %% 2)]
   }
   if (length(g1) != length(g2)) {
     warning("Input genotype length mismatch; truncating.")
@@ -239,8 +239,9 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   alleles2 <- matrix(g2, ncol = 2, byrow = TRUE)
   alleles <- cbind(alleles1, alleles2)
   alleles
-  sum(apply(alleles, 1, function(row) min(sum(row[1:2] != row[3:4], na.rm=T),
-                                          sum(row[2:1] != row[3:4]), na.rm=T) ))
+  sum(apply(alleles, 1,
+            function(row) min(sum(row[1:2] != row[3:4], na.rm = T),
+                              sum(row[2:1] != row[3:4]), na.rm = T)))
 }
 
 #' Find closest matches in distance matrix
@@ -260,8 +261,8 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
   entries <- lapply(1:nrow(dist_mat), function(nr) {
     m <- min(dist_mat[nr, ])
     nearby <- dist_mat[nr, dist_mat[nr, ] < m + range &
-                         dist_mat[nr, ] < maximum, drop=F]
-    nearby <- nearby[1, order(nearby), drop=F]
+                         dist_mat[nr, ] < maximum, drop = F]
+    nearby <- nearby[1, order(nearby), drop = F]
     nm <- colnames(nearby)
     nearby <- nearby[1, ]
     names(nearby) <- nm
@@ -292,11 +293,11 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
   chunks <- split(results_summary, droplevels(results_summary$Locus))
   lapply(chunks, function(chunk) {
     alleles <- chunk[, c("Allele1Seq", "Allele2Seq")]
-    a1 <- as.character(alleles[,1])
-    a2 <- as.character(alleles[,2])
+    a1 <- as.character(alleles[, 1])
+    a2 <- as.character(alleles[, 2])
     a2 <- ifelse(is.na(a2), a1, a2)
-    names(a1) <- paste(rownames(alleles), 1, sep="_")
-    names(a2) <- paste(rownames(alleles), 2, sep="_")
+    names(a1) <- paste(rownames(alleles), 1, sep = "_")
+    names(a2) <- paste(rownames(alleles), 2, sep = "_")
     a <- c(a1, a2)
     # If there are no sequences, skip the alignment and record NA for this
     # locus.  (The msa function doesn't do this sort of checking itself,
@@ -304,26 +305,27 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
     if (all(is.na(a)))
       return(NULL)
     # Turn NAs into empty strings
-    a[is.na(a)] <- ''
+    a[is.na(a)] <- ""
     # Dereplicate identical sequences, if specified
     if (derep) {
       tbl <- table(a)
       n <- unname(tbl)
       a <- names(tbl)
-      names(a) <- paste(nchar(a), n,sep='_')
+      names(a) <- paste(nchar(a), n, sep = "_")
     }
     # If there are any other missing sequences, put a stub in place so msa still
     # runs without complaints.
-    a[a==''] <- '-'
+    a[a == ""] <- "-"
     # msa() generates a bunch of text on standard output and I can't see any
     # options to turn that off.  Using a workaround here.
     tryCatch({
-      sink('/dev/null')
+      sink("/dev/null")
       alignments <- msa::msaClustalW(a,
-                                     type="dna",
-                                     substitutionMatrix = 'clustalw',
+                                     type = "dna",
+                                     substitutionMatrix = "clustalw",
                                      ...)
-    }, finally = {
+    },
+    finally = {
       sink()
     })
     alignments
@@ -349,8 +351,8 @@ tally_cts_per_locus <- function(results) {
   # expected locus.  Bind these to the original data to force the heatmap to use
   # a uniform scale.
   cols.match <- results$summary[rownames(tbl), "Locus"]
-  tbl.anno <- data.frame(Total=rowSums(tbl),
-                         Matching=sapply(seq_along(cols.match),
+  tbl.anno <- data.frame(Total = rowSums(tbl),
+                         Matching = sapply(seq_along(cols.match),
                             function(i) tbl[i, as.character(cols.match[i])]))
   tbl <- cbind(tbl.anno, tbl)
   tbl
