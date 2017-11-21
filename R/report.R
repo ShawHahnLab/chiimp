@@ -470,8 +470,12 @@ plot_heatmap <- function(results,
   data[is.na(labels)] <- NA
   labels[is.na(labels)] <- ''
 
+  # Handle edge cases where all the values are the same and/or all NA
+  if (all(is.na(data)))
+    data[,] <- 0
   if (min(data,na.rm=T) == max(data, na.rm=T))
-    breaks <- c(max(data))
+    breaks <- range(c(0, max(data), 1))
+  
   pheatmap::pheatmap(data,
                      cluster_rows = F,
                      cluster_cols = F,
