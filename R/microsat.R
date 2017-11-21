@@ -50,8 +50,9 @@ config.defaults <- list(
   report=TRUE,
   # Should the code executed in the report generation be included in the report?
   report.echo=FALSE,
-  # Title at top of the report.
+  # Title and other metadata at top of the report.
   report.title="Microsatellite Report",
+  report.author=NULL,
   # Length of suffix on automated allele names in tables.
   report.hash_len=6,
   # List of vectors of locus names to use to break up tables into reasonable
@@ -125,8 +126,7 @@ full_analysis <- function(config) {
     # Reorder entries and levels to match locus_attrs.
     results$summary$Locus <- factor(results$summary$Locus,
                                     levels = rownames(locus_attrs))
-    ord <- order(results$summary$Locus,
-                 order_entries(dataset))
+    ord <- order_entries(results$summary)
     results$summary <- results$summary[ord, ]
     results$data <- results$data[ord]
     results$locus_attrs <- locus_attrs
@@ -165,6 +165,7 @@ render_report <- function(results, config) {
     if (!dir.exists(dirname(fp.report.out)))
       dir.create(dirname(fp.report.out), recursive = TRUE)
     pandoc_metadata <- c(title = report.title,
+                         author = report.author,
                          date = format(Sys.Date(), "%Y-%m-%d"))
     pandoc_args <- format_pandoc_args(pandoc_metadata)
     rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
