@@ -331,6 +331,31 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
 }
 
 
+# Counts per Locus --------------------------------------------------------
+
+# Produce a table of read counts matching (by primer) each locus per sample.
+tally_cts_per_locus <- function(results) {
+  # Create table of counts of sequences that match each possible locus across
+  # samples.  Only include loci we expect from the metadata, rather than any
+  # known in locus_attrs.
+  .levels <- match(rownames(results$locus_attrs), results$summary$Locus)
+  .levels <- results$summary$Locus[.levels[!is.na(.levels)]]
+  tbl <- do.call(rbind, lapply(results$data, function(d) {
+    d$MatchingLocus <- factor(d$MatchingLocus,
+                              levels = .levels)
+    sapply(split(d$Count, d$MatchingLocus), sum)
+  }))
+  # Make some extra columns for total sequences and sequences matching the
+  # expected locus.  Bind these to the original data to force the heatmap to use
+  # a uniform scale.
+  cols.match <- results$summary[rownames(tbl), "Locus"]
+  tbl.anno <- data.frame(Total=rowSums(tbl),
+                         Matching=sapply(seq_along(cols.match),
+                            function(i) tbl[i, as.character(cols.match[i])]))
+  tbl <- cbind(tbl.anno, tbl)
+  tbl
+}
+
 # Locus Performance -------------------------------------------------------
 
 # TODO: functions to evaluate the level of genotyping success and allele

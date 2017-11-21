@@ -124,6 +124,7 @@ full_analysis <- function(config) {
                                counts.min = sample_summary$counts.min,
                                summary.function = sample_summary_func)
     # Reorder entries and levels to match locus_attrs.
+    # TODO merge these steps into analyze_dataset or summarize_dataset
     results$summary$Locus <- factor(results$summary$Locus,
                                     levels = rownames(locus_attrs))
     ord <- order_entries(results$summary)
@@ -135,6 +136,7 @@ full_analysis <- function(config) {
     if (!is.null(fp.genotypes.known))
       genotypes.known <- load_genotypes(fp.genotypes.known)
     results <- summarize_dataset(results, genotypes.known)
+    results$cts_per_locus <- tally_cts_per_locus(results)
     results$config <- config.full
     results$allele.names <- NULL
     if (!is.null(fp.allele.names))

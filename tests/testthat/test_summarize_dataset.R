@@ -19,8 +19,10 @@ test_that("summarize_dataset produces additional summaries", {
   # functions too.
   with(results_summary_data, {
     results_mod <- summarize_dataset(results)
-    expect_equal(names(results_mod),
-                 c(names(results), c("alignments", "dist_mat")))
+    names_observed <- names(results_mod)
+    names_expected <- c(names(results), "alignments", "dist_mat")
+    expect_equal(names_observed,
+                 names_expected)
   })
 })
 
@@ -166,4 +168,13 @@ test_that("align_alleles works for empty sequence sets", {
     alignments <- align_alleles(results$summary)
     expect_equal(alignments$A, NULL)
   })
+})
+
+
+# test_tally_cts_per_locus ------------------------------------------------
+
+test_that("tally_cts_per_locus counts matches per locus per sample", {
+  # Right now the function is called in full_analysis, but it really should be
+  # rolled into summarize_dataset.
+  skip("test not yet implemented")
 })
