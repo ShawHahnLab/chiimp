@@ -4,9 +4,9 @@
 \alias{analyze_dataset}
 \title{Analyze all samples in a dataset}
 \usage{
-analyze_dataset(dataset, locus_attrs, num.cores = max(1,
-  as.integer(parallel::detectCores()/2) - 1),
-  summary.function = summarize_sample, nrepeats, fraction.min, counts.min)
+analyze_dataset(dataset, locus_attrs, nrepeats, fraction.min, counts.min,
+  num.cores = max(1, as.integer(parallel::detectCores()/2) - 1),
+  summary.function = summarize_sample)
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
@@ -15,14 +15,8 @@ analyze_dataset(dataset, locus_attrs, num.cores = max(1,
 \item{locus_attrs}{data frame of locus attributes as produced by
 \code{load_locus_attrs}.}
 
-\item{num.cores}{integer number of CPU cores to use in parallel for sample
-analysis.}
-
-\item{summary.function}{function to use when summarizing each sample's full
-details into the standard attributes.}
-
 \item{nrepeats}{number of repeats of each locus' motif to require for a
-match.}
+match (see \code{analyze_sample}).}
 
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that
@@ -31,6 +25,12 @@ locus, to be considered as a potential allele.}
 \item{counts.min}{numeric threshold for the minimum number of counts that
 must be present, in total across entries passing all filters, for potential
 alleles to be considered.}
+
+\item{num.cores}{integer number of CPU cores to use in parallel for sample
+analysis.}
+
+\item{summary.function}{function to use when summarizing each sample's full
+details into the standard attributes.}
 }
 \value{
 list of results

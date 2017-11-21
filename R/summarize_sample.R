@@ -1,6 +1,11 @@
 # Create a summary list for a single sample, targeting a single locus.  See
 # summarize_sample below for the entries in the returned list.
 
+# Different versions summarize_sample to allow via configuration in
+# full_analysis.
+sample_summary_funcs <- c("summarize_sample",
+                          "summarize_sample_naive",
+                          "summarize_sample_by_length")
 
 #' Summarize a processed STR sample
 #'
@@ -86,7 +91,9 @@ summarize_sample <- function(sample.data, locus.name, fraction.min, counts.min) 
 # Like summarize_sample above, but skips allele_match and stutter removal.
 summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
                                    counts.min) {
-  chunk <- sample.data[as.character(sample.data$MatchingLocus) == locus.name, ]
+  chunk <- with(sample.data,
+                sample.data[!is.na(MatchingLocus) &
+                              as.character(MatchingLocus) == locus.name, ])
   count.total <- sum(sample.data$Count)
   count.locus <- sum(chunk$Count)
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]

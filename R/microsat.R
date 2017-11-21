@@ -42,6 +42,7 @@ config.defaults <- list(
   dp.output.allele_seqs="allele-sequences",  # FASTA sequences for alleles
   ## Sample genotyping settings
   sample_analysis = list(nrepeats = 3),
+  sample_summary_func = "summarize_sample",
   sample_summary = list(fraction.min = 0.05,
                         counts.min = 500),
   ## Report generation settings
@@ -114,10 +115,13 @@ full_analysis <- function(config) {
       logmsg(paste0("Loading locus attributes from ", fp.locus_attrs, "..."))
     locus_attrs <- load_locus_attrs(fp.locus_attrs)
     if (verbose) logmsg("Analyzing samples...")
+    idx <- match(sample_summary_func, sample_summary_funcs, nomatch = 1)
+    sample_summary_func <- get(sample_summary_funcs[idx])
     results <- analyze_dataset(dataset, locus_attrs,
                                nrepeats = sample_analysis$nrepeats,
                                fraction.min = sample_summary$fraction.min,
-                               counts.min = sample_summary$counts.min)
+                               counts.min = sample_summary$counts.min,
+                               summary.function = sample_summary_func)
     ord <- order(match(dataset$Locus, rownames(locus_attrs)),
                  order_entries(dataset))
     results$summary <- results$summary[ord, ]
@@ -141,7 +145,7 @@ full_analysis <- function(config) {
       saveRDS(results, file.path(dp.output, fp.output.rds))
     if (report) {
       if (verbose) logmsg("Creating report...")
-      render_report(results, config)
+      render_report(results, results$config)
     }
     if (verbose) logmsg("Done.")
     return(results)
