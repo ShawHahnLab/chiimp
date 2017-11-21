@@ -294,7 +294,7 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
 #'
 #' @export
 align_alleles <- function(results_summary, derep=TRUE, ...) {
-  chunks <- split(results_summary, results_summary$Locus)
+  chunks <- split(results_summary, droplevels(results_summary$Locus))
   lapply(chunks, function(chunk) {
     alleles <- chunk[, c("Allele1Seq", "Allele2Seq")]
     a1 <- as.character(alleles[,1])
