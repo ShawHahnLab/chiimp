@@ -9,6 +9,8 @@ locus_attrs_cols <- c("LengthMin", "LengthMax", "LengthBuffer", "Motif",
 # Exepcted column names for genotypes.known
 genotypes_cols <- c("Name", "Locus", "Allele1Seq", "Allele2Seq")
 
+# Expected column names for allele.names
+allele_names_cols <- c("Locus", "Name", "Seq")
 
 #' Load configuration file
 #'
@@ -47,6 +49,29 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
   if (any(col.missing)) {
     warning(paste("Missing columns in locus_attrs table:",
                   locus_attrs_cols[col.missing]))
+  }
+  data
+}
+
+#' Load table of known allele names
+#'
+#' Load a tab-separated table of allele names for use in reporting.
+#'
+#' @param fp.allele.names path to text file.
+#' @param ... additional arguments passed to \code{read.table}.
+#'
+#' @return data frame of allele names
+#'
+#' @export
+load_allele_names <- function(fp.allele.names, ...) {
+  data <- utils::read.table(fp.allele.names,
+                            header = T,
+                            sep="\t",
+                            ...)
+  col.missing <- is.na(match(allele_names_cols, colnames(data)))
+  if (any(col.missing)) {
+    warning(paste("Missing columns in allele.names table:",
+                  allele_names_cols[col.missing]))
   }
   data
 }

@@ -123,18 +123,22 @@ full_analysis <- function(config) {
                                counts.min = sample_summary$counts.min,
                                summary.function = sample_summary_func)
     # Reorder entries and levels to match locus_attrs.
-    ord <- order(match(dataset$Locus, rownames(locus_attrs)),
+    results$summary$Locus <- factor(results$summary$Locus,
+                                    levels = rownames(locus_attrs))
+    ord <- order(results$summary$Locus,
                  order_entries(dataset))
     results$summary <- results$summary[ord, ]
     results$data <- results$data[ord]
     results$locus_attrs <- locus_attrs
-    levels(results$summary$Locus) <- rownames(locus_attrs)
     if (verbose) logmsg("Summarizing results...")
     genotypes.known <- NULL
     if (!is.null(fp.genotypes.known))
       genotypes.known <- load_genotypes(fp.genotypes.known)
     results <- summarize_dataset(results, genotypes.known)
     results$config <- config.full
+    results$allele.names <- NULL
+    if (!is.null(fp.allele.names))
+      results$allele.names <- load_allele_names(fp.allele.names)
     if (verbose) logmsg("Saving output files...")
     save_histograms(results, file.path(dp.output, dp.output.histograms))
     save_results_summary(results$summary, file.path(dp.output, fp.output.summary))
@@ -160,10 +164,19 @@ render_report <- function(results, config) {
     fp.report.out <- file.path(dp.output, fp.report)
     if (!dir.exists(dirname(fp.report.out)))
       dir.create(dirname(fp.report.out), recursive = TRUE)
-    pandoc_args <- c(paste0("--metadata=title:\"", report.title, "\""))
+    pandoc_metadata <- c(title = report.title,
+                         date = format(Sys.Date(), "%Y-%m-%d"))
+    pandoc_args <- format_pandoc_args(pandoc_metadata)
     rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
                       output_options = list(pandoc_args = pandoc_args))
   })
+}
+
+format_pandoc_args <- function(metadata) {
+  metadata <- paste(names(metadata),
+                    lapply(metadata,
+                           function(s) paste0("\"", s, "\"")), sep=":")
+  paste("--metadata=", metadata, sep="")
 }
 
 #' Handle full microsatellite analysis from command-line
