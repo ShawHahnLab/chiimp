@@ -319,7 +319,7 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
     # msa() generates a bunch of text on standard output and I can't see any
     # options to turn that off.  Using a workaround here.
     tryCatch({
-      sink("/dev/null")
+      sink(fp_devnull)
       alignments <- msa::msaClustalW(a,
                                      type = "dna",
                                      substitutionMatrix = "clustalw",

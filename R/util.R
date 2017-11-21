@@ -1,4 +1,4 @@
-# Misc utility functions used by the others.
+# Misc utility functions and variables used by the others.
 
 # create unique rownames for the given data frame, using whichever sample
 # metadata columns are available.
@@ -42,3 +42,7 @@ order_entries <- function(data) {
   items <- items[!sapply(items, is.null)]
   do.call(order, items)
 }
+
+
+# Equivalent of /dev/null for the build platform.
+fp_devnull <- c(unix="/dev/null", windows="nul")[.Platform$OS.type]

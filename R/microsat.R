@@ -6,6 +6,9 @@
 #' Analyze DNA microsatellites in high-throughput sequencing datasets.
 "_PACKAGE"
 
+
+# Configuration -----------------------------------------------------------
+
 #' Default microsatellite configuration
 #'
 #' The entries in this list show the build-time configuration defaults for all
@@ -79,6 +82,8 @@ config.defaults <- list(
   ## Other settings
   # Print status messages to standard error.
   verbose = TRUE)
+
+# Analysis ----------------------------------------------------------------
 
 #' Perform a full microsatellite analysis
 #'
@@ -167,28 +172,6 @@ full_analysis <- function(config) {
   })
 }
 
-render_report <- function(results, config) {
-  with(config, {
-    fp.report.in <- system.file("report", "report.Rmd", package = "microsat")
-    fp.report.out <- file.path(dp.output, fp.report)
-    if (!dir.exists(dirname(fp.report.out)))
-      dir.create(dirname(fp.report.out), recursive = TRUE)
-    pandoc_metadata <- c(title = report.title,
-                         author = report.author,
-                         date = format(Sys.Date(), "%Y-%m-%d"))
-    pandoc_args <- format_pandoc_args(pandoc_metadata)
-    rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
-                      output_options = list(pandoc_args = pandoc_args))
-  })
-}
-
-format_pandoc_args <- function(metadata) {
-  metadata <- paste(names(metadata),
-                    lapply(metadata,
-                           function(s) paste0("\"", s, "\"")), sep = ":")
-  paste("--metadata=", metadata, sep = "")
-}
-
 #' Handle full microsatellite analysis from command-line
 #'
 #' Read configuration from command-line arguments and run \code{full_analysis}.
@@ -211,6 +194,30 @@ main <- function(args=NULL) {
   full_analysis(config)
 }
 
+# Util --------------------------------------------------------------------
+
+render_report <- function(results, config) {
+  with(config, {
+    fp.report.in <- system.file("report", "report.Rmd", package = "microsat")
+    fp.report.out <- file.path(dp.output, fp.report)
+    if (!dir.exists(dirname(fp.report.out)))
+      dir.create(dirname(fp.report.out), recursive = TRUE)
+    pandoc_metadata <- c(title = report.title,
+                         author = report.author,
+                         date = format(Sys.Date(), "%Y-%m-%d"))
+    pandoc_args <- format_pandoc_args(pandoc_metadata)
+    rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
+                      output_options = list(pandoc_args = pandoc_args))
+  })
+}
+
+format_pandoc_args <- function(metadata) {
+  metadata <- paste(names(metadata),
+                    lapply(metadata,
+                           function(s) paste0("\"", s, "\"")), sep = ":")
+  paste("--metadata=", metadata, sep = "")
+}
+
 logmsg <- function(msg) {
-  cat(paste0(msg, "\n"), file = "/dev/stderr")
+  cat(paste0(msg, "\n"), file = fp_devnull)
 }
