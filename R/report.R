@@ -696,7 +696,7 @@ rmd_plot_cts_per_locus <- function(results,
   tbl <- log10(tbl)
   # Count samples per locus, for breaking big heatmaps into smaller chunks but
   # not splitting loci
-  tbl.loci <- table(results$summary$Locus)
+  tbl.loci <- table(droplevels(results$summary$Locus))
   tbl.loci <- tbl.loci[match(rownames(results$locus_attrs),
                              names(tbl.loci))]
   tbl.loci <- tbl.loci[!is.na(tbl.loci)]
