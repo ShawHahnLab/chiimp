@@ -1,15 +1,5 @@
 ## Allele Alignments per Locus
 
 ```{r alignments, results='asis'}
-invisible(lapply(names(results$alignments), function(loc) {
-  cat(paste0("\n\n### Locus ", loc, "\n\n"))
-  if (is.null(results$alignments[[loc]])) {
-    cat(paste0("No sequences to align for Locus ", loc, "."))
-    return() 
-  }
-  fp <- file.path(results$config$dp.output,
-                  results$config$dp.output.alignment_images,
-                  paste0(loc, ".png"))
-  cat(paste0("![](", fp, ")"))
-}))
+rmd_alignments(results)
 ```

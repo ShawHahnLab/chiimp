@@ -475,7 +475,7 @@ plot_heatmap <- function(results,
     data[,] <- 0
   if (min(data,na.rm=T) == max(data, na.rm=T))
     breaks <- range(c(0, max(data), 1))
-  
+
   pheatmap::pheatmap(data,
                      cluster_rows = F,
                      cluster_cols = F,
@@ -725,4 +725,19 @@ rmd_plot_cts_per_locus <- function(results,
                        color = color,
                        breaks = breaks)
   }
+}
+
+# Insert image links to pre-rendered alignment images.
+rmd_alignments <- function(results, heading_prefix="###") {
+  invisible(lapply(names(results$alignments), function(loc) {
+    cat(paste0("\n\n", heading_prefix," Locus ", loc, "\n\n"))
+    if (is.null(results$alignments[[loc]])) {
+      cat(paste0("No sequences to align for Locus ", loc, "."))
+      return()
+    }
+    fp <- file.path(results$config$dp.output,
+                    results$config$dp.output.alignment_images,
+                    paste0(loc, ".png"))
+    cat(paste0("![](", fp, ")"))
+  }))
 }
