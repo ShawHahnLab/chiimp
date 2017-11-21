@@ -6,6 +6,10 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = report.echo, fig.width = 8, fig.height = 8)
+
+num.samples    <- length(unique(results$summary$Sample))
+num.replicates <- length(unique(results$summary$Replicate))
+num.loci       <- length(unique(results$summary$Locus))
 ```
 
 ```{r child="report_genotypes.Rmd", eval=report.sections[["genotypes"]]}

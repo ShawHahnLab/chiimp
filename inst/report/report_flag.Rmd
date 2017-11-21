@@ -1,8 +1,12 @@
 ## Flagged Values
 
+```{r report.flag_prep}
+fig.height.flag <- num.samples * num.replicates / 6
+```
+
 ### Possible PCR Stutter
 
-```{r report.stutter}
+```{r report.stutter, fig.height=fig.height.flag}
 plot_heatmap_stutter(results)
 ```
 
@@ -12,7 +16,7 @@ These tables are color-coded to show samples with more than two prominent
 sequences. Cases with more than two could imply contamination or excessive
 PCR stutter.
 
-```{r report.peaks}
+```{r report.peaks, fig.height=fig.height.flag}
 plot_heatmap_prominent_seqs(results)
 ```
 
@@ -23,12 +27,12 @@ represented by the called alleles per sample, running from red for 0% to white
 for 100%.  The proportion is calculated for both alleles and color-coded with
 the same color for both.
 
-```{r report.prop}
+```{r report.prop, fig.height=fig.height.flag}
 plot_heatmap_proportions(results)
 ```
 
 ### Possible Homozygous Samples
 
-```{r report.homozygous}
+```{r report.homozygous, fig.height=fig.height.flag}
 plot_heatmap_homozygous(results)
 ```
