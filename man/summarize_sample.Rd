@@ -27,7 +27,8 @@ list of attributes describing the sample.
 Converts a full STR sample data frame into a concise list of consistent
 attributes, suitable for binding together across samples for a dataset.  At
 this stage the summary is prepared for a single specific locus, in contrast
-to \code{analyze_sample}.
+to \code{analyze_sample}.  The Allele1 entries correspond to the sequence
+with the highest count, Allele2 the second highest.
 }
 \details{
 Entries in the returned list:
