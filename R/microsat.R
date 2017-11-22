@@ -248,5 +248,6 @@ format_pandoc_args <- function(metadata) {
 #' @param msg text to print.
 #' @param end ending to concatenate to message; defaults to newline character.
 logmsg <- function(msg, end="\n") {
-  cat(paste0(msg, end), file = fp_devnull)
+  # stderr: file descriptor 2
+  cat(paste0(msg, end), file = 2)
 }
