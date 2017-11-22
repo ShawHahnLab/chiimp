@@ -1,8 +1,5 @@
 ## Identification with Known Genotypes
 
 ```{r identifications, results="asis"}
-rmd_kable_idents(results,
-                 hash.len = report.hash_len,
-                 range = report.dist_range,
-                 maximum = report.dist_max)
+rmd_kable_idents(results, hash.len = report.hash_len)
 ```

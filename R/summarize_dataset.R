@@ -33,7 +33,6 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
   if (!missing(genotypes.known) & !is.null(genotypes.known)) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
-    results$closest_matches <- find_closest_matches(results$dist_mat_known)
     results$genotypes.known <- genotypes.known
   }
   return(results)

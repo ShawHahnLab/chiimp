@@ -701,12 +701,9 @@ kable_idents <- function(tbl, closest) {
   k
 }
 
-rmd_kable_idents <- function(results, hash.len, range, maximum,
-                             locus_chunks=NULL) {
-  closest <- find_closest_matches(results$dist_mat_known,
-                                  range = range,
-                                  maximum = maximum)
-  tbl.combo <- report_idents(results, closest, hash.len)
+# TODO use locus_chunks
+rmd_kable_idents <- function(results, hash.len, locus_chunks=NULL) {
+  tbl.combo <- report_idents(results, results$closest_matches, hash.len)
   kable_idents(tbl.combo, closest)
 }
 
