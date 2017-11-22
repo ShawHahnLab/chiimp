@@ -11,7 +11,7 @@ analyze_sample(seqs, locus_attrs, nrepeats)
 
 \item{locus_attrs}{data frame of attributes for loci to look for.}
 
-\item{nrepeats}{number of repeats of each locus" motif to require for a
+\item{nrepeats}{number of repeats of each locus' motif to require for a
 match.}
 }
 \value{

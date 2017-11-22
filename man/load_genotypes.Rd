@@ -9,7 +9,7 @@ load_genotypes(fp, ...)
 \arguments{
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{read.table}.}
+\item{...}{additional arguments passed to \code{\link[utils]{read.table}}.}
 }
 \value{
 data frame of genotypes

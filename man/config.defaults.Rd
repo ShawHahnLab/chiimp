@@ -11,7 +11,7 @@ config.defaults
 \description{
 The entries in this list show the build-time configuration defaults for all
 aspects of the microsatellite analysis.  These can be overridden by passing a
-list to \code{full_analysis} with entries of the same names.
+list to \code{\link{full_analysis}} with entries of the same names.
 }
 \details{
 Notable Options:

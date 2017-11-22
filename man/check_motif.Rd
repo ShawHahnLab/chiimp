@@ -19,5 +19,5 @@ logical vector indicating where repeats were observed.
 }
 \description{
 Return a logical vector specifying, for each entry, if the sequence contains
-at least nrepeats perfect repeats of the matching locus" motif.
+at least \code{nrepeats} perfect repeats of the matching locus' motif.
 }

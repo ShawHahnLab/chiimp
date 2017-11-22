@@ -9,11 +9,11 @@
 #' and a summary data frame showing each sample's summary row-by-row.
 #'
 #' @param dataset data frame of sample details as produced by
-#'   \code{prepare_dataset}.
+#'   \code{\link{prepare_dataset}}.
 #' @param locus_attrs data frame of locus attributes as produced by
-#'   \code{load_locus_attrs}.
+#'   \code{\link{load_locus_attrs}}.
 #' @param nrepeats number of repeats of each locus' motif to require for a
-#'   match (see \code{analyze_sample}).
+#'   match (see \code{\link{analyze_sample}}).
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
@@ -21,11 +21,15 @@
 #'   must be present, in total across entries passing all filters, for potential
 #'   alleles to be considered.
 #' @param num.cores integer number of CPU cores to use in parallel for sample
-#'   analysis.
+#'   analysis.  Defaults to one less than half the number of detected cores with
+#'   a minimum of 1.  If 1, the function will run without using the
+#'   \code{parallel} package.
 #' @param summary.function function to use when summarizing each sample's full
-#'   details into the standard attributes.
+#'   details into the standard attributes Defaults to
+#'   \code{\link{summarize_sample}}.
 #'
-#' @return list of results
+#' @return list of results, with \code{summary} set to the single summary data
+#'   frame and \code{data} the per-sample data frames.
 #'
 #' @export
 analyze_dataset <- function(dataset,
@@ -74,8 +78,20 @@ analyze_dataset <- function(dataset,
   tidy_analyzed_dataset(dataset, raw.results)
 }
 
-# rearrange the pairs of sample summary / sample data objects into a single
-# summary cross-sample data frame and a list of detailed per-sample data frames.
+#' Tidy raw analyzed dataset results
+#'
+#' Rearrange pairs of sample summary / sample data objects into a single
+#' summary cross-sample data frame and a list of detailed per-sample data
+#' frames.
+#'
+#' @param dataset data frame of sample details as produced by
+#'   \code{\link{prepare_dataset}}.
+#' @param raw.results list of pairs of sample summary and sample data data
+#'   frames (from \code{\link{summarize_sample}} and
+#'   \code{\link{analyze_sample}}).
+#'
+#' @return list of results, with \code{summary} set to the single summary data
+#'   frame and \code{data} the per-sample data frames.
 tidy_analyzed_dataset <- function(dataset, raw.results) {
   summaries <- lapply(raw.results, `[[`, 1)
   data <- lapply(raw.results, `[[`, 2)

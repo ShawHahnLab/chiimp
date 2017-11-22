@@ -4,10 +4,10 @@
 \alias{load_seqs}
 \title{Load vector of sequences from FASTA/FASTQ file}
 \usage{
-load_seqs(fp.seqs)
+load_seqs(fp)
 }
 \arguments{
-\item{fp.seqs}{path to file}
+\item{fp}{path to sequence file}
 }
 \value{
 vector of sequences

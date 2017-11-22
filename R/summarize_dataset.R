@@ -4,22 +4,25 @@
 
 #' Add further summaries to analyzed dataset
 #'
-#' Take a results list as produced by \code{analyze_dataset} and add additional
-#' entries for inter-sample and inter-locus analyses:
+#' Take a results list as produced by \code{\link{analyze_dataset}} and add
+#' additional entries for inter-sample and inter-locus analyses.
 #'
 #' @details
 #' Additional entries in the returned list:
-#'   * alignments: inter-allele alignments for each locus
-#'   * dist_mat: inter-sample distance matrix
+#'   * alignments: inter-allele alignments for each locus, from
+#'     \code{\link{align_alleles}}.
+#'   * dist_mat: inter-sample distance matrix, from \code{\link{make_dist_mat}}.
 #'   * dist_mat_known: if genotypes.known is given, this distance matrix of
-#'     sample-to-individual values will be present.
+#'     sample-to-individual values will be present, from
+#'     \code{\link{make_dist_mat_known}}.
 #' @md
 #'
 #' @param results list containing summary data frame and sample-specific data
-#'   frames as produced by \code{analyze_dataset}.
+#'   frames as produced by \code{\link{analyze_dataset}}.
 #' @param genotypes.known optional data frame of known genotypes that should be
-#'   compared to the observed genotypes in the results.  If provided
-#'   dist_mat_known will be present in the output.
+#'   compared to the observed genotypes in the results, as loaded by
+#'   \code{\link{load_genotypes}}.  If provided \code{dist_mat_known} will be
+#'   present in the output.
 #'
 #' @return expanded list with additional summaries.
 #'
@@ -36,87 +39,6 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
   return(results)
 }
 
-# Genotype and Attribute Tables -------------------------------------------
-
-# Tabulate genotypes across loci.  Which attributes will actually be used for
-# the table is configurable.
-summarize_genotypes <- function(results_summary,
-                                vars=c("Allele1Seq", "Allele2Seq")) {
-  combo <- results_summary[, c("Sample", "Replicate", "Locus", vars)]
-  combo[, vars[1]] <- as.character(combo[, vars[1]])
-  combo[, vars[2]] <- as.character(combo[, vars[2]])
-  # Repeat alleles for homozygous cases
-  combo[, vars[2]] <- ifelse(results_summary$Homozygous,
-                             combo[, vars[1]],
-                             combo[, vars[2]])
-  # Re-order to put shorter alleles first, if we've been called with vars for
-  # integers (otherwise we're just sorting text)
-  if (is.character(combo[[vars[1]]])) {
-    idx <- nchar(combo[[vars[1]]]) > nchar(combo[[vars[2]]]) |
-            ( nchar(combo[[vars[1]]]) == nchar(combo[[vars[2]]]) &
-              combo[[vars[1]]] > combo[[vars[2]]] )
-  } else {
-    idx <- combo[[vars[1]]] > combo[[vars[2]]]
-  }
-  idx[is.na(idx)] <- F
-  combo[idx, vars] <- combo[idx, rev(vars)]
-  # Mark those cases that are not homozygous but just happen to have the same
-  # short name (i.e. allele sequence length)
-  combo[, vars[2]] <- ifelse( !(results_summary$Homozygous) &
-                                combo[, vars[1]] == combo[, vars[2]],
-                              paste0(combo[, vars[2]], "*"),
-                              combo[, vars[2]])
-  # Reshape into wide table
-  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
-  tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
-                 timevar = "Locus", direction = "wide")
-  tbl <- tbl[, -3]
-  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = 2),
-                       c(1, 2),
-                       sep = "_")
-  colnames(tbl) <- c("Sample", "Replicate", allele_cols)
-  tbl <- tbl[order_entries(tbl), ]
-  rownames(tbl) <- make_rownames(tbl)
-  tbl
-}
-
-summarize_genotypes_known <- function(genotypes.known, tbl.genotypes=NULL) {
-  # Kludgy workaround to make summarize_genotypes handle a different sort of
-  # data frame
-  genotypes.known$Replicate <- NA
-  genotypes.known$Sample <- genotypes.known$Name
-  genotypes.known <- genotypes.known[, -match("Name",
-                                              colnames(genotypes.known))]
-  genotypes.known$Homozygous <- is.na(as.character(genotypes.known$Allele2Seq))
-  tbl.known <- summarize_genotypes(genotypes.known)
-  if (!missing(tbl.genotypes))
-    tbl.known <- tbl.known[, colnames(tbl.genotypes)]
-  tbl.known
-}
-
-# tabulate an arbitrary attribute across loci, assuming repeats by two for the
-# alleles.  (use this for color-coding summary heatmaps on top of the attribute
-# values, like Homozgyous or ProminentSeqs.)
-summarize_attribute <- function(results_summary, attrib, repeats = 2) {
-  attrib_rep <- rep(attrib, repeats)
-  combo <- results_summary[, c("Sample", "Replicate", "Locus", attrib_rep)]
-  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
-  # reshape into wide table
-  tbl <- stats::reshape(combo,
-                 v.names = make.names(attrib_rep, unique = T),
-                 idvar = "ID",
-                 timevar = "Locus", direction = "wide")
-  tbl <- tbl[, -3]
-  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = repeats),
-                       1:repeats,
-                       sep = "_")
-  colnames(tbl) <- c("Sample", "Replicate", allele_cols)
-  tbl <- tbl[order_entries(tbl), ]
-  rownames(tbl) <- make_rownames(tbl)
-  tbl
-}
-
-
 # Distances ---------------------------------------------------------------
 
 # TODO this is all super roundabout.  rewrite to use the outer() approach for
@@ -126,9 +48,11 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
 #'
 #' Compare the genotype of each sample to each other sample in a given results
 #' summary data frame, and create a between-sample distance matrix.  This will
-#' be a symmetric matrix, unlike what \code{make_dist_mat_known} produces.
+#' be a symmetric matrix, unlike what \code{\link{make_dist_mat_known}}
+#' produces.
 #'
-#' @param results_summary cross-sample summary data frame
+#' @param results_summary cross-sample summary data frame as produced by
+#'   \code{\link{analyze_dataset}}.
 #' @param dist.func function to calculate inter-sample distances.  Should take
 #'   two vectors, one for each genotype, with two values per locus corresponding
 #'   to the two alleles.
@@ -170,10 +94,11 @@ make_dist_mat <- function(results_summary,
 #' genotypes in the supplied table, and create a sample-to-known-genotype
 #' distance matrix.
 #'
-#' @param results_summary cross-sample summary data frame
+#' @param results_summary cross-sample summary data frame as produced by
+#'   \code{\link{analyze_dataset}}.
 #' @param genotypes.known data frame of known genotypes, with one row per
 #'   individual per locus, and columns "Name", "Locus", "Allele1Seq",
-#'   "Allele2Seq".
+#'   "Allele2Seq".  See \code{\link{load_genotypes}}.
 #' @param dist.func function to calculate inter-sample distances.  Should take
 #'   two vectors, one for each genotype, with two values per locus corresponding
 #'   to the two alleles.
@@ -249,10 +174,11 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
 #' Given a distance matrix with samples on rows and names on columns, return a
 #' list of vectors with the closest-matching names for each sample.
 #'
-#' @param dist_mat matrix of distance values.
-#' @param range optional numeric for distances to each set of names, from the
-#'   minimum distance per sample.
-#' @param maximum optional numeric maximum value for any distance
+#' @param dist_mat matrix of distance values, such as produced by
+#'   \code{\link{make_dist_mat}} and \code{\link{make_dist_mat_known}}.
+#' @param range optional numeric for distances to each set of nearby names,
+#'   relative to the closest match.
+#' @param maximum optional numeric maximum value for any distance.
 #'
 #' @return list of named vectors containing distances for each sample.
 #'
@@ -284,7 +210,7 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
 #' @param results_summary cross-sample summary data frame.
 #' @param derep logical; should allele sequences be dereplicated prior to
 #'   alignment?  TRUE by default.
-#' @param ... additional arguments passed to \code{msa}.
+#' @param ... additional arguments passed to \code{\link[msa]{msa}}.
 #'
 #' @return list of MSA alignment objects, one per locus.
 #'
@@ -332,10 +258,140 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
   })
 }
 
+# Genotype and Attribute Tables -------------------------------------------
+
+#' Create Summary Genotype Table
+#'
+#' Tabulate genotypes across an analyzed dataset, with samples on rows and loci
+#' on columns.  Which attributes will actually be used for the table is
+#' configurable.
+#'
+#' @param results_summary cross-sample summary data frame as produced by
+#'   \code{\link{analyze_dataset}}.
+#' @param vars vector of column names in \code{results_summary} to use for the
+#'   summary.  Defaults to the sequence content for the two alleles.
+#'
+#' @return data frame of genotypes across samples and loci.
+#'
+#' @export
+summarize_genotypes <- function(results_summary,
+                                vars=c("Allele1Seq", "Allele2Seq")) {
+  combo <- results_summary[, c("Sample", "Replicate", "Locus", vars)]
+  combo[, vars[1]] <- as.character(combo[, vars[1]])
+  combo[, vars[2]] <- as.character(combo[, vars[2]])
+  # Repeat alleles for homozygous cases
+  combo[, vars[2]] <- ifelse(results_summary$Homozygous,
+                             combo[, vars[1]],
+                             combo[, vars[2]])
+  # Re-order to put shorter alleles first, if we've been called with vars for
+  # integers (otherwise we're just sorting text)
+  if (is.character(combo[[vars[1]]])) {
+    idx <- nchar(combo[[vars[1]]]) > nchar(combo[[vars[2]]]) |
+      ( nchar(combo[[vars[1]]]) == nchar(combo[[vars[2]]]) &
+          combo[[vars[1]]] > combo[[vars[2]]] )
+  } else {
+    idx <- combo[[vars[1]]] > combo[[vars[2]]]
+  }
+  idx[is.na(idx)] <- F
+  combo[idx, vars] <- combo[idx, rev(vars)]
+  # Mark those cases that are not homozygous but just happen to have the same
+  # short name (i.e. allele sequence length)
+  combo[, vars[2]] <- ifelse( !(results_summary$Homozygous) &
+                                combo[, vars[1]] == combo[, vars[2]],
+                              paste0(combo[, vars[2]], "*"),
+                              combo[, vars[2]])
+  # Reshape into wide table
+  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
+  tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
+                        timevar = "Locus", direction = "wide")
+  tbl <- tbl[, -3]
+  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = 2),
+                       c(1, 2),
+                       sep = "_")
+  colnames(tbl) <- c("Sample", "Replicate", allele_cols)
+  tbl <- tbl[order_entries(tbl), ]
+  rownames(tbl) <- make_rownames(tbl)
+  tbl
+}
+
+#' Create Summary Genotype Table for Known Genotypes
+#'
+#' Tabulate genotypes across an analyzed dataset, with samples on rows and loci
+#' on columns.  Which attributes will actually be used for the table is
+#' configurable.
+#'
+#' @param genotypes_known table of known individuals' genotypes as loaded via
+#'   \code{\link{load_genotypes}}.
+#' @param tbl_genotypes existing genotype summary table to use for locus
+#'   selection and column ordering.
+#'
+#' @return data frame of genotypes across individuals and loci.
+#'
+#' @export
+summarize_genotypes_known <- function(genotypes_known, tbl_genotypes=NULL) {
+  # Kludgy workaround to make summarize_genotypes handle a different sort of
+  # data frame
+  genotypes_known$Replicate <- NA
+  genotypes_known$Sample <- genotypes_known$Name
+  genotypes_known <- genotypes_known[, -match("Name",
+                                              colnames(genotypes_known))]
+  genotypes_known$Homozygous <- is.na(as.character(genotypes_known$Allele2Seq))
+  tbl_known <- summarize_genotypes(genotypes_known)
+  if (!missing(tbl_genotypes))
+    tbl_known <- tbl_known[, colnames(tbl_genotypes)]
+  tbl_known
+}
+
+#' Create Summary Attribute Table
+#'
+#' Tabulate a single arbitrary attribute across loci, assuming repeats by two
+#' for the alleles.  This is used for color-coding summary heatmaps (see
+#' \code{\link{plot_heatmap}}) on top of the attribute values, like Homozgyous
+#' or ProminentSeqs.
+#'
+#' @param results_summary cross-sample summary data frame as produced by
+#'   \code{\link{analyze_dataset}}.
+#' @param attrib name of column from \code{results_summary} to tabulate.
+#' @param repeats number of times to repeat each column, for matching with two
+#'   alleles per entry.
+#'
+#' @return data frame of attribute across samples and loci.
+#'
+#' @export
+summarize_attribute <- function(results_summary, attrib, repeats = 2) {
+  attrib_rep <- rep(attrib, repeats)
+  combo <- results_summary[, c("Sample", "Replicate", "Locus", attrib_rep)]
+  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
+  # reshape into wide table
+  tbl <- stats::reshape(combo,
+                        v.names = make.names(attrib_rep, unique = T),
+                        idvar = "ID",
+                        timevar = "Locus", direction = "wide")
+  tbl <- tbl[, -3]
+  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = repeats),
+                       1:repeats,
+                       sep = "_")
+  colnames(tbl) <- c("Sample", "Replicate", allele_cols)
+  tbl <- tbl[order_entries(tbl), ]
+  rownames(tbl) <- make_rownames(tbl)
+  tbl
+}
 
 # Counts per Locus --------------------------------------------------------
 
-# Produce a table of read counts matching (by primer) each locus per sample.
+#' Create Counts-per-Locus Table
+#'
+#' Produce a table of read counts matching (by primer) each locus per sample.
+#'
+#' @param results list containing summary data frame and sample-specific data
+#'   frames as produced by \code{\link{analyze_dataset}}.
+#'
+#' @return Data frame of read counts with samples on rows and loci on columns.
+#'   Addition columns at the left specify the number of reads matching any known
+#'   locus (\code{Total}) and the number of reads matching the expected locus
+#'   (\code{Matching}).
+#'
+#' @export
 tally_cts_per_locus <- function(results) {
   # Create table of counts of sequences that match each possible locus across
   # samples.  Only include loci we expect from the metadata, rather than any

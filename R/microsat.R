@@ -13,7 +13,7 @@
 #'
 #' The entries in this list show the build-time configuration defaults for all
 #' aspects of the microsatellite analysis.  These can be overridden by passing a
-#' list to \code{full_analysis} with entries of the same names.
+#' list to \code{\link{full_analysis}} with entries of the same names.
 #'
 #' Notable Options:
 #'   * dp.data: directory path to input sequence files
@@ -91,7 +91,7 @@ config.defaults <- list(
 #' analysis, and save the corresponding output files.
 #'
 #' @param config list of configuration options.  See the summary for
-#'   \code{config.defaults} for more details.
+#'   \code{\link{config.defaults}} for more details.
 #'
 #' @return list of results, with the full configuration list included as
 #'   "config."
@@ -174,10 +174,11 @@ full_analysis <- function(config) {
 
 #' Handle full microsatellite analysis from command-line
 #'
-#' Read configuration from command-line arguments and run \code{full_analysis}.
+#' Read configuration from command-line arguments and run
+#' \code{\link{full_analysis}}.
 #'
 #' @param args optional character vector of arguments to use rather than those
-#'   detected with \code{commandArgs}.
+#'   detected with \code{\link[base]{commandArgs}}.
 #'
 #' @return list of results, with the full configuration list included as
 #'   "config."
@@ -196,6 +197,15 @@ main <- function(args=NULL) {
 
 # Util --------------------------------------------------------------------
 
+#' Render Microsatellite Report Document
+#'
+#' Write an HTML report summarizing the results of a full microsatellite
+#' analysis.
+#'
+#' @param results list of microsatellite analysis results as produced by
+#'   \code{\link{full_analysis}}.
+#' @param config list of configuration options (see
+#'   \code{\link{config.defaults}}).
 render_report <- function(results, config) {
   with(config, {
     fp.report.in <- system.file("report", "report.Rmd", package = "microsat")
@@ -211,6 +221,16 @@ render_report <- function(results, config) {
   })
 }
 
+#' Create Pandoc Metadata Argument Strings
+#'
+#' Convert named list of pandoc metadata options into command-line
+#' \code{--metadata} argument strings.
+#'
+#' @param metadata named list of
+#'   \href{http://pandoc.org/MANUAL.html#metadata-blocks}{pandoc metadata
+#'   options}.
+#'
+#' @return list of \code{--metadata} argument strings
 format_pandoc_args <- function(metadata) {
   metadata <- paste(names(metadata),
                     lapply(metadata,
@@ -218,6 +238,12 @@ format_pandoc_args <- function(metadata) {
   paste("--metadata=", metadata, sep = "")
 }
 
-logmsg <- function(msg) {
-  cat(paste0(msg, "\n"), file = fp_devnull)
+#' Write Log Message
+#'
+#' Print a log message to the standard error stream.
+#'
+#' @param msg text to print.
+#' @param end ending to concatenate to message; defaults to newline character.
+logmsg <- function(msg, end="\n") {
+  cat(paste0(msg, end), file = fp_devnull)
 }

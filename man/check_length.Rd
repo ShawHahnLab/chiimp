@@ -13,8 +13,9 @@ check_length(sample.data, locus_attrs)
 }
 \value{
 logical vector specifying, for each entry, if the sequence is within
-  the matching locus" expected length range.
+  the matching locus' expected length range.
 }
 \description{
-Return a logical vector specifying, for each entry, if the sequence is within the expected length range for the matched locus.
+Return a logical vector specifying, for each entry, if the sequence is within
+the expected length range for the matched locus.
 }

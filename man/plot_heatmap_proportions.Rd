@@ -9,11 +9,14 @@ plot_heatmap_proportions(results, ...)
 \arguments{
 \item{results}{combined results list}
 
-\item{...}{additional arguments passed to \code{plot_heatmap}.}
+\item{...}{additional arguments passed to \code{\link{plot_heatmap}}.}
 }
 \description{
 Given a cross-sample summary data frame as produced by
-\code{analyze_dataset}, plot a heatmap showing the proportion of matching
-sequences for the identified alleles versus all matching sequences, with
-sample identifiers on rows and loci on columns.
+\code{\link{analyze_dataset}}, plot a heatmap showing the proportion of
+matching sequences for the identified alleles versus all matching sequences,
+with sample identifiers on rows and loci on columns.
+}
+\seealso{
+\code{\link{plot_heatmap}}
 }

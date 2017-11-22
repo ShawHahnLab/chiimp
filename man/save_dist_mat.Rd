@@ -7,11 +7,12 @@
 save_dist_mat(dist_mat, fp)
 }
 \arguments{
-\item{dist_mat}{matrix produced by \code{summarize_dataset}.}
+\item{dist_mat}{matrix produced by \code{\link{summarize_dataset}} via
+\code{\link{make_dist_mat}}.}
 
 \item{fp}{output file path.}
 }
 \description{
-Save the inter-sample distance matrix produced by \code{summarize_dataset} to
-the specified file path in CSV format.
+Save the inter-sample distance matrix produced by
+\code{\link{summarize_dataset}} to the specified file path in CSV format.
 }

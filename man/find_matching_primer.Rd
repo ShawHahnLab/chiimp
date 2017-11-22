@@ -15,6 +15,6 @@ find_matching_primer(sample.data, locus_attrs)
 factor of locus names corresponding the matched primer sequences.
 }
 \description{
-Return a factor giving the locus name matching each sample data entry"s
+Return a factor giving the locus name matching each sample data entry's
 matching primer (first found).
 }

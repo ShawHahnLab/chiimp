@@ -352,8 +352,25 @@ histogram2 <- function(samp,
   }
 }
 
-# if include.blanks = TRUE then we should have a full count of all alleles when
-# adding up the numbers on the extra axis labels.
+#' Plot Sequence Alignments
+#'
+#' Plot an MSA alignment object.
+#'
+#' @param alignment MSA alignment object as produced by
+#'   \code{\link{align_alleles}}, or character vector of the corresponding
+#'   sequences.
+#' @param labels custom labels to draw for each entry in \code{alignment}.  By
+#'   default it's assumed that \code{align_alleles} was called with
+#'   \code{derep=TRUE} and sequences are labeled by number of occurrences.
+#' @param include.blanks should blank sequences present in the alignment be
+#'   included in the plot?  \code{FALSE} by default.  If TRUE and \code{labels}
+#'   is left at the default, the extra axis labels will add up to a full count
+#'   of the number of alleles observed.
+#' @param ... additional arguments passed to \code{\link[dnaplotr]{plotDNA}}.
+#'
+#' @seealso \code{\link{align_alleles}}
+#'
+#' @export
 plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   # Convert to character and remove blanks if specified
   if (is.character(alignment))
@@ -371,7 +388,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
                     ...)
   # Add faint lines between all sequences
   for (i in seq_along(seqs))
-    graphics::abline(h = i+0.5, col = grDevices::rgb(0.5, 0.5, 0.5, 0.5))
+    graphics::abline(h = i + 0.5, col = grDevices::rgb(0.5, 0.5, 0.5, 0.5))
   # Add a label for every unique sequence, using the names of the supplied
   # sequences
   if (missing(labels))
@@ -389,9 +406,26 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
 
 # A skewed 0 -> 1 scale for color-coding distance tables
 make.dist_scale <- function(n) {
-  ((0:n) / n) ** (1 / 3)
+  ( (0:n) / n) ** (1 / 3)
 }
 
+#' Plot Distance Matrix
+#'
+#' Plot a heatmap of a distance matrix.
+#'
+#' @param dist_mat distance matrix as produced by
+#'   \code{\link{summarize_dataset}} via \code{\link{make_dist_mat}}.
+#' @param num.alleles the maximum number of matching/mis-matching alleles.  Used
+#'   to determine color scaling.  Defaults to the highest observed distance in
+#'   the matrix.
+#' @param dist.display_thresh distance value at or below which distances will be
+#'   explicitly drawn on the heatmap.  Above this value only the color-coding
+#'   will signify distance.
+#' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
+#'
+#' @seealso \code{\link{make_dist_mat}}
+#'
+#' @export
 plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
                           dist.display_thresh=round(num.alleles * 2 / 3),
                           ...) {
@@ -422,18 +456,21 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 
 #' Render heatmap of STR attribute across samples and loci
 #'
-#' Given a cross-sample summary data frame as produced by \code{analyze_dataset}
-#' and the name of a column (e.g., Stutter, Homozygous, ProminentSequences),
-#' plot a heatmap of the values for that attribute, with sample identifiers on
-#' rows and loci on columns.  The attribute will be coerced to numeric.
+#' Given a cross-sample summary data frame as produced by
+#' \code{\link{analyze_dataset}} and the name of a column (e.g., Stutter,
+#' Homozygous, ProminentSequences), plot a heatmap of the values for that
+#' attribute, with sample identifiers on rows and loci on columns.  The
+#' attribute will be coerced to numeric.
 #'
 #' @param results combined results list
 #' @param attribute character name of column in results$summary to use.
 #' @param label.by vector of column names to use when writing the genotype
-#'   summary values on top of the heatmap cells (default: allele lengths).
-#' @param color vector of colors passed to \code{pheatmap}.
-#' @param breaks vector of breakpoints passed to \code{pheatmap}.
-#' @param ... additional arguments to \code{pheatmap}.
+#'   summary values on top of the heatmap cells.  Defaults to allele sequence
+#'   lengths.
+#' @param color vector of colors passed to \code{\link[pheatmap]{pheatmap}}.
+#' @param breaks vector of breakpoints passed to
+#'   \code{\link[pheatmap]{pheatmap}}, autocalculated by default.
+#' @param ... additional arguments to \code{\link[pheatmap]{pheatmap}}.
 #'
 #' @export
 plot_heatmap <- function(results,
@@ -443,9 +480,9 @@ plot_heatmap <- function(results,
                          breaks=NA,
                          ...) {
   tbl <- summarize_attribute(results$summary, attribute)
-  data <- tbl[, -(1:2)] + 0
+  data <- tbl[, - (1:2)] + 0
   tbl.labels <- summarize_genotypes(results$summary, vars = label.by)
-  labels <- tbl.labels[, -(1:2)]
+  labels <- tbl.labels[, - (1:2)]
   data[is.na(labels)] <- NA
   labels[is.na(labels)] <- ""
 
@@ -467,12 +504,14 @@ plot_heatmap <- function(results,
 #' Plot heatmap of suspected PCR stutter
 #'
 #' Given a cross-sample summary data frame as produced by
-#' \code{analyze_dataset}, plot a heatmap showing which samples had alleles
-#' ignored due to suspected PCR stutter, with sample identifiers on rows and
-#' loci on columns.
+#' \code{\link{analyze_dataset}}, plot a heatmap showing which samples had
+#' alleles ignored due to suspected PCR stutter, with sample identifiers on rows
+#' and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{plot_heatmap}.
+#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#'
+#' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
 plot_heatmap_stutter <- function(results, ...) {
@@ -485,11 +524,13 @@ plot_heatmap_stutter <- function(results, ...) {
 #' Plot heatmap of homozygous samples
 #'
 #' Given a cross-sample summary data frame as produced by
-#' \code{analyze_dataset}, plot a heatmap showing which samples appear
+#' \code{\link{analyze_dataset}}, plot a heatmap showing which samples appear
 #' homozygous, with sample identifiers on rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{plot_heatmap}.
+#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#'
+#' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
 plot_heatmap_homozygous <- function(results, ...) {
@@ -502,12 +543,14 @@ plot_heatmap_homozygous <- function(results, ...) {
 #' Plot heatmap of samples with multiple prominent sequences
 #'
 #' Given a cross-sample summary data frame as produced by
-#' \code{analyze_dataset}, plot a heatmap showing samples with more than two
-#' prominent sequences in their analysis output, with sample identifiers on rows
-#' and loci on columns.
+#' \code{\link{analyze_dataset}}, plot a heatmap showing samples with more than
+#' two prominent sequences in their analysis output, with sample identifiers on
+#' rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{plot_heatmap}.
+#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#'
+#' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
 plot_heatmap_prominent_seqs <- function(results, ...) {
@@ -532,12 +575,14 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
 #' Plot heatmap of proportion of allele sequence counts
 #'
 #' Given a cross-sample summary data frame as produced by
-#' \code{analyze_dataset}, plot a heatmap showing the proportion of matching
-#' sequences for the identified alleles versus all matching sequences, with
-#' sample identifiers on rows and loci on columns.
+#' \code{\link{analyze_dataset}}, plot a heatmap showing the proportion of
+#' matching sequences for the identified alleles versus all matching sequences,
+#' with sample identifiers on rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{plot_heatmap}.
+#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#'
+#' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
 plot_heatmap_proportions <- function(results, ...) {

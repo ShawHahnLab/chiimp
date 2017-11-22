@@ -7,12 +7,13 @@
 find_closest_matches(dist_mat, range = 2, maximum = 8)
 }
 \arguments{
-\item{dist_mat}{matrix of distance values.}
+\item{dist_mat}{matrix of distance values, such as produced by
+\code{\link{make_dist_mat}} and \code{\link{make_dist_mat_known}}.}
 
-\item{range}{optional numeric for distances to each set of names, from the
-minimum distance per sample.}
+\item{range}{optional numeric for distances to each set of nearby names,
+relative to the closest match.}
 
-\item{maximum}{optional numeric maximum value for any distance}
+\item{maximum}{optional numeric maximum value for any distance.}
 }
 \value{
 list of named vectors containing distances for each sample.

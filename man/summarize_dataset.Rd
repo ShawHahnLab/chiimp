@@ -8,25 +8,28 @@ summarize_dataset(results, genotypes.known = NULL)
 }
 \arguments{
 \item{results}{list containing summary data frame and sample-specific data
-frames as produced by \code{analyze_dataset}.}
+frames as produced by \code{\link{analyze_dataset}}.}
 
 \item{genotypes.known}{optional data frame of known genotypes that should be
-compared to the observed genotypes in the results.  If provided
-dist_mat_known will be present in the output.}
+compared to the observed genotypes in the results, as loaded by
+\code{\link{load_genotypes}}.  If provided \code{dist_mat_known} will be
+present in the output.}
 }
 \value{
 expanded list with additional summaries.
 }
 \description{
-Take a results list as produced by \code{analyze_dataset} and add additional
-entries for inter-sample and inter-locus analyses:
+Take a results list as produced by \code{\link{analyze_dataset}} and add
+additional entries for inter-sample and inter-locus analyses.
 }
 \details{
 Additional entries in the returned list:
 \itemize{
-\item alignments: inter-allele alignments for each locus
-\item dist_mat: inter-sample distance matrix
+\item alignments: inter-allele alignments for each locus, from
+\code{\link{align_alleles}}.
+\item dist_mat: inter-sample distance matrix, from \code{\link{make_dist_mat}}.
 \item dist_mat_known: if genotypes.known is given, this distance matrix of
-sample-to-individual values will be present.
+sample-to-individual values will be present, from
+\code{\link{make_dist_mat_known}}.
 }
 }

@@ -12,8 +12,8 @@ sample_summary_funcs <- c("summarize_sample",
 #' Converts a full STR sample data frame into a concise list of consistent
 #' attributes, suitable for binding together across samples for a dataset.  At
 #' this stage the summary is prepared for a single specific locus, in contrast
-#' to \code{analyze_sample}.  The Allele1 entries correspond to the sequence
-#' with the highest count, Allele2 the second highest.
+#' to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
+#' sequence with the highest count, Allele2 the second highest.
 #'
 #' @details
 #' Entries in the returned list:
@@ -34,8 +34,8 @@ sample_summary_funcs <- c("summarize_sample",
 #' @md
 #'
 #' @param sample.data data frame of processed data for sample as produced by
-#'   \code{analyze_sample}
-#' @param locus.name character name of locus to summarize with
+#'   \code{\link{analyze_sample}}.
+#' @param locus.name character name of locus to summarize with.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
@@ -90,7 +90,23 @@ summarize_sample <- function(sample.data, locus.name, fraction.min,
   return(sample.summary)
 }
 
-# Like summarize_sample above, but skips allele_match and stutter removal.
+
+#' Summarize a processed STR sample, Simple Version
+#'
+#' Summarize as in \code{\link{summarize_sample}}, but skip allele_match and
+#' stutter removal.  Entries in the returned list are the same.
+#'
+#' @param sample.data data frame of processed data for sample as produced by
+#'   \code{\link{analyze_sample}}.
+#' @param locus.name character name of locus to summarize with.
+#' @param fraction.min numeric threshold for the minimum proportion of counts a
+#'   given entry must have, compared to the total matching all criteria for that
+#'   locus, to be considered as a potential allele.
+#' @param counts.min numeric threshold for the minimum number of counts that
+#'   must be present, in total across entries passing all filters, for potential
+#'   alleles to be considered.
+#'
+#' @return list of attributes describing the sample.
 summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
                                    counts.min) {
   chunk <- with(sample.data,
@@ -118,7 +134,22 @@ summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
   return(sample.summary)
 }
 
-# old version of summary algorithm
+#' Summarize a processed STR sample, Length Version
+#'
+#' Summarize as in \code{\link{summarize_sample}}, but group entries by sequence
+#' length rather than identity.
+#'
+#' @param sample.data data frame of processed data for sample as produced by
+#'   \code{\link{analyze_sample}}.
+#' @param locus.name character name of locus to summarize with.
+#' @param fraction.min numeric threshold for the minimum proportion of counts a
+#'   given entry must have, compared to the total matching all criteria for that
+#'   locus, to be considered as a potential allele.
+#' @param counts.min numeric threshold for the minimum number of counts that
+#'   must be present, in total across entries passing all filters, for potential
+#'   alleles to be considered.
+#'
+#' @return list of attributes describing the sample.
 summarize_sample_by_length <- function (sample.data, locus.name,
                                         fraction.min=0.15,
                                         counts.min=500) {
@@ -163,6 +194,16 @@ summarize_sample_by_length <- function (sample.data, locus.name,
   return(sample.summary)
 }
 
+#' Check Sample Data for Potential Allele Matches
+#'
+#' Check the entries in a processed sample data frame for potential matches to a
+#' given locus.
+#'
+#' @param sample.data data frame of processed data for sample as produced by
+#'   \code{\link{analyze_sample}}.
+#' @param locus.name character name of locus to match against.
+#'
+#' @return logical vector of entries for potential alleles.
 allele_match <- function(sample.data, locus.name) {
   with(sample.data,
        as.character(MatchingLocus) == locus.name &

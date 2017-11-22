@@ -8,9 +8,9 @@ summarize_sample(sample.data, locus.name, fraction.min, counts.min)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by
-\code{analyze_sample}}
+\code{\link{analyze_sample}}.}
 
-\item{locus.name}{character name of locus to summarize with}
+\item{locus.name}{character name of locus to summarize with.}
 
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that
@@ -27,8 +27,8 @@ list of attributes describing the sample.
 Converts a full STR sample data frame into a concise list of consistent
 attributes, suitable for binding together across samples for a dataset.  At
 this stage the summary is prepared for a single specific locus, in contrast
-to \code{analyze_sample}.  The Allele1 entries correspond to the sequence
-with the highest count, Allele2 the second highest.
+to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
+sequence with the highest count, Allele2 the second highest.
 }
 \details{
 Entries in the returned list:

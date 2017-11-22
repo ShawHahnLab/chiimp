@@ -8,7 +8,7 @@ save_histograms(results, dp, image.func = "png", width = 1600,
   height = 1200, res = 150)
 }
 \arguments{
-\item{results}{list of results as created by \code{analyze.dataset}.}
+\item{results}{list of results as created by \code{\link{analyze_dataset}}.}
 
 \item{dp}{output directory path.}
 

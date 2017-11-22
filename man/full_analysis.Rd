@@ -8,7 +8,7 @@ full_analysis(config)
 }
 \arguments{
 \item{config}{list of configuration options.  See the summary for
-\code{config.defaults} for more details.}
+\code{\link{config.defaults}} for more details.}
 }
 \value{
 list of results, with the full configuration list included as

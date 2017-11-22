@@ -8,12 +8,13 @@ main(args = NULL)
 }
 \arguments{
 \item{args}{optional character vector of arguments to use rather than those
-detected with \code{commandArgs}.}
+detected with \code{\link[base]{commandArgs}}.}
 }
 \value{
 list of results, with the full configuration list included as
   "config."
 }
 \description{
-Read configuration from command-line arguments and run \code{full_analysis}.
+Read configuration from command-line arguments and run
+\code{\link{full_analysis}}.
 }

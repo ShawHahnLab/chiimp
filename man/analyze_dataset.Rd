@@ -10,13 +10,13 @@ analyze_dataset(dataset, locus_attrs, nrepeats, fraction.min, counts.min,
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
-\code{prepare_dataset}.}
+\code{\link{prepare_dataset}}.}
 
 \item{locus_attrs}{data frame of locus attributes as produced by
-\code{load_locus_attrs}.}
+\code{\link{load_locus_attrs}}.}
 
 \item{nrepeats}{number of repeats of each locus' motif to require for a
-match (see \code{analyze_sample}).}
+match (see \code{\link{analyze_sample}}).}
 
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that
@@ -27,13 +27,17 @@ must be present, in total across entries passing all filters, for potential
 alleles to be considered.}
 
 \item{num.cores}{integer number of CPU cores to use in parallel for sample
-analysis.}
+analysis.  Defaults to one less than half the number of detected cores with
+a minimum of 1.  If 1, the function will run without using the
+\code{parallel} package.}
 
 \item{summary.function}{function to use when summarizing each sample's full
-details into the standard attributes.}
+details into the standard attributes Defaults to
+\code{\link{summarize_sample}}.}
 }
 \value{
-list of results
+list of results, with \code{summary} set to the single summary data
+  frame and \code{data} the per-sample data frames.
 }
 \description{
 Load all samples for a given dataset and produce a list of processed samples

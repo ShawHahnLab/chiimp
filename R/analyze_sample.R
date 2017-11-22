@@ -29,7 +29,7 @@
 #'
 #' @param seqs character vector containing sequences.
 #' @param locus_attrs data frame of attributes for loci to look for.
-#' @param nrepeats number of repeats of each locus" motif to require for a
+#' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match.
 #'
 #' @return data frame of dereplicated sequences with added annotations.
@@ -75,7 +75,7 @@ analyze_sample <- function(seqs, locus_attrs, nrepeats) {
 
 #' Label STR sample rows by locus
 #'
-#' Return a factor giving the locus name matching each sample data entry"s
+#' Return a factor giving the locus name matching each sample data entry's
 #' matching primer (first found).
 #'
 #' @param sample.data data frame of processed sample data.
@@ -99,7 +99,7 @@ find_matching_primer <- function(sample.data, locus_attrs) {
 #' Check sequences for STR repeats
 #'
 #' Return a logical vector specifying, for each entry, if the sequence contains
-#' at least nrepeats perfect repeats of the matching locus" motif.
+#' at least \code{nrepeats} perfect repeats of the matching locus' motif.
 #'
 #' @param sample.data data frame of processed sample data.
 #' @param locus_attrs data frame of attributes for loci to look for.
@@ -120,13 +120,14 @@ check_motif <- function(sample.data, locus_attrs, nrepeats) {
 
 #' Check sequences for expected length
 #'
-#' Return a logical vector specifying, for each entry, if the sequence is within the expected length range for the matched locus.
+#' Return a logical vector specifying, for each entry, if the sequence is within
+#' the expected length range for the matched locus.
 #'
 #' @param sample.data data frame of processed sample data.
 #' @param locus_attrs data frame of attributes for loci to look for.
 #'
 #' @return logical vector specifying, for each entry, if the sequence is within
-#'   the matching locus" expected length range.
+#'   the matching locus' expected length range.
 check_length <- function(sample.data, locus_attrs) {
   with(sample.data, {
     Lmin <- locus_attrs[MatchingLocus, "LengthMin"]
@@ -154,8 +155,8 @@ check_length <- function(sample.data, locus_attrs) {
 #' @param count.min lowest count for a given entry to still attempt a check for
 #'   stutter.
 #'
-#' @return integer vector specifying, for each entry, what other entry may have
-#'   produced each entry as a stutter band.
+#' @return integer vector specifying, for each entry, the row index for another
+#'   entry that may have produced each entry as a stutter band.
 find_stutter <- function(sample.data, locus_attrs,
                          count.ratio_max = 1 / 3,
                          count.min = 10) {

@@ -4,10 +4,10 @@
 \alias{prepare_dataset}
 \title{Load table of locus attributes}
 \usage{
-prepare_dataset(directory, pattern, ord = c(1, 2, 3))
+prepare_dataset(dp, pattern, ord = c(1, 2, 3))
 }
 \arguments{
-\item{directory}{location to search for matching data files.}
+\item{dp}{directory path to search for matching data files.}
 
 \item{pattern}{regular expression to use for parsing filenames.}
 

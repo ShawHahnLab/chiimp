@@ -4,15 +4,16 @@
 \alias{load_config}
 \title{Load configuration file}
 \usage{
-load_config(fp.config)
+load_config(fp)
 }
 \arguments{
-\item{fp.config}{path to configuration file.}
+\item{fp}{path to configuration file.}
 }
 \value{
 list of configuration options
 }
 \description{
 Load a YAML-formatted text file of configuration options for microsatellite
-analysis.  This is currently just a wrapper around \code{yaml.load()}.
+analysis.  This is currently just a wrapper around
+\code{\link[yaml]{yaml.load}}.
 }
