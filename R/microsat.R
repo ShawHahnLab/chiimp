@@ -141,9 +141,10 @@ full_analysis <- function(config) {
     if (!is.null(fp.genotypes.known))
       genotypes.known <- load_genotypes(fp.genotypes.known)
     results <- summarize_dataset(results, genotypes.known)
-    results$closest_matches <- find_closest_matches(results$dist_mat_known,
-                                                    range = report.dist_range,
-                                                    maximum = report.dist_max)
+    if (!is.null(fp.genotypes.known))
+      results$closest_matches <- find_closest_matches(results$dist_mat_known,
+                                                      range = report.dist_range,
+                                                      maximum = report.dist_max)
     results$cts_per_locus <- tally_cts_per_locus(results)
     results$config <- config.full
     results$allele.names <- NULL
