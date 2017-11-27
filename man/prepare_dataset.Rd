@@ -11,8 +11,9 @@ prepare_dataset(dp, pattern, ord = c(1, 2, 3))
 
 \item{pattern}{regular expression to use for parsing filenames.}
 
-\item{ord}{integer vector giving order of fields (replicate/sample/locus) in
-filenames.}
+\item{ord}{integer vector giving order of the fields Replicate, Sample, and
+Locus in filenames.  For example, if Locus is the first field followed by
+Replicate and Sample, set \code{ord=c(3, 1, 2)}.}
 }
 \value{
 data frame of metadata for all files found

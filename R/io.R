@@ -99,15 +99,15 @@ load_genotypes <- function(fp, ...) {
   data
 }
 
-# TODO rewrite this mess!
 #' Load table of locus attributes
 #'
 #' Load a tab-separated table of locus attributes to use for analysis.
 #'
 #' @param dp directory path to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.
-#' @param ord integer vector giving order of fields (replicate/sample/locus) in
-#'   filenames.
+#' @param ord integer vector giving order of the fields Replicate, Sample, and
+#'   Locus in filenames.  For example, if Locus is the first field followed by
+#'   Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 #'
 #' @return data frame of metadata for all files found
 #'
