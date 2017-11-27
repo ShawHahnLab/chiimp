@@ -704,7 +704,7 @@ kable_idents <- function(tbl, closest) {
 # TODO use locus_chunks
 rmd_kable_idents <- function(results, hash.len, locus_chunks=NULL) {
   tbl.combo <- report_idents(results, results$closest_matches, hash.len)
-  kable_idents(tbl.combo, closest)
+  kable_idents(tbl.combo, results$closest_matches)
 }
 
 # Make chunked heatmaps for the counts-per-locus table.
