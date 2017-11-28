@@ -57,6 +57,8 @@ report_idents <- function(results, closest, hash.len) {
   # multiple per sample) that are closest to each sample.  Next, interleave with
   # the samples themselves and group each set in a report table.
   tbl.closest <- do.call(rbind, lapply(names(closest), function(nm) {
+    if(length(closest[[nm]]) == 0)
+      return(NULL)
     cbind(tbl.known[names(closest[[nm]]), ],
           Distance = closest[[nm]],
           Reference = nm)
