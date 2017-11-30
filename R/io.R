@@ -99,12 +99,14 @@ load_genotypes <- function(fp, ...) {
   data
 }
 
-#' Load table of locus attributes
+#' Extract Sample Attributes from Filenames
 #'
-#' Load a tab-separated table of locus attributes to use for analysis.
+#' Find files matching a pattern in a given directory, and build a data frame of
+#' standard sample attributes from fields in the filenames.
 #'
 #' @param dp directory path to search for matching data files.
-#' @param pattern regular expression to use for parsing filenames.
+#' @param pattern regular expression to use for parsing filenames.  There should
+#'   be exactly three groups in the pattern, for Replicate, Sample, and Locus.
 #' @param ord integer vector giving order of the fields Replicate, Sample, and
 #'   Locus in filenames.  For example, if Locus is the first field followed by
 #'   Replicate and Sample, set \code{ord=c(3, 1, 2)}.
@@ -120,10 +122,13 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3)) {
                           recursive = TRUE,
                           include.dirs = FALSE)
   seq_file_attrs <- stringr::str_match_all(seq_files, pattern)
+  if (! all(sapply(seq_file_attrs, length) == length(ord) + 1)) {
+    warning("Some filenames did not match the given pattern")
+  }
   # transpose so the list is grouped by filename/attribute rather than
   # entry by entry.
-  seq_file_attrs <- lapply(seq(length(seq_file_attrs[[1]])), function(y) {
-      unlist(lapply(seq_file_attrs, "[", y))
+  seq_file_attrs <- lapply(seq(length(ord) + 1), function(y) {
+      sapply(seq_file_attrs, "[", y)
     })
   # filename as the first column, then whatever order the attrs are in
   n <- c("Filename", "Replicate", "Sample", "Locus")

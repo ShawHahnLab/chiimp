@@ -2,14 +2,15 @@
 % Please edit documentation in R/io.R
 \name{prepare_dataset}
 \alias{prepare_dataset}
-\title{Load table of locus attributes}
+\title{Extract Sample Attributes from Filenames}
 \usage{
 prepare_dataset(dp, pattern, ord = c(1, 2, 3))
 }
 \arguments{
 \item{dp}{directory path to search for matching data files.}
 
-\item{pattern}{regular expression to use for parsing filenames.}
+\item{pattern}{regular expression to use for parsing filenames.  There should
+be exactly three groups in the pattern, for Replicate, Sample, and Locus.}
 
 \item{ord}{integer vector giving order of the fields Replicate, Sample, and
 Locus in filenames.  For example, if Locus is the first field followed by
@@ -19,5 +20,6 @@ Replicate and Sample, set \code{ord=c(3, 1, 2)}.}
 data frame of metadata for all files found
 }
 \description{
-Load a tab-separated table of locus attributes to use for analysis.
+Find files matching a pattern in a given directory, and build a data frame of
+standard sample attributes from fields in the filenames.
 }

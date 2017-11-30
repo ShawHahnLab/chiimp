@@ -118,5 +118,16 @@ test_that("prepare_dataset works on nested directories", {
 })
 
 test_that("prepare_dataset handles broken patterns", {
-  skip("test not yet implemented")
+  replicates <- 1:3
+  samples <- 1:5
+  loci <- sort(rownames(locus_attrs))
+  # Whoops, we left out the loci field in the pattern.  We should get a warning.
+  tryCatch({
+    data <- setup_data_dir(replicates, samples, loci)
+    expect_warning(dataset <- prepare_dataset(data$dp, '(\\d+)-(\\d+)'))
+  },
+  finally = {
+    lapply(data$fps, file.remove)
+    file.remove(data$dp)
+  })
 })
