@@ -4,10 +4,12 @@
 \alias{logmsg}
 \title{Write Log Message}
 \usage{
-logmsg(msg, end = "\\n")
+logmsg(msg, col2 = Sys.time(), end = "\\n")
 }
 \arguments{
 \item{msg}{text to print.}
+
+\item{col2}{extra text to show at right margin; defaults to current time.}
 
 \item{end}{ending to concatenate to message; defaults to newline character.}
 }

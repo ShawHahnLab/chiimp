@@ -115,10 +115,10 @@ full_analysis <- function(config) {
     config.full$report.sections$identifications
 
   with(config.full, {
-    if (verbose) logmsg(paste0("Loading dataset from ", dp.data, "..."))
+    if (verbose) logmsg(paste0("Loading dataset: ", dp.data, "..."))
     dataset <- prepare_dataset(dp.data, pattern, ord)
     if (verbose)
-      logmsg(paste0("Loading locus attributes from ", fp.locus_attrs, "..."))
+      logmsg(paste0("Loading locus attrs: ", fp.locus_attrs, "..."))
     locus_attrs <- load_locus_attrs(fp.locus_attrs)
     if (verbose) logmsg("Analyzing samples...")
     idx <- match(sample_summary_func, sample_summary_funcs, nomatch = 1)
@@ -247,8 +247,14 @@ format_pandoc_args <- function(metadata) {
 #' Print a log message to the standard error stream.
 #'
 #' @param msg text to print.
+#' @param col2 extra text to show at right margin; defaults to current time.
 #' @param end ending to concatenate to message; defaults to newline character.
-logmsg <- function(msg, end="\n") {
+logmsg <- function(msg, col2=as.character(Sys.time()), end="\n") {
+  if (!is.null(col2)) {
+    # right-justify col2, aim to fit total msg within 80 characters
+    pad <- max(1, 80 - nchar(msg) - nchar(col2))
+    msg <- paste0(msg, paste(rep(" ", pad),  collapse = ""), col2)
+  }
   # stderr: file descriptor 2
   cat(paste0(msg, end), file = 2)
 }
