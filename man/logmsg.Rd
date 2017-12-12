@@ -4,7 +4,7 @@
 \alias{logmsg}
 \title{Write Log Message}
 \usage{
-logmsg(msg, col2 = Sys.time(), end = "\\n")
+logmsg(msg, col2 = as.character(Sys.time()), end = "\\n")
 }
 \arguments{
 \item{msg}{text to print.}
