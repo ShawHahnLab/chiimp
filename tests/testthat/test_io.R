@@ -113,10 +113,6 @@ test_that("prepare_dataset handles different field ordering", {
   })
 })
 
-test_that("prepare_dataset works on nested directories", {
-  skip("test not yet implemented")
-})
-
 test_that("prepare_dataset handles broken patterns", {
   replicates <- 1:3
   samples <- 1:5
@@ -130,4 +126,14 @@ test_that("prepare_dataset handles broken patterns", {
     lapply(data$fps, file.remove)
     file.remove(data$dp)
   })
+})
+
+test_that("prepare_dataset warns of repeated identifier rows", {
+  # It should throw a warning if there are multiple rows for any
+  # Replicate/Sample/Locus combination.
+  skip("test not yet implemented")
+})
+
+test_that("prepare_dataset works on nested directories", {
+  skip("test not yet implemented")
 })
