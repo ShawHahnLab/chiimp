@@ -131,7 +131,14 @@ test_that("prepare_dataset handles broken patterns", {
 test_that("prepare_dataset warns of repeated identifier rows", {
   # It should throw a warning if there are multiple rows for any
   # Replicate/Sample/Locus combination.
-  skip("test not yet implemented")
+  replicates <- 1:3
+  samples <- 1:5
+  loci <- sort(rownames(locus_attrs))
+  data <- setup_data_dir(replicates, samples, loci)
+  cat("", file = paste0(data$fps[3], ".extra"))
+  expect_warning({
+    dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    }, "Some replicate/sample/locus combinations match multiple files")
 })
 
 test_that("prepare_dataset works on nested directories", {

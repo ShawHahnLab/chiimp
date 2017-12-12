@@ -141,6 +141,10 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3)) {
   # order by locus/sample/replicate
   data <- data[order_entries(data), ]
   rownames(data) <- make_rownames(data)
+  # complain if any replicate/sample/locus combo matches more than one entry
+  if (max(table(paste(data$Replicate, data$Sample, data$Locus))) > 1) {
+    warning("Some replicate/sample/locus combinations match multiple files")
+  }
   return(data)
 }
 
