@@ -241,6 +241,11 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
     # If there are any other missing sequences, put a stub in place so msa still
     # runs without complaints.
     a[a == ""] <- "-"
+    # If we only have one sequence skip using msa() since it will fail.  Just
+    # return that sequence.
+    if (length(a) == 1) {
+      return(a)
+    }
     # msa() generates a bunch of text on standard output and I can't see any
     # options to turn that off.  Using a workaround here.
     tryCatch({
