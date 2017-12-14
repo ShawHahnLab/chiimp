@@ -170,6 +170,23 @@ test_that("align_alleles works for empty sequence sets", {
   })
 })
 
+test_that("align_alleles works for identical sequence sets", {
+  # Apparently msa() fails when given a single sequence (derep=TRUE for
+  # align_alleles), throwing a "There is an invalid aln file!" error.
+  # I'll do its validating for it and account for this inside align_alleles.
+  with(results_summary_data, {
+    # Overwrite Locus A seqs with same content
+    idx <- which(results$summary$Locus == "A")
+    results$summary[idx, "Allele1Seq"] <- results$summary[idx[1], "Allele1Seq"]
+    results$summary[idx, "Allele2Seq"] <- NA
+    alignments <- align_alleles(results$summary)
+    # This should still work, just with the same sequence back for A's
+    # alignment
+    expect_equal(unname(alignments$A),
+                 as.character(results$summary[idx[1], "Allele1Seq"]))
+  })
+})
+
 
 # test_tally_cts_per_locus ------------------------------------------------
 
