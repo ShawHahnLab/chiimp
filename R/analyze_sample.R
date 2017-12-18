@@ -164,10 +164,10 @@ find_stutter <- function(sample.data, locus_attrs,
   stutter <- as.integer(rep(NA, nrow(sample.data)))
 
   # across rows for this locus,
-  for(locus_name in rownames(locus_attrs)) {
+  for (locus_name in rownames(locus_attrs)) {
     locus.match <- sample.data$MatchingLocus == locus_name
     motif.len <- nchar(as.character(locus_attrs[locus_name, "Motif"]))
-    for(idx in which(locus.match)) {
+    for (idx in which(locus.match)) {
       # look at each row, and see if any others may be
       # stutter using each row here as a source.
       L <- sample.data[idx, "Length"] - motif.len

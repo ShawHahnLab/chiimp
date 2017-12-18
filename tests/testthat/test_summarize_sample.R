@@ -106,7 +106,7 @@ test_that("summarize_sample counts prominent sequences", {
   sample.summary.2B    <- summarize_sample(sample.data.2B, "B",
                                          fraction.min = 0.05, counts.min = 500)
   sample.data.3B       <- analyze_sample(seqs3$B, locus_attrs, 3)
-  sample.summary.3B    <- summarize_sample(sample.data.3B, 'B',
+  sample.summary.3B    <- summarize_sample(sample.data.3B, "B",
                                          fraction.min = 0.05, counts.min = 500)
   sample.data.empty    <- analyze_sample(c(), locus_attrs, 3)
   sample.summary.empty <- summarize_sample(sample.data.empty, "B",
@@ -131,7 +131,7 @@ test_that("summarize_sample rejects low-count samples", {
   # Here we check that the filtered-counts-thresholding is applied, by forcing
   # the counts to a low number.  This should still report some stats but should
   # leave out the allele1/allele2 information.
-  sample.data$Count <- sample.data$Count/100
+  sample.data$Count <- sample.data$Count / 100
   sample.summary <- summarize_sample(sample.data, "A",
                                      fraction.min = 0.05, counts.min = 500)
   with(sample.summary, {

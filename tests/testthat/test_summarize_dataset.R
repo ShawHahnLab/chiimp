@@ -1,12 +1,12 @@
 prepare_for_summary <- function() {
   data.dir <- tempfile()
   write_seqs(seqs, data.dir)
-  dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+  dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
   results <- analyze_dataset(dataset, locus_attrs, fraction.min = 0.05,
                              counts.min = 500, nrepeats = 3, num.cores = 1)
   lapply(dataset$Filename, file.remove)
   file.remove(data.dir)
-  return(list(dataset=dataset, results=results))
+  return(list(dataset = dataset, results = results))
 }
 
 results_summary_data <- prepare_for_summary()
@@ -37,9 +37,9 @@ test_that("make_dist_mat produces a valid distance matrix", {
     expect_equal(colnames(dist_mat), samps)
     # For our test data samples are far apart from each other, but with no
     # missing entries the diagonal is zero.
-    dists <- matrix(7, nrow=length(samps), ncol=length(samps))
-    dists[1,3] <- 8
-    dists[3,1] <- 8
+    dists <- matrix(7, nrow = length(samps), ncol = length(samps))
+    dists[1, 3] <- 8
+    dists[3, 1] <- 8
     diag(dists) <- 0
     expect_true(all(dist_mat == dists))
   })
@@ -61,8 +61,8 @@ test_that("calc_genotype_distance scores genotypes correctly", {
 test_that("calc_genotype_distance handles multiple data types", {
   # As written it should work with character, numeric, whatever-- it just uses
   # the != operator.
-  g.num <- c(1,2,3,4)
-  g.alpha <- c('a', 'b', 'c', 'd')
+  g.num <- c(1, 2, 3, 4)
+  g.alpha <- c("a", "b", "c", "d")
   d <- calc_genotype_distance(g.num, g.alpha)
   d.num <- calc_genotype_distance(g.num, g.num)
   d.alpha <- calc_genotype_distance(g.alpha, g.alpha)
@@ -135,8 +135,8 @@ test_that("align_alleles produces per-allele alignments", {
   with(results_summary_data, {
     alignments <- align_alleles(results$summary, derep = FALSE)
     expect_equal(names(alignments), levels(results$summary$Locus))
-    n1 <- paste(rownames(subset(results$summary, Locus == "A")), 1, sep='_')
-    n2 <- paste(rownames(subset(results$summary, Locus == "A")), 2, sep='_')
+    n1 <- paste(rownames(subset(results$summary, Locus == "A")), 1, sep = "_")
+    n2 <- paste(rownames(subset(results$summary, Locus == "A")), 2, sep = "_")
     expect_equal(sort(names(as.character(alignments[["A"]]))),
                  sort(c(n1, n2)))
   })
@@ -152,7 +152,7 @@ test_that("align_alleles works for empty sequences", {
     results$summary[idx[1], "Allele2Seq"] <- NA
     # Locus A's alignment should be OK, just with one stub entry
     alignments <- align_alleles(results$summary)
-    expect_true(any(grepl('-', as.character(alignments$A))))
+    expect_true(any(grepl("-", as.character(alignments$A))))
   })
 })
 

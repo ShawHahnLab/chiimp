@@ -72,4 +72,4 @@ make_allele_name <- function(data, hash.len=6) {
 }
 
 # Equivalent of /dev/null for the build platform.
-fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type]
+fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint

@@ -4,7 +4,7 @@
 # temporary file in TSV format, and return the path.
 write_locus_attrs <- function(txt) {
   fp <- tempfile()
-  write(gsub(' +', '\t', txt), file = fp)
+  write(gsub(" +", "\t", txt), file = fp)
   fp
 }
 
@@ -12,16 +12,15 @@ write_locus_attrs <- function(txt) {
 setup_data_dir <- function(replicates, samples, loci, ord=c(1, 2, 3)) {
   dp <- tempfile()
   dir.create(dp)
-  f <- function(...) paste(..., sep='-')
   args <- list(replicates, samples, loci)
   args <- args[ord]
   stems <- apply(do.call(expand.grid, args),
                  1,
                  paste,
-                 collapse="-")
-  fps <- file.path(dp, paste0(stems, '.fastq'))
-  lapply(fps, function(fp) cat('', file=fp))
-  return(list(dp=dp, fps=fps))
+                 collapse = "-")
+  fps <- file.path(dp, paste0(stems, ".fastq"))
+  lapply(fps, function(fp) cat("", file = fp))
+  return(list(dp = dp, fps = fps))
 }
 
 test_that("load_locus_attrs parses locus details", {
@@ -40,7 +39,7 @@ test_that("load_locus_attrs parses locus details", {
 test_that("load_locus_attrs handles missing column names", {
   # It should throw a warning if one of the expected columns is missing, and
   # then proceed.  The other columns should still match up.
-  txt.wrong <- gsub('LengthMin', 'length_min', txt.locus_attrs)
+  txt.wrong <- gsub("LengthMin", "length_min", txt.locus_attrs)
   fp <- write_locus_attrs(txt.wrong)
   expect_warning({
     locus_attrs_test <- load_locus_attrs(fp)
@@ -62,7 +61,7 @@ test_that("prepare_dataset parses file paths", {
   loci <- sort(rownames(locus_attrs))
   # by default the field ordering is assumed to be replicate, sample, locus
   data <- setup_data_dir(replicates, samples, loci)
-  dataset <- prepare_dataset(data$dp, '(\\d+)-(\\d+)-([A-Za-z0-9]+)')
+  dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
   expect_equal(colnames(dataset),
                c("Filename", "Replicate", "Sample", "Locus"))
   expect_equal(sort(dataset$Filename), sort(data$fps))
@@ -87,7 +86,7 @@ test_that("prepare_dataset handles different field ordering", {
   # --> Locus, Replicate, Sample
   ord <- c(3, 1, 2)
   data <- setup_data_dir(replicates, samples, loci, ord)
-  dataset <- prepare_dataset(data$dp, '([A-Za-z0-9]+)-(\\d+)-(\\d+)', ord)
+  dataset <- prepare_dataset(data$dp, "([A-Za-z0-9]+)-(\\d+)-(\\d+)", ord)
   expect_equal(colnames(dataset),
                c("Filename", "Locus", "Replicate", "Sample"))
   expect_equal(sort(dataset$Filename), sort(data$fps))
@@ -107,7 +106,7 @@ test_that("prepare_dataset handles broken patterns", {
   loci <- sort(rownames(locus_attrs))
   # Whoops, we left out the loci field in the pattern.  We should get a warning.
   data <- setup_data_dir(replicates, samples, loci)
-  expect_warning(dataset <- prepare_dataset(data$dp, '(\\d+)-(\\d+)'))
+  expect_warning(dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)"))
 })
 
 test_that("prepare_dataset warns of repeated identifier rows", {
@@ -119,8 +118,9 @@ test_that("prepare_dataset warns of repeated identifier rows", {
   data <- setup_data_dir(replicates, samples, loci)
   cat("", file = paste0(data$fps[3], ".extra"))
   expect_warning({
-    dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-    }, "Some replicate/sample/locus combinations match multiple files")
+      dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    },
+    "Some replicate/sample/locus combinations match multiple files")
 })
 
 test_that("prepare_dataset works on nested directories", {

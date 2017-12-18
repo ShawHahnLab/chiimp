@@ -62,7 +62,7 @@ simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
                                   make.reps(attrs$Motif,
                                             L[2] - nchar(attrs$Motif)),
                                   attrs$ReversePrimer)
-  ## Mix in off-target amplification
+  ## Mix in off target amplification
   idx <- seq(1, length(seqs), off_target_ratio)
   seqs[idx] <- paste0(attrs$Primer, make.seq_junk(10), attrs$ReversePrimer)
   ## TODO add contam
@@ -90,7 +90,7 @@ seqs2 <- simulate.set(locus_attrs)
 seqs3 <- simulate.set(locus_attrs)
 set.seed(NULL)
 # 3 samples, then loci
-seqs <- list('1' = seqs1, '2' = seqs2, '3' = seqs3)
+seqs <- list("1" = seqs1, "2" = seqs2, "3" = seqs3)
 
 # TODO support replicates
 write_seqs <- function(seq_sets,
