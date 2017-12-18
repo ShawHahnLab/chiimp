@@ -42,7 +42,8 @@ order_entries <- function(data) {
   items <- list(data$Locus,
                 as.integer(gsub("[^0-9]+", "", data$Sample)),
                 data$Sample,
-                data$Replicate)
+                data$Replicate,
+                data$Distance)
   items <- items[!sapply(items, is.null)]
   do.call(order, items)
 }

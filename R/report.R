@@ -73,10 +73,7 @@ report_idents <- function(results, closest, hash.len) {
                                   "[", 2)
   # Remove reference column
   tbl.closest <- tbl.closest[, -match("Reference", colnames(tbl.closest))]
-  rownames(tbl.closest) <- paste(tbl.closest$Sample,
-                                 tbl.closest$Replicate,
-                                 tbl.closest$Name,
-                                 sep = ".")
+  rownames(tbl.closest) <- make_rownames(tbl.closest)
 
   tbl.ident <- report_genotypes(tbl.closest[, -match(c("Distance", "Name"),
                                                      colnames(tbl.closest))],
@@ -91,12 +88,9 @@ report_idents <- function(results, closest, hash.len) {
   tbl.combo <- rbind(tbl.obs, tbl.ident)
 
   # Order by sample by distance, with observations first, before known genotypes
-  idx <- order(tbl.combo$Sample,
-               tbl.combo$Replicate,
-               tbl.combo$Distance,
-               na.last = FALSE)
-  tbl.combo <- tbl.combo[idx, ]
   tbl.combo$Distance[is.na(tbl.combo$Distance)] <- ""
+  tbl.combo <- tbl.combo[order_entries(tbl.combo), ]
+
   return(tbl.combo)
 }
 
@@ -447,16 +441,23 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
   # Scale font size automatically between min and max values
   fontsize <- min(16, max(4, 17 - 0.11 * nrow(dist_mat)))
 
-  vals <- dist_mat
-  pheatmap::pheatmap(vals,
-           color = color,
-           display_numbers = labels,
-           treeheight_row = 0,
-           breaks = 0:num.alleles,
-           clustering_distance_rows = stats::as.dist(dist_mat),
-           clustering_distance_cols = stats::as.dist(dist_mat),
-           fontsize = fontsize,
-           ...)
+  args <- list(mat = dist_mat,
+               color = color,
+               display_numbers = labels,
+               treeheight_row = 0,
+               breaks = 0:num.alleles,
+               fontsize = fontsize)
+  if (nrow(dist_mat) == ncol(dist_mat)) {
+    args <- c(args,
+              clustering_distance_rows = stats::as.dist(dist_mat),
+              clustering_distance_cols = stats::as.dist(dist_mat))
+  } else {
+    args <- c(args,
+              cluster_cols = FALSE,
+              cluster_rows = FALSE)
+  }
+
+  do.call(pheatmap::pheatmap, c(args, ...))
 }
 
 
