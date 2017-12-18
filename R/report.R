@@ -65,9 +65,16 @@ report_idents <- function(results, closest, hash.len) {
   }))
   # I should clean up these functions to avoid this sort of mess.
   tbl.closest$Name <- tbl.closest$Sample
-  tbl.closest$Sample <- tbl.closest$Reference
+  tbl.closest$Sample <- sapply(strsplit(as.character(tbl.closest$Reference),
+                                        "-"),
+                             "[", 1)
+  tbl.closest$Replicate <- sapply(strsplit(as.character(tbl.closest$Reference),
+                                           "-"),
+                                  "[", 2)
+  # Remove reference column
   tbl.closest <- tbl.closest[, -match("Reference", colnames(tbl.closest))]
   rownames(tbl.closest) <- paste(tbl.closest$Sample,
+                                 tbl.closest$Replicate,
                                  tbl.closest$Name,
                                  sep = ".")
 
@@ -81,12 +88,11 @@ report_idents <- function(results, closest, hash.len) {
   # Set common columns and combine tables
   tbl.obs$Distance <- NA
   tbl.obs$Name <- ""
-  if ("Replicate" %in% colnames(tbl.obs))
-    tbl.ident$Replicate <- ""
   tbl.combo <- rbind(tbl.obs, tbl.ident)
 
   # Order by sample by distance, with observations first, before known genotypes
   idx <- order(tbl.combo$Sample,
+               tbl.combo$Replicate,
                tbl.combo$Distance,
                na.last = FALSE)
   tbl.combo <- tbl.combo[idx, ]
