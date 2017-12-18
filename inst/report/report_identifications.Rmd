@@ -1,7 +1,10 @@
 ## Identification with Known Genotypes
 
 ```{r identifications, results="asis"}
-rmd_kable_idents(results, hash.len = report.hash_len)
+rmd_kable_idents(results,
+                 allele.names = results$allele.names,
+                 hash.len = report.hash_len,
+                 na.replicates = report.na.replicates)
 ```
 
 ### Distance Matrix for Known Genotypes

@@ -50,7 +50,33 @@ report_genotypes <- function(tbl,
   tbl
 }
 
-report_idents <- function(results, closest, hash.len) {
+#' Create identification summary table
+#'
+#' Report the genotypes present in a processed dataset, paired with close
+#' matches to known individuals, converting sequences to short names with
+#' optional custom naming via \code{\link{report_genotypes}}.
+#'
+#' @param results results list as produced by \code{\link{summarize_dataset}}.
+#' @param closest list of closest matches as produced by
+#'   \code{\link{find_closest_matches}}.
+#' @param allele.names optional data frame of custom allele names.  If present
+#'   the columns "Seq" and "Name" will be used to map exact sequences to custom
+#'   names.
+#' @param hash.len number of characters of the sequence has to include when
+#'   auto-generating allele names.  If set to zero the hash suffix is not
+#'   included.
+#' @param na.replicates text to replace NA entries with for the Replicates
+#'     column.
+#'
+#' @return data frame showing summary of sample genotypes with interleved
+#'   genotypes for similar known individuals.
+#'
+#' @export
+report_idents <- function(results,
+                          closest,
+                          allele.names=NULL,
+                          hash.len=6,
+                          na.replicates="") {
   tbl <- summarize_genotypes(results$summary)
   tbl.known <- summarize_genotypes_known(results$genotypes.known, tbl)
   # Now tbl.closest contains a full genotype table of those entries (possibly
@@ -71,16 +97,22 @@ report_idents <- function(results, closest, hash.len) {
   tbl.closest$Replicate <- sapply(strsplit(as.character(tbl.closest$Reference),
                                            "-"),
                                   "[", 2)
+
   # Remove reference column
   tbl.closest <- tbl.closest[, -match("Reference", colnames(tbl.closest))]
   rownames(tbl.closest) <- make_rownames(tbl.closest)
 
   tbl.ident <- report_genotypes(tbl.closest[, -match(c("Distance", "Name"),
                                                      colnames(tbl.closest))],
-                                hash.len = hash.len)
+                                allele.names = allele.names,
+                                hash.len = hash.len,
+                                na.replicates = na.replicates)
   tbl.ident <- cbind(tbl.ident, tbl.closest[, c("Distance", "Name")])
 
-  tbl.obs <- report_genotypes(tbl, hash.len = hash.len)
+  tbl.obs <- report_genotypes(tbl,
+                              allele.names = allele.names,
+                              hash.len = hash.len,
+                              na.replicates = na.replicates)
 
   # Set common columns and combine tables
   tbl.obs$Distance <- NA
@@ -711,8 +743,16 @@ kable_idents <- function(tbl, closest) {
 }
 
 # TODO use locus_chunks
-rmd_kable_idents <- function(results, hash.len, locus_chunks=NULL) {
-  tbl.combo <- report_idents(results, results$closest_matches, hash.len)
+rmd_kable_idents <- function(results,
+                             allele.names,
+                             hash.len,
+                             na.replicates,
+                             locus_chunks=NULL) {
+  tbl.combo <- report_idents(results,
+                             closest = results$closest_matches,
+                             allele.names = allele.names,
+                             hash.len = hash.len,
+                             na.replicates = na.replicates)
   kable_idents(tbl.combo, results$closest_matches)
 }
 
