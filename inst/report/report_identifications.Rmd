@@ -3,3 +3,9 @@
 ```{r identifications, results="asis"}
 rmd_kable_idents(results, hash.len = report.hash_len)
 ```
+
+### Distance Matrix for Known Genotypes
+
+```{r identifications_distances}
+plot_dist_mat(results$dist_mat_known)
+```

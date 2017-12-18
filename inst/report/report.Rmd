@@ -15,10 +15,10 @@ num.loci       <- length(unique(results$summary$Locus))
 ```{r child="report_genotypes.Rmd", eval=report.sections[["genotypes"]]}
 ```
 
-```{r child="report_identifications.Rmd", eval=report.sections[["identifications"]]}
+```{r child="report_distances.Rmd", eval=report.sections[["distances"]]}
 ```
 
-```{r child="report_distances.Rmd", eval=report.sections[["distances"]]}
+```{r child="report_identifications.Rmd", eval=report.sections[["identifications"]]}
 ```
 
 ```{r child="report_flag.Rmd", eval=report.sections[["flags"]]}
