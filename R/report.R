@@ -18,6 +18,8 @@
 #'   included.
 #' @param na.replicates text to replace NA entries with for the Replicates
 #'     column.
+#' @param closest list of closest matches as produced by
+#'   \code{\link{find_closest_matches}}.
 #'
 #' @return data frame showing summary of genotypes.
 #'
@@ -25,7 +27,8 @@
 report_genotypes <- function(tbl,
                              allele.names=NULL,
                              hash.len=6,
-                             na.replicates="") {
+                             na.replicates="",
+                             closest=NULL) {
   # At this point there are columns for sample, replicate, and then the loci.
   # Name each entry in the table with either a custom or auto-generated short
   # name.
@@ -40,6 +43,18 @@ report_genotypes <- function(tbl,
       tbl[i, j] <- n
     }
   }
+  # If a closest-matches list was given, add columns using that
+  if (!is.null(closest)) {
+    idents <- do.call(rbind, lapply(closest, function(who) {
+      if (length(who) == 0) {
+        data.frame(Distance=NA, Name=NA)
+      } else {
+        data.frame(Distance=who[1], Name=names(who[1]), stringsAsFactors = F)
+      }
+    }))
+    tbl <- cbind(tbl, idents)
+  }
+
   # If we have no replicates drop that column
   if (all(is.na(tbl$Replicate)))
     tbl <- tbl[, -2]
@@ -691,15 +706,19 @@ rmd_kable_genotypes <- function(results, hash.len,
                                 allele.names=NULL,
                                 na.replicates="",
                                 locus_chunks=NULL,
-                                group_samples=FALSE) {
+                                group_samples=FALSE,
+                                closest=NULL) {
   tbl.g <- summarize_genotypes(results$summary)
   tbl <- report_genotypes(tbl.g,
                           allele.names = allele.names,
                           hash.len = hash.len,
-                          na.replicates = na.replicates)
+                          na.replicates = na.replicates,
+                          closest = closest)
   if (!is.null(locus_chunks)) {
     prefix <- match(c("Sample", "Replicate"), colnames(tbl))
     prefix <- prefix[!is.na(prefix)]
+    suffix <- match(c("Distance", "Name"), colnames(tbl))
+    suffix <- suffix[!is.na(suffix)]
     for (chunk_name in names(locus_chunks)) {
       locus_cols <- paste(rep(locus_chunks[[chunk_name]], each = 2),
                           c(1, 2),
@@ -707,7 +726,8 @@ rmd_kable_genotypes <- function(results, hash.len,
       m <- match(locus_cols, colnames(tbl))
       m <- m[!is.na(m)]
       cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
-      cat(kable_genotypes(tbl[, c(prefix, m)], group_samples = group_samples))
+      cat(kable_genotypes(tbl[, c(prefix, m, suffix)],
+                          group_samples = group_samples))
     }
   } else {
     cat(kable_genotypes(tbl, group_samples = group_samples))

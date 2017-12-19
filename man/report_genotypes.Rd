@@ -5,7 +5,7 @@
 \title{Create genotype summary table}
 \usage{
 report_genotypes(tbl, allele.names = NULL, hash.len = 6,
-  na.replicates = "")
+  na.replicates = "", closest = NULL)
 }
 \arguments{
 \item{tbl}{data frame as produced by \code{summarize_genotypes}.}
@@ -20,6 +20,9 @@ included.}
 
 \item{na.replicates}{text to replace NA entries with for the Replicates
 column.}
+
+\item{closest}{list of closest matches as produced by
+\code{\link{find_closest_matches}}.}
 }
 \value{
 data frame showing summary of genotypes.

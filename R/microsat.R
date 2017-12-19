@@ -220,6 +220,7 @@ render_report <- function(results, config) {
                          author = report.author,
                          date = format(Sys.Date(), "%Y-%m-%d"))
     pandoc_args <- format_pandoc_args(pandoc_metadata)
+    pandoc_args <- c(pandoc_args, paste0("--css=", "report.css"))
     rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
                       output_options = list(pandoc_args = pandoc_args))
   })

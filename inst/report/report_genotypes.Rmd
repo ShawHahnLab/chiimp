@@ -6,5 +6,6 @@ rmd_kable_genotypes(results,
                     hash.len = report.hash_len,
                     na.replicates = report.na.replicates,
                     locus_chunks = report.locus_chunks,
-                    group_samples = report.group_samples)
+                    group_samples = report.group_samples,
+                    closest = results$closest_matches)
 ```
