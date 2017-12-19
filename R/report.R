@@ -486,7 +486,7 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
   color <- grDevices::rgb(red = 1, green = dist_scale, blue = dist_scale)
 
   # Scale font size automatically between min and max values
-  fontsize <- min(16, max(4, 17 - 0.11 * nrow(dist_mat)))
+  fontsize <- min(16, max(4, 17 - 0.11 * max(dim(dist_mat))))
 
   args <- list(mat = dist_mat,
                color = color,
@@ -715,25 +715,16 @@ rmd_kable_genotypes <- function(results, hash.len,
                           na.replicates = na.replicates,
                           closest = closest)
   if (!is.null(locus_chunks)) {
-    prefix <- match(c("Sample", "Replicate"), colnames(tbl))
-    prefix <- prefix[!is.na(prefix)]
-    suffix <- match(c("Distance", "Name"), colnames(tbl))
-    suffix <- suffix[!is.na(suffix)]
-    for (chunk_name in names(locus_chunks)) {
-      locus_cols <- paste(rep(locus_chunks[[chunk_name]], each = 2),
-                          c(1, 2),
-                          sep = "_")
-      m <- match(locus_cols, colnames(tbl))
-      m <- m[!is.na(m)]
-      cat(paste0("\n\n### Loci: ", chunk_name, "\n\n"))
-      cat(kable_genotypes(tbl[, c(prefix, m, suffix)],
-                          group_samples = group_samples))
-    }
+    chunk_up(data = tbl,
+             locus_chunks = locus_chunks,
+             kable_func = kable_genotypes,
+             group_samples = group_samples)
   } else {
     cat(kable_genotypes(tbl, group_samples = group_samples))
   }
 }
 
+# convenience function for post-processing report_idents() output
 kable_idents <- function(tbl, closest) {
   # Remove columns that will be represented in other ways (sample/remplicate in
   # row groupings)
@@ -762,7 +753,7 @@ kable_idents <- function(tbl, closest) {
   k
 }
 
-# TODO use locus_chunks
+# Write markdown tables to standard output for report_idents()
 rmd_kable_idents <- function(results,
                              allele.names,
                              hash.len,
@@ -773,7 +764,14 @@ rmd_kable_idents <- function(results,
                              allele.names = allele.names,
                              hash.len = hash.len,
                              na.replicates = na.replicates)
-  kable_idents(tbl.combo, results$closest_matches)
+  if (!is.null(locus_chunks)) {
+    chunk_up(data = tbl.combo,
+             locus_chunks = locus_chunks,
+             kable_func = kable_idents,
+             closest = results$closest_matches)
+  } else {
+    cat(kable_idents(tbl.combo, results$closest_matches))
+  }
 }
 
 # Make chunked heatmaps for the counts-per-locus table.
@@ -798,7 +796,8 @@ rmd_plot_cts_per_locus <- function(results,
   breaks <- 0:ceiling(max(tbl, na.rm = T))
   color <- viridis::viridis(max(breaks))
   # Draw each heatmap across chunks of loci.  Written to assume there will be
-  # multiple but this should work fine even if there's only one.
+  # multiple but this should work fine even if there's only one.  (Note that
+  # this is all across rows, not columns like in chunk_up().)
   for (loci in loci.chunked) {
     idx <- results$summary$Locus %in% loci
     idx.row <- rownames(results$summary)[idx]
@@ -831,4 +830,25 @@ rmd_alignments <- function(results, heading_prefix="###") {
                     paste0(loc, ".png"))
     cat(paste0("![](", fp, ")"))
   }))
+}
+
+# Util --------------------------------------------------------------------
+
+chunk_up <- function(data, locus_chunks, kable_func, heading_prefix="###",
+                     ...) {
+  locus_cols_all <- allelify(locus_chunks)
+  for (chunk_name in names(locus_chunks)) {
+    # Remove locus columns not present in the current chunk.  It's organized
+    # this way to leave the non-locus columns alone.
+    # TODO support name ordering given by locus_chunks[[chunk_name]]
+    locus_cols <- allelify(locus_chunks[[chunk_name]])
+    locus_cols_extra <- locus_cols_all[-match(locus_cols, locus_cols_all)]
+    tbl.chunk <- data[, -match(locus_cols_extra, colnames(data))]
+    cat(paste0("\n\n", heading_prefix, " ", "Loci: ", chunk_name, "\n\n"))
+    cat(kable_func(tbl.chunk, ...))
+  }
+}
+
+allelify <- function(loci) {
+  paste(rep(unlist(loci), each = 2), c(1, 2), sep = "_")
 }

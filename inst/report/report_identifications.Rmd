@@ -4,7 +4,8 @@
 rmd_kable_idents(results,
                  allele.names = results$allele.names,
                  hash.len = report.hash_len,
-                 na.replicates = report.na.replicates)
+                 na.replicates = report.na.replicates,
+                 locus_chunks = report.locus_chunks)
 ```
 
 ### Distance Matrix for Known Genotypes
