@@ -429,8 +429,15 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   if (! include.blanks)
     seqs <- seqs[grep("^-+$", seqs, invert = TRUE)]
   # Create grouping factor using sequence length (just strip out the gap
-  # character to get the original length back).
-  groups <- factor(paste("  ", nchar(gsub("-", "", seqs)), "bp"))
+  # character to get the original length back).  Make sure we're using a
+  # consistent order for the sequences, grouping factor, and labels.
+  lengths <- nchar(gsub("-", "", seqs))
+  ord <- order(lengths)
+  seqs <- seqs[ord]
+  lengths <- lengths[ord]
+  groups <- paste("  ", lengths, "bp")
+  groups <- factor(groups, levels=groups)
+  # Make plot
   graphics::par(mar = c(5, 5, 4, 5))
   dnaplotr::plotDNA(seqs,
                     groups = groups,
