@@ -12,6 +12,7 @@ test_that("plot_alignment plots alignments for a locus", {
     hash <- openssl::md5(data_png)
     known <- unlist(strsplit("88:89:3e:cc:32:69:0b:9a:34:26:45:fe:36:c1:dc:9c",
                            ":"))
+    cat(paste0("\n\n\n", hash, "\n\n\n"), file="/dev/stderr")
     expect_true(all(hash == known))
   })
 })
