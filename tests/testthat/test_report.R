@@ -18,15 +18,14 @@ test_that("plot_alignment plots alignments for a locus", {
     known_txt <- "26:6e:41:90:5d:51:00:4c:f9:9c:2d:b9:c2:cd:64:e0" # bmp
     known <- unlist(strsplit(known_txt, ":"))
 
-    stderr <- file('/dev/stderr', 'w')
-    cat(paste0("\n\n\n", "#######################", "\n\n\n"), file = stderr)
-    cat(paste0("\n\n\n", hash, "\n\n\n"), file = stderr)
+    cat(paste0("\n\n\n", hash, "\n\n\n"), file = "/dev/stderr")
+
+    stderr <- file('binary.log', 'w')
     for (i in seq(1, length(data_png), 16)) {
-      cat(data_png[i:min(length(data_png),i+15)], "\n", file = stderr)
+      cat(data_png[i:min(length(data_png),i+15)], "\n", file = binarylog)
     }
-    cat(paste0("\n\n\n", "#######################", "\n\n\n"), file = stderr)
-    flush(stderr)
-    close(stderr)
+    flush(binarylog)
+    close(binarylog)
 
     expect_true(all(hash == known))
   })
