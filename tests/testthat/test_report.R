@@ -19,11 +19,13 @@ test_that("plot_alignment plots alignments for a locus", {
     known <- unlist(strsplit(known_txt, ":"))
 
     stderr <- file('/dev/stderr', 'w')
+    cat(paste0("\n\n\n", "#######################", "\n\n\n"), file = stderr)
     cat(paste0("\n\n\n", hash, "\n\n\n"), file = stderr)
     for (i in seq(1, length(data_png), 16)) {
       cat(data_png[i:min(length(data_png),i+15)], "\n", file = stderr)
     }
-    cat("\n\n\n", file = stderr)
+    cat(paste0("\n\n\n", "#######################", "\n\n\n"), file = stderr)
+    flush(stderr)
     close(stderr)
 
     expect_true(all(hash == known))
