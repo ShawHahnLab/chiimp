@@ -7,3 +7,5 @@ r:
   - devel
   - bioc-devel
 cache: packages
+after_script:
+  - ./travis-tool.sh dump_logs
