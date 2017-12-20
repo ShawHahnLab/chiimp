@@ -20,11 +20,18 @@ test_that("plot_alignment plots alignments for a locus", {
 
     cat(paste0("\n\n\n", hash, "\n\n\n"), file = "/dev/stderr")
 
+    # graphical parameters
+    parlog <- file('par.log', 'w')
+    parlist <- par()
+    cat(paste(names(parlist), parlist, sep = "="), sep = "\n", file = parlog)
+    close(parlog)
+
+
+    # image data
     binarylog <- file('binary.log', 'w')
     for (i in seq(1, length(data_png), 16)) {
       cat(data_png[i:min(length(data_png),i+15)], "\n", file = binarylog)
     }
-    flush(binarylog)
     close(binarylog)
 
     expect_true(all(hash == known))
