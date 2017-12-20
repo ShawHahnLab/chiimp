@@ -20,7 +20,7 @@ test_that("plot_alignment plots alignments for a locus", {
 
     cat(paste0("\n\n\n", hash, "\n\n\n"), file = "/dev/stderr")
 
-    stderr <- file('binary.log', 'w')
+    binarylog <- file('binary.log', 'w')
     for (i in seq(1, length(data_png), 16)) {
       cat(data_png[i:min(length(data_png),i+15)], "\n", file = binarylog)
     }
