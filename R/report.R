@@ -43,13 +43,14 @@ report_genotypes <- function(tbl,
       tbl[i, j] <- n
     }
   }
-  # If a closest-matches list was given, add columns using that
+  # If a closest-matches list was given, add columns using that-- but only if
+  # there's exactly one.
   if (!is.null(closest)) {
     idents <- do.call(rbind, lapply(closest, function(who) {
-      if (length(who) == 0) {
-        data.frame(Distance=NA, Name=NA)
+      if (length(who) == 1) {
+        data.frame(Distance=who, Name=names(who), stringsAsFactors = F)
       } else {
-        data.frame(Distance=who[1], Name=names(who[1]), stringsAsFactors = F)
+        data.frame(Distance=NA, Name=NA)
       }
     }))
     tbl <- cbind(tbl, idents)
