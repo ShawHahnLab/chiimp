@@ -217,7 +217,7 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
 align_alleles <- function(results_summary, derep=TRUE, ...) {
   chunks <- split(results_summary, droplevels(results_summary$Locus))
   lapply(chunks, function(chunk) {
-    if (all(c("Allele1Seq", "Allele2Seq") %in% colnames(alleles))) {
+    if (all(c("Allele1Seq", "Allele2Seq") %in% colnames(results_summary))) {
       a <- flatten_alleles(chunk)
       ids <- NULL
     } else {
