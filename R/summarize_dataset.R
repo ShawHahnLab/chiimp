@@ -217,13 +217,13 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
 align_alleles <- function(results_summary, derep=TRUE, ...) {
   chunks <- split(results_summary, droplevels(results_summary$Locus))
   lapply(chunks, function(chunk) {
-    alleles <- chunk[, c("Allele1Seq", "Allele2Seq")]
-    a1 <- as.character(alleles[, 1])
-    a2 <- as.character(alleles[, 2])
-    a2 <- ifelse(is.na(a2), a1, a2)
-    names(a1) <- paste(rownames(alleles), 1, sep = "_")
-    names(a2) <- paste(rownames(alleles), 2, sep = "_")
-    a <- c(a1, a2)
+    if (all(c("Allele1Seq", "Allele2Seq") %in% colnames(alleles))) {
+      a <- flatten_alleles(chunk)
+      ids <- NULL
+    } else {
+      a <- as.character(chunk$Seq)
+      ids <- as.character(chunk$Name)
+    }
     # If there are no sequences, skip the alignment and record NA for this
     # locus.  (The msa function doesn't do this sort of checking itself,
     # apparently.
@@ -235,8 +235,13 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
     if (derep) {
       tbl <- table(a)
       n <- unname(tbl)
+      if (is.null(ids)) {
+        ids <- nchar(names(tbl))
+      } else {
+        ids <- ids[match(names(tbl), a)]
+      }
       a <- names(tbl)
-      names(a) <- paste(nchar(a), n, sep = "_")
+      names(a) <- paste(ids, n, sep = "_")
     }
     # If there are any other missing sequences, put a stub in place so msa still
     # runs without complaints.
@@ -422,3 +427,17 @@ tally_cts_per_locus <- function(results) {
 
 # TODO: functions to evaluate the level of genotyping success and allele
 # diversity across loci.
+
+
+# Util --------------------------------------------------------------------
+
+# handles Homozygous entries via NA as Allele2Seq
+flatten_alleles <- function(tbl) {
+  alleles <- tbl[, c("Allele1Seq", "Allele2Seq")]
+  a1 <- as.character(alleles[, 1])
+  a2 <- as.character(alleles[, 2])
+  a2 <- ifelse(is.na(a2), a1, a2)
+  names(a1) <- paste(rownames(alleles), 1, sep = "_")
+  names(a2) <- paste(rownames(alleles), 2, sep = "_")
+  return(c(a1, a2))
+}

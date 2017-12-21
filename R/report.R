@@ -435,8 +435,14 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   ord <- order(lengths)
   seqs <- seqs[ord]
   lengths <- lengths[ord]
+  # Add a label for every unique sequence, using the names of the supplied
+  # sequences
+  if (missing(labels))
+    labels <- sapply(strsplit(names(seqs), "_"), "[", 2)
+  else
+    labels <- labels[ord]
   groups <- paste("  ", lengths, "bp")
-  groups <- factor(groups, levels=groups)
+  groups <- factor(groups, levels=unique(groups))
   # Make plot
   graphics::par(mar = c(5, 5, 4, 5))
   dnaplotr::plotDNA(seqs,
@@ -445,16 +451,13 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   # Add faint lines between all sequences
   for (i in seq_along(seqs))
     graphics::abline(h = i + 0.5, col = grDevices::rgb(0.5, 0.5, 0.5, 0.5))
-  # Add a label for every unique sequence, using the names of the supplied
-  # sequences
-  if (missing(labels))
-    labels <- sapply(strsplit(names(seqs), "_"), "[", 2)
-  graphics::axis(4,
-       at = 1:length(seqs),
-       labels = labels,
-       tick = F,
-       padj = -2.5,
-       cex.axis = 0.6)
+  if (!is.null(labels))
+    graphics::axis(4,
+         at = 1:length(seqs),
+         labels = labels,
+         tick = F,
+         padj = -2.5,
+         cex.axis = 0.6)
 }
 
 # Distance Matrices -------------------------------------------------------
