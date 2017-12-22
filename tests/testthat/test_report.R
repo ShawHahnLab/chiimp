@@ -4,7 +4,7 @@
 test_that("plot_alignment plots alignments for a locus", {
   with(results_summary_data, {
     alignments <- align_alleles(results$summary)
-    fp_img <- tempfile()
+    fp_img <- "alignment.svg.log"
     svg(fp_img)
     plot_alignment(alignments[["A"]])
     dev.off()
