@@ -4,15 +4,14 @@
 test_that("plot_alignment plots alignments for a locus", {
   with(results_summary_data, {
     alignments <- align_alleles(results$summary)
-    fp_img <- "alignment.svg.log"
-    svg(fp_img)
-    plot_alignment(alignments[["A"]])
+    fp_img <- tempfile()
+    png(fp_img)
+    plot_data <- plot_alignment(alignments[["A"]])
     dev.off()
-    data_img <- readBin(fp_img, n=1e6, raw())
-    hash <- openssl::md5(data_img)
-    known_txt <- "25:95:62:2f:b7:ee:d6:5d:41:bf:17:c1:24:16:d5:e5"
-    known <- unlist(strsplit(known_txt, ":"))
-    cat(paste0("\n\n\n", hash, "\n\n\n"), file = "/dev/stderr")
-    expect_true(all(hash == known))
+    groups <- c("   162 bp", "   174 bp", "   178 bp", "   182 bp", "   194 bp")
+    groups <- factor(groups)
+    labels <- c("1", "2", "1", "1", "1")
+    expect_equal(plot_data$labels, labels)
+    expect_equal(plot_data$groups, groups)
   })
 })

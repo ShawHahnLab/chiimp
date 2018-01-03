@@ -22,6 +22,10 @@ of the number of alleles observed.}
 
 \item{...}{additional arguments passed to \code{\link[dnaplotr]{plotDNA}}.}
 }
+\value{
+list of the sequence, sequence group, and label character vectors
+  used in the plot.
+}
 \description{
 Plot an MSA alignment object.
 }

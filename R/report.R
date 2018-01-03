@@ -418,6 +418,9 @@ histogram2 <- function(samp,
 #'   of the number of alleles observed.
 #' @param ... additional arguments passed to \code{\link[dnaplotr]{plotDNA}}.
 #'
+#' @return list of the sequence, sequence group, and label character vectors
+#'   used in the plot.
+#'
 #' @seealso \code{\link{align_alleles}}
 #'
 #' @export
@@ -459,6 +462,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
          tick = F,
          padj = -2.5,
          cex.axis = 0.6)
+  return(list(seqs = seqs, groups = groups, labels = labels))
 }
 
 # Distance Matrices -------------------------------------------------------
