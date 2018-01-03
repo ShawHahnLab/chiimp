@@ -48,9 +48,9 @@ report_genotypes <- function(tbl,
   if (!is.null(closest)) {
     idents <- do.call(rbind, lapply(closest, function(who) {
       if (length(who) == 1) {
-        data.frame(Distance=who, Name=names(who), stringsAsFactors = F)
+        data.frame(Distance = who, Name = names(who), stringsAsFactors = F)
       } else {
-        data.frame(Distance=NA, Name=NA)
+        data.frame(Distance = NA, Name = NA)
       }
     }))
     tbl <- cbind(tbl, idents)
@@ -443,7 +443,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
   else
     labels <- labels[ord]
   groups <- paste("  ", lengths, "bp")
-  groups <- factor(groups, levels=unique(groups))
+  groups <- factor(groups, levels = unique(groups))
   # Make plot
   graphics::par(mar = c(5, 5, 4, 5))
   dnaplotr::plotDNA(seqs,
