@@ -92,12 +92,14 @@ config.defaults <- list(
 #'
 #' @param config list of configuration options.  See the summary for
 #'   \code{\link{config.defaults}} for more details.
+#' @param dataset optional custom data frame to override the sample attributes
+#'   defined in the config.
 #'
 #' @return list of results, with the full configuration list included as
 #'   "config."
 #'
 #' @export
-full_analysis <- function(config) {
+full_analysis <- function(config, dataset=NULL) {
   # Overaly explicit configuration onto the default settings
   config.full <- utils::modifyList(config.defaults, config)
 
@@ -116,7 +118,9 @@ full_analysis <- function(config) {
 
   with(config.full, {
     if (verbose) logmsg(paste0("Loading dataset: ", dp.data, "..."))
-    dataset <- prepare_dataset(dp.data, pattern, ord)
+    if (is.null(dataset)) {
+      dataset <- prepare_dataset(dp.data, pattern, ord)
+    }
     if (verbose)
       logmsg(paste0("Loading locus attrs: ", fp.locus_attrs, "..."))
     locus_attrs <- load_locus_attrs(fp.locus_attrs)

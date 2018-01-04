@@ -4,11 +4,14 @@
 \alias{full_analysis}
 \title{Perform a full microsatellite analysis}
 \usage{
-full_analysis(config)
+full_analysis(config, dataset = NULL)
 }
 \arguments{
 \item{config}{list of configuration options.  See the summary for
 \code{\link{config.defaults}} for more details.}
+
+\item{dataset}{optional custom data frame to override the sample attributes
+defined in the config.}
 }
 \value{
 list of results, with the full configuration list included as
