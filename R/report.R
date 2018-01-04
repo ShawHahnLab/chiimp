@@ -858,7 +858,9 @@ chunk_up <- function(data, locus_chunks, kable_func, heading_prefix="###",
     # TODO support name ordering given by locus_chunks[[chunk_name]]
     locus_cols <- allelify(locus_chunks[[chunk_name]])
     locus_cols_extra <- locus_cols_all[-match(locus_cols, locus_cols_all)]
-    tbl.chunk <- data[, -match(locus_cols_extra, colnames(data))]
+    idx.extra <- match(locus_cols_extra, colnames(data))
+    idx.extra <- idx.extra[!is.na(idx.extra)]
+    tbl.chunk <- data[, -idx.extra]
     cat(paste0("\n\n", heading_prefix, " ", "Loci: ", chunk_name, "\n\n"))
     cat(kable_func(tbl.chunk, ...))
   }
