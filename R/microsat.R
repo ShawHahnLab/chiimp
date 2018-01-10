@@ -110,22 +110,22 @@ config.defaults <- list(
 #' @export
 full_analysis <- function(config, dataset=NULL) {
   # Overaly explicit configuration onto the default settings
-  config.full <- utils::modifyList(config.defaults, config)
+  config_full <- utils::modifyList(config.defaults, config)
 
   # Make output path absolute
-  config.full$output$dp <-
-    if (substr(config.full$output$dp, 1, 1) != .Platform$file.sep) {
-      file.path(normalizePath("."), config.full$output$dp)
+  config_full$output$dp <-
+    if (substr(config_full$output$dp, 1, 1) != .Platform$file.sep) {
+      file.path(normalizePath("."), config_full$output$dp)
     } else {
-      config.full$output$dp
+      config_full$output$dp
     }
 
   # Only show identifications if a known genotypes table was supplied
-  config.full$report.sections$identifications <-
-    ! is.null(config.full$fp.genotypes.known) &&
-    config.full$report.sections$identifications
+  config_full$report.sections$identifications <-
+    ! is.null(config_full$fp.genotypes.known) &&
+    config_full$report.sections$identifications
 
-  with(config.full, {
+  with(config_full, {
     if (verbose) logmsg(paste0("Loading dataset: ", dataset_opts$dp, "..."))
     if (is.null(dataset)) {
       dataset <- do.call(prepare_dataset, dataset_opts)
@@ -159,7 +159,7 @@ full_analysis <- function(config, dataset=NULL) {
                                                       range = report.dist_range,
                                                       maximum = report.dist_max)
     results$cts_per_locus <- tally_cts_per_locus(results)
-    results$config <- config.full
+    results$config <- config_full
     results$allele.names <- NULL
     if (!is.null(fp.allele.names))
       results$allele.names <- load_allele_names(fp.allele.names)
@@ -225,16 +225,16 @@ main <- function(args=NULL) {
 #'   \code{\link{config.defaults}}).
 render_report <- function(results, config) {
   with(config, {
-    fp.report.in <- system.file("report", "report.Rmd", package = "microsat")
-    fp.report.out <- file.path(output$dp, output$fp_report)
-    if (!dir.exists(dirname(fp.report.out)))
-      dir.create(dirname(fp.report.out), recursive = TRUE)
+    fp_report_in <- system.file("report", "report.Rmd", package = "microsat")
+    fp_report_out <- file.path(output$dp, output$fp_report)
+    if (!dir.exists(dirname(fp_report_out)))
+      dir.create(dirname(fp_report_out), recursive = TRUE)
     pandoc_metadata <- c(title = report.title,
                          author = report.author,
                          date = format(Sys.Date(), "%Y-%m-%d"))
     pandoc_args <- format_pandoc_args(pandoc_metadata)
     pandoc_args <- c(pandoc_args, paste0("--css=", "report.css"))
-    rmarkdown::render(fp.report.in, quiet = TRUE, output_file = fp.report.out,
+    rmarkdown::render(fp_report_in, quiet = TRUE, output_file = fp_report_out,
                       output_options = list(pandoc_args = pandoc_args))
   })
 }
