@@ -20,7 +20,8 @@
 #'     * dp: directory path to input sequence files
 #'     * pattern: regular expression for the input filename pattern
 #'     * ord: order of fields in the input filename pattern
-#'   * dp.output: directory path for saving output data
+#'   * output:
+#'     * dp: directory path for saving output data
 #'   * fp.locus_attrs: file path to locus attributes TSV file
 #'   * fp.genotypes.known: file path to known genotypes TSV file
 #' @md
@@ -32,22 +33,25 @@ config.defaults <- list(
     dp = "str-data",
     pattern = "(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
     ord = c(1, 2, 3),
-    autorep = FALSE),
+    autorep = FALSE
+  ),
   # Other input and output paths
   fp.locus_attrs = "locus_attrs.tsv",
   fp.allele.names = NULL,
   fp.genotypes.known = NULL,
-  dp.output = "str-results",
-  ## Names for files and subdirectories under dp.output
-  fp.output.summary = "summary.csv",  # Dataset summary table
-  fp.report = "report.html",  # Report document
-  fp.output.dist_mat = "sample-distances.csv",  # Sample-to-sample distances
-  fp.output.rds = NULL,  # Data file to save results to
-  dp.output.histograms = "histograms",  # Read count by length histograms
-  dp.output.alignments = "alignments",  # Sequence alignments across alleles
-  dp.output.alignment_images = "alignment-images",  # Images of alignments
-  dp.output.processed_samples = "processed-samples",  # Sample data tables
-  dp.output.allele_seqs = "allele-sequences",  # FASTA sequences for alleles
+  ## Names for output files and directories
+  output = list(
+    dp = "str-results",  # Main output directory
+    fp_summary = "summary.csv",  # Dataset summary table
+    fp_report = "report.html",  # Report document
+    fp_dist_mat = "sample-distances.csv",  # Sample-to-sample distances
+    fp_rds = NULL,  # Data file to save results to
+    dp_histograms = "histograms",  # Read count by length histograms
+    dp_alignments = "alignments",  # Sequence alignments across alleles
+    dp_alignment_images = "alignment-images",  # Images of alignments
+    dp_processed_samples = "processed-samples",  # Sample data tables
+    dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
+  ),
   ## Sample genotyping settings
   sample_analysis = list(nrepeats = 3),
   sample_summary_func = "summarize_sample",
@@ -109,11 +113,11 @@ full_analysis <- function(config, dataset=NULL) {
   config.full <- utils::modifyList(config.defaults, config)
 
   # Make output path absolute
-  config.full$dp.output <-
-    if (substr(config.full$dp.output, 1, 1) != .Platform$file.sep) {
-      file.path(normalizePath("."), config.full$dp.output)
+  config.full$output$dp <-
+    if (substr(config.full$output$dp, 1, 1) != .Platform$file.sep) {
+      file.path(normalizePath("."), config.full$output$dp)
     } else {
-      config.full$dp.output
+      config.full$output$dp
     }
 
   # Only show identifications if a known genotypes table was supplied
@@ -161,21 +165,21 @@ full_analysis <- function(config, dataset=NULL) {
       results$allele.names <- load_allele_names(fp.allele.names)
     if (verbose) logmsg("Saving output files...")
     save_histograms(results,
-                    file.path(dp.output, dp.output.histograms))
+                    file.path(output$dp, output$dp_histograms))
     save_results_summary(results$summary,
-                         file.path(dp.output, fp.output.summary))
+                         file.path(output$dp, output$fp_summary))
     save_alignments(results$alignments,
-                    file.path(dp.output, dp.output.alignments))
+                    file.path(output$dp, output$dp_alignments))
     save_alignment_images(results$alignments,
-                          file.path(dp.output, dp.output.alignment_images))
+                          file.path(output$dp, output$dp_alignment_images))
     save_sample_data(results$data,
-                     file.path(dp.output, dp.output.processed_samples))
+                     file.path(output$dp, output$dp_processed_samples))
     save_allele_seqs(results$summary,
-                     file.path(dp.output, dp.output.allele_seqs))
+                     file.path(output$dp, output$dp_allele_seqs))
     save_dist_mat(results$dist_mat,
-                  file.path(dp.output, fp.output.dist_mat))
-    if (!is.null(fp.output.rds))
-      saveRDS(results, file.path(dp.output, fp.output.rds))
+                  file.path(output$dp, output$fp_dist_mat))
+    if (!is.null(output$fp_rds))
+      saveRDS(results, file.path(output$dp, output$fp_rds))
     if (report) {
       if (verbose) logmsg("Creating report...")
       render_report(results, results$config)
@@ -222,7 +226,7 @@ main <- function(args=NULL) {
 render_report <- function(results, config) {
   with(config, {
     fp.report.in <- system.file("report", "report.Rmd", package = "microsat")
-    fp.report.out <- file.path(dp.output, fp.report)
+    fp.report.out <- file.path(output$dp, output$fp_report)
     if (!dir.exists(dirname(fp.report.out)))
       dir.create(dirname(fp.report.out), recursive = TRUE)
     pandoc_metadata <- c(title = report.title,
