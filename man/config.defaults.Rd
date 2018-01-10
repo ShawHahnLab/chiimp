@@ -4,7 +4,7 @@
 \name{config.defaults}
 \alias{config.defaults}
 \title{Default microsatellite configuration}
-\format{An object of class \code{list} of length 31.}
+\format{An object of class \code{list} of length 29.}
 \usage{
 config.defaults
 }
@@ -16,9 +16,12 @@ list to \code{\link{full_analysis}} with entries of the same names.
 \details{
 Notable Options:
 \itemize{
-\item dp.data: directory path to input sequence files
+\item dataset_opts:
+\itemize{
+\item dp: directory path to input sequence files
 \item pattern: regular expression for the input filename pattern
 \item ord: order of fields in the input filename pattern
+}
 \item dp.output: directory path for saving output data
 \item fp.locus_attrs: file path to locus attributes TSV file
 \item fp.genotypes.known: file path to known genotypes TSV file

@@ -16,9 +16,10 @@
 #' list to \code{\link{full_analysis}} with entries of the same names.
 #'
 #' Notable Options:
-#'   * dp.data: directory path to input sequence files
-#'   * pattern: regular expression for the input filename pattern
-#'   * ord: order of fields in the input filename pattern
+#'   * dataset_opts:
+#'     * dp: directory path to input sequence files
+#'     * pattern: regular expression for the input filename pattern
+#'     * ord: order of fields in the input filename pattern
 #'   * dp.output: directory path for saving output data
 #'   * fp.locus_attrs: file path to locus attributes TSV file
 #'   * fp.genotypes.known: file path to known genotypes TSV file
@@ -26,10 +27,13 @@
 #'
 #' @export
 config.defaults <- list(
-  dp.data = "str-data",
-  pattern = "(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
-  ord = c(1, 2, 3),
-  autorep = FALSE,
+  ## Arguments to prepare_dataset
+  dataset_opts = list(
+    dp = "str-data",
+    pattern = "(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
+    ord = c(1, 2, 3),
+    autorep = FALSE),
+  # Other input and output paths
   fp.locus_attrs = "locus_attrs.tsv",
   fp.allele.names = NULL,
   fp.genotypes.known = NULL,
@@ -118,10 +122,9 @@ full_analysis <- function(config, dataset=NULL) {
     config.full$report.sections$identifications
 
   with(config.full, {
-    if (verbose) logmsg(paste0("Loading dataset: ", dp.data, "..."))
+    if (verbose) logmsg(paste0("Loading dataset: ", dataset_opts$dp, "..."))
     if (is.null(dataset)) {
-      dataset <- prepare_dataset(dp = dp.data, pattern = pattern, ord = ord,
-                                 autorep = autorep)
+      dataset <- do.call(prepare_dataset, dataset_opts)
     }
     if (verbose)
       logmsg(paste0("Loading locus attrs: ", fp.locus_attrs, "..."))
