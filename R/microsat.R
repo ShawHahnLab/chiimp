@@ -165,23 +165,7 @@ full_analysis <- function(config, dataset=NULL) {
   if (!is.null(cfg$fp_allele_names))
     results$allele.names <- load_allele_names(cfg$fp_allele_names)
   if (cfg$verbose) logmsg("Saving output files...")
-  save_histograms(results,
-                  file.path(cfg$output$dp, cfg$output$dp_histograms))
-  save_results_summary(results$summary,
-                  file.path(cfg$output$dp, cfg$output$fp_summary))
-  save_alignments(results$alignments,
-                  file.path(cfg$output$dp, cfg$output$dp_alignments))
-  save_alignment_images(results$alignments,
-                  file.path(cfg$output$dp, cfg$output$dp_alignment_images))
-  save_sample_data(results$data,
-                  file.path(cfg$output$dp, cfg$output$dp_processed_samples))
-  save_allele_seqs(results$summary,
-                  file.path(cfg$output$dp, cfg$output$dp_allele_seqs))
-  save_dist_mat(results$dist_mat,
-                  file.path(cfg$output$dp, cfg$output$fp_dist_mat))
-  if (!is.null(cfg$output$fp_rds))
-    saveRDS(results,
-                  file.path(cfg$output$dp, cfg$output$fp_rds))
+    save_data(results, results$config)
   if (cfg$report) {
     if (cfg$verbose) logmsg("Creating report...")
     render_report(results, results$config)
@@ -238,6 +222,35 @@ render_report <- function(results, config) {
     rmarkdown::render(fp_report_in, quiet = TRUE, output_file = fp_report_out,
                       output_options = list(pandoc_args = pandoc_args))
   })
+}
+
+#' Save Microsatellite Analysis to Disk
+#'
+#' Save the various parts of a finished microsatellite analysis to data files
+#' and plot images.
+#'
+#' @param results list of microsatellite analysis results as produced by
+#'   \code{\link{full_analysis}}.
+#' @param config list of configuration options (see
+#'   \code{\link{config.defaults}}).
+save_data <- function(results, config) {
+  save_histograms(results,
+              file.path(config$output$dp, config$output$dp_histograms))
+  save_results_summary(results$summary,
+              file.path(config$output$dp, config$output$fp_summary))
+  save_alignments(results$alignments,
+              file.path(config$output$dp, config$output$dp_alignments))
+  save_alignment_images(results$alignments,
+              file.path(config$output$dp, config$output$dp_alignment_images))
+  save_sample_data(results$data,
+              file.path(config$output$dp, config$output$dp_processed_samples))
+  save_allele_seqs(results$summary,
+              file.path(config$output$dp, config$output$dp_allele_seqs))
+  save_dist_mat(results$dist_mat,
+              file.path(config$output$dp, config$output$fp_dist_mat))
+  if (!is.null(config$output$fp_rds))
+    saveRDS(results,
+              file.path(config$output$dp, config$output$fp_rds))
 }
 
 #' Create Pandoc Metadata Argument Strings
