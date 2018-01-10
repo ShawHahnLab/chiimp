@@ -142,53 +142,52 @@ full_analysis <- function(config, dataset=NULL) {
                              fraction.min = cfg$sample_summary$fraction.min,
                              counts.min = cfg$sample_summary$counts.min,
                              summary.function = sample_summary_func)
-  with(config_full, {
-    # Reorder entries and levels to match locus_attrs.
-    # TODO merge these steps into analyze_dataset or summarize_dataset
-    results$summary$Locus <- factor(results$summary$Locus,
-                                    levels = rownames(locus_attrs))
-    ord <- order_entries(results$summary)
-    results$summary <- results$summary[ord, ]
-    results$data <- results$data[ord]
-    results$locus_attrs <- locus_attrs
-    if (verbose) logmsg("Summarizing results...")
-    genotypes.known <- NULL
-    if (!is.null(fp.genotypes.known))
-      genotypes.known <- load_genotypes(fp.genotypes.known)
-    results <- summarize_dataset(results, genotypes.known)
-    if (!is.null(fp.genotypes.known))
-      results$closest_matches <- find_closest_matches(results$dist_mat_known,
-                                                      range = report.dist_range,
-                                                      maximum = report.dist_max)
-    results$cts_per_locus <- tally_cts_per_locus(results)
-    results$config <- config_full
-    results$allele.names <- NULL
-    if (!is.null(fp.allele.names))
-      results$allele.names <- load_allele_names(fp.allele.names)
-    if (verbose) logmsg("Saving output files...")
-    save_histograms(results,
-                    file.path(output$dp, output$dp_histograms))
-    save_results_summary(results$summary,
-                         file.path(output$dp, output$fp_summary))
-    save_alignments(results$alignments,
-                    file.path(output$dp, output$dp_alignments))
-    save_alignment_images(results$alignments,
-                          file.path(output$dp, output$dp_alignment_images))
-    save_sample_data(results$data,
-                     file.path(output$dp, output$dp_processed_samples))
-    save_allele_seqs(results$summary,
-                     file.path(output$dp, output$dp_allele_seqs))
-    save_dist_mat(results$dist_mat,
-                  file.path(output$dp, output$fp_dist_mat))
-    if (!is.null(output$fp_rds))
-      saveRDS(results, file.path(output$dp, output$fp_rds))
-    if (report) {
-      if (verbose) logmsg("Creating report...")
-      render_report(results, results$config)
-    }
-    if (verbose) logmsg("Done.")
-    return(results)
-  })
+  # Reorder entries and levels to match locus_attrs.
+  # TODO merge these steps into analyze_dataset or summarize_dataset
+  results$summary$Locus <- factor(results$summary$Locus,
+                                  levels = rownames(locus_attrs))
+  ord <- order_entries(results$summary)
+  results$summary <- results$summary[ord, ]
+  results$data <- results$data[ord]
+  results$locus_attrs <- locus_attrs
+  if (cfg$verbose) logmsg("Summarizing results...")
+  genotypes.known <- NULL
+  if (!is.null(cfg$fp.genotypes.known))
+    genotypes.known <- load_genotypes(cfg$fp.genotypes.known)
+  results <- summarize_dataset(results, genotypes.known)
+  if (!is.null(cfg$fp.genotypes.known))
+    results$closest_matches <- find_closest_matches(results$dist_mat_known,
+                                                range = cfg$report.dist_range,
+                                                maximum = cfg$report.dist_max)
+  results$cts_per_locus <- tally_cts_per_locus(results)
+  results$config <- config_full
+  results$allele.names <- NULL
+  if (!is.null(cfg$fp.allele.names))
+    results$allele.names <- load_allele_names(cfg$fp.allele.names)
+  if (cfg$verbose) logmsg("Saving output files...")
+  save_histograms(results,
+                  file.path(cfg$output$dp, cfg$output$dp_histograms))
+  save_results_summary(results$summary,
+                  file.path(cfg$output$dp, cfg$output$fp_summary))
+  save_alignments(results$alignments,
+                  file.path(cfg$output$dp, cfg$output$dp_alignments))
+  save_alignment_images(results$alignments,
+                  file.path(cfg$output$dp, cfg$output$dp_alignment_images))
+  save_sample_data(results$data,
+                  file.path(cfg$output$dp, cfg$output$dp_processed_samples))
+  save_allele_seqs(results$summary,
+                  file.path(cfg$output$dp, cfg$output$dp_allele_seqs))
+  save_dist_mat(results$dist_mat,
+                  file.path(cfg$output$dp, cfg$output$fp_dist_mat))
+  if (!is.null(cfg$output$fp_rds))
+    saveRDS(results,
+                  file.path(cfg$output$dp, cfg$output$fp_rds))
+  if (cfg$report) {
+    if (cfg$verbose) logmsg("Creating report...")
+    render_report(results, results$config)
+  }
+  if (cfg$verbose) logmsg("Done.")
+  return(results)
 }
 
 #' Handle full microsatellite analysis from command-line
