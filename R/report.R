@@ -840,8 +840,8 @@ rmd_alignments <- function(results, heading_prefix="###") {
       cat(paste0("No sequences to align for Locus ", loc, "."))
       return()
     }
-    fp <- file.path(results$config$dp.output,
-                    results$config$dp.output.alignment_images,
+    fp <- file.path(results$config$output$dp,
+                    results$config$output$dp_alignment_images,
                     paste0(loc, ".png"))
     cat(paste0("![](", fp, ")"))
   }))
