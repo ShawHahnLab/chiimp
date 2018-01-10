@@ -139,8 +139,7 @@ full_analysis <- function(config, dataset=NULL) {
   sample_summary_func <- get(sample_summary_funcs[idx])
   results <- analyze_dataset(dataset, locus_attrs,
                              nrepeats = cfg$sample_analysis$nrepeats,
-                             fraction.min = cfg$sample_summary$fraction.min,
-                             counts.min = cfg$sample_summary$counts.min,
+                             summary_args = cfg$sample_summary,
                              summary.function = sample_summary_func)
   # Reorder entries and levels to match locus_attrs.
   # TODO merge these steps into analyze_dataset or summarize_dataset

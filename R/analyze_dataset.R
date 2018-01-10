@@ -14,16 +14,11 @@
 #'   \code{\link{load_locus_attrs}}.
 #' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match (see \code{\link{analyze_sample}}).
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
-#' @param counts.min numeric threshold for the minimum number of counts that
-#'   must be present, in total across entries passing all filters, for potential
-#'   alleles to be considered.
 #' @param num.cores integer number of CPU cores to use in parallel for sample
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
 #'   \code{parallel} package.
+#' @param summary_args list of arguments to \code{summary.function}.
 #' @param summary.function function to use when summarizing each sample's full
 #'   details into the standard attributes Defaults to
 #'   \code{\link{summarize_sample}}.
@@ -35,18 +30,16 @@
 analyze_dataset <- function(dataset,
                             locus_attrs,
                             nrepeats,
-                            fraction.min,
-                            counts.min,
                             num.cores=max(1,
                                 as.integer(parallel::detectCores() / 2) - 1),
+                            summary_args,
                             summary.function=summarize_sample) {
   analyze.entry <- function(entry, summary.function) {
     seqs <- load_seqs(entry["Filename"])
     sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
-    sample.summary <- summary.function(sample.data,
-                                       entry["Locus"],
-                                       fraction.min,
-                                       counts.min)
+    args <- c(list(sample.data = sample.data, locus.name = entry["Locus"]),
+              summary_args)
+    sample.summary <- do.call(summary.function, args)
     return(list(summary = sample.summary, data = sample.data))
   }
   if (num.cores > 1) {
