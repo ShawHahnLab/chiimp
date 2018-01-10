@@ -29,6 +29,7 @@ config.defaults <- list(
   dp.data = "str-data",
   pattern = "(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
   ord = c(1, 2, 3),
+  autorep = FALSE,
   fp.locus_attrs = "locus_attrs.tsv",
   fp.allele.names = NULL,
   fp.genotypes.known = NULL,
@@ -119,7 +120,8 @@ full_analysis <- function(config, dataset=NULL) {
   with(config.full, {
     if (verbose) logmsg(paste0("Loading dataset: ", dp.data, "..."))
     if (is.null(dataset)) {
-      dataset <- prepare_dataset(dp.data, pattern, ord)
+      dataset <- prepare_dataset(dp = dp.data, pattern = pattern, ord = ord,
+                                 autorep = autorep)
     }
     if (verbose)
       logmsg(paste0("Loading locus attrs: ", fp.locus_attrs, "..."))
