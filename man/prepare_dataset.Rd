@@ -4,7 +4,7 @@
 \alias{prepare_dataset}
 \title{Extract Sample Attributes from Filenames}
 \usage{
-prepare_dataset(dp, pattern, ord = c(1, 2, 3))
+prepare_dataset(dp, pattern, ord = c(1, 2, 3), autorep = FALSE)
 }
 \arguments{
 \item{dp}{directory path to search for matching data files.}
@@ -15,6 +15,9 @@ be exactly three groups in the pattern, for Replicate, Sample, and Locus.}
 \item{ord}{integer vector giving order of the fields Replicate, Sample, and
 Locus in filenames.  For example, if Locus is the first field followed by
 Replicate and Sample, set \code{ord=c(3, 1, 2)}.}
+
+\item{autorep}{logical allowing for automatic handling of any duplicates
+found, labeling them as replicates.  FALSE by default.}
 }
 \value{
 data frame of metadata for all files found

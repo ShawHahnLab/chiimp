@@ -110,11 +110,13 @@ load_genotypes <- function(fp, ...) {
 #' @param ord integer vector giving order of the fields Replicate, Sample, and
 #'   Locus in filenames.  For example, if Locus is the first field followed by
 #'   Replicate and Sample, set \code{ord=c(3, 1, 2)}.
+#' @param autorep logical allowing for automatic handling of any duplicates
+#'   found, labeling them as replicates.  FALSE by default.
 #'
 #' @return data frame of metadata for all files found
 #'
 #' @export
-prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3)) {
+prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
   # get all matching filenames and extract substrings
   seq_files <- list.files(path = dp,
                           pattern = pattern,
@@ -140,6 +142,20 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3)) {
                            as.integer(as.character(data$Replicate)))
   # order by locus/sample/replicate
   data <- data[order_entries(data), ]
+  # If specified, automatically number duplicates as replicates, if they don't
+  # have a replicate number already.
+  if (autorep) {
+    data <- do.call(rbind, lapply(split(data,
+                                           paste(data$Sample,
+                                                 data$Locus)),
+           function(chunk) {
+             chunk$Replicate <- ifelse(is.na(chunk$Replicate),
+                                       1:nrow(chunk),
+                                       chunk$Replicate)
+             chunk
+    }))
+    data <- data[order_entries(data), ]
+  }
   rownames(data) <- make_rownames(data)
   # complain if any replicate/sample/locus combo matches more than one entry
   if (max(table(paste(data$Replicate, data$Sample, data$Locus))) > 1) {

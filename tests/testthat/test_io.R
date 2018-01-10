@@ -123,6 +123,29 @@ test_that("prepare_dataset warns of repeated identifier rows", {
     "Some replicate/sample/locus combinations match multiple files")
 })
 
+test_that("prepare_dataset can autolabel replicates", {
+  # With autorep=TRUE it should automatically number replicates.
+  replicates <- 1
+  samples <- 1:5
+  loci <- sort(rownames(locus_attrs))
+  data <- setup_data_dir(replicates, samples, loci)
+  cat("", file = paste0(data$fps[3], ".2"))
+  cat("", file = paste0(data$fps[3], ".3"))
+  dataset <- prepare_dataset(data$dp,
+                             pattern = "()1-(\\d+)-([A-Za-z0-9]+)",
+                             autorep = TRUE)
+  extras <- paste0(data$fps[3], c(".2", ".3"))
+  expect_equal(sort(dataset$Filename), sort(c(data$fps, extras)))
+  expect_equal(as.character(dataset$Locus),
+               c(loci[1], loci[1], rep(loci, each = 5)))
+  s <- as.character(rep(samples, 4))
+  s <- c(s[1:3], s[3], s[3], s[4:length(s)])
+  expect_equal(as.character(dataset$Sample), s)
+  r <- rep(1, nrow(dataset))
+  r[4:5] <- 2:3
+  expect_equal(dataset$Replicate, r)
+})
+
 test_that("prepare_dataset works on nested directories", {
   skip("test not yet implemented")
 })
