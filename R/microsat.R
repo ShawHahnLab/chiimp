@@ -22,8 +22,8 @@
 #'     * ord: order of fields in the input filename pattern
 #'   * output:
 #'     * dp: directory path for saving output data
-#'   * fp.locus_attrs: file path to locus attributes TSV file
-#'   * fp.genotypes.known: file path to known genotypes TSV file
+#'   * fp_locus_attrs: file path to locus attributes TSV file
+#'   * fp_genotypes_known: file path to known genotypes TSV file
 #' @md
 #'
 #' @export
@@ -36,9 +36,9 @@ config.defaults <- list(
     autorep = FALSE
   ),
   # Other input and output paths
-  fp.locus_attrs = "locus_attrs.tsv",
-  fp.allele.names = NULL,
-  fp.genotypes.known = NULL,
+  fp_locus_attrs = "locus_attrs.tsv",
+  fp_allele_names = NULL,
+  fp_genotypes_known = NULL,
   ## Names for output files and directories
   output = list(
     dp = "str-results",  # Main output directory
@@ -122,7 +122,7 @@ full_analysis <- function(config, dataset=NULL) {
 
   # Only show identifications if a known genotypes table was supplied
   config_full$report.sections$identifications <-
-    ! is.null(config_full$fp.genotypes.known) &&
+    ! is.null(config_full$fp_genotypes_known) &&
     config_full$report.sections$identifications
 
   cfg <- config_full
@@ -132,8 +132,8 @@ full_analysis <- function(config, dataset=NULL) {
     dataset <- do.call(prepare_dataset, cfg$dataset_opts)
   }
   if (cfg$verbose)
-    logmsg(paste0("Loading locus attrs: ", cfg$fp.locus_attrs, "..."))
-  locus_attrs <- load_locus_attrs(cfg$fp.locus_attrs)
+    logmsg(paste0("Loading locus attrs: ", cfg$fp_locus_attrs, "..."))
+  locus_attrs <- load_locus_attrs(cfg$fp_locus_attrs)
   if (cfg$verbose) logmsg("Analyzing samples...")
   idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
   sample_summary_func <- get(sample_summary_funcs[idx])
@@ -152,18 +152,18 @@ full_analysis <- function(config, dataset=NULL) {
   results$locus_attrs <- locus_attrs
   if (cfg$verbose) logmsg("Summarizing results...")
   genotypes.known <- NULL
-  if (!is.null(cfg$fp.genotypes.known))
-    genotypes.known <- load_genotypes(cfg$fp.genotypes.known)
+  if (!is.null(cfg$fp_genotypes_known))
+    genotypes.known <- load_genotypes(cfg$fp_genotypes_known)
   results <- summarize_dataset(results, genotypes.known)
-  if (!is.null(cfg$fp.genotypes.known))
+  if (!is.null(cfg$fp_genotypes_known))
     results$closest_matches <- find_closest_matches(results$dist_mat_known,
                                                 range = cfg$report.dist_range,
                                                 maximum = cfg$report.dist_max)
   results$cts_per_locus <- tally_cts_per_locus(results)
   results$config <- config_full
   results$allele.names <- NULL
-  if (!is.null(cfg$fp.allele.names))
-    results$allele.names <- load_allele_names(cfg$fp.allele.names)
+  if (!is.null(cfg$fp_allele_names))
+    results$allele.names <- load_allele_names(cfg$fp_allele_names)
   if (cfg$verbose) logmsg("Saving output files...")
   save_histograms(results,
                   file.path(cfg$output$dp, cfg$output$dp_histograms))

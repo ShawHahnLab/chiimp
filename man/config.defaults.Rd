@@ -26,8 +26,8 @@ Notable Options:
 \itemize{
 \item dp: directory path for saving output data
 }
-\item fp.locus_attrs: file path to locus attributes TSV file
-\item fp.genotypes.known: file path to known genotypes TSV file
+\item fp_locus_attrs: file path to locus attributes TSV file
+\item fp_genotypes_known: file path to known genotypes TSV file
 }
 }
 \keyword{datasets}

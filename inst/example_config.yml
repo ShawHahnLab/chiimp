@@ -5,4 +5,4 @@ datset_opts:
   pattern: 'Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+)_.*\.fastq$'
 output:
   dp: 'str-results'
-fp.locus_attrs: '~/analysis/locus_attrs.tsv'
+fp_locus_attrs: '~/analysis/locus_attrs.tsv'
