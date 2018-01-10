@@ -125,22 +125,24 @@ full_analysis <- function(config, dataset=NULL) {
     ! is.null(config_full$fp.genotypes.known) &&
     config_full$report.sections$identifications
 
+  cfg <- config_full
+  if (cfg$verbose)
+    logmsg(paste0("Loading dataset: ", cfg$dataset_opts$dp, "..."))
+  if (is.null(dataset)) {
+    dataset <- do.call(prepare_dataset, cfg$dataset_opts)
+  }
+  if (cfg$verbose)
+    logmsg(paste0("Loading locus attrs: ", cfg$fp.locus_attrs, "..."))
+  locus_attrs <- load_locus_attrs(cfg$fp.locus_attrs)
+  if (cfg$verbose) logmsg("Analyzing samples...")
+  idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
+  sample_summary_func <- get(sample_summary_funcs[idx])
+  results <- analyze_dataset(dataset, locus_attrs,
+                             nrepeats = cfg$sample_analysis$nrepeats,
+                             fraction.min = cfg$sample_summary$fraction.min,
+                             counts.min = cfg$sample_summary$counts.min,
+                             summary.function = sample_summary_func)
   with(config_full, {
-    if (verbose) logmsg(paste0("Loading dataset: ", dataset_opts$dp, "..."))
-    if (is.null(dataset)) {
-      dataset <- do.call(prepare_dataset, dataset_opts)
-    }
-    if (verbose)
-      logmsg(paste0("Loading locus attrs: ", fp.locus_attrs, "..."))
-    locus_attrs <- load_locus_attrs(fp.locus_attrs)
-    if (verbose) logmsg("Analyzing samples...")
-    idx <- match(sample_summary_func, sample_summary_funcs, nomatch = 1)
-    sample_summary_func <- get(sample_summary_funcs[idx])
-    results <- analyze_dataset(dataset, locus_attrs,
-                               nrepeats = sample_analysis$nrepeats,
-                               fraction.min = sample_summary$fraction.min,
-                               counts.min = sample_summary$counts.min,
-                               summary.function = sample_summary_func)
     # Reorder entries and levels to match locus_attrs.
     # TODO merge these steps into analyze_dataset or summarize_dataset
     results$summary$Locus <- factor(results$summary$Locus,
