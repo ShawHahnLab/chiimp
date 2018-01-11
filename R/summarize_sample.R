@@ -61,7 +61,7 @@ summarize_sample <- function(sample.data, locus.name, fraction.min,
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
   # Remove stutter, if present.
   stutter <- FALSE
-  if (!is.na(chunk[2, "Stutter"])) {
+  while (!is.na(chunk[2, "Stutter"])) {
     chunk <- chunk[-2, ]
     stutter <- TRUE
   }
@@ -159,14 +159,14 @@ summarize_sample_guided <- function(sample.data, locus.name, fraction.min,
     idx <- idx[!is.na(idx)]
     chunk <- chunk[idx, ]
   }
-  
+
   # Threshold potential alleles at minimum count.
   # If two expected lengths were given, just take those two entries.
   # If a single expected length was given, ensure we at least get one sequence
   # at that length.
   idx <- chunk$Count >= fraction.min * count.locus
   if (is.null(expected_lengths)) {
-    chunk <- chunk[idx, ]  
+    chunk <- chunk[idx, ]
   } else if (length(expected_lengths) == 1) {
   # The only case where we should bother with this, if there are expected
   # lengths given, is if there was only one length.  In that case we should
@@ -176,12 +176,12 @@ summarize_sample_guided <- function(sample.data, locus.name, fraction.min,
       idx <- 1
     chunk <- chunk[idx, ]
   }
-  
+
   # Remove stutter, if present.
   stutter <- NA
   if (is.null(expected_lengths)) {
     stutter <- FALSE
-    if (!is.na(chunk[2, "Stutter"])) {
+    while (!is.na(chunk[2, "Stutter"])) {
       chunk <- chunk[-2, ]
       stutter <- TRUE
     }
@@ -290,7 +290,7 @@ summarize_sample_by_length <- function (sample.data, locus.name,
   chunk <- chunk[order(chunk$Count, decreasing = T), ]
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
   stutter <- FALSE
-  if (!is.na(chunk[2, "Stutter"])) {
+  while (!is.na(chunk[2, "Stutter"])) {
     chunk <- chunk[-2, ]
     stutter <- TRUE
   }
