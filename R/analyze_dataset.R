@@ -39,6 +39,13 @@ analyze_dataset <- function(dataset,
     sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
     args <- c(list(sample.data = sample.data, locus.name = entry["Locus"]),
               summary_args)
+    # If the dataset attributes specified expected lengths per sample per locus,
+    # pass those in as well.
+    # TODO just make the entry object a standard argument to these variant functions.
+    expected_lengths <- unlist(unique(entry[c("ExpectedLength1",
+                                              "ExpectedLength2")]))
+    if (!is.null(expected_lengths) && !is.na(expected_lengths))
+      args <- c(args, list(expected_lengths = expected_lengths))
     sample.summary <- do.call(summary.function, args)
     return(list(summary = sample.summary, data = sample.data))
   }
@@ -56,7 +63,9 @@ analyze_dataset <- function(dataset,
     parallel::clusterEvalQ(cluster, library(dnar))
     parallel::clusterExport(cluster, cluster_names)
     tryCatch({
-      # Load, analyze, and summarize each sample across the cluster.
+      # Load, analyze, and summarize each sample across the cluster.  Each row
+      # in the dataset data frame will be given as the entry argument to
+      # analyze.entry.
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
                                         summary.function = summary.function)
     },
