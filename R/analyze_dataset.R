@@ -41,7 +41,8 @@ analyze_dataset <- function(dataset,
               summary_args)
     # If the dataset attributes specified expected lengths per sample per locus,
     # pass those in as well.
-    # TODO just make the entry object a standard argument to these variant functions.
+    # TODO just make the entry object a standard argument to these variant
+    # functions.
     expected_lengths <- unlist(unique(entry[c("ExpectedLength1",
                                               "ExpectedLength2")]))
     if (!is.null(expected_lengths) && !is.na(expected_lengths))
