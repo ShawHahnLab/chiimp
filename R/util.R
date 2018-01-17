@@ -12,7 +12,7 @@
 #'
 #' @return vector of unique row names
 make_rownames <- function(data) {
-  cols.names <- c("Sample", "Name", "Replicate", "Locus")
+  cols.names <- c("Dataset", "Sample", "Name", "Replicate", "Locus")
   cols.idx <- match(cols.names, colnames(data))
   cols.idx <- cols.idx[!is.na(cols.idx)]
   cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
