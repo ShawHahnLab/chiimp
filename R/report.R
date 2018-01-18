@@ -828,7 +828,9 @@ rmd_plot_cts_per_locus <- function(results,
                        cluster_cols = F,
                        gaps_col = c(1, 2),
                        color = color,
-                       breaks = breaks)
+                       breaks = breaks,
+                       legend_breaks = breaks,
+                       legend_labels = paste0("10^", breaks))
   }
 }
 
