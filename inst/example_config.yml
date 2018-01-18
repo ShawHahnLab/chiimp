@@ -1,8 +1,8 @@
 ---
  
-datset_opts:
-  dp: '~/data/str-dataset'
-  pattern: 'Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+)_.*\.fastq$'
+dataset_opts:
+  dp: 'str-dataset'
+  pattern: 'Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+).*\.fasta$'
 output:
   dp: 'str-results'
-fp_locus_attrs: '~/analysis/locus_attrs.tsv'
+fp_locus_attrs: 'locus_attrs.tsv'
