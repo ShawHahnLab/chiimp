@@ -31,4 +31,6 @@ Remotes:
   github::sherrillmix/dnar,
   github::sherrillmix/dnaplotr
 RoxygenNote: 6.0.1
-Suggests: testthat
+Suggests:
+  testthat,
+  roxygen2
