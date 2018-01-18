@@ -1,4 +1,12 @@
 #!/usr/bin/env Rscript
 
-library(microsat)
+# If called from package source, load from that
+args <- commandArgs()
+f <- gsub("^--file=", "", args[grep("^--file=", args)])
+f <- normalizePath(f)
+path <- dirname(dirname(f))
+if (basename(path) == "inst") {
+  suppressWarnings(devtools::load_all(dirname(path), quiet = TRUE))
+}
+
 results <- microsat::main()
