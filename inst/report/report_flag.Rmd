@@ -1,7 +1,7 @@
 ## Flagged Values
 
 ```{r report.flag_prep}
-fig.height.flag <- num.samples * num.replicates / 6
+fig.height.flag <- 2 + num.samples * num.replicates / 6
 ```
 
 ### Possible PCR Stutter
