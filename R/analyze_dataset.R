@@ -58,7 +58,8 @@ analyze_dataset <- function(dataset,
                        "find_matching_primer",
                        "check_motif",
                        "find_stutter",
-                       "check_length")
+                       "check_length",
+                       "allele_match")
     cluster <- parallel::makeCluster(num.cores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
