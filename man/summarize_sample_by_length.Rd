@@ -4,14 +4,15 @@
 \alias{summarize_sample_by_length}
 \title{Summarize a processed STR sample, Length Version}
 \usage{
-summarize_sample_by_length(sample.data, locus.name, fraction.min = 0.15,
+summarize_sample_by_length(sample.data, sample.attrs, fraction.min = 0.15,
   counts.min = 500)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by
 \code{\link{analyze_sample}}.}
 
-\item{locus.name}{character name of locus to summarize with.}
+\item{sample.attrs}{list of sample attributes, such as the rows produced by
+\code{\link{prepare_dataset}}.  Used to select the locus name to filter on.}
 
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that

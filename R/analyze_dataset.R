@@ -18,9 +18,10 @@
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
 #'   \code{parallel} package.
-#' @param summary_args list of arguments to \code{summary.function}.
+#' @param summary_args list of supplemental arguments to
+#'   \code{summary.function}.
 #' @param summary.function function to use when summarizing each sample's full
-#'   details into the standard attributes Defaults to
+#'   details into the standard attributes.  Defaults to
 #'   \code{\link{summarize_sample}}.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
@@ -37,16 +38,8 @@ analyze_dataset <- function(dataset,
   analyze.entry <- function(entry, summary.function) {
     seqs <- load_seqs(entry["Filename"])
     sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
-    args <- c(list(sample.data = sample.data, locus.name = entry["Locus"]),
+    args <- c(list(sample.data = sample.data, sample.attrs = entry),
               summary_args)
-    # If the dataset attributes specified expected lengths per sample per locus,
-    # pass those in as well.
-    # TODO just make the entry object a standard argument to these variant
-    # functions.
-    expected_lengths <- unlist(unique(entry[c("ExpectedLength1",
-                                              "ExpectedLength2")]))
-    if (!is.null(expected_lengths) && !is.na(expected_lengths))
-      args <- c(args, list(expected_lengths = expected_lengths))
     sample.summary <- do.call(summary.function, args)
     return(list(summary = sample.summary, data = sample.data))
   }

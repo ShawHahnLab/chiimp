@@ -36,7 +36,8 @@ sample_summary_funcs <- c("summarize_sample",
 #'
 #' @param sample.data data frame of processed data for sample as produced by
 #'   \code{\link{analyze_sample}}.
-#' @param locus.name character name of locus to summarize with.
+#' @param sample.attrs list of sample attributes, such as the rows produced by
+#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
@@ -47,9 +48,10 @@ sample_summary_funcs <- c("summarize_sample",
 #' @return list of attributes describing the sample.
 #'
 #' @export
-summarize_sample <- function(sample.data, locus.name, fraction.min,
+summarize_sample <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
   # extract sample data entries that meet all criteria for a potential allele
+  locus.name <- sample.attrs[["Locus"]]
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   # Note that counts.locus is more restrictive than the total counts of all
@@ -119,24 +121,26 @@ summarize_sample <- function(sample.data, locus.name, fraction.min,
 #'
 #' @param sample.data data frame of processed data for sample as produced by
 #'   \code{\link{analyze_sample}}.
-#' @param locus.name character name of locus to summarize with.
+#' @param sample.attrs list of sample attributes, such as the rows produced by
+#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on
+#'   and the sequence lengths to select.  If the ExpectedLength1 and
+#'   ExpectedLength2 columns are given, \code{counts.min} and the stutter
+#'   filtering are ignored. \code{fraction.min} is also ignored if two lengths
+#'   are given.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
 #' @param counts.min numeric threshold for the minimum number of counts that
 #'   must be present, in total across entries passing all filters, for potential
 #'   alleles to be considered.
-#' @param expected_lengths numeric vector of one or two sequence lengths to
-#'   expect for this sample.  Unused by default.  If specified,
-#'   \code{counts.min} and the stutter filtering are ignored.
-#'   \code{fraction.min} is also ignored if two lengths are given.
 #'
 #' @return list of attributes describing the sample.
 #'
 #' @export
-summarize_sample_guided <- function(sample.data, locus.name, fraction.min,
-                             counts.min, expected_lengths=NULL) {
+summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
+                             counts.min) {
   # extract sample data entries that meet all criteria for a potential allele
+  locus.name <- sample.attrs[["Locus"]]
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   # Note that counts.locus is more restrictive than the total counts of all
@@ -150,6 +154,9 @@ summarize_sample_guided <- function(sample.data, locus.name, fraction.min,
   # entries.  We do this in a roundabout way to handle the length-homoplasy
   # case, where only one sequence length is expected but there are two distinct
   # alleles present at that same length.
+  expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
+                        sample.attrs[["ExpectedLength2"]])
+  expected_lengths <- unique(expected_lengths[!is.na(expected_lengths)])
   if (!is.null(expected_lengths)) {
     expected_lengths <- unique(expected_lengths)
     idx <- match(expected_lengths, chunk$Length)
@@ -220,7 +227,8 @@ summarize_sample_guided <- function(sample.data, locus.name, fraction.min,
 #'
 #' @param sample.data data frame of processed data for sample as produced by
 #'   \code{\link{analyze_sample}}.
-#' @param locus.name character name of locus to summarize with.
+#' @param sample.attrs list of sample attributes, such as the rows produced by
+#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
@@ -229,8 +237,9 @@ summarize_sample_guided <- function(sample.data, locus.name, fraction.min,
 #'   alleles to be considered.
 #'
 #' @return list of attributes describing the sample.
-summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
+summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
                                    counts.min) {
+  locus.name <- sample.attrs[["Locus"]]
   chunk <- with(sample.data,
                 sample.data[!is.na(MatchingLocus) &
                               as.character(MatchingLocus) == locus.name, ])
@@ -263,7 +272,8 @@ summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
 #'
 #' @param sample.data data frame of processed data for sample as produced by
 #'   \code{\link{analyze_sample}}.
-#' @param locus.name character name of locus to summarize with.
+#' @param sample.attrs list of sample attributes, such as the rows produced by
+#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
@@ -272,9 +282,10 @@ summarize_sample_naive <- function(sample.data, locus.name, fraction.min,
 #'   alleles to be considered.
 #'
 #' @return list of attributes describing the sample.
-summarize_sample_by_length <- function (sample.data, locus.name,
+summarize_sample_by_length <- function (sample.data, sample.attrs,
                                         fraction.min=0.15,
                                         counts.min=500) {
+  locus.name <- sample.attrs[["Locus"]]
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   count.total <- sum(sample.data$Count)

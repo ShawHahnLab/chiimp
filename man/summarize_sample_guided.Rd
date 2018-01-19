@@ -4,14 +4,18 @@
 \alias{summarize_sample_guided}
 \title{Summarize a processed STR sample Using Known Lengths}
 \usage{
-summarize_sample_guided(sample.data, locus.name, fraction.min, counts.min,
-  expected_lengths = NULL)
+summarize_sample_guided(sample.data, sample.attrs, fraction.min, counts.min)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by
 \code{\link{analyze_sample}}.}
 
-\item{locus.name}{character name of locus to summarize with.}
+\item{sample.attrs}{list of sample attributes, such as the rows produced by
+\code{\link{prepare_dataset}}.  Used to select the locus name to filter on
+and the sequence lengths to select.  If the ExpectedLength1 and
+ExpectedLength2 columns are given, \code{counts.min} and the stutter
+filtering are ignored. \code{fraction.min} is also ignored if two lengths
+are given.}
 
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that
@@ -20,11 +24,6 @@ locus, to be considered as a potential allele.}
 \item{counts.min}{numeric threshold for the minimum number of counts that
 must be present, in total across entries passing all filters, for potential
 alleles to be considered.}
-
-\item{expected_lengths}{numeric vector of one or two sequence lengths to
-expect for this sample.  Unused by default.  If specified,
-\code{counts.min} and the stutter filtering are ignored.
-\code{fraction.min} is also ignored if two lengths are given.}
 }
 \value{
 list of attributes describing the sample.

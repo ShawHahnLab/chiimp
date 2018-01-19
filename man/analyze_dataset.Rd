@@ -23,10 +23,11 @@ analysis.  Defaults to one less than half the number of detected cores with
 a minimum of 1.  If 1, the function will run without using the
 \code{parallel} package.}
 
-\item{summary_args}{list of arguments to \code{summary.function}.}
+\item{summary_args}{list of supplemental arguments to
+\code{summary.function}.}
 
 \item{summary.function}{function to use when summarizing each sample's full
-details into the standard attributes Defaults to
+details into the standard attributes.  Defaults to
 \code{\link{summarize_sample}}.}
 }
 \value{
