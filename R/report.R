@@ -147,15 +147,18 @@ report_idents <- function(results,
 #' Plot basic histogram of STR sample
 #'
 #' Given a processed STR sample, plot a histogram of counts per sequence length.
+#' If selected, bars for the counts of sequences matching a selected locus, and
+#' the counts of sequences representing called alleles, will be overlayed.
 #'
 #' @param samp data frame of dereplicated sequences.
 #' @param main title of the plot.
 #' @param locus.name name of the locus to match alleles for.  If unspecified the
-#'   locus with the highest matched counts will be used.
+#'   locus with the highest matched counts will be used.  To disable the
+#'   matching entirely use \code{NA}.
 #' @param sample.summary summary data frame as prepared by
-#'   \code{summarize_sample}
+#'   \code{summarize_sample}.  Used to label the called alleles.
 #' @param cutoff_fraction numeric threshold for the fraction of locus-matching
-#'   counts needed to call an allele.
+#'   counts needed to call an allele.  To disable display use \code{NA}.
 #' @param xlim numeric range for x-axis.
 #'
 #' @export
@@ -193,7 +196,7 @@ histogram <- function(samp,
   ymax <- max(heights$TotalCount)
 
   # Plot bars for all counts
-  xlim <- range(heights$Length)
+  #xlim <- range(heights$Length)
   ylim <- range(heights$TotalCount)
   graphics::plot(heights$Length,
        heights$TotalCount,
@@ -793,7 +796,8 @@ rmd_kable_idents <- function(results,
 # max.rows: maximum number of rows in a given chunked heatmap
 rmd_plot_cts_per_locus <- function(results,
                                    max.rows=30,
-                                   heading_prefix="###") {
+                                   heading_prefix="###",
+                                   ...) {
   tbl <- results$cts_per_locus
   # Switch to log scale
   tbl[tbl == 0] <- NA
@@ -830,7 +834,8 @@ rmd_plot_cts_per_locus <- function(results,
                        color = color,
                        breaks = breaks,
                        legend_breaks = breaks,
-                       legend_labels = paste0("10^", breaks))
+                       legend_labels = paste0("10^", breaks),
+                       ...)
   }
 }
 

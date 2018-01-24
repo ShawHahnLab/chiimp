@@ -14,16 +14,19 @@ histogram(samp, main = "Number of Reads by Sequence Length",
 \item{main}{title of the plot.}
 
 \item{locus.name}{name of the locus to match alleles for.  If unspecified the
-locus with the highest matched counts will be used.}
+locus with the highest matched counts will be used.  To disable the
+matching entirely use \code{NA}.}
 
 \item{sample.summary}{summary data frame as prepared by
-\code{summarize_sample}}
+\code{summarize_sample}.  Used to label the called alleles.}
 
 \item{cutoff_fraction}{numeric threshold for the fraction of locus-matching
-counts needed to call an allele.}
+counts needed to call an allele.  To disable display use \code{NA}.}
 
 \item{xlim}{numeric range for x-axis.}
 }
 \description{
 Given a processed STR sample, plot a histogram of counts per sequence length.
+If selected, bars for the counts of sequences matching a selected locus, and
+the counts of sequences representing called alleles, will be overlayed.
 }
