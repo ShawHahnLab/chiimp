@@ -32,6 +32,7 @@ report_genotypes <- function(tbl,
   # At this point there are columns for sample, replicate, and then the loci.
   # Name each entry in the table with either a custom or auto-generated short
   # name.
+  tbl_out <- tbl
   for (j in 3:ncol(tbl)) {
     for (i in 1:nrow(tbl)) {
       if (is.na(tbl[i, j]))
@@ -40,7 +41,22 @@ report_genotypes <- function(tbl,
       n <- as.character(allele.names[row, "Name"])
       if (is.na(n) || length(n) == 0)
         n <- make_allele_name(tbl[i, j], hash.len)
-      tbl[i, j] <- n
+      tbl_out[i, j] <- n
+      # What about length homoplasy, if we've trimmed hash.len too low to tell
+      # by the name alone?  Append an asterisk to the second allele.
+      # TODO This is also handled separately in summarize_genotypes and the
+      # logic is scattered in a few of these functions.  This should be cleaned
+      # up.
+      # Modify the allele name if:
+      #  * It's the second allele of the pair
+      #  * The genotype is really heterozygous
+      #  * But the same name is reported for the first allele
+      if (j %% 2 == 0
+          && tbl[i, j] != tbl[i, j-1]
+          && tbl_out[i, j] == tbl_out[i, j-1]) {
+        tbl_out[i, j] <- paste0(tbl_out[i, j], "*")
+      }
+
     }
   }
   # If a closest-matches list was given, add columns using that-- but only if
@@ -53,17 +69,17 @@ report_genotypes <- function(tbl,
         data.frame(Distance = NA, Name = NA)
       }
     }))
-    tbl <- cbind(tbl, idents)
+    tbl_out <- cbind(tbl_out, idents)
   }
 
   # If we have no replicates drop that column
-  if (all(is.na(tbl$Replicate)))
-    tbl <- tbl[, -2]
+  if (all(is.na(tbl_out$Replicate)))
+    tbl_out <- tbl_out[, -2]
   else
-    tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
+    tbl_out$Replicate[is.na(tbl_out$Replicate)] <- na.replicates
   # Blank out any remaining NA values
-  tbl[is.na(tbl)] <- ""
-  tbl
+  tbl_out[is.na(tbl_out)] <- ""
+  tbl_out
 }
 
 #' Create identification summary table
