@@ -157,8 +157,9 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
                         sample.attrs[["ExpectedLength2"]])
   expected_lengths <- unique(expected_lengths[!is.na(expected_lengths)])
+  if (!is.null(expected_lengths) & length(expected_lengths) == 0)
+    expected_lengths <- NULL
   if (!is.null(expected_lengths)) {
-    expected_lengths <- unique(expected_lengths)
     idx <- match(expected_lengths, chunk$Length)
     idx <- idx[!is.na(idx)]
     if (length(idx) == 1)
@@ -241,8 +242,7 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
                                    counts.min) {
   locus.name <- sample.attrs[["Locus"]]
   chunk <- with(sample.data,
-                sample.data[!is.na(MatchingLocus) &
-                              as.character(MatchingLocus) == locus.name, ])
+                sample.data[LengthMatch & ! is.na(LengthMatch), ])
   count.total <- sum(sample.data$Count)
   count.locus <- sum(chunk$Count)
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
