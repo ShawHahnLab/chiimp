@@ -502,8 +502,8 @@ make.dist_scale <- function(n) {
 #'   to determine color scaling.  Defaults to the highest observed distance in
 #'   the matrix.
 #' @param dist.display_thresh distance value at or below which distances will be
-#'   explicitly drawn on the heatmap.  Above this value only the color-coding
-#'   will signify distance.
+#'   explicitly drawn on the heatmap.  Above this value only the color-coding 
+#'   will signify distance.  Use \code{NA} to always show numbers.
 #' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
 #'
 #' @seealso \code{\link{make_dist_mat}}
@@ -513,6 +513,8 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
                           dist.display_thresh=round(num.alleles * 2 / 3),
                           ...) {
   labels <- matrix(character(length(dist_mat)), nrow = nrow(dist_mat))
+  if (is.na(dist.display_thresh))
+    dist.display_thresh <- max(dist_mat)
   idx <- dist_mat <= dist.display_thresh
   labels[idx] <- dist_mat[idx]
   diag(labels) <- ""

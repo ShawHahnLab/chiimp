@@ -11,5 +11,6 @@ rmd_kable_idents(results,
 ### Distance Matrix for Known Genotypes
 
 ```{r identifications_distances}
-plot_dist_mat(results$dist_mat_known)
+plot_dist_mat(results$dist_mat_known,
+              dist.display_thresh = report.dist_max)
 ```
