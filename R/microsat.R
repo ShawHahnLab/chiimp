@@ -79,7 +79,7 @@ config.defaults <- list(
   # listed as similar to a sample, and dist_max is the maximum distance for a
   # given individual to be listed.
   report.dist_range = 2,
-  report.dist_max = 8,
+  report.dist_max = 3,
   # Sub-sections of the report that can be excluded by overriding these with
   # FALSE.
   report.sections = list(genotypes       = TRUE,
