@@ -52,6 +52,8 @@ config.defaults <- list(
     dp_processed_samples = "processed-samples",  # Sample data tables
     dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
   ),
+  ## Options for analyze_dataset
+  dataset_analysis = list(ncores = 0),
   ## Sample genotyping settings
   sample_analysis = list(nrepeats = 3),
   sample_summary_func = "summarize_sample",
@@ -139,6 +141,7 @@ full_analysis <- function(config, dataset=NULL) {
   sample_summary_func <- get(sample_summary_funcs[idx])
   results <- analyze_dataset(dataset, locus_attrs,
                              nrepeats = cfg$sample_analysis$nrepeats,
+                             ncores = cfg$dataset_analysis$ncores,
                              summary_args = cfg$sample_summary,
                              summary.function = sample_summary_func)
   # Reorder entries and levels to match locus_attrs.

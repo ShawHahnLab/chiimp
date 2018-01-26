@@ -14,7 +14,7 @@
 #'   \code{\link{load_locus_attrs}}.
 #' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match (see \code{\link{analyze_sample}}).
-#' @param num.cores integer number of CPU cores to use in parallel for sample
+#' @param ncores integer number of CPU cores to use in parallel for sample
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
 #'   \code{parallel} package.
@@ -31,10 +31,12 @@
 analyze_dataset <- function(dataset,
                             locus_attrs,
                             nrepeats,
-                            num.cores=max(1,
-                                as.integer(parallel::detectCores() / 2) - 1),
+                            ncores = 0,
                             summary_args,
                             summary.function=summarize_sample) {
+  if (ncores == 0) {
+    ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
+  }
   analyze.entry <- function(entry, summary.function) {
     seqs <- load_seqs(entry["Filename"])
     sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
@@ -43,7 +45,7 @@ analyze_dataset <- function(dataset,
     sample.summary <- do.call(summary.function, args)
     return(list(summary = sample.summary, data = sample.data))
   }
-  if (num.cores > 1) {
+  if (ncores > 1) {
     # Set up the cluster and export requried names.
     cluster_names <- c("locus_attrs",
                        "load_seqs",
@@ -53,7 +55,7 @@ analyze_dataset <- function(dataset,
                        "find_stutter",
                        "check_length",
                        "allele_match")
-    cluster <- parallel::makeCluster(num.cores)
+    cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
     parallel::clusterExport(cluster, cluster_names)

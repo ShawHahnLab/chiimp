@@ -4,8 +4,7 @@
 \alias{analyze_dataset}
 \title{Analyze all samples in a dataset}
 \usage{
-analyze_dataset(dataset, locus_attrs, nrepeats, num.cores = max(1,
-  as.integer(parallel::detectCores()/2) - 1), summary_args,
+analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
   summary.function = summarize_sample)
 }
 \arguments{
@@ -18,7 +17,7 @@ analyze_dataset(dataset, locus_attrs, nrepeats, num.cores = max(1,
 \item{nrepeats}{number of repeats of each locus' motif to require for a
 match (see \code{\link{analyze_sample}}).}
 
-\item{num.cores}{integer number of CPU cores to use in parallel for sample
+\item{ncores}{integer number of CPU cores to use in parallel for sample
 analysis.  Defaults to one less than half the number of detected cores with
 a minimum of 1.  If 1, the function will run without using the
 \code{parallel} package.}

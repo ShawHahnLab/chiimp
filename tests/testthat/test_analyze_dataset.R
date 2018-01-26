@@ -6,7 +6,7 @@
 
 # Currently if I try to run analyze_dataset with the parallel package the tests
 # fail when run under R CMD check but work fine when run interactively.  For now
-# I'm just sticking with num.cores = 1 here and in test_summarize_dataset.R to
+# I'm just sticking with ncores = 1 here and in test_summarize_dataset.R to
 # avoid calling parallel:: functions.
 # Possibly relevant:
 #  * https://github.com/r-lib/testthat/issues/602
@@ -22,7 +22,7 @@ test_that("analyze_dataset processes samples correctly", {
   results <- analyze_dataset(dataset, locus_attrs,
                              summary_args = list(
                                fraction.min = 0.05,
-                               counts.min = 500), nrepeats = 3, num.cores = 1)
+                               counts.min = 500), nrepeats = 3, ncores = 1)
   with(results, {
     # These should just match what we fed in via dataset.
     expect_equal(summary$Filename,  dataset$Filename)
@@ -55,7 +55,7 @@ test_that("analyze_dataset processes samples correctly", {
 })
 
 test_that("analyze_dataset runs single-threaded", {
-  # analyze_dataset should run properly with num.cores=1 (just slower).
+  # analyze_dataset should run properly with ncores=1 (just slower).
   skip("test not yet implemented")
 })
 

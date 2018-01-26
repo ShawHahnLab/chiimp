@@ -16,8 +16,8 @@ to determine color scaling.  Defaults to the highest observed distance in
 the matrix.}
 
 \item{dist.display_thresh}{distance value at or below which distances will be
-explicitly drawn on the heatmap.  Above this value only the color-coding
-will signify distance.}
+explicitly drawn on the heatmap.  Above this value only the color-coding 
+will signify distance.  Use \code{NA} to always show numbers.}
 
 \item{...}{additional arguments passed to \code{\link[pheatmap]{pheatmap}}.}
 }

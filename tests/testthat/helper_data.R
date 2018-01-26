@@ -118,7 +118,7 @@ prepare_for_summary <- function() {
   results <- analyze_dataset(dataset, locus_attrs,
                              summary_args = list(fraction.min = 0.05,
                                                  counts.min = 500),
-                             nrepeats = 3, num.cores = 1)
+                             nrepeats = 3, ncores = 1)
   lapply(dataset$Filename, file.remove)
   file.remove(data.dir)
   return(list(dataset = dataset, results = results))
