@@ -882,10 +882,21 @@ chunk_up <- function(data, locus_chunks, kable_func, heading_prefix="###",
     # this way to leave the non-locus columns alone.
     # TODO support name ordering given by locus_chunks[[chunk_name]]
     locus_cols <- allelify(locus_chunks[[chunk_name]])
+    # If these loci don't apply at all for the data, just skip to the next chunk
+    # of loci.
+    if (! any(colnames(data) %in% locus_cols)) {
+      next
+    }
+    # Determine which loci don't apply for this chunk and remove those columns.
     locus_cols_extra <- locus_cols_all[-match(locus_cols, locus_cols_all)]
     idx.extra <- match(locus_cols_extra, colnames(data))
     idx.extra <- idx.extra[!is.na(idx.extra)]
-    tbl.chunk <- data[, -idx.extra]
+    if (length(idx.extra) > 0) {
+      tbl.chunk <- data[, -idx.extra]
+    } else {
+      tbl.chunk <- data
+    }
+    # Write the table including a heading for the loci
     cat(paste0("\n\n", heading_prefix, " ", "Loci: ", chunk_name, "\n\n"))
     cat(kable_func(tbl.chunk, ...))
   }
