@@ -502,7 +502,7 @@ make.dist_scale <- function(n) {
 #'   to determine color scaling.  Defaults to the highest observed distance in
 #'   the matrix.
 #' @param dist.display_thresh distance value at or below which distances will be
-#'   explicitly drawn on the heatmap.  Above this value only the color-coding 
+#'   explicitly drawn on the heatmap.  Above this value only the color-coding
 #'   will signify distance.  Use \code{NA} to always show numbers.
 #' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
 #'
@@ -884,7 +884,7 @@ rmd_plot_cts_per_locus <- function(results,
     }
     if (length(loci.chunked) > 1)
       cat(paste0("\n\n", heading_prefix, " ", heading, "\n\n"))
-    plot_cts_per_locus(results, idx.row, ...)
+    plot_cts_per_locus(results$cts_per_locus, idx.row, ...)
   }
 }
 
