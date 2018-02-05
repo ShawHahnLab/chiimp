@@ -692,6 +692,48 @@ plot_heatmap_proportions <- function(results, ...) {
 }
 
 
+# Counts per Locus Heatmap ------------------------------------------------
+
+#' Plot heatmap of read counts matching each locus primer
+#'
+#' Given a data frame as produced by \code{\link{tally_cts_per_locus}}, plot a
+#' heatmap showing the number of reads matching the forward primer of each locus
+#' across samples.  Samples are shown on rows with the reads categorized by
+#' locus across columns.
+#'
+#' @param cts_per_locus data frame as produced by
+#'   \code{\link{tally_cts_per_locus}}.
+#' @param idx.row Optional vector of sample row indices to use.  (Using this
+#'   argument rather than filtering the input allows the same plot scale to be
+#'   used across plots.)
+#' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
+#'
+#' @seealso \code{\link{plot_heatmap}}
+#'
+#' @export
+plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, ...) {
+  # Switch to log scale
+  cts_per_locus[cts_per_locus == 0] <- NA
+  cts_per_locus <- log10(cts_per_locus)
+  # Break on powers of ten (since we already log10'd above)
+  breaks <- 0:ceiling(max(cts_per_locus, na.rm = T))
+  color <- viridis::viridis(max(breaks))
+
+  if (! missing(idx.row)) {
+    cts_per_locus <- cts_per_locus[idx.row, ]
+  }
+  pheatmap::pheatmap(cts_per_locus,
+                     cluster_rows = F,
+                     cluster_cols = F,
+                     gaps_col = c(1, 2),
+                     color = color,
+                     breaks = breaks,
+                     legend_breaks = breaks,
+                     legend_labels = paste0("10^", breaks),
+                     ...)
+}
+
+
 # Markdown ----------------------------------------------------------------
 
 # k: existing kable-generated table
@@ -810,16 +852,14 @@ rmd_kable_idents <- function(results,
   }
 }
 
-# Make chunked heatmaps for the counts-per-locus table.
+# Make chunked heatmaps for the counts-per-locus table.  This does not assume
+# that we have evenly-distributed numbers of samples across loci, so it will try
+# to group samples into reasonably-sized sets across loci where necessary.
 # max.rows: maximum number of rows in a given chunked heatmap
 rmd_plot_cts_per_locus <- function(results,
                                    max.rows=30,
                                    heading_prefix="###",
                                    ...) {
-  tbl <- results$cts_per_locus
-  # Switch to log scale
-  tbl[tbl == 0] <- NA
-  tbl <- log10(tbl)
   # Count samples per locus, for breaking big heatmaps into smaller chunks but
   # not splitting loci
   tbl.loci <- table(droplevels(results$summary$Locus))
@@ -829,9 +869,8 @@ rmd_plot_cts_per_locus <- function(results,
   # Break loci into chunks to keep heatmap sizes reasonable
   loci.chunked <- split(names(tbl.loci),
                         floor(cumsum(tbl.loci) / max.rows))
-  # Break on powers of ten (since we already log10'd above)
-  breaks <- 0:ceiling(max(tbl, na.rm = T))
-  color <- viridis::viridis(max(breaks))
+
+
   # Draw each heatmap across chunks of loci.  Written to assume there will be
   # multiple but this should work fine even if there's only one.  (Note that
   # this is all across rows, not columns like in chunk_up().)
@@ -845,15 +884,7 @@ rmd_plot_cts_per_locus <- function(results,
     }
     if (length(loci.chunked) > 1)
       cat(paste0("\n\n", heading_prefix, " ", heading, "\n\n"))
-    pheatmap::pheatmap(tbl[rownames(tbl) %in% idx.row, ],
-                       cluster_rows = F,
-                       cluster_cols = F,
-                       gaps_col = c(1, 2),
-                       color = color,
-                       breaks = breaks,
-                       legend_breaks = breaks,
-                       legend_labels = paste0("10^", breaks),
-                       ...)
+    plot_cts_per_locus(results, idx.row, ...)
   }
 }
 
