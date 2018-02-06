@@ -5,7 +5,7 @@
 
 dir=$(readlink -f $(dirname $BASH_SOURCE))
 scratch=$(mktemp -d)
-R --vanilla -q -e "devtools::load_all('.', quiet=T); write_seqs(seqs, '$scratch/str-dataset', 'Replicate1-Sample%s-%s.fasta')"
+R --vanilla -q -e "devtools::load_all('.', quiet=T); test_data\$write_seqs(test_data\$seqs, '$scratch/str-dataset', 'Replicate1-Sample%s-%s.fasta')"
 cp "$dir/../example_locus_attrs.tsv" "$scratch/locus_attrs.tsv"
 cp "$dir/../example_config.yml" "$scratch/config.yml"
 cd "$scratch"
