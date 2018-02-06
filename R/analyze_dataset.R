@@ -46,7 +46,7 @@ analyze_dataset <- function(dataset,
     return(list(summary = sample.summary, data = sample.data))
   }
   if (ncores > 1) {
-    # Set up the cluster and export requried names.
+    # Set up the cluster and export required names.
     cluster_names <- c("locus_attrs",
                        "load_seqs",
                        "analyze_sample",
@@ -58,7 +58,9 @@ analyze_dataset <- function(dataset,
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
-    parallel::clusterExport(cluster, cluster_names)
+    parallel::clusterExport(cl = cluster,
+                            varlist = cluster_names,
+                            envir = environment())
     tryCatch({
       # Load, analyze, and summarize each sample across the cluster.  Each row
       # in the dataset data frame will be given as the entry argument to
