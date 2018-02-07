@@ -405,7 +405,7 @@ tally_cts_per_locus <- function(results) {
   # Create table of counts of sequences that match each possible locus across
   # samples.  Only include loci we expect from the metadata, rather than any
   # known in locus_attrs.
-  .levels <- match(rownames(results$locus_attrs), results$summary$Locus)
+  .levels <- match(results$locus_attrs$Locus, results$summary$Locus)
   .levels <- results$summary$Locus[.levels[!is.na(.levels)]]
   tbl <- do.call(rbind, lapply(results$data, function(d) {
     d$MatchingLocus <- factor(d$MatchingLocus,

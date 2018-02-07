@@ -17,3 +17,16 @@ data frame of locus attributes
 \description{
 Load a comma-separated table of locus attributes to use for analysis.
 }
+\details{
+Columns Required:
+\itemize{
+\item Locus: Unique identifier for a given locus
+\item LengthMin: Minimum known allele sequence length for this locus
+\item LengthMax: Minimum known allele sequence length for this locus
+\item LengthBuffer: Additional sequence length below LengthMin and above
+LengthMax to accept for a candidate allele
+\item Primer: The forward PCR primer sequence for a given locus, used when
+matching sequences to loci
+\item ReversePrimer: The reverse PCR primer sequence
+}
+}

@@ -16,7 +16,8 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
 1        232        270          20             TATC    ACAGTCAAGAATAACTGCCC    CTGTGGCTCAAAAGCTGAAT
 2        218        337          20             TCCA    TTGTCTCCCCAGTTGCTA      TCTGTCATAAACCGTCTGCA"
   f.locus_attrs <- textConnection(txt.locus_attrs)
-  locus_attrs <- read.table(f.locus_attrs, header = T, row.names = 1, stringsAsFactors = F)
+  locus_attrs <- read.table(f.locus_attrs, header = T, stringsAsFactors = F)
+  rownames(locus_attrs) <- locus_attrs$Locus
   close(f.locus_attrs)
   rm(f.locus_attrs)
 

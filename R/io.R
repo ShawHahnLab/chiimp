@@ -3,7 +3,7 @@
 # Load Inputs -------------------------------------------------------------
 
 # Expected column names for locus_attrs
-locus_attrs_cols <- c("LengthMin", "LengthMax", "LengthBuffer", "Motif",
+locus_attrs_cols <- c("Locus", "LengthMin", "LengthMax", "LengthBuffer", "Motif",
                       "Primer", "ReversePrimer")
 
 # Exepcted column names for genotypes.known
@@ -34,6 +34,17 @@ load_config <- function(fp) {
 #'
 #' Load a comma-separated table of locus attributes to use for analysis.
 #'
+#' Columns Required:
+#'   * Locus: Unique identifier for a given locus
+#'   * LengthMin: Minimum known allele sequence length for this locus
+#'   * LengthMax: Minimum known allele sequence length for this locus
+#'   * LengthBuffer: Additional sequence length below LengthMin and above
+#'     LengthMax to accept for a candidate allele
+#'   * Primer: The forward PCR primer sequence for a given locus, used when
+#'     matching sequences to loci
+#'   * ReversePrimer: The reverse PCR primer sequence
+#' @md
+#'
 #' @param fp.locus_attrs path to text file.
 #' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
 #'
@@ -43,7 +54,6 @@ load_config <- function(fp) {
 load_locus_attrs <- function(fp.locus_attrs, ...) {
   data <- utils::read.table(fp.locus_attrs,
                             header = T,
-                            row.names = 1,
                             sep = ",",
                             ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
@@ -51,6 +61,11 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
     warning(paste("Missing columns in locus_attrs table:",
                   locus_attrs_cols[col.missing]))
   }
+  rows_repeated <- data$Locus[-match(data$Locus, data$Locus)]
+  if (length(rows_repeated) > 0) {
+    warning(paste("Repeated loci in attrs table:", rows_repeated))
+  }
+  rownames(data) <- make_rownames(data)
   data
 }
 

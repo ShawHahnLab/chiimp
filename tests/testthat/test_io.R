@@ -51,10 +51,29 @@ with(test_data, {
     file.remove(fp)
     expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
     expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
-    expect_equal(locus_attrs_cols[-1], colnames(locus_attrs_test)[-1])
+    expect_equal(locus_attrs_cols[-2], colnames(locus_attrs_test)[-2])
     expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
     expect_true(all(locus_attrs == locus_attrs_test))
   })
+
+
+  test_that("load_locus_attrs complains for repeated loci", {
+    # It should throw a warning if any Locus names are repeated.
+    txt.wrong <- gsub("\nB ", "\nA ", txt.locus_attrs)
+    fp <- write_locus_attrs(txt.wrong)
+    expect_warning({
+      locus_attrs_test <- load_locus_attrs(fp)
+    })
+    file.remove(fp)
+    # The data frame will still be constructed, but the second A row will have
+    # the row name "A.1".
+    expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
+    expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
+    expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
+    expect_equal(c("A", "A.1", "1", "2"), rownames(locus_attrs_test))
+    expect_true(all(locus_attrs[, -1] == locus_attrs_test[, -1]))
+  })
+
 
 # test prepare_dataset ----------------------------------------------------
 
