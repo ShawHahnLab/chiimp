@@ -15,5 +15,5 @@ load_allele_names(fp, ...)
 data frame of allele names
 }
 \description{
-Load a tab-separated table of allele names for use in reporting.
+Load a comma-separated table of allele names for use in reporting.
 }

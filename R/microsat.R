@@ -22,8 +22,8 @@
 #'     * ord: order of fields in the input filename pattern
 #'   * output:
 #'     * dp: directory path for saving output data
-#'   * fp_locus_attrs: file path to locus attributes TSV file
-#'   * fp_genotypes_known: file path to known genotypes TSV file
+#'   * fp_locus_attrs: file path to locus attributes CSV file
+#'   * fp_genotypes_known: file path to known genotypes CSV file
 #' @md
 #'
 #' @export
@@ -36,7 +36,7 @@ config.defaults <- list(
     autorep = FALSE
   ),
   # Other input and output paths
-  fp_locus_attrs = "locus_attrs.tsv",
+  fp_locus_attrs = "locus_attrs.csv",
   fp_allele_names = NULL,
   fp_genotypes_known = NULL,
   ## Names for output files and directories

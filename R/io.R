@@ -32,7 +32,7 @@ load_config <- function(fp) {
 
 #' Load table of locus attributes
 #'
-#' Load a tab-separated table of locus attributes to use for analysis.
+#' Load a comma-separated table of locus attributes to use for analysis.
 #'
 #' @param fp.locus_attrs path to text file.
 #' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
@@ -44,7 +44,7 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
   data <- utils::read.table(fp.locus_attrs,
                             header = T,
                             row.names = 1,
-                            sep = "\t",
+                            sep = ",",
                             ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
@@ -56,7 +56,7 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 
 #' Load table of known allele names
 #'
-#' Load a tab-separated table of allele names for use in reporting.
+#' Load a comma-separated table of allele names for use in reporting.
 #'
 #' @param fp path to text file.
 #' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
@@ -67,7 +67,7 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 load_allele_names <- function(fp, ...) {
   data <- utils::read.table(fp,
                             header = T,
-                            sep = "\t",
+                            sep = ",",
                             ...)
   col.missing <- is.na(match(allele_names_cols, colnames(data)))
   if (any(col.missing)) {
@@ -79,7 +79,7 @@ load_allele_names <- function(fp, ...) {
 
 #' Load table of genotypes
 #'
-#' Load a comman-separated table of genotypes, one pair of alleles per row.
+#' Load a comma-separated table of genotypes, one pair of alleles per row.
 #'
 #' @param fp path to text file.
 #' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
@@ -88,8 +88,12 @@ load_allele_names <- function(fp, ...) {
 #'
 #' @export
 load_genotypes <- function(fp, ...) {
-  data <- utils::read.table(fp, header = T, sep = ",", colClasses = "character",
-                     na.strings = "", ...)
+  data <- utils::read.table(fp,
+                            header = T,
+                            sep = ",",
+                            colClasses = "character",
+                            na.strings = "",
+                            ...)
   col.missing <- is.na(match(genotypes_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in genotypes table:",

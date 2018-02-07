@@ -15,5 +15,5 @@ load_genotypes(fp, ...)
 data frame of genotypes
 }
 \description{
-Load a comman-separated table of genotypes, one pair of alleles per row.
+Load a comma-separated table of genotypes, one pair of alleles per row.
 }

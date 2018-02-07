@@ -15,5 +15,5 @@ load_locus_attrs(fp.locus_attrs, ...)
 data frame of locus attributes
 }
 \description{
-Load a tab-separated table of locus attributes to use for analysis.
+Load a comma-separated table of locus attributes to use for analysis.
 }

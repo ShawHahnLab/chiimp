@@ -8,7 +8,7 @@ with(test_data, {
   # temporary file in TSV format, and return the path.
   write_locus_attrs <- function(txt) {
     fp <- tempfile()
-    write(gsub(" +", "\t", txt), file = fp)
+    write(gsub(" +", ",", txt), file = fp)
     fp
   }
 
