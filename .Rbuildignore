@@ -2,5 +2,6 @@
 ^\.Rproj\.user$
 ^\.travis.yml$
 environment.yml
-setup.sh
+install_linux_conda.sh
+install_windows.cmd
 README.md

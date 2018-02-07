@@ -1,5 +1,14 @@
 #!/usr/bin/env Rscript
 
+# microsat command-line script.
+#
+# This will load microsat from either an available library, or (if executed
+# from within the package source directory) directly from the package source
+# via devtools.
+#
+# In Linux this should be executable directly.  To use in Windows see
+# microsat.cmd.
+
 # If called from package source, load from that
 args <- commandArgs()
 f <- gsub("^--file=", "", args[grep("^--file=", args)])

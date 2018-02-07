@@ -2,7 +2,7 @@ Package: microsat
 Title: Analyze Microsatellites in High-Throughput Sequencing Data
 Version: 0.0.0.9000
 Authors@R: person("Jesse", "Connell", email = "ancon@upenn.edu", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: An R package to analyze microsatellites in high-throughput sequencing datasets.
 Depends: R (>= 3.2.3)
 License: file LICENSE
 Encoding: UTF-8
