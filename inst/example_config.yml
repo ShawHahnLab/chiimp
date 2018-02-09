@@ -1,8 +1,26 @@
 ---
- 
+# This is an example configuration file for a microsat analysis.  These lines
+# starting with a "#" are comments.  See the below lines with a keyword
+# followed by a colon for example settings.  Sub-sections are indented with two
+# spaces.
+
+# "dataset_opts" defines options related to the input data.
+#   "dp" defines the directory containing sequence files.
+#   "pattern" defines the how the Replicate, Sample, and Locus fields are
+#   positioned within the file names.
+#   An example file name matching this pattern:
+#     "Replicate1-Sample30-A.fastq.gz"
 dataset_opts:
   dp: 'str-dataset'
-  pattern: 'Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+).*\.fasta$'
+  pattern: 'Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+)'
+# "output" defines options related to analysis output.
+#   "dp" defines the directory that will contain all output files.
 output:
   dp: 'str-results'
+# This is the location of the spreadsheet defining locus attributes (lengths,
+# primers, etc.)  See example_locus_attrs.csv for an example.
 fp_locus_attrs: 'locus_attrs.csv'
+
+# There are many more options available than are shown here.  For the full list
+# and all default values, see R/microsat.R.  This file format is YAML
+# (http://yaml.org/).
