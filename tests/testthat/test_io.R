@@ -75,6 +75,36 @@ with(test_data, {
   })
 
 
+# test load_dataset -------------------------------------------------------
+
+  test_that("load_dataset loads sample attributes", {
+    replicates <- 1:3
+    samples <- 1:5
+    loci <- sort(rownames(locus_attrs))
+    ids <- as.character(outer(replicates,
+                              outer(samples,
+                                    loci,
+                                    FUN = paste,
+                                    sep = "-"),
+                              FUN = paste,
+                              sep = "-"))
+    dataset_known <- data.frame(Filename = paste0(ids,
+                                 ".fasta"),
+               Replicate = as.character(rep(replicates,
+                                          length(samples) * length(loci))),
+               Sample = as.character(rep(samples,
+                            times = length(loci),
+                            each = length(replicates))),
+               Locus = rep(loci, each = length(samples)*length(replicates)),
+               stringsAsFactors = FALSE)
+    rownames(dataset_known) <- with(dataset_known,
+                                    paste(Sample, Replicate, Locus, sep = "-"))
+    fp <- tempfile()
+    write.csv(dataset_known, file = fp, na = "", row.names = F)
+    dataset <- load_dataset(fp)
+    expect_identical(dataset, dataset_known)
+  })
+
 # test prepare_dataset ----------------------------------------------------
 
   test_that("prepare_dataset parses file paths", {

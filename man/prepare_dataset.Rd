@@ -24,5 +24,9 @@ data frame of metadata for all files found
 }
 \description{
 Find files matching a pattern in a given directory, and build a data frame of
-standard sample attributes from fields in the filenames.
+standard sample attributes from fields in the filenames.  Alternatively, use
+\code{\link{load_dataset}} to load a spreadsheet of sample attributes
+explicitly.  \code{load_dataset} should be used for cases where more than one
+locus is to be analyzed from a single sequencer sample (i.e., multiplexed
+samples).
 }
