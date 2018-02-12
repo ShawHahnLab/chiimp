@@ -145,7 +145,8 @@ check_length <- function(sample.data, locus_attrs) {
 #' stutter from another entry in the sample.  This only considers STR-labeled
 #' rows and those with a count above \code{count.min}, and requires a given
 #' entry to have counts at most \code{count.ratio_max} compared to the candidate
-#' "source" entry to be considered stutter.
+#' "source" entry to be considered stutter.  Sequence content is not currently
+#' considered, just relative sequence lengths and counts.
 #'
 #' @param sample.data data frame of processed sample data.
 #' @param locus_attrs data frame of attributes for loci to look for.
