@@ -4,7 +4,7 @@
 \name{config.defaults}
 \alias{config.defaults}
 \title{Default microsatellite configuration}
-\format{An object of class \code{list} of length 21.}
+\format{An object of class \code{list} of length 22.}
 \usage{
 config.defaults
 }
@@ -26,6 +26,8 @@ Notable Options:
 \itemize{
 \item dp: directory path for saving output data
 }
+\item fp_dataset: file path to table of sample attributes to use, rather than
+detecting via dataset_opts
 \item fp_locus_attrs: file path to locus attributes CSV file
 \item fp_genotypes_known: file path to known genotypes CSV file
 }
