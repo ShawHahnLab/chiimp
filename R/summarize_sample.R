@@ -67,6 +67,17 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
     chunk <- chunk[-2, ]
     stutter <- TRUE
   }
+
+  # Remove artefact-like sequences, if present.
+  looks_like_artefact <- function(chunk) {
+    ratio <- chunk[2, "Count"] / chunk[1, "Count"]
+    dist <- abs( chunk[2, "Length"] - chunk[1, "Length"] )
+    ! (is.na(ratio) || is.na(dist)) && ratio < 0.25 && dist <= 1
+  }
+  while (looks_like_artefact(chunk)) {
+    chunk <- chunk[-2, ]
+  }
+
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent.seqs <- nrow(chunk)
