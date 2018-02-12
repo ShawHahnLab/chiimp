@@ -22,6 +22,8 @@
 #'     * ord: order of fields in the input filename pattern
 #'   * output:
 #'     * dp: directory path for saving output data
+#'   * fp_dataset: file path to table of sample attributes to use, rather than
+#'     detecting via dataset_opts
 #'   * fp_locus_attrs: file path to locus attributes CSV file
 #'   * fp_genotypes_known: file path to known genotypes CSV file
 #' @md
@@ -36,6 +38,7 @@ config.defaults <- list(
     autorep = FALSE
   ),
   # Other input and output paths
+  fp_dataset = NULL,
   fp_locus_attrs = "locus_attrs.csv",
   fp_allele_names = NULL,
   fp_genotypes_known = NULL,
@@ -129,9 +132,15 @@ full_analysis <- function(config, dataset=NULL) {
 
   cfg <- config_full
   if (cfg$verbose)
-    logmsg(paste0("Loading dataset: ", cfg$dataset_opts$dp, "..."))
+    logmsg(paste0("Loading dataset: ", ifelse(is.null(cfg$fp_dataset),
+                                              cfg$dataset_opts$dp,
+                                              cfg$fp_dataset), "..."))
   if (is.null(dataset)) {
-    dataset <- do.call(prepare_dataset, cfg$dataset_opts)
+    if (is.null(cfg$fp_dataset)) {
+      dataset <- do.call(prepare_dataset, cfg$dataset_opts)
+    } else {
+      dataset <- load_dataset(cfg$fp_dataset)
+    }
   }
   if (cfg$verbose)
     logmsg(paste0("Loading locus attrs: ", cfg$fp_locus_attrs, "..."))

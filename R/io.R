@@ -12,6 +12,9 @@ genotypes_cols <- c("Name", "Locus", "Allele1Seq", "Allele2Seq")
 # Expected column names for allele.names
 allele_names_cols <- c("Locus", "Name", "Seq")
 
+# Expected column names for dataset
+dataset_cols <- c("Filename", "Replicate", "Sample", "Locus")
+
 #' Load configuration file
 #'
 #' Load a YAML-formatted text file of configuration options for microsatellite
@@ -118,10 +121,49 @@ load_genotypes <- function(fp, ...) {
   data
 }
 
+#' Load table of sample attributes
+#'
+#' Load a comma-separated table of sample attributes for the dataset to be
+#' anlayzed.  Columns should be Filename (the path to each data file), Replicate
+#' (an identifier for repeated samples; use blanks if not applicable), Sample
+#' (identifier for a given biological sample), and Locus (a locus identifier
+#' matching that used in the locus attributes table).
+#'
+#' Alternatively, use \code{\link{prepare_dataset}} to automatically read sample
+#' attributes from filenames.  If more than one locus is to be analyzed from a
+#' single sequencer sample (i.e., multiplexed samples), \code{load_dataset}
+#' should be used.
+#'
+#' @param fp path to text file.
+#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#'
+#' @return data frame of sample attributes for the dataset.
+#'
+#' @export
+load_dataset <- function(fp, ...) {
+  data <- utils::read.table(fp,
+                            header = T,
+                            sep = ",",
+                            colClasses = "character",
+                            na.strings = "",
+                            ...)
+  col.missing <- is.na(match(dataset_cols, colnames(data)))
+  if (any(col.missing)) {
+    warning(paste("Missing columns in genotypes table:",
+                  dataset_cols[col.missing]))
+  }
+  rownames(data) <- make_rownames(data)
+  data
+}
+
 #' Extract Sample Attributes from Filenames
 #'
 #' Find files matching a pattern in a given directory, and build a data frame of
-#' standard sample attributes from fields in the filenames.
+#' standard sample attributes from fields in the filenames.  Alternatively, use
+#' \code{\link{load_dataset}} to load a spreadsheet of sample attributes
+#' explicitly.  \code{load_dataset} should be used for cases where more than one
+#' locus is to be analyzed from a single sequencer sample (i.e., multiplexed
+#' samples).
 #'
 #' @param dp directory path to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.  There should
