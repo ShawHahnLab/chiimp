@@ -53,6 +53,7 @@ analyze_dataset <- function(dataset,
                        "find_matching_primer",
                        "check_motif",
                        "find_stutter",
+                       "find_artifact",
                        "check_length",
                        "allele_match")
     cluster <- parallel::makeCluster(ncores)

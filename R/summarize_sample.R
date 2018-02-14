@@ -88,6 +88,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
                            Stutter = stutter,
+                           Artifact = artifact,
                            CountTotal = count.total,
                            CountLocus = count.locus,
                            ProminentSeqs = prominent.seqs))
@@ -188,12 +189,14 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
 
   # Remove stutter, if present.
   stutter <- NA
+  artifact <- NA
   if (is.null(expected_lengths)) {
-    stutter <- FALSE
-    while (!is.na(chunk[2, "Stutter"])) {
-      chunk <- chunk[-2, ]
-      stutter <- TRUE
-    }
+    # Remove stutter, if present.
+    stutter <- !is.na(chunk[2, "Stutter"])
+    chunk <- chunk[is.na(chunk[, "Stutter"]), ]
+    # Remove artifact-like sequences, if present.
+    artifact <- !is.na(chunk[2, "Artifact"])
+    chunk <- chunk[is.na(chunk[, "Artifact"]), ]
   }
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
@@ -215,6 +218,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
                            Stutter = stutter,
+                           Artifact = artifact,
                            CountTotal = count.total,
                            CountLocus = count.locus,
                            ProminentSeqs = prominent.seqs))
@@ -260,6 +264,7 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
                            Stutter = NA,
+                           Artifact = NA,
                            CountTotal = count.total,
                            CountLocus = count.locus,
                            ProminentSeqs = prominent.seqs))
@@ -301,11 +306,14 @@ summarize_sample_by_length <- function (sample.data, sample.attrs,
 
   chunk <- chunk[order(chunk$Count, decreasing = T), ]
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-  stutter <- FALSE
-  while (!is.na(chunk[2, "Stutter"])) {
-    chunk <- chunk[-2, ]
-    stutter <- TRUE
-  }
+
+  # Remove stutter, if present.
+  stutter <- !is.na(chunk[2, "Stutter"])
+  chunk <- chunk[is.na(chunk[, "Stutter"]), ]
+  # Remove artifact-like sequences, if present.
+  artifact <- !is.na(chunk[2, "Artifact"])
+  chunk <- chunk[is.na(chunk[, "Artifact"]), ]
+
   prominent.seqs <- nrow(chunk)
   # enforce count limit after all filtering
   if (count.locus < counts.min)
