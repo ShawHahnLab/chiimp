@@ -10,6 +10,12 @@ fig.height.flag <- 2 + num.samples * num.replicates / 6
 plot_heatmap_stutter(results)
 ```
 
+### Possible PCR Artifacts
+
+```{r report.artifacts, fig.height=fig.height.flag}
+plot_heatmap_artifacts(results)
+```
+
 ### More than Two Prominent Sequences
 
 These tables are color-coded to show samples with more than two prominent 

@@ -51,7 +51,7 @@ with(test_data, {
       expect_equal(summary$Stutter, s)
       expect_equal(summary$CountTotal, integer(12)+5000)
       expect_equal(summary$CountLocus, integer(12)+4500)
-      expect_equal(summary$ProminentSeqs,  c(4, 3, 4, 2, 3, 3, 3, 2, 1, 3, 4, 1))
+      expect_equal(summary$ProminentSeqs,  c(2, 3, 2, 2, 2, 3, 2, 2, 1, 2, 3, 1))
       lapply(dataset$Filename, file.remove)
       file.remove(data.dir)
     })

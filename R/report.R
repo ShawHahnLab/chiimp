@@ -613,6 +613,26 @@ plot_heatmap_stutter <- function(results, ...) {
                ...)
 }
 
+#' Plot heatmap of suspected PCR artifacts
+#'
+#' Given a cross-sample summary data frame as produced by
+#' \code{\link{analyze_dataset}}, plot a heatmap showing which samples had
+#' alleles ignored due to a suspected PCR artifact, with sample identifiers on
+#' rows and loci on columns.
+#'
+#' @param results combined results list
+#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#'
+#' @seealso \code{\link{plot_heatmap}}
+#'
+#' @export
+plot_heatmap_artifacts <- function(results, ...) {
+  plot_heatmap(results,
+               "Artifact",
+               legend = FALSE,
+               ...)
+}
+
 #' Plot heatmap of homozygous samples
 #'
 #' Given a cross-sample summary data frame as produced by

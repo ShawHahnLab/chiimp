@@ -30,7 +30,7 @@ with(test_data, {
       expect_equal(Stutter, FALSE)
       expect_equal(CountTotal, 5000)
       expect_equal(CountLocus, count.locus)
-      expect_equal(ProminentSeqs, 3)
+      expect_equal(ProminentSeqs, 2)
     })
   }
 
@@ -153,8 +153,8 @@ with(test_data, {
     sample.summary.empty <- summarize_sample(sample.data.empty, list(Locus="B"),
                                            fraction.min = 0.05, counts.min = 500)
 
-    expect_equal(sample.summary.1B$ProminentSeqs,    3)
-    expect_equal(sample.summary.2B$ProminentSeqs,    4)
+    expect_equal(sample.summary.1B$ProminentSeqs,    2)
+    expect_equal(sample.summary.2B$ProminentSeqs,    3)
     expect_equal(sample.summary.3B$ProminentSeqs,    1)
     expect_equal(sample.summary.empty$ProminentSeqs, 0)
     # Despite having stutter-y peaks the first two did not have a potential allele
@@ -186,7 +186,7 @@ with(test_data, {
       expect_equal(Stutter, FALSE)
       expect_equal(CountTotal, 50)
       expect_equal(CountLocus, 45)
-      expect_equal(ProminentSeqs, 3)
+      expect_equal(ProminentSeqs, 2)
     })
   })
 

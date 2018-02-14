@@ -15,6 +15,7 @@ with(test_data, {
       expect_equal(MotifMatch, c(T, T))
       expect_equal(LengthMatch, c(T, T))
       expect_equal(Stutter, as.integer(c(NA, NA)))
+      expect_equal(Artifact, as.integer(c(NA, NA)))
     })
   })
 
@@ -39,6 +40,7 @@ with(test_data, {
     expect_equal(chunk$MotifMatch, FALSE)
     expect_equal(chunk$LengthMatch, NA)
     expect_equal(chunk$Stutter, as.integer(NA))
+    expect_equal(chunk$Artifact, as.integer(NA))
   })
 
   test_that("analyze_sample checks for motif repeats", {
@@ -50,6 +52,7 @@ with(test_data, {
       expect_equal(range(Length), c(45, 57))
       expect_equal(droplevels(unique(MatchingLocus)), factor("A"))
       expect_true(all(is.na(Stutter)))
+      expect_true(all(is.na(Artifact)))
     })
   })
 
@@ -63,6 +66,7 @@ with(test_data, {
     expect_equal(droplevels(unique(MatchingLocus)), factor("A"))
     expect_true(all(!(MotifMatch)))
     expect_true(all(is.na(Stutter)))
+    expect_true(all(is.na(Artifact)))
     })
   })
 
@@ -73,6 +77,10 @@ with(test_data, {
     expect_equal(chunk$Stutter, c(1, 2))
     # TODO add expectation for high-count case that should not be marked as
     # stutter
+  })
+
+  test_that("analyze_sample marks artifact entries", {
+    skip("tets not yet implemented")
   })
 
 })
