@@ -41,10 +41,12 @@ make_rownames <- function(data) {
 order_entries <- function(data) {
   items <- list(data$Locus,
                 as.integer(gsub("[^0-9]+", "", data$Sample)),
+                data$Name,
                 data$Sample,
+                data$Dataset,
                 data$Replicate,
                 data$Distance)
-  items <- items[!sapply(items, is.null)]
+  items <- items[sapply(items, length) != 0]
   do.call(order, items)
 }
 

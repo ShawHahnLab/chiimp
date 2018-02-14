@@ -117,6 +117,7 @@ load_genotypes <- function(fp, ...) {
     warning(paste("Missing columns in genotypes table:",
                   genotypes_cols[col.missing]))
   }
+  data <- data[order_entries(data), ]
   rownames(data) <- make_rownames(data)
   data
 }
