@@ -62,21 +62,15 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   # Threshold potential alleles at minimum count
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
   # Remove stutter, if present.
-  stutter <- FALSE
-  while (!is.na(chunk[2, "Stutter"])) {
-    chunk <- chunk[-2, ]
-    stutter <- TRUE
-  }
-
+  stutter <- !is.na(chunk[2, "Stutter"])
+  chunk <- chunk[is.na(chunk[, "Stutter"]), ]
   # Remove artefact-like sequences, if present.
   looks_like_artefact <- function(chunk) {
-    ratio <- chunk[2, "Count"] / chunk[1, "Count"]
-    dist <- abs( chunk[2, "Length"] - chunk[1, "Length"] )
-    ! (is.na(ratio) || is.na(dist)) && ratio < 0.25 && dist <= 1
+    ratio <- chunk[, "Count"] / chunk[1, "Count"]
+    dist <- abs( chunk[, "Length"] - chunk[1, "Length"] )
+    ! (is.na(ratio) | is.na(dist)) & ratio < 1/3 & dist <= 1
   }
-  while (looks_like_artefact(chunk)) {
-    chunk <- chunk[-2, ]
-  }
+  chunk <- chunk[! looks_like_artefact(chunk), ]
 
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
