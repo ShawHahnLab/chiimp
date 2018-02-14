@@ -64,13 +64,9 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   # Remove stutter, if present.
   stutter <- !is.na(chunk[2, "Stutter"])
   chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-  # Remove artefact-like sequences, if present.
-  looks_like_artefact <- function(chunk) {
-    ratio <- chunk[, "Count"] / chunk[1, "Count"]
-    dist <- abs( chunk[, "Length"] - chunk[1, "Length"] )
-    ! (is.na(ratio) | is.na(dist)) & ratio < 1/3 & dist <= 1
-  }
-  chunk <- chunk[! looks_like_artefact(chunk), ]
+  # Remove artifact-like sequences, if present.
+  artifact <- !is.na(chunk[2, "Artifact"])
+  chunk <- chunk[is.na(chunk[, "Artifact"]), ]
 
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.

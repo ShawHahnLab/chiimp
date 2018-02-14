@@ -58,8 +58,9 @@ analyze_sample <- function(seqs, locus_attrs, nrepeats) {
   # Label rows where the sequence length matches the matching locus" length
   # range.
   data$LengthMatch <- check_length(data, locus_attrs)
-  # Label rows that look like PCR stutter of other rows.
+  # Label rows that look like PCR stutter or other artifacts of other rows.
   data$Stutter <- find_stutter(data, locus_attrs)
+  data$Artifact <- find_artifact(data, locus_attrs)
   # Add columns for the proportion of counts out of the total and out of those
   # for the matching locus.  This way this information is preserved even in
   # subsets of the original sample data.
@@ -183,4 +184,51 @@ find_stutter <- function(sample.data, locus_attrs,
   }
 
   return(stutter)
+}
+
+#' Check for non-stutter PCR artifacts between sample entries
+#'
+#' Searches a processed STR sample for entries that may be PCR artifacts, other
+#' than stutter, from another entry in the sample.  Potential artifacts are
+#' sequences with counts lower than another sequence by a given ratio and
+#' sequence length within 1 bp of the other sequence.  This only considers
+#' STR-labeled rows and those with a count above \code{count.min}, and requires
+#' a given entry to have counts at most \code{count.ratio_max} compared to the
+#' candidate "source" entry to be considered an artifact.  Sequence content is
+#' not currently considered, just relative sequence lengths and counts.
+#'
+#' @param sample.data data frame of processed sample data.
+#' @param locus_attrs data frame of attributes for loci to look for.
+#' @param count.ratio_max comparing the currently-checked entry to another
+#'   entry, this is the highest ratio of counts where an entry will still be
+#'   considered artifactual
+#' @param count.min lowest count for a given entry to still attempt a check for
+#'   an artifact.
+#'
+#' @return integer vector specifying, for each entry, the row index for another
+#'   entry that may have produced each entry as an artifactual sequence.
+find_artifact <- function(sample.data, locus_attrs,
+                         count.ratio_max = 1 / 3,
+                         count.min = 10) {
+
+  artifact <- as.integer(rep(NA, nrow(sample.data)))
+
+  # across rows for this locus,
+  for (locus_name in rownames(locus_attrs)) {
+    locus.match <- sample.data$MatchingLocus == locus_name
+    for (idx in which(locus.match)) {
+      # look at each row, and see if any others may be
+      # artifacts using each row here as a source.
+      L <- sample.data[idx, "Length"]
+      C <- sample.data[idx, "Count"] * count.ratio_max
+      #  mark any of the other rows that look like artifacts of this row.
+      others.match <- locus.match &
+        abs(sample.data$Length - L) <= 1 &
+        sample.data$Count <= C &
+        sample.data$Count > count.min
+      artifact[others.match] <- idx
+    }
+  }
+
+  return(artifact)
 }

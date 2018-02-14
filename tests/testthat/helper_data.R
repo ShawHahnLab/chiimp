@@ -22,7 +22,7 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
   rm(f.locus_attrs)
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
-                        "LengthMatch", "Stutter", "FractionOfTotal",
+                        "LengthMatch", "Stutter", "Artifact", "FractionOfTotal",
                         "FractionOfLocus")
   sample.summary.cols <- c("Allele1Seq", "Allele1Count",
                            "Allele1Length", "Allele2Seq",
