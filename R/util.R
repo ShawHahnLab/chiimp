@@ -27,10 +27,11 @@ make_rownames <- function(data) {
 
 #' Define Ordering for STR Data
 #'
-#' Create a standardized ordering vector (as per \code{\link{order}}) for the
-#' rows of the given data frame, using whichever STR-related metadata columns
+#' Create a standardized ordering vector (as per \code{\link{order}}) for the 
+#' rows of the given data frame, using whichever STR-related metadata columns 
 #' are available.  Sample identifiers are treated as integers primarily but then
-#' resolved further by character sorting.
+#' resolved further by character sorting.  Note that the identification-related
+#' report code relies on this to order lowest-distance genotype matches first.
 #'
 #' @seealso \code{\link{make_rownames}}
 #'
@@ -41,11 +42,11 @@ make_rownames <- function(data) {
 order_entries <- function(data) {
   items <- list(data$Locus,
                 as.integer(gsub("[^0-9]+", "", data$Sample)),
-                data$Name,
                 data$Sample,
                 data$Dataset,
                 data$Replicate,
-                data$Distance)
+                data$Distance,
+                data$Name)
   items <- items[sapply(items, length) != 0]
   do.call(order, items)
 }
