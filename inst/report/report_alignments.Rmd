@@ -1,5 +1,10 @@
 ## Allele Alignments per Locus
 
+These alignment visualizations show the unique identified alleles per locus. 
+Allele sequences are grouped and ordered by length as shown on the right. 
+Smaller text shown for every sequence shows the number of occurrences identified
+in the dataset (with homozygous cases counted twice).
+
 ```{r alignments, results='asis'}
 rmd_alignments(results)
 ```

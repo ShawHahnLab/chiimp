@@ -1,5 +1,9 @@
 ## Inter-Sample Distance Matrix
 
+This matrix shows the number of allele mismatches between every pair of samples,
+color-coded to show identical samples as red and maximally-mismatched samples as
+white. Entirely missing entries are counted as mismatches.
+
 ```{r distances}
 plot_dist_mat(results$dist_mat,
               dist.display_thresh = NA)

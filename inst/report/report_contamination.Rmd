@@ -1,5 +1,12 @@
 ## Counts per Locus
 
+These tables show each sample on a row and numbers of reads from each sample 
+grouped on columns.  The sequences are categorized by matching locus using the 
+forward primer sequence.  The first two columns on the left show the total 
+number of reads in the sample and the number of reads matching the expected 
+locus, respectively.  Read counts are color-coded on a log scale, binned by
+order of magnitude.
+
 ```{r contamination, results='asis', fig.height=12}
 rmd_plot_cts_per_locus(results)
 ```

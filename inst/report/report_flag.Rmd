@@ -4,13 +4,19 @@
 fig.height.flag <- 2 + num.samples * num.replicates / 6
 ```
 
-### Possible PCR Stutter
+### Possible PCR Stutter Removed
+
+These tables show samples that had a candidate allele filtered out because it
+was potential PCR stutter.
 
 ```{r report.stutter, fig.height=fig.height.flag}
 plot_heatmap_stutter(results)
 ```
 
-### Possible PCR Artifacts
+### Possible PCR Artifacts Removed
+
+These tables show samples that had a candidate allele filtered out because it
+was a potential (non-stutter) PCR artifact.
 
 ```{r report.artifacts, fig.height=fig.height.flag}
 plot_heatmap_artifacts(results)
@@ -18,9 +24,10 @@ plot_heatmap_artifacts(results)
 
 ### More than Two Prominent Sequences
 
-These tables are color-coded to show samples with more than two prominent 
-sequences. Cases with more than two could imply contamination or excessive
-PCR stutter.
+These tables are color-coded to show samples with more than two abundant 
+sequences still present after all filtering. Cases with more than two could 
+imply contamination or excessive PCR stutter or artifacts obscuring the correct
+allele sequences.
 
 ```{r report.peaks, fig.height=fig.height.flag}
 plot_heatmap_prominent_seqs(results)
@@ -38,6 +45,8 @@ plot_heatmap_proportions(results)
 ```
 
 ### Possible Homozygous Samples
+
+These tables show which samples are reported as homozygous.
 
 ```{r report.homozygous, fig.height=fig.height.flag}
 plot_heatmap_homozygous(results)

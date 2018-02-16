@@ -10,6 +10,11 @@ rmd_kable_idents(results,
 
 ### Distance Matrix for Known Genotypes
 
+This matrix shows the number of allele mismatches between every sample and every
+known genotype, color-coded to show identical samples as red and
+maximally-mismatched samples as white. Entirely missing entries are counted as
+mismatches.
+
 ```{r identifications_distances}
 plot_dist_mat(results$dist_mat_known,
               dist.display_thresh = report.dist_max)
