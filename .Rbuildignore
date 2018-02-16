@@ -3,5 +3,8 @@
 ^\.travis.yml$
 environment.yml
 install_linux_conda.sh
+install_linux.sh
 install_windows.cmd
 README.md
+GUIDE.Rmd
+GUIDE.pdf

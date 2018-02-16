@@ -2,6 +2,10 @@
 
 # Set up an install on Linux from scratch.
 #
+# You probably want "install_linux.sh" instead; this will pull in a lot of
+# dependencies into a self-contained Anaconda environment instead of using
+# system packages.
+#
 # This uses Miniconda to provide R and encapsulate packages.
 # OS-provided packages: texlive, pandoc
 
