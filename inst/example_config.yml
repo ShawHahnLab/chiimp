@@ -1,5 +1,5 @@
 ---
-# This is an example configuration file for a microsat analysis.  These lines
+# This is an example configuration file for a CHIIMP analysis.  These lines
 # starting with a "#" are comments.  See the below lines with a keyword
 # followed by a colon for example settings.  Sub-sections are indented with two
 # spaces.
@@ -22,5 +22,5 @@ output:
 fp_locus_attrs: locus_attrs.csv
 
 # There are many more options available than are shown here.  For the full list
-# and all default values, see R/microsat.R.  This file format is YAML
+# and all default values, see R/chiimp.R.  This file format is YAML
 # (http://yaml.org/).

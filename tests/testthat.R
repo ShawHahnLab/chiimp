@@ -1,4 +1,4 @@
 library(testthat)
-library(microsat)
+library(chiimp)
 
-test_check("microsat")
+test_check("chiimp")

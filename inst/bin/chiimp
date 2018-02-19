@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
 
-# microsat command-line script.
+# CHIIMP command-line script.
 #
-# This will load microsat from either an available library, or (if executed
-# from within the package source directory) directly from the package source
-# via devtools.
+# This will load chiimp from either an available library, or (if executed from
+# within the package source directory) directly from the package source via
+# devtools.
 #
 # In Linux this should be executable directly.  To use in Windows see
-# microsat.cmd.
+# chiimp.cmd.
 
 # If called from package source, load from that
 args <- commandArgs()
@@ -18,4 +18,4 @@ if (basename(path) == "inst") {
   suppressWarnings(devtools::load_all(dirname(path), quiet = TRUE))
 }
 
-results <- microsat::main()
+results <- chiimp::main()

@@ -1,8 +1,8 @@
 @echo off
 
-:: Windows wrapper to the microsat command-line script.
+:: Windows wrapper to the CHIIMP command-line script.
 ::
-:: This will locate the R and RStudio installations to use for microsat.  This
+:: This will locate the R and RStudio installations to use for CHIIMP.  This
 :: script will wait for a keypress before exiting since it presumably opened
 :: its own terminal window.
 
@@ -18,5 +18,5 @@ set rdir=%rpath%\..\
 REM  TODO: detect RStudio instead of presuming the path
 set RSTUDIO_PANDOC=C:\Program Files\RStudio\bin\pandoc
 
-"%rdir%\RScript" "%dir%\microsat" %*
+"%rdir%\RScript" "%dir%\chiimp" %*
 pause

@@ -130,7 +130,7 @@ main <- function(args=NULL) {
 #'   \code{\link{config.defaults}}).
 render_report <- function(results, config) {
   with(config, {
-    fp_report_in <- system.file("report", "report.Rmd", package = "microsat")
+    fp_report_in <- system.file("report", "report.Rmd", package = "chiimp")
     fp_report_out <- file.path(output$dp, output$fp_report)
     if (!dir.exists(dirname(fp_report_out)))
       dir.create(dirname(fp_report_out), recursive = TRUE)
