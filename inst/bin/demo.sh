@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Wrapper script to set up and execute a demo, using the "microsat" executable
+# Wrapper script to set up and execute a demo, using the "chiimp" executable
 # R script and the test data.
 
 dir=$(readlink -f $(dirname $BASH_SOURCE))
@@ -9,4 +9,4 @@ R --vanilla -q -e "devtools::load_all('.', quiet=T); test_data\$write_seqs(test_
 cp "$dir/../example_locus_attrs.csv" "$scratch/locus_attrs.csv"
 cp "$dir/../example_config.yml" "$scratch/config.yml"
 cd "$scratch"
-"$dir/microsat" "config.yml"
+"$dir/chiimp" "config.yml"

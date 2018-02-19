@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Install microsat on Linux.
+# Install CHIIMP on Linux.
 
 # A base R install is assumed to already be present, but all dependencies
 # should be installed automatically here.
@@ -12,9 +12,9 @@ pkgdir_r=$pkgdir:\=\\%\\.
 devtools_setup="install.packages('devtools',repos='https://cloud.r-project.org')"
 bioclite_setup="source('https://bioconductor.org/biocLite.R');biocLite();biocLite('msa')"
 deps_setup="devtools::install_deps('$pkgdir_r',dependencies=TRUE)"
-microsat_test="quit(save='no',status=sum(as.data.frame(devtools::test('$pkgdir_r'))\$failed))"
-microsat_setup="devtools::install('$pkgdir_r')"
-microsat_get_path="cat(system.file('bin','microsat',package='microsat'))"
+chiimp_test="quit(save='no',status=sum(as.data.frame(devtools::test('$pkgdir_r'))\$failed))"
+chiimp_setup="devtools::install('$pkgdir_r')"
+chiimp_get_path="cat(system.file('bin','chiimp',package='chiimp'))"
 
 "$rexe" --version
 echo
@@ -30,9 +30,9 @@ echo "### Installing dependencies"
 echo
 "$rexe" --slave -e "$deps_setup"
 echo
-echo "### Testing microsat"
+echo "### Testing CHIIMP"
 echo
-if "$rexe" --slave -e "$microsat_test"
+if "$rexe" --slave -e "$chiimp_test"
 then
 	echo
 	echo
@@ -41,6 +41,6 @@ then
 	echo
 fi
 echo
-echo "### Installing microsat"
+echo "### Installing CHIIMP"
 echo
-"$rexe" --slave -e "$microsat_setup"
+"$rexe" --slave -e "$chiimp_setup"

@@ -9,7 +9,7 @@
 # This uses Miniconda to provide R and encapsulate packages.
 # OS-provided packages: texlive, pandoc
 
-PKG="microsat"
+PKG="chiimp"
 CONDA="$HOME/miniconda3"
 # Using a specific version until Anaconda gets this issue fixed
 # https://stackoverflow.com/questions/46450912/
@@ -26,7 +26,7 @@ fi
 
 # Contrast this more general approach with the more exact package matching
 # with:
-#     conda create --name microsat --file spec-file.txt
+#     conda create --name chiimp --file spec-file.txt
 $CONDA/bin/conda env list | grep -q "$PKG" ||
 	$CONDA/bin/conda env create --file environment.yml
 
@@ -63,9 +63,9 @@ export R_TEXI2DVICMD=$(which texi2dvi)
 
 # Special install procedure for msa
 R -q -e '"msa" %in% installed.packages() || {source("https://bioconductor.org/biocLite.R"); biocLite("msa")}'
-# Install microsat itself
-R -q -e '"microsat" %in% installed.packages() || devtools::install(".")'
+# Install chiimp itself
+R -q -e '"chiimp" %in% installed.packages() || devtools::install(".")'
 
-# Add the microsat executable to the conda environment path
-[ -e $CONDA/envs/$PKG/bin/microsat ] ||
-	ln -s $CONDA/envs/$PKG/lib/R/library/microsat/bin/microsat $CONDA/envs/$PKG/bin
+# Add the chiimp executable to the conda environment path
+[ -e $CONDA/envs/$PKG/bin/chiimp ] ||
+	ln -s $CONDA/envs/$PKG/lib/R/library/chiimp/bin/chiimp $CONDA/envs/$PKG/bin

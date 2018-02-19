@@ -1,6 +1,6 @@
 # Anaconda environment setup file
 # https://conda.io/docs/user-guide/tasks/manage-environments.html
-name: microsat
+name: chiimp
 channels:
 - defaults
 dependencies:

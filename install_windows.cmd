@@ -1,6 +1,6 @@
 @echo off
 
-:: Install microsat on Windows.
+:: Install CHIIMP on Windows.
 :: 
 :: A base R install is assumed to already be present, but all dependencies
 :: should be installed automatically here.
@@ -12,7 +12,7 @@ set rpath=%rpath:"=%
 set rdir=%rpath%\..\
 set rexe=%rdir%\R
 
-REM  Path to microsat source, relative to this script.
+REM  Path to chiimp source, relative to this script.
 set pkgdir=%~dp0
 REM  Since I'm pasting text directly into R commands below we'll need to 
 REM  escape the backslashes.
@@ -27,9 +27,9 @@ REM  more complex it might be worth switching to PowerShell.
 set devtools_setup=install.packages('devtools',repos='https://cloud.r-project.org')
 set bioclite_setup=source('https://bioconductor.org/biocLite.R');biocLite();biocLite('msa')
 set deps_setup=devtools::install_deps('%pkgdir_r%',dependencies=TRUE)
-set microsat_test=quit(save='no',status=sum(as.data.frame(devtools::test('%pkgdir_r%'))$failed))
-set microsat_setup=devtools::install('%pkgdir_r%')
-set microsat_get_path=cat(system.file('bin','microsat',package='microsat'))
+set chiimp_test=quit(save='no',status=sum(as.data.frame(devtools::test('%pkgdir_r%'))$failed))
+set chiimp_setup=devtools::install('%pkgdir_r%')
+set chiimp_get_path=cat(system.file('bin','chiimp',package='chiimp'))
 
 "%rexe%" --version
 echo.
@@ -45,9 +45,9 @@ echo ### Installing dependencies
 echo.
 "%rexe%" --slave -e %deps_setup%
 echo.
-echo ### Testing microsat
+echo ### Testing CHIIMP
 echo.
-"%rexe%" --slave -e %microsat_test%
+"%rexe%" --slave -e %chiimp_test%
 if errorlevel 1 (
 	echo.
 	echo.
@@ -56,10 +56,10 @@ if errorlevel 1 (
 	echo.
 )
 echo.
-echo ### Installing microsat
+echo ### Installing CHIIMP
 echo.
-"%rexe%" --slave -e %microsat_setup%
+"%rexe%" --slave -e %chiimp_setup%
 
-for /f %%x in ('"%rexe%" --slave -e cat^(system.file^('bin'^,'microsat.cmd'^,package^='microsat'^)^)') do set microsat_path=%%x
+for /f %%x in ('"%rexe%" --slave -e cat^(system.file^('bin'^,'chiimp.cmd'^,package^='chiimp'^)^)') do set chiimp_path=%%x
 REM  https://stackoverflow.com/a/30029955/6073858
-powershell "$s=(New-Object -COM WScript.Shell).CreateShortcut('%userprofile%\Desktop\microsat.lnk');$s.TargetPath='%microsat_path%';$s.Save()"
+powershell "$s=(New-Object -COM WScript.Shell).CreateShortcut('%userprofile%\Desktop\CHIIMP.lnk');$s.TargetPath='%chiimp_path%';$s.Save()"
