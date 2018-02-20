@@ -6,6 +6,6 @@ Computational, High-throughput Individual Identification through Microsatellite 
 An R package and standalone program to analyze microsatellites in
 high-throughput sequencing datasets.
 
-For installation and program usage see the user guide in
-[GUIDE.pdf](GUIDE.pdf).  For usage as an R package also see the built-in
-package documentation.
+For automated installation and program usage see GUIDE.pdf in a
+[released version](https://github.com/ShawHahnLab/chiimp/releases).  For usage
+as an R package also see the built-in package documentation.
