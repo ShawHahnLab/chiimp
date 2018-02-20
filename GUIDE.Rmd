@@ -50,7 +50,7 @@ package along with R dependencies.  A symbolic link to the program is created at
 
 ### Mac OS
 
-On Mac OS, run the `install_mac` shell script to automatically install the
+On Mac OS, run the `install_mac.sh` shell script to automatically install the
 package along with R dependencies.  A symbolic link to the program is created
 at `$HOME/Desktop/CHIIMP`.
 
@@ -330,7 +330,7 @@ cat("\n\n")
 
 Below is a list of commonly-customized options.  Nested lists imply nested
 options in the configuration file; see the "Example Configuration File" section
-above for more inforamtion.  (See also the end of this document for a full list
+above for more information.  (See also the end of this document for a full list
 with all default settings.)  For more information on the format of the
 spreadsheets listed here, see the "Input Data Organization" section above.
 
