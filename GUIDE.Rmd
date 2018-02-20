@@ -42,9 +42,13 @@ the package and R dependencies, and create a desktop shortcut.
 
 On Linux, run the `install_linux.sh` shell script to automatically install the 
 package along with R dependencies.  A symbolic link to the program is created at
-`$HOME/Desktop/chiimp`.
+`$HOME/Desktop/CHIIMP`.
 
 ### Mac OS
+
+On Mac OS, run the `install_mac` shell script to automatically install the
+package along with R dependencies.  A symbolic link to the program is created
+at `$HOME/Desktop/CHIIMP`.
 
 ## Input Data Organization
 
