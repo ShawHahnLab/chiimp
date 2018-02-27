@@ -64,8 +64,10 @@ full_analysis <- function(config, dataset=NULL) {
                              summary.function = sample_summary_func)
   # Reorder entries to match locus_attrs.
   # TODO merge these steps into analyze_dataset or summarize_dataset
-  ord <- order(match(results$summary$Locus, locus_attrs$Locus),
-               order_entries(results$summary))
+  results$summary$Locus <- factor(results$summary$Locus,
+                                  levels = locus_attrs$Locus)
+  results$summary$Locus <- droplevels(results$summary$Locus)
+  ord <- order_entries(results$summary)
   results$summary <- results$summary[ord, ]
   results$data <- results$data[ord]
   results$locus_attrs <- locus_attrs

@@ -414,7 +414,7 @@ save_histograms <- function(results, dp, image.func="png",
                      res = res)
     eval(img.call)
     histogram(results$data[[entry]],
-              locus.name = results$summary[entry, "Locus"],
+              locus.name = as.character(results$summary[entry, "Locus"]),
               sample.summary = results$summary[entry, ],
               main = entry)
     grDevices::dev.off()
