@@ -38,7 +38,7 @@ report_genotypes <- function(tbl,
       if (is.na(tbl[i, j]))
         next
       row <- match(tbl[i, j], allele.names[, "Seq"])
-      n <- as.character(allele.names[row, "Name"])
+      n <- allele.names[row, "Name"]
       if (is.na(n) || length(n) == 0)
         n <- make_allele_name(tbl[i, j], hash.len)
       tbl_out[i, j] <- n
@@ -64,7 +64,7 @@ report_genotypes <- function(tbl,
   if (!is.null(closest)) {
     idents <- do.call(rbind, lapply(closest, function(who) {
       if (length(who) == 1) {
-        data.frame(Distance = who, Name = names(who), stringsAsFactors = F)
+        data.frame(Distance = who, Name = names(who), stringsAsFactors = FALSE)
       } else {
         data.frame(Distance = NA, Name = NA)
       }
@@ -235,7 +235,7 @@ histogram <- function(samp,
     })
     cts <- cts[order(cts$Count, decreasing = T), ]
     locus.name <- if (nrow(cts) > 1) {
-      as.character(cts[[1, "MatchingLocus"]])
+      cts[[1, "MatchingLocus"]]
     } else {
       NA
     }
@@ -339,7 +339,7 @@ histogram2 <- function(samp,
         dplyr::summarize(Count = sum(Count))
     })
     cts <- cts[order(cts$Count, decreasing = T), ]
-    locus.name <- as.character(cts[[1, "MatchingLocus"]])
+    locus.name <- cts[[1, "MatchingLocus"]]
   }
 
   # TODO:
@@ -403,7 +403,7 @@ histogram2 <- function(samp,
         if (is.na(am)) am <- F
         # Is the sequence an exact match for an identified allele?
         is_allele <- chunk[n, "Seq"] %in%
-          as.character(unlist(sample.summary[c("Allele1Seq", "Allele2Seq")]))
+          unlist(sample.summary[c("Allele1Seq", "Allele2Seq")])
         # Color each rectangle according to its category as defined by the
         # above.  The default will be the locus-labeled colors.
         col <- col.labeled
@@ -882,7 +882,7 @@ rmd_plot_cts_per_locus <- function(results,
                                    ...) {
   # Count samples per locus, for breaking big heatmaps into smaller chunks but
   # not splitting loci
-  tbl.loci <- table(droplevels(results$summary$Locus))
+  tbl.loci <- table(results$summary$Locus)
   tbl.loci <- tbl.loci[match(results$locus_attrs$Locus,
                              names(tbl.loci))]
   tbl.loci <- tbl.loci[!is.na(tbl.loci)]

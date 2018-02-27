@@ -215,14 +215,14 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
 #'
 #' @export
 align_alleles <- function(results_summary, derep=TRUE, ...) {
-  chunks <- split(results_summary, droplevels(results_summary$Locus))
+  chunks <- split(results_summary, results_summary$Locus)
   lapply(chunks, function(chunk) {
     if (all(c("Allele1Seq", "Allele2Seq") %in% colnames(results_summary))) {
       a <- flatten_alleles(chunk)
       ids <- NULL
     } else {
-      a <- as.character(chunk$Seq)
-      ids <- as.character(chunk$Name)
+      a <- chunk$Seq
+      ids <- chunk$Name
     }
     # If there are no sequences, skip the alignment and record NA for this
     # locus.  (The msa function doesn't do this sort of checking itself,
@@ -314,7 +314,7 @@ summarize_genotypes <- function(results_summary,
   tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
                         timevar = "Locus", direction = "wide")
   tbl <- tbl[, -3]
-  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = 2),
+  allele_cols <- paste(rep(unique(combo$Locus), each = 2),
                        c(1, 2),
                        sep = "_")
   colnames(tbl) <- c("Sample", "Replicate", allele_cols)
@@ -344,7 +344,7 @@ summarize_genotypes_known <- function(genotypes_known, tbl_genotypes=NULL) {
   genotypes_known$Sample <- genotypes_known$Name
   genotypes_known <- genotypes_known[, -match("Name",
                                               colnames(genotypes_known))]
-  genotypes_known$Homozygous <- is.na(as.character(genotypes_known$Allele2Seq))
+  genotypes_known$Homozygous <- is.na(genotypes_known$Allele2Seq)
   tbl_known <- summarize_genotypes(genotypes_known)
   if (!missing(tbl_genotypes))
     tbl_known <- tbl_known[, colnames(tbl_genotypes)]
@@ -377,7 +377,7 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
                         idvar = "ID",
                         timevar = "Locus", direction = "wide")
   tbl <- tbl[, -3]
-  allele_cols <- paste(rep(as.character(unique(combo$Locus)), each = repeats),
+  allele_cols <- paste(rep(unique(combo$Locus), each = repeats),
                        1:repeats,
                        sep = "_")
   colnames(tbl) <- c("Sample", "Replicate", allele_cols)
@@ -418,7 +418,8 @@ tally_cts_per_locus <- function(results) {
   cols.match <- results$summary[rownames(tbl), "Locus"]
   tbl.anno <- data.frame(Total = rowSums(tbl),
                          Matching = sapply(seq_along(cols.match),
-                            function(i) tbl[i, as.character(cols.match[i])]))
+                            function(i) tbl[i, as.character(cols.match[i])]),
+                         stringsAsFactors = FALSE)
   tbl <- cbind(tbl.anno, tbl)
   tbl
 }
@@ -434,8 +435,8 @@ tally_cts_per_locus <- function(results) {
 # handles Homozygous entries via NA as Allele2Seq
 flatten_alleles <- function(tbl) {
   alleles <- tbl[, c("Allele1Seq", "Allele2Seq")]
-  a1 <- as.character(alleles[, 1])
-  a2 <- as.character(alleles[, 2])
+  a1 <- alleles[, 1]
+  a2 <- alleles[, 2]
   a2 <- ifelse(is.na(a2), a1, a2)
   names(a1) <- paste(rownames(alleles), 1, sep = "_")
   names(a2) <- paste(rownames(alleles), 2, sep = "_")
