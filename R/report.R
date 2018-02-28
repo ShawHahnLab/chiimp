@@ -190,6 +190,7 @@ histogram <- function(samp,
   ## Define colors and other plot parameters
   hist_colors <- c(bar_unlabeled = "#000000FF", # non-locus sequences
                    bar_filtered  = "#FFAAAAFF", # matching allele conditions
+                   bar_topcounts = "#0000FFFF", # , but just seq w/ max counts
                    bar_allele    = "#FF0000FF", # matching alleles in summary
                    line_cutoff   = "#00000080", # threshold for allele calls
                    rect_region   = "#0000001E") # region for filtered sequences
@@ -256,6 +257,15 @@ histogram <- function(samp,
            col = hist_colors["bar_filtered"],
            lwd = lwd,
            lend = 1)
+    # Draw bars for the highest unique sequence at each length
+    idx <- match(samp.filt$Length, samp.filt$Length)
+    heights.filt.top <- samp.filt[idx, ]
+    graphics::points(heights.filt.top$Length,
+                     heights.filt.top$Count,
+                     type = "h",
+                     col = hist_colors["bar_topcounts"],
+                     lwd = lwd,
+                     lend = 1)
     # Shade the domain of the filtered data in gray
     xlim.filt <- range(samp.filt$Length)
     graphics::polygon(x = rep(xlim.filt, each = 2),
