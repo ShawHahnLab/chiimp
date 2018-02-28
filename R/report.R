@@ -189,8 +189,8 @@ histogram <- function(samp,
 
   ## Define colors and other plot parameters
   hist_colors <- c(bar_unlabeled = "#000000FF", # non-locus sequences
-                   bar_filtered  = "#FFAAAAFF", # matching allele conditions
-                   bar_topcounts = "#0000FFFF", # , but just seq w/ max counts
+                   bar_filtered  = "#888888FF", # matching allele conditions
+                   bar_topcounts = "#FFAAAAFF", # , but just seq w/ max counts
                    bar_allele    = "#FF0000FF", # matching alleles in summary
                    line_cutoff   = "#00000080", # threshold for allele calls
                    rect_region   = "#0000001E") # region for filtered sequences
