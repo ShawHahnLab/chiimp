@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# Install CHIIMP on Linux.
+# Install CHIIMP on Mac OS.
 
 # A base R install is assumed to already be present, but all dependencies
 # should be installed automatically here.
 
 rexe=$(which R)
-pkgdir=$(readlink -f $(dirname $BASH_SOURCE))
+pkgdir=$(dirname $BASH_SOURCE)
 pkgdir_r=$pkgdir
 
 devtools_setup="install.packages('devtools',repos='https://cloud.r-project.org')"
@@ -49,6 +49,6 @@ if [ -d "$HOME/Desktop" ]; then
 	echo
 	echo "### Creating Desktop Symbolic Link"
 	echo
-	chiimp_path=$("$rexe" --slave -e "cat(system.file('bin','chiimp.sh',package='chiimp'))")
+	chiimp_path=$("$rexe" --slave -e "cat(system.file('bin','chiimp.command',package='chiimp'))")
 	ln -s "$chiimp_path" $HOME/Desktop/CHIIMP
 fi

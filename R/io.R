@@ -3,8 +3,8 @@
 # Load Inputs -------------------------------------------------------------
 
 # Expected column names for locus_attrs
-locus_attrs_cols <- c("Locus", "LengthMin", "LengthMax", "LengthBuffer", "Motif",
-                      "Primer", "ReversePrimer")
+locus_attrs_cols <- c("Locus", "LengthMin", "LengthMax", "LengthBuffer",
+                      "Motif", "Primer", "ReversePrimer")
 
 # Exepcted column names for genotypes.known
 genotypes_cols <- c("Name", "Locus", "Allele1Seq", "Allele2Seq")
@@ -56,8 +56,9 @@ load_config <- function(fp) {
 #' @export
 load_locus_attrs <- function(fp.locus_attrs, ...) {
   data <- utils::read.table(fp.locus_attrs,
-                            header = T,
+                            header = TRUE,
                             sep = ",",
+                            stringsAsFactors = FALSE,
                             ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
@@ -84,8 +85,9 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 #' @export
 load_allele_names <- function(fp, ...) {
   data <- utils::read.table(fp,
-                            header = T,
+                            header = TRUE,
                             sep = ",",
+                            stringsAsFactors = FALSE,
                             ...)
   col.missing <- is.na(match(allele_names_cols, colnames(data)))
   if (any(col.missing)) {
@@ -197,11 +199,11 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
   # filename as the first column, then whatever order the attrs are in
   n <- c("Filename", "Replicate", "Sample", "Locus")
   names(seq_file_attrs) <- n[c(1, 1 + ord)]
-  data <- do.call(data.frame, seq_file_attrs)
+  data <- do.call(data.frame, c(seq_file_attrs, stringsAsFactors = FALSE))
   data$Filename <- seq_files
   data$Replicate <- ifelse(data$Replicate == "",
                            NA,
-                           as.integer(as.character(data$Replicate)))
+                           as.integer(data$Replicate))
   # order by locus/sample/replicate
   data <- data[order_entries(data), ]
   # If specified, automatically number duplicates as replicates, if they don't

@@ -23,7 +23,7 @@ with(test_data, {
     with(results_summary_data, {
       dist_mat <- make_dist_mat(results$summary)
       # row and column names should both be equal to the sample identifiers
-      samps <- levels(dataset$Sample)
+      samps <- unique(dataset$Sample)
       expect_equal(rownames(dist_mat), samps)
       expect_equal(colnames(dist_mat), samps)
       # For our test data samples are far apart from each other, but with no
@@ -106,7 +106,7 @@ with(test_data, {
   test_that("align_alleles produces sequence alignments", {
     with(results_summary_data, {
       alignments <- align_alleles(results$summary)
-      expect_equal(names(alignments), levels(results$summary$Locus))
+      expect_equal(names(alignments), unique(results$summary$Locus))
       expect_equal(names(as.character(alignments[["A"]])),
                    c("182_1", "194_1", "178_1", "174_2", "162_1"))
       expect_equal(as.character(alignments[["A"]])[[1]],
@@ -125,7 +125,7 @@ with(test_data, {
     # tests the other option.
     with(results_summary_data, {
       alignments <- align_alleles(results$summary, derep = FALSE)
-      expect_equal(names(alignments), levels(results$summary$Locus))
+      expect_equal(names(alignments), unique(results$summary$Locus))
       n1 <- paste(rownames(subset(results$summary, Locus == "A")), 1, sep = "_")
       n2 <- paste(rownames(subset(results$summary, Locus == "A")), 2, sep = "_")
       expect_equal(sort(names(as.character(alignments[["A"]]))),

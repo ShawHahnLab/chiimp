@@ -95,9 +95,11 @@ analyze_dataset <- function(dataset,
 #' @return list of results, with \code{summary} set to the single summary data
 #'   frame and \code{data} the per-sample data frames.
 tidy_analyzed_dataset <- function(dataset, raw.results) {
-  summaries <- lapply(raw.results, `[[`, 1)
+  summaries <- lapply(raw.results, function(s) {
+    data.frame(s[[1]], stringsAsFactors = FALSE)
+  })
   data <- lapply(raw.results, `[[`, 2)
-  summary <- do.call(rbind.data.frame, summaries)
+  summary <- do.call(rbind, summaries)
   rownames(summary) <- rownames(dataset)
   names(data)       <- rownames(dataset)
   summary <- cbind(dataset, summary)
