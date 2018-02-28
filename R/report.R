@@ -188,16 +188,12 @@ histogram <- function(samp,
                       xlim=range(samp$Length)) {
 
   ## Define colors and other plot parameters
-  # The non-locus sequences
-  col.unlabeled   <- "#000000"
-  # Locus-labeled and matching all allele conditions
-  col.filtered    <- "#FFAAAA"
-  # Sequences matching alleles in sample.summary
-  col.allele      <- "#FF0000"
-  # Line showing threshold for allele calls
-  col.cutoff <- grDevices::rgb(0, 0, 0, 0.5)
-  # Shaded region for filtered sequences
-  col.region <- grDevices::rgb(0, 0, 0, 30, maxColorValue = 255)
+  hist_colors <- c(bar_unlabeled = "#000000FF", # non-locus sequences
+                   bar_filtered  = "#FFAAAAFF", # matching allele conditions
+                   bar_allele    = "#FF0000FF", # matching alleles in summary
+                   line_cutoff   = "#00000080", # threshold for allele calls
+                   rect_region   = "#0000001E") # region for filtered sequences
+
   lwd <- 5
 
   ## If there were no sequences at all, don't bother plotting.
@@ -220,7 +216,7 @@ histogram <- function(samp,
        xlim = xlim,
        ylim = ylim,
        main = main,
-       col = col.unlabeled,
+       col = hist_colors["bar_unlabeled"],
        xlab = "Length (nt)",
        ylab = "Sequence Count",
        lwd = lwd,
@@ -257,19 +253,19 @@ histogram <- function(samp,
     graphics::points(heights.filt$Length,
            heights.filt$TotalCount,
            type = "h",
-           col = col.filtered,
+           col = hist_colors["bar_filtered"],
            lwd = lwd,
            lend = 1)
     # Shade the domain of the filtered data in gray
     xlim.filt <- range(samp.filt$Length)
     graphics::polygon(x = rep(xlim.filt, each = 2),
             y = c(0, ymax, ymax, 0),
-            col = col.region,
+            col = hist_colors["rect_region"],
             border = NA)
     # Draw a line to mark the cutoff value for what's considered a prominent
     # count
     cutoff <- cutoff_fraction * sum(samp.filt$Count)
-    graphics::abline(h = cutoff, col = col.cutoff)
+    graphics::abline(h = cutoff, col = hist_colors["line_cutoff"])
   }
 
   # Draw bars for the exact allele sequences identified
@@ -282,7 +278,7 @@ histogram <- function(samp,
       graphics::points(pts.x,
              pts.y,
              type = "h",
-             col = col.allele,
+             col = hist_colors["bar_allele"],
              lwd = lwd,
              lend = 1)
   }
@@ -293,7 +289,7 @@ histogram <- function(samp,
                     "Filtered",
                     "Called Alleles",
                     "Unique Seq. Threshold"),
-         col = c(col.unlabeled, col.filtered, col.allele, col.cutoff),
+         col = hist_colors[1:4],
          pch = c(15, 15, 15, NA),
          lty = c(NA, NA, NA, 1))
 }
