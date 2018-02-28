@@ -238,13 +238,8 @@ histogram <- function(samp,
     }
   }
 
-  # Define subset of sample data that matches all locus conditions
-  samp.filt <- with(samp,
-                 subset(samp, MatchingLocus == locus.name &
-                              MotifMatch &
-                              LengthMatch))
-
-  # Just the matching sequences, if there are any.
+  # Just the sequences matching all locus conditions, if there are any.
+  samp.filt <- samp[full_locus_match(samp, locus.name), ]
   if (nrow(samp.filt) > 0) {
     heights.filt <- with(samp.filt, {
       samp.filt %>%
@@ -297,11 +292,12 @@ histogram <- function(samp,
   graphics::legend(x = "topright", bty = "n",
          legend = c("Original",
                     "Filtered",
+                    "Filtered, top unique Seq.",
                     "Called Alleles",
                     "Unique Seq. Threshold"),
-         col = hist_colors[1:4],
-         pch = c(15, 15, 15, NA),
-         lty = c(NA, NA, NA, 1))
+         col = hist_colors[1:5],
+         pch = c(15, 15, 15, 15, NA),
+         lty = c(NA, NA, NA, NA, 1))
 }
 
 #' Plot advanced histogram of STR sample
@@ -405,7 +401,7 @@ histogram2 <- function(samp,
                chunk[n, "Cumsum"],
                chunk[n, "Cumsum"] - chunk[n, "Count"])
         # Is the sequence matching all criteria for a candidate allele?
-        am <- allele_match(chunk[n, ], locus.name)
+        am <- full_locus_match(chunk[n, ], locus.name)
         if (is.na(am)) am <- F
         # Is the sequence an exact match for an identified allele?
         is_allele <- chunk[n, "Seq"] %in%

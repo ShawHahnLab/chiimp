@@ -55,7 +55,7 @@ analyze_dataset <- function(dataset,
                        "find_stutter",
                        "find_artifact",
                        "check_length",
-                       "allele_match")
+                       "full_locus_match")
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))

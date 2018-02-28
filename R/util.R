@@ -1,5 +1,23 @@
 # Misc utility functions and variables used by the others.
 
+
+#' Check Sample Data for Potential Allele Matches
+#'
+#' Check the entries in a processed sample data frame for potential matches to a
+#' given locus.
+#'
+#' @param sample.data data frame of processed data for sample as produced by
+#'   \code{\link{analyze_sample}}.
+#' @param locus.name character name of locus to match against.
+#'
+#' @return logical vector of entries for potential alleles.
+full_locus_match <- function(sample_data, locus_name) {
+  with(sample_data,
+       as.character(MatchingLocus) == locus_name &
+         MotifMatch &
+         LengthMatch)
+}
+
 #' Create Row Names for STR Data
 #'
 #' Create unique rownames for the given data frame, using whichever STR-related
@@ -27,8 +45,8 @@ make_rownames <- function(data) {
 
 #' Define Ordering for STR Data
 #'
-#' Create a standardized ordering vector (as per \code{\link{order}}) for the 
-#' rows of the given data frame, using whichever STR-related metadata columns 
+#' Create a standardized ordering vector (as per \code{\link{order}}) for the
+#' rows of the given data frame, using whichever STR-related metadata columns
 #' are available.  Sample identifiers are treated as integers primarily but then
 #' resolved further by character sorting.  Note that the identification-related
 #' report code relies on this to order lowest-distance genotype matches first.

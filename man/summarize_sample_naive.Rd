@@ -25,6 +25,6 @@ alleles to be considered.}
 list of attributes describing the sample.
 }
 \description{
-Summarize as in \code{\link{summarize_sample}}, but skip allele_match and
+Summarize as in \code{\link{summarize_sample}}, but skip full_locus_match and
 stutter removal.  Entries in the returned list are the same.
 }

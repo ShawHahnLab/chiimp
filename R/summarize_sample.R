@@ -52,7 +52,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
   # extract sample data entries that meet all criteria for a potential allele
   locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
+  idx <- which(full_locus_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   # Note that counts.locus is more restrictive than the total counts of all
   # entries with MatchingLocus equal to the given locus name, since idx includes
@@ -143,7 +143,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
   # extract sample data entries that meet all criteria for a potential allele
   locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
+  idx <- which(full_locus_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   # Note that counts.locus is more restrictive than the total counts of all
   # entries with MatchingLocus equal to the given locus name, since idx includes
@@ -228,7 +228,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
 
 #' Summarize a processed STR sample, Simple Version
 #'
-#' Summarize as in \code{\link{summarize_sample}}, but skip allele_match and
+#' Summarize as in \code{\link{summarize_sample}}, but skip full_locus_match and
 #' stutter removal.  Entries in the returned list are the same.
 #'
 #' @param sample.data data frame of processed data for sample as produced by
@@ -292,7 +292,7 @@ summarize_sample_by_length <- function (sample.data, sample.attrs,
                                         fraction.min=0.15,
                                         counts.min=500) {
   locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
+  idx <- which(full_locus_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   count.total <- sum(sample.data$Count)
   count.locus <- sum(chunk$Count)
@@ -334,21 +334,4 @@ summarize_sample_by_length <- function (sample.data, sample.attrs,
                            CountLocus = count.locus,
                            ProminentSeqs = prominent.seqs))
   return(sample.summary)
-}
-
-#' Check Sample Data for Potential Allele Matches
-#'
-#' Check the entries in a processed sample data frame for potential matches to a
-#' given locus.
-#'
-#' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
-#' @param locus.name character name of locus to match against.
-#'
-#' @return logical vector of entries for potential alleles.
-allele_match <- function(sample.data, locus.name) {
-  with(sample.data,
-       as.character(MatchingLocus) == locus.name &
-         MotifMatch &
-         LengthMatch)
 }
