@@ -142,45 +142,46 @@ check_length <- function(sample.data, locus_attrs) {
 
 #' Check for PCR stutter between sample entries
 #'
-#' Searches a processed STR sample for entries that may be artifacts of PCR
-#' stutter from another entry in the sample.  This only considers STR-labeled
-#' rows and those with a count above \code{count.min}, and requires a given
-#' entry to have counts at most \code{count.ratio_max} compared to the candidate
-#' "source" entry to be considered stutter.  Sequence content is not currently
-#' considered, just relative sequence lengths and counts.
+#' Searches a processed STR sample for entries that may be artifacts of PCR 
+#' stutter from another entry in the sample.  This only considers STR-labeled 
+#' rows and requires a given entry to have counts at most \code{count.ratio_max}
+#' compared to the candidate "source" entry to be considered stutter.  Sequence
+#' content is not currently considered, just relative sequence lengths and
+#' counts.
 #'
 #' @param sample.data data frame of processed sample data.
 #' @param locus_attrs data frame of attributes for loci to look for.
 #' @param count.ratio_max comparing the currently-checked entry to another
 #'   entry, this is the highest ratio of counts where an entry will still be
 #'   considered stutter.
-#' @param count.min lowest count for a given entry to still attempt a check for
-#'   stutter.
 #'
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as a stutter band.
 find_stutter <- function(sample.data, locus_attrs,
-                         count.ratio_max = 1 / 3,
-                         count.min = 10) {
+                         count.ratio_max = 1 / 3) {
 
-  stutter <- as.integer(rep(NA, nrow(sample.data)))
+  stutter <- integer(nrow(sample.data))*NA
 
   # across rows for this locus,
   for (locus_name in rownames(locus_attrs)) {
-    locus.match <- sample.data$MatchingLocus == locus_name
+    idxl_main <- sample.data$MatchingLocus == locus_name
+    idxl_main[is.na(idxl_main)] <- F
+    d <- sample.data[idxl_main, ]
     motif.len <- nchar(as.character(locus_attrs[locus_name, "Motif"]))
-    for (idx in which(locus.match)) {
-      # look at each row, and see if any others may be
-      # stutter using each row here as a source.
-      L <- sample.data[idx, "Length"] - motif.len
-      C <- sample.data[idx, "Count"] * count.ratio_max
-      #  mark any of the other rows that look like stutter of this row.
-      others.match <- locus.match &
-        sample.data$Length == L &
-        sample.data$Count <= C &
-        sample.data$Count > count.min
-      stutter[others.match] <- idx
-    }
+    # Any given index in d could be stutter.
+    # these are lengths to look for as potential stutter sources of each row
+    lens_up <- d$Length + motif.len
+    # These will be row indexes for any possible stutter source, going by
+    # length.  Implicitly each index will match the highest count as well.
+    idx_length <- match(lens_up, d$Length)
+    # TRUE for the idx_length rows with counts below the cutoff
+    idxl_stutter <- d$Count < d$Count[idx_length]*count.ratio_max
+    # Now, these are the index values in d that look like stutter of any given
+    # row (non-matching entries are left in place but set to NA)
+    idx_length[! idxl_stutter] <- NA
+    # Next, insert these into the stutter vector, at the right position, with
+    # the right index values.
+    stutter[which(idxl_main)] <- idx_length + cumsum(!idxl_main)[idx_length]
   }
 
   return(stutter)
@@ -188,46 +189,48 @@ find_stutter <- function(sample.data, locus_attrs,
 
 #' Check for non-stutter PCR artifacts between sample entries
 #'
-#' Searches a processed STR sample for entries that may be PCR artifacts, other
-#' than stutter, from another entry in the sample.  Potential artifacts are
-#' sequences with counts lower than another sequence by a given ratio and
-#' sequence length within 1 bp of the other sequence.  This only considers
-#' STR-labeled rows and those with a count above \code{count.min}, and requires
-#' a given entry to have counts at most \code{count.ratio_max} compared to the
-#' candidate "source" entry to be considered an artifact.  Sequence content is
-#' not currently considered, just relative sequence lengths and counts.
+#' Searches a processed STR sample for entries that may be PCR artifacts, other 
+#' than stutter, from another entry in the sample.  Potential artifacts are 
+#' sequences with counts lower than another sequence by a given ratio and 
+#' sequence length within 1 bp of the other sequence.  This only considers 
+#' STR-labeled rows and requires a given entry to have counts at most
+#' \code{count.ratio_max} compared to the candidate "source" entry to be
+#' considered an artifact.  Sequence content is not currently considered, just
+#' relative sequence lengths and counts.
 #'
 #' @param sample.data data frame of processed sample data.
 #' @param locus_attrs data frame of attributes for loci to look for.
 #' @param count.ratio_max comparing the currently-checked entry to another
 #'   entry, this is the highest ratio of counts where an entry will still be
 #'   considered artifactual
-#' @param count.min lowest count for a given entry to still attempt a check for
-#'   an artifact.
 #'
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as an artifactual sequence.
 find_artifact <- function(sample.data, locus_attrs,
-                         count.ratio_max = 1 / 3,
-                         count.min = 10) {
+                         count.ratio_max = 1 / 3) {
 
-  artifact <- as.integer(rep(NA, nrow(sample.data)))
+  artifact <- integer(nrow(sample.data))*NA
 
   # across rows for this locus,
   for (locus_name in rownames(locus_attrs)) {
-    locus.match <- sample.data$MatchingLocus == locus_name
-    for (idx in which(locus.match)) {
-      # look at each row, and see if any others may be
-      # artifacts using each row here as a source.
-      L <- sample.data[idx, "Length"]
-      C <- sample.data[idx, "Count"] * count.ratio_max
-      #  mark any of the other rows that look like artifacts of this row.
-      others.match <- locus.match &
-        abs(sample.data$Length - L) <= 1 &
-        sample.data$Count <= C &
-        sample.data$Count > count.min
-      artifact[others.match] <- idx
-    }
+    idxl_main <- sample.data$MatchingLocus == locus_name
+    idxl_main[is.na(idxl_main)] <- F
+    d <- sample.data[idxl_main, ]
+    # for each length it's the index of the first (highest-count) entry with
+    # that length.
+    matches <- matrix(c(match(d$Length, d$Length),
+                        match(d$Length-1, d$Length),
+                        match(d$Length+1, d$Length)), ncol = 3)
+    # Now take the first (highest-count) of the set
+    idx_length <- apply(matches, 1, min)
+    # TRUE for the idx_length rows with counts below the cutoff
+    idxl_artifact <- d$Count < d$Count[idx_length]*count.ratio_max
+    # Now, these are the index values in d that look like stutter of any given
+    # row (non-matching entries are left in place but set to NA)
+    idx_length[! idxl_artifact] <- NA
+    # Next, insert these into the stutter vector, at the right position, with
+    # the right index values.
+    artifact[which(idxl_main)] <- idx_length + cumsum(!idxl_main)[idx_length]
   }
 
   return(artifact)
