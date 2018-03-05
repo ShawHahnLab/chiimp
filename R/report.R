@@ -701,8 +701,10 @@ plot_heatmap_proportions <- function(results, ...) {
   cts <- results$summary[, c("Allele1Count", "Allele2Count")]
   prop.counted <- rowSums(cts, na.rm = T) / results$summary$CountLocus
   results$summary$ProportionCounted <- prop.counted
+  # A color scale going from red at 0 to white at 1, but values skewed toward
+  # white.
   color_func <- grDevices::colorRampPalette(c("red", "white"))
-  breaks <- seq(0, 1, 0.001)
+  breaks <- seq(0, 1, 0.001)^2.5
   colors <- color_func(length(breaks) - 1)
   plot_heatmap(results,
                "ProportionCounted",
