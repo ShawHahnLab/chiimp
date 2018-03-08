@@ -670,6 +670,9 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
   # shades of red for higher numbers.
   color_func <- grDevices::colorRampPalette(c("white", "red"))
   ps <- results$summary[!is.na(results$summary$Allele1Seq), "ProminentSeqs"]
+  if(length(ps) == 0) {
+    ps <- 0
+  }
   # Deep red will only be used if somehow there are a whole lot of extra
   # sequences (say, 8); otherwise it should just go up to a pink color.
   colors <- color_func(max(8, max(ps) + 1))
