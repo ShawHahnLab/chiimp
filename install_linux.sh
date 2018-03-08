@@ -17,6 +17,15 @@ chiimp_setup="devtools::install('$pkgdir_r')"
 chiimp_get_path="cat(system.file('bin','chiimp',package='chiimp'))"
 
 "$rexe" --version
+
+# If the user's R library directory isn't there R just tries to install
+# globally, and that would only work for root.  So we'll create the user's R
+# library directory for non-root users if needed.
+userlib=$(R --slave -e 'cat(file.path(Sys.getenv("HOME"), "R", paste0(version$platform, "-library"), paste(version$major, strsplit(version$minor, "\\.")[[1]][1], sep=".")), "\n")')
+if [[ $(id -u) -gt 0 && ! -d "$userlib" ]]; then
+	mkdir -p "$userlib"
+fi
+
 echo
 echo "### Installing devtools"
 echo
