@@ -57,4 +57,5 @@ if [ -d "$HOME/Desktop" ]; then
 	echo "### Creating Desktop Icon"
 	echo
 	echo "$desktop_file" > "$HOME/Desktop/CHIIMP.desktop"
+	chmod +x "$HOME/Desktop/CHIIMP.desktop"
 fi
