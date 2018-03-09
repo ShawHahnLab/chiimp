@@ -7,7 +7,9 @@
 
 # This directory
 dir=$(readlink -f $(dirname $BASH_SOURCE))
+cfg_dir=$(dirname "$1")
 
+cd "$cfg_dir"
 Rscript "$dir/chiimp" $*
 read -p "Press any key to continue... " -n1 -s
 echo
