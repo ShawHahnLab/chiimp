@@ -40,7 +40,7 @@ report_genotypes <- function(tbl,
         next
       row <- match(tbl[i, j], allele.names[, "Seq"])
       n <- allele.names[row, "Name"]
-      if (is.na(n) || length(n) == 0)
+      if (is.null(n) || is.na(n) || length(n) == 0)
         n <- make_allele_name(tbl[i, j], hash.len)
       tbl_out[i, j] <- n
       # What about length homoplasy, if we've trimmed hash.len too low to tell
