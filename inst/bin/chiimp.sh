@@ -9,6 +9,7 @@
 dir=$(readlink -f $(dirname $BASH_SOURCE))
 cfg_dir=$(dirname "$1")
 
+which pandoc > /dev/null || export RSTUDIO_PANDOC=/usr/lib/rstudio/bin/pandoc
 cd "$cfg_dir"
 Rscript "$dir/chiimp" $*
 read -p "Press any key to continue... " -n1 -s
