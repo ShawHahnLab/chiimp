@@ -26,41 +26,83 @@ with(test_data, {
     results <- analyze_dataset(dataset, locus_attrs,
                                summary_args = list(
                                  fraction.min = 0.05,
-                                 counts.min = 500), nrepeats = 3, ncores = 1)
-    with(results, {
+                                 counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1)
+    lapply(dataset$Filename, file.remove)
+    file.remove(data.dir)
+    with(results$summary, {
       # These should just match what we fed in via dataset.
-      expect_equal(summary$Filename,  dataset$Filename)
-      expect_equal(summary$Replicate, dataset$Replicate)
-      expect_equal(summary$Sample,    dataset$Sample)
-      expect_equal(summary$Locus,     dataset$Locus)
+      expect_equal(Filename,  dataset$Filename)
+      expect_equal(Replicate, dataset$Replicate)
+      expect_equal(Sample,    dataset$Sample)
+      expect_equal(Locus,     dataset$Locus)
       # Skipping allele seqs here, but we should already be checking more than
       # enough and have that checked in test_summarize_sample.
-      expect_equal(summary$Allele1Count, c(2794, 2041, 2909, 3035, 2902, 2288,
-                                           2803, 2394, 3971, 2489, 2656, 4082))
-      expect_equal(summary$Allele1Length, c(272, 276, 276, 278, 346, 318,
-                                            162, 182, 174, 244, 212, 224))
-      expect_equal(summary$Allele2Count, c(1055, 1402, 1004, 1142, 1088, 1270,
-                                           1300, 2003,   NA, 1304, 1059,   NA))
-      expect_equal(summary$Allele2Length, c(260, 288, 252, 342, 314, 350,
-                                            194, 178,  NA, 220, 220,  NA))
+      expect_equal(Allele1Count, c(2794, 2041, 2909, 3035, 2902, 2288,
+                                   2803, 2394, 3971, 2489, 2656, 4082))
+      expect_equal(Allele1Length, c(272, 276, 276, 278, 346, 318,
+                                    162, 182, 174, 244, 212, 224))
+      expect_equal(Allele2Count, c(1055, 1402, 1004, 1142, 1088, 1270,
+                                   1300, 2003,   NA, 1304, 1059,   NA))
+      expect_equal(Allele2Length, c(260, 288, 252, 342, 314, 350,
+                                    194, 178,  NA, 220, 220,  NA))
+      # Auto-generated names for all sequences.  NA entries in give NA out.
+      expect_equal(Allele1Name, c("272-292a2a", "276-ea279a", "276-ea279a",
+                                  "278-ae70f3", "346-b05233", "318-35b7b6",
+                                  "162-c6933c", "182-d679e1", "174-8a43ea",
+                                  "244-3c2ff2", "212-6d4afb", "224-053ec2"))
+      expect_equal(Allele2Name, c("260-9a01fc", "288-201179", "252-a5eee8",
+                                  "342-2e88c0", "314-ce2338", "350-4acdbb",
+                                  "194-fc013a", "178-d84dc0", NA,
+                                  "220-fb9a92", "220-fb9a92", NA))
       h <- logical(12)
       h[c(9, 12)] <- TRUE
-      expect_equal(summary$Homozygous, h)
+      expect_equal(Homozygous, h)
       s <- logical(12)
       s[c(9, 12)] <- TRUE
-      expect_equal(summary$Stutter, s)
-      expect_equal(summary$CountTotal, integer(12)+5000)
-      expect_equal(summary$CountLocus, integer(12)+4500)
-      expect_equal(summary$ProminentSeqs,  c(2, 3, 2, 2, 2, 3, 2, 2, 1, 2, 3, 1))
-      lapply(dataset$Filename, file.remove)
-      file.remove(data.dir)
+      expect_equal(Stutter, s)
+      expect_equal(CountTotal, integer(12)+5000)
+      expect_equal(CountLocus, integer(12)+4500)
+      expect_equal(ProminentSeqs,  c(2, 3, 2, 2, 2, 3, 2, 2, 1, 2, 3, 1))
     })
 
   })
 
-  test_that("analyze_dataset runs single-threaded", {
-    # analyze_dataset should run properly with ncores=1 (just slower).
-    skip("test not yet implemented")
+  test_that("analyze_dataset names known alleles", {
+    # If we gave names for some known allele sequences, do they show up
+    # appropriately in the summary table?
+    data.dir <- tempfile()
+    write_seqs(seqs, data.dir)
+    dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+    known_alleles <- data.frame(Locus = c("1", "1", "A"),
+                                Seq = c("ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT",
+                                        "ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT",
+                                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"),
+                                Name = c("272-a",
+                                         "260-X",
+                                         "different_name_format"))
+    results <- analyze_dataset(dataset, locus_attrs,
+                               summary_args = list(
+                                 fraction.min = 0.05,
+                                 counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1,
+                               known_alleles = known_alleles)
+    lapply(dataset$Filename, file.remove)
+    file.remove(data.dir)
+    with(results$summary, {
+      expect_equal(Allele1Name, c("272-a",      "276-ea279a", "276-ea279a",
+                                  "278-ae70f3", "346-b05233", "318-35b7b6",
+                                  "different_name_format", "182-d679e1",
+                                    "174-8a43ea",
+                                  "244-3c2ff2", "212-6d4afb", "224-053ec2"))
+      expect_equal(Allele2Name, c("260-X",      "288-201179", "252-a5eee8",
+                                  "342-2e88c0", "314-ce2338", "350-4acdbb",
+                                  "194-fc013a", "178-d84dc0", NA,
+                                  "220-fb9a92", "220-fb9a92", NA))
+    })
+
   })
 
   test_that("analyze_dataset warns of missing loci", {

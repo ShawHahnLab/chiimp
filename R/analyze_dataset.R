@@ -33,7 +33,8 @@ analyze_dataset <- function(dataset,
                             nrepeats,
                             ncores = 0,
                             summary_args,
-                            summary.function=summarize_sample) {
+                            summary.function=summarize_sample,
+                            known_alleles=NULL) {
   if (ncores == 0) {
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
