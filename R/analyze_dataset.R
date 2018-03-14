@@ -47,18 +47,22 @@ analyze_dataset <- function(dataset,
   }
   if (ncores > 1) {
     # Set up the cluster and export required names.
-    cluster_names <- c("locus_attrs",
-                       "load_seqs",
-                       "analyze_sample",
-                       "find_matching_primer",
-                       "check_motif",
-                       "find_stutter",
-                       "find_artifact",
-                       "check_length",
-                       "allele_match")
+    cluster_names <- c("locus_attrs")
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
+    # Load the currently-used version of chiimp if running from a source
+    # version.
+    # Without this, parallel runs will use an installed version of chiimp, if 
+    # present, even if the first process started from a devtools source 
+    # directory.  This would give unexpected behavior between different
+    # installed/source versions.  There's probably a better way to handle this
+    # situation but this works for now.
+    if (basename(system.file(package = getPackageName())) == "inst") {
+      dp <- dirname(system.file(package = getPackageName()))
+      parallel::clusterExport(cluster, "dp", envir = environment())
+      parallel::clusterEvalQ(cluster, devtools::load_all(dp))
+    }
     parallel::clusterExport(cl = cluster,
                             varlist = cluster_names,
                             envir = environment())
