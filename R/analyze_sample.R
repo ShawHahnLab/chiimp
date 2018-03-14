@@ -221,8 +221,14 @@ find_artifact <- function(sample.data, locus_attrs,
     matches <- matrix(c(match(d$Length, d$Length),
                         match(d$Length-1, d$Length),
                         match(d$Length+1, d$Length)), ncol = 3)
-    # Now take the first (highest-count) of the set
-    idx_length <- apply(matches, 1, min)
+    # Now take the first (highest-count) of the set, ignoring NA's, and giving
+    # NA if all is NA for a given entry.
+    idx_length <- apply(matches, 1, function(r) {
+      if (all(is.na(r))) {
+        return(NA)
+      }
+      min(r, na.rm = TRUE)
+    })
     # TRUE for the idx_length rows with counts below the cutoff
     idxl_artifact <- d$Count < d$Count[idx_length]*count.ratio_max
     # Now, these are the index values in d that look like stutter of any given
