@@ -53,13 +53,14 @@ analyze_dataset <- function(dataset,
     parallel::clusterEvalQ(cluster, library(dnar))
     # Load the currently-used version of chiimp if running from a source
     # version.
-    # Without this, parallel runs will use an installed version of chiimp, if 
-    # present, even if the first process started from a devtools source 
+    # Without this, parallel runs will use an installed version of chiimp, if
+    # present, even if the first process started from a devtools source
     # directory.  This would give unexpected behavior between different
     # installed/source versions.  There's probably a better way to handle this
     # situation but this works for now.
-    if (basename(system.file(package = getPackageName())) == "inst") {
-      dp <- dirname(system.file(package = getPackageName()))
+    pkg <- methods::getPackageName()
+    if (basename(system.file(package = pkg)) == "inst") {
+      dp <- dirname(system.file(package = pkg))
       parallel::clusterExport(cluster, "dp", envir = environment())
       parallel::clusterEvalQ(cluster, devtools::load_all(dp))
     }
