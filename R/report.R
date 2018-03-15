@@ -670,7 +670,7 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
   # shades of red for higher numbers.
   color_func <- grDevices::colorRampPalette(c("white", "red"))
   ps <- results$summary[!is.na(results$summary$Allele1Seq), "ProminentSeqs"]
-  if(length(ps) == 0) {
+  if (length(ps) == 0) {
     ps <- 0
   }
   # Deep red will only be used if somehow there are a whole lot of extra
@@ -707,7 +707,7 @@ plot_heatmap_proportions <- function(results, ...) {
   # A color scale going from red at 0 to white at 1, but values skewed toward
   # white.
   color_func <- grDevices::colorRampPalette(c("red", "white"))
-  breaks <- seq(0, 1, 0.001)^2.5
+  breaks <- seq(0, 1, 0.001) ^ 2.5
   colors <- color_func(length(breaks) - 1)
   plot_heatmap(results,
                "ProportionCounted",
