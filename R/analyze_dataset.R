@@ -83,7 +83,11 @@ analyze_dataset <- function(dataset,
                          summary.function = summary.function)
   }
   # Recombined results into a summary data frame and a list of full sample data.
-  tidy_analyzed_dataset(dataset, raw.results)
+  results <- tidy_analyzed_dataset(dataset, raw.results)
+  # Add allele name columns to all data frames for any allele in the given
+  # known_alleles data frame or called in the current genotypes.
+  results <- name_known_sequences(results, known_alleles)
+  results
 }
 
 #' Tidy raw analyzed dataset results
@@ -110,4 +114,67 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
   names(data)       <- rownames(dataset)
   summary <- cbind(dataset, summary)
   return(list(summary = summary, data = data))
+}
+
+#' Name known allele sequences
+#'
+#' For the given results list (pair of summary data frame and list of per-sample
+#' data frames as produced by \code{\link{tidy_analyzed_dataset}}), add columns
+#' to all data frames defining names for recognized sequences.  For the summary
+#' data frame this will be Allele1Name and Allele2Name.  For each sample data
+#' frame this will be SeqName, defined for any sequences represented in the
+#' summary or in a given known alleles set.
+#'
+#' @param results results list as produced by
+#'   \code{\link{tidy_analyzed_dataset}}.
+#' @param known_alleles data frame of custom allele names as defined for
+#'   \code{\link{load_allele_names}}.  if NULL only the names automatically
+#'   generated for the summary will be used.
+#'
+#' @return list of results, with \code{summary} set to the single summary data
+#'   frame and \code{data} the per-sample data frames.  A "SeqName" column in
+#'   sample data frames and "Allele1Name" and "Allele2Name" columns in the
+#'   summary data frame will associate any sequence matching a known allele (for
+#'   either the given table or the current dataset) with a text name.
+name_known_sequences <- function(results, known_alleles) {
+  # Make names for given seqs, using existing names where available.
+  nm <- function(seqs) {
+    nms <- make_allele_name(seqs)
+    if (! is.null(known_alleles)) {
+      idx <- match(seqs, known_alleles$Seq)
+      nms <- ifelse(is.na(idx),
+             nms,
+             as.character(known_alleles$Name[idx]))
+    }
+    nms
+  }
+
+  # Name all of the called alleles across samples
+  results$summary$Allele1Name <- nm(results$summary$Allele1Seq)
+  results$summary$Allele2Name <- nm(results$summary$Allele2Seq)
+
+  # Create table of allele names for current dataset
+  a1 <- results$summary[, c("Locus", "Allele1Seq", "Allele1Name")]
+  a2 <- results$summary[, c("Locus", "Allele2Seq", "Allele2Name")]
+  colnames(a1) <- c("Locus", "Seq", "Name")
+  colnames(a2) <- c("Locus", "Seq", "Name")
+  aT <- rbind(a1, a2)
+  aT <- unique(aT[! is.na(aT$Seq), ])
+
+  # Merge into given known alleles table (if present)
+  known_alleles <- if (is.null(known_alleles)) {
+    aT
+  } else {
+    known_alleles$Name <- as.character(known_alleles$Name)
+    unique(rbind(known_alleles, aT))
+  }
+
+  # Name recognized sequences in each sample data frame
+  results$data <- lapply(results$data, function(d) {
+    idx <- match(d$Seq, known_alleles$Seq)
+    d$SeqName <- known_alleles$Name[idx]
+    d
+  })
+
+  return(results)
 }

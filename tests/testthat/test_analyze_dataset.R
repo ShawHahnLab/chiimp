@@ -72,6 +72,8 @@ with(test_data, {
   test_that("analyze_dataset names known alleles", {
     # If we gave names for some known allele sequences, do they show up
     # appropriately in the summary table?
+
+    # First, set up example as above, but using known_alleles data frame
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
@@ -91,6 +93,8 @@ with(test_data, {
                                known_alleles = known_alleles)
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
+
+    # Check that the resulting allele names match all the expected values
     with(results$summary, {
       expect_equal(Allele1Name, c("272-a",      "276-ea279a", "276-ea279a",
                                   "278-ae70f3", "346-b05233", "318-35b7b6",
@@ -103,6 +107,26 @@ with(test_data, {
                                   "220-fb9a92", "220-fb9a92", NA))
     })
 
+    # Check that the resulting sequence names in the sample data frames match
+    # up. We have the one or two called alleles per sample checked here, with
+    # one cross-appearance checked below.
+    lapply(rownames(results$summary), function(nm) {
+      # First called allele for these cases should always be the first seq in
+      # each table.
+      expect_equal(results$summary[nm, "Allele1Name"],
+                   results$data[[nm]]$SeqName[1])
+      # Second called allele, if present, will be below the first somewhere.
+      # Remaining seqs will be unnamed.
+      if (! results$summary[nm, "Homozygous"]) {
+        idx <- match(results$summary[nm, "Allele2Seq"], results$data[[nm]]$Seq)
+        expect_equal(results$summary[nm, "Allele2Name"],
+                     results$data[[nm]]$SeqName[idx])
+      }
+    })
+
+    # One particular case: 3-B showed a stutter-rejected sequence that's the
+    # called allele for another sample.
+    expect_equal(results$data[["3-B"]]$SeqName[2], "220-fb9a92")
   })
 
   test_that("analyze_dataset warns of missing loci", {

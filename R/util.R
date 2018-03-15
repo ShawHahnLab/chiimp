@@ -40,8 +40,8 @@ make_rownames <- function(data) {
 
 #' Define Ordering for STR Data
 #'
-#' Create a standardized ordering vector (as per \code{\link{order}}) for the 
-#' rows of the given data frame, using whichever STR-related metadata columns 
+#' Create a standardized ordering vector (as per \code{\link{order}}) for the
+#' rows of the given data frame, using whichever STR-related metadata columns
 #' are available.  Sample identifiers are treated as integers primarily but then
 #' resolved further by character sorting.  Note that the identification-related
 #' report code relies on this to order lowest-distance genotype matches first.
@@ -74,7 +74,7 @@ order_entries <- function(data) {
 #'
 #' @return vector of short names
 make_allele_name <- function(data, hash.len=6) {
-  if (is.character(data)) {
+  txt <- if (is.character(data)) {
     if (hash.len > 0) {
       paste(nchar(data),
             substr(openssl::md5(data), 1, hash.len),
@@ -85,6 +85,8 @@ make_allele_name <- function(data, hash.len=6) {
   } else {
     as.character(data)
   }
+  txt[is.na(data)] <- NA
+  txt
 }
 
 # Equivalent of /dev/null for the build platform.

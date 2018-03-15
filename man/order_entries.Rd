@@ -14,8 +14,8 @@ or \code{summary} from \code{\link{summarize_dataset}}.}
 integer vector of new row ordering
 }
 \description{
-Create a standardized ordering vector (as per \code{\link{order}}) for the 
-rows of the given data frame, using whichever STR-related metadata columns 
+Create a standardized ordering vector (as per \code{\link{order}}) for the
+rows of the given data frame, using whichever STR-related metadata columns
 are available.  Sample identifiers are treated as integers primarily but then
 resolved further by character sorting.  Note that the identification-related
 report code relies on this to order lowest-distance genotype matches first.

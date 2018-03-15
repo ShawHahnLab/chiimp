@@ -5,7 +5,7 @@
 \title{Analyze all samples in a dataset}
 \usage{
 analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
-  summary.function = summarize_sample)
+  summary.function = summarize_sample, known_alleles = NULL)
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
