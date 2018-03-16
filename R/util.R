@@ -1,5 +1,8 @@
 # Misc utility functions and variables used by the others.
 
+# Sample data frame helpers -----------------------------------------------
+
+
 #' Create identifiers for STR Data
 #'
 #' Create entry IDs for the given data frame, using whichever STR-related
@@ -64,6 +67,10 @@ order_entries <- function(data) {
   do.call(order, items)
 }
 
+
+# Alleles -----------------------------------------------------------------
+
+
 #' Create Short Allele Names
 #'
 #' Autogenerate short names for sequences using sequence length and content.
@@ -88,6 +95,46 @@ make_allele_name <- function(data, hash.len=6) {
   txt[is.na(data)] <- NA
   txt
 }
+
+# Defines a standard order for allele names.
+order_alleles <- function(nms) {
+  ints <- as.integer(gsub("[^0-9]+.*", "", nms))
+  order(ints, nms)
+}
+
+#' Name allele sequences in genotype data frame
+#'
+#' Add Allele1Name and Allele2Name columns matching Allele1Seq and Allele2Seq in
+#' the given data frame.  Names from the given known_alleles data frame will be
+#' used for recognized sequences.
+#'
+#' @param data data frame containing Allele1Seq and Allele2Seq colums such as
+#'   the first list item produced by \code{\link{analyze_dataset}}.
+#' @param known_alleles data frame of custom allele names as defined for
+#'   \code{\link{load_allele_names}}.  if NULL only automatically generated
+#'   names will be used.
+#' @return data frame provided with Allele1Name and Allele2Name columns added
+name_alleles_in_table <- function(data, known_alleles=NULL) {
+  # Make names for given seqs, using existing names where available.
+  nm <- function(seqs) {
+    nms <- make_allele_name(seqs)
+    if (! is.null(known_alleles)) {
+      idx <- match(seqs, known_alleles$Seq)
+      nms <- ifelse(is.na(idx),
+                    nms,
+                    as.character(known_alleles$Name[idx]))
+    }
+    nms
+  }
+  # Name all of the called alleles across entries
+  data$Allele1Name <- nm(data$Allele1Seq)
+  data$Allele2Name <- nm(data$Allele2Seq)
+  data
+}
+
+
+# Other -------------------------------------------------------------------
+
 
 # Equivalent of /dev/null for the build platform.
 fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint

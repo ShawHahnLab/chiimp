@@ -140,21 +140,8 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
 #'   summary data frame will associate any sequence matching a known allele (for
 #'   either the given table or the current dataset) with a text name.
 name_known_sequences <- function(results, known_alleles) {
-  # Make names for given seqs, using existing names where available.
-  nm <- function(seqs) {
-    nms <- make_allele_name(seqs)
-    if (! is.null(known_alleles)) {
-      idx <- match(seqs, known_alleles$Seq)
-      nms <- ifelse(is.na(idx),
-             nms,
-             as.character(known_alleles$Name[idx]))
-    }
-    nms
-  }
-
   # Name all of the called alleles across samples
-  results$summary$Allele1Name <- nm(results$summary$Allele1Seq)
-  results$summary$Allele2Name <- nm(results$summary$Allele2Seq)
+  results$summary <- name_alleles_in_table(results$summary, known_alleles)
 
   # Create table of allele names for current dataset
   a1 <- results$summary[, c("Locus", "Allele1Seq", "Allele1Name")]

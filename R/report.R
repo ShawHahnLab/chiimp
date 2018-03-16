@@ -3,6 +3,60 @@
 
 # Tables ------------------------------------------------------------------
 
+# For each pair of alleles in the given data frame, reorder in standard order,
+# duplicate for homozygous, and fill in blank for remaining NAs.
+normalize_alleles <- function(data) {
+  as.data.frame(t(apply(data, 1, function(pair) {
+    ord <- order_alleles(pair)
+    pair <- pair[ord]
+    if (is.na(pair[1])) {
+      pair[1] <- ""
+    }
+    pair[is.na(pair)] <- pair[1]
+    pair
+  })))
+}
+
+#' Wide table of allele names vs loci
+#'
+#' Allele pairs are shown in a standardized order with homozygous entries shown
+#' twice.
+#'
+#' @param data data frame containing Allele1Name and Allele2Name colums such as
+#'   the first list item produced by \code{\link{analyze_dataset}}.  If allele
+#'   names are not yet present call \code{\link{name_alleles_in_table}}.
+#' @param extra_cols names or index values of additional columns from input data
+#'   frame to be kept in output data frame.  These should be consistent across
+#'   loci for a given entry.
+#' @return wide format data frame with sample entries on rows and loci on
+#'   columns.  An ID column will label sample entries by whichever columns were
+#'   provided in the input (see \code{\link{make_entry_id}}).
+tabulate_allele_names <- function(data, extra_cols=NULL) {
+  # Order and replicate (for homozygous) the allele names
+  nms <- normalize_alleles(data[, c("Allele1Name", "Allele2Name")])
+  # Create unique (aside from Locus) identifiers for each entry
+  id <- make_entry_id(data[, -match("Locus", colnames(data))])
+  # Our normalized and ordered long-format data frame to be reshaped.
+  long <- data.frame(ID = id,
+                     Locus = data$Locus,
+                     data[, extra_cols, drop = FALSE],
+                     nms)
+  long <- long[order_entries(long), ]
+  # Switch to wide format, putting the allele names per locus across columns
+  # (along with ID and whatever extra_cols were given).
+  tbl <- stats::reshape(long, v.names = c("V1", "V2"),
+                        idvar = "ID",
+                        timevar = "Locus",
+                        direction = "wide")
+  # Fix row and colunn names
+  rownames(tbl) <- tbl$ID
+  allele_cols <- paste(rep(levels(droplevels(data$Locus)), each = 2),
+                       c(1, 2),
+                       sep = "_")
+  colnames(tbl) <- c("ID", extra_cols, allele_cols)
+  tbl
+}
+
 #' Create genotype summary table
 #'
 #' Report the genotypes present in a processed dataset, converting sequences to
