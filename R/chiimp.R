@@ -59,15 +59,16 @@ full_analysis <- function(config, dataset=NULL) {
   if (cfg$verbose) logmsg("Analyzing samples...")
   idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
   sample_summary_func <- get(sample_summary_funcs[idx])
-  results$allele.names <- NULL
+  allele.names <- NULL
   if (!is.null(cfg$fp_allele_names))
-    results$allele.names <- load_allele_names(cfg$fp_allele_names)
+    allele.names <- load_allele_names(cfg$fp_allele_names)
   results <- analyze_dataset(dataset, locus_attrs,
                              nrepeats = cfg$sample_analysis$nrepeats,
                              ncores = cfg$dataset_analysis$ncores,
                              summary_args = cfg$sample_summary,
                              summary.function = sample_summary_func,
-                             known_alleles = results$allele.names)
+                             known_alleles = allele.names)
+  results$allele.names <- allele.names
   # Reorder entries to match locus_attrs.
   # TODO merge these steps into analyze_dataset or summarize_dataset
   results$summary$Locus <- factor(results$summary$Locus,
