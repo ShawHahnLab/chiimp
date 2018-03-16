@@ -28,9 +28,12 @@ normalize_alleles <- function(data) {
 #' @param extra_cols names or index values of additional columns from input data
 #'   frame to be kept in output data frame.  These should be consistent across
 #'   loci for a given entry.
+#'
 #' @return wide format data frame with sample entries on rows and loci on
 #'   columns.  An ID column will label sample entries by whichever columns were
 #'   provided in the input (see \code{\link{make_entry_id}}).
+#'
+#' @export
 tabulate_allele_names <- function(data, extra_cols=NULL) {
   # Order and replicate (for homozygous) the allele names
   nms <- normalize_alleles(data[, c("Allele1Name", "Allele2Name")])
@@ -77,8 +80,6 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #'   \code{\link{find_closest_matches}}.
 #'
 #' @return data frame showing summary of genotypes.
-#'
-#' @export
 report_genotypes <- function(tbl,
                              allele.names=NULL,
                              hash.len=6,
