@@ -23,6 +23,9 @@
 #' @param summary.function function to use when summarizing each sample's full
 #'   details into the standard attributes.  Defaults to
 #'   \code{\link{summarize_sample}}.
+#' @param known_alleles data frame of custom allele names as defined for
+#'   \code{\link{load_allele_names}}.  if NULL only the names automatically
+#'   generated for the dataset summary will be used.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
 #'   frame and \code{data} the per-sample data frames.
