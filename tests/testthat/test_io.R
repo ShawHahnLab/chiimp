@@ -1,35 +1,68 @@
 context("Test input/output functions")
 
+
+# helpers -------------------------------------------------------------------
+
+
+# Take a version of the raw locus_attrs text from helper_data.R, save it to a
+# temporary file in TSV format, and return the path.
+write_locus_attrs <- function(txt) {
+  fp <- tempfile()
+  write(gsub(" +", ",", txt), file = fp)
+  fp
+}
+
+# create directory of empty files following a given name pattern.
+setup_data_dir <- function(replicates, samples, loci, ord=c(1, 2, 3)) {
+  dp <- tempfile()
+  dir.create(dp)
+  args <- list(replicates, samples, loci)
+  args <- args[ord]
+  stems <- apply(do.call(expand.grid, args),
+                 1,
+                 paste,
+                 collapse = "-")
+  # (hardcoded to match stems)
+  pattern <- "(\\d+)-(\\d+)-([A-Za-z0-9]+)"
+  fps <- file.path(dp, paste0(stems, ".fastq"))
+  lapply(fps, function(fp) cat("", file = fp))
+  return(list(dp = dp, fps = fps, pattern = pattern))
+}
+
+# simple example dataset data frame
+setup_dataset <- function(reps=1:3, samps=1:5,
+                          loci=sort(rownames(test_data$locus_attrs))) {
+  ids <- as.character(outer(reps,
+                            outer(samps,
+                                  loci,
+                                  FUN = paste,
+                                  sep = "-"),
+                            FUN = paste,
+                            sep = "-"))
+  dataset <- data.frame(
+    Filename = paste0(ids, ".fasta"),
+    Replicate = as.character(rep(reps, length(samps) * length(loci))),
+    Sample = as.character(rep(samps,
+                              times = length(loci),
+                              each = length(reps))),
+    Locus = rep(loci, each = length(samps) * length(reps)),
+    stringsAsFactors = FALSE)
+  rownames(dataset) <- with(dataset, paste(Sample,
+                                           Replicate,
+                                           Locus,
+                                           sep = "-"))
+  dataset
+}
+
 with(test_data, {
+
 
 # test load_locus_attrs ---------------------------------------------------
 
-  # Take a version of the raw locus_attrs text from helper_data.R, save it to a
-  # temporary file in TSV format, and return the path.
-  write_locus_attrs <- function(txt) {
-    fp <- tempfile()
-    write(gsub(" +", ",", txt), file = fp)
-    fp
-  }
-
-  # create directory of empty files following a given name pattern.
-  setup_data_dir <- function(replicates, samples, loci, ord=c(1, 2, 3)) {
-    dp <- tempfile()
-    dir.create(dp)
-    args <- list(replicates, samples, loci)
-    args <- args[ord]
-    stems <- apply(do.call(expand.grid, args),
-                   1,
-                   paste,
-                   collapse = "-")
-    fps <- file.path(dp, paste0(stems, ".fastq"))
-    lapply(fps, function(fp) cat("", file = fp))
-    return(list(dp = dp, fps = fps))
-  }
 
   test_that("load_locus_attrs parses locus details", {
-    # Write the raw text to a temp file, read it back in, and verify that the data
-    # structure matches the predefined one.
+    # Write the raw text to a temp file, read it back in, and verify that the
+    # data structure matches the predefined one.
     fp <- write_locus_attrs(txt.locus_attrs)
     locus_attrs_test <- load_locus_attrs(fp)
     file.remove(fp)
@@ -77,35 +110,30 @@ with(test_data, {
 
 # test load_dataset -------------------------------------------------------
 
+
   test_that("load_dataset loads sample attributes", {
-    replicates <- 1:3
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    ids <- as.character(outer(replicates,
-                              outer(samples,
-                                    loci,
-                                    FUN = paste,
-                                    sep = "-"),
-                              FUN = paste,
-                              sep = "-"))
-    dataset_known <- data.frame(Filename = paste0(ids,
-                                 ".fasta"),
-               Replicate = as.character(rep(replicates,
-                                          length(samples) * length(loci))),
-               Sample = as.character(rep(samples,
-                            times = length(loci),
-                            each = length(replicates))),
-               Locus = rep(loci, each = length(samples)*length(replicates)),
-               stringsAsFactors = FALSE)
-    rownames(dataset_known) <- with(dataset_known,
-                                    paste(Sample, Replicate, Locus, sep = "-"))
+    dataset_known <- setup_dataset()
     fp <- tempfile()
     write.csv(dataset_known, file = fp, na = "", row.names = F)
     dataset <- load_dataset(fp)
     expect_identical(dataset, dataset_known)
   })
 
+# test save_dataset -------------------------------------------------------
+
+
+  test_that("save_dataset saves sample attributes", {
+    # We'll just make sure that saving and then re-loading provides what was
+    # saved.  load_dataset is tested separately above.
+    dataset_known <- setup_dataset()
+    fp <- tempfile()
+    save_dataset(dataset_known, fp)
+    dataset <- load_dataset(fp)
+    expect_identical(dataset, dataset_known)
+  })
+
 # test prepare_dataset ----------------------------------------------------
+
 
   test_that("prepare_dataset parses file paths", {
     ## Basic test of prepare_dataset
@@ -114,7 +142,7 @@ with(test_data, {
     loci <- sort(rownames(locus_attrs))
     # by default the field ordering is assumed to be replicate, sample, locus
     data <- setup_data_dir(replicates, samples, loci)
-    dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    dataset <- prepare_dataset(data$dp, data$pattern)
     expect_equal(colnames(dataset),
                  c("Filename", "Replicate", "Sample", "Locus"))
     expect_equal(sort(dataset$Filename), sort(data$fps))
@@ -157,7 +185,8 @@ with(test_data, {
     replicates <- 1:3
     samples <- 1:5
     loci <- sort(rownames(locus_attrs))
-    # Whoops, we left out the loci field in the pattern.  We should get a warning.
+    # Whoops, we left out the loci field in the pattern.  We should get a
+    # warning.
     data <- setup_data_dir(replicates, samples, loci)
     expect_warning(dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)"))
   })
@@ -171,7 +200,7 @@ with(test_data, {
     data <- setup_data_dir(replicates, samples, loci)
     cat("", file = paste0(data$fps[3], ".extra"))
     expect_warning({
-        dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+        dataset <- prepare_dataset(data$dp, data$pattern)
       },
       "Some replicate/sample/locus combinations match multiple files")
   })
@@ -201,6 +230,33 @@ with(test_data, {
 
   test_that("prepare_dataset works on nested directories", {
     skip("test not yet implemented")
+  })
+
+  test_that("prepare_dataset can separate multiplexed samples", {
+    replicates <- 1
+    samples <- 1:5
+    loci <- sort(rownames(locus_attrs))
+    # Set up locus name placeholders for multiplexed samples, lumping loci
+    # together two at a time (assumes even number)
+    locusmap <- sapply(1:2, function(i) {
+        loci[seq(i, length(loci), 2)]
+      },
+      simplify = FALSE)
+    names(locusmap) <- sapply(locusmap, paste, collapse = "")
+    # Write data using multiplex version of locus names
+    data <- setup_data_dir(replicates, samples, names(locusmap))
+    # Create the full dataset table we expect to see
+    dataset_known <- setup_dataset(reps = replicates,
+                                   samp = samples,
+                                   loci = loci)
+    # prepare_dataset gives integers for replicate.  Should reconcile that up
+    # with load_dataset and setup_dataset.
+    dataset_known$Replicate <- as.integer(dataset_known$Replicate)
+    # Read dataset from disk using the mapping of locus names
+    dataset <- prepare_dataset(data$dp, data$pattern, locusmap = locusmap)
+    # Aside from the different filenames, does everything match up?
+    dataset_known$Filename <- dataset$Filename
+    expect_equal(dataset, dataset_known)
   })
 
 })
