@@ -1,5 +1,8 @@
 # Misc utility functions and variables used by the others.
 
+# Sample data frame helpers -----------------------------------------------
+
+
 #' Create identifiers for STR Data
 #'
 #' Create entry IDs for the given data frame, using whichever STR-related
@@ -40,8 +43,8 @@ make_rownames <- function(data) {
 
 #' Define Ordering for STR Data
 #'
-#' Create a standardized ordering vector (as per \code{\link{order}}) for the 
-#' rows of the given data frame, using whichever STR-related metadata columns 
+#' Create a standardized ordering vector (as per \code{\link{order}}) for the
+#' rows of the given data frame, using whichever STR-related metadata columns
 #' are available.  Sample identifiers are treated as integers primarily but then
 #' resolved further by character sorting.  Note that the identification-related
 #' report code relies on this to order lowest-distance genotype matches first.
@@ -64,20 +67,24 @@ order_entries <- function(data) {
   do.call(order, items)
 }
 
+
+# Alleles -----------------------------------------------------------------
+
+
 #' Create Short Allele Names
 #'
 #' Autogenerate short names for sequences using sequence length and content.
 #'
 #' @param data character vector of sequences
-#' @param hash.len number of characters of alphanumeric hash to include as a
+#' @param hash_len number of characters of alphanumeric hash to include as a
 #'   suffix.  (See \code{\link[openssl]{md5}}.)
 #'
 #' @return vector of short names
-make_allele_name <- function(data, hash.len=6) {
-  if (is.character(data)) {
-    if (hash.len > 0) {
+make_allele_name <- function(data, hash_len=6) {
+  txt <- if (is.character(data)) {
+    if (hash_len > 0) {
       paste(nchar(data),
-            substr(openssl::md5(data), 1, hash.len),
+            substr(openssl::md5(data), 1, hash_len),
             sep = "-")
     } else {
       nchar(data)
@@ -85,7 +92,51 @@ make_allele_name <- function(data, hash.len=6) {
   } else {
     as.character(data)
   }
+  txt[is.na(data)] <- NA
+  txt
 }
+
+# Defines a standard order for allele names.
+order_alleles <- function(nms) {
+  ints <- as.integer(gsub("[^0-9]+.*", "", nms))
+  order(ints, nms)
+}
+
+#' Name allele sequences in genotype data frame
+#'
+#' Add Allele1Name and Allele2Name columns matching Allele1Seq and Allele2Seq in
+#' the given data frame.  Names from the given known_alleles data frame will be
+#' used for recognized sequences.
+#'
+#' @param data data frame containing Allele1Seq and Allele2Seq colums such as
+#'   the first list item produced by \code{\link{analyze_dataset}}.
+#' @param known_alleles data frame of custom allele names as defined for
+#'   \code{\link{load_allele_names}}.  if NULL only automatically generated
+#'   names will be used.
+#' @param name_args list of additional arguments to \code{make_allele_name}.
+#'
+#' @return data frame provided with Allele1Name and Allele2Name columns added
+name_alleles_in_table <- function(data, known_alleles=NULL, name_args=list()) {
+  # Make names for given seqs, using existing names where available.
+  nm <- function(seqs) {
+    nms <- do.call(make_allele_name, c(list(data = seqs), name_args))
+    if (! is.null(known_alleles)) {
+      idx <- match(seqs, known_alleles$Seq)
+      nms <- ifelse(is.na(idx),
+                    nms,
+                    as.character(known_alleles$Name[idx]))
+    }
+    nms
+  }
+  # Name all of the called alleles across entries
+  data$Allele1Name <- nm(data$Allele1Seq)
+  data$Allele2Name <- nm(data$Allele2Seq)
+  data
+}
+
+
+# Other -------------------------------------------------------------------
+
 
 # Equivalent of /dev/null for the build platform.
 fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint

@@ -6,7 +6,10 @@
 #' Analyze all samples in a dataset
 #'
 #' Load all samples for a given dataset and produce a list of processed samples
-#' and a summary data frame showing each sample's summary row-by-row.
+#' and a summary data frame showing each sample's summary row-by-row.  The
+#' entries in the processed-samples list and the rows in the summary data frame
+#' will be sorted according to the ordering of loci in \code{locus_attrs} and
+#' by the sample attributes.
 #'
 #' @param dataset data frame of sample details as produced by
 #'   \code{\link{prepare_dataset}}.
@@ -23,6 +26,11 @@
 #' @param summary.function function to use when summarizing each sample's full
 #'   details into the standard attributes.  Defaults to
 #'   \code{\link{summarize_sample}}.
+#' @param known_alleles data frame of custom allele names as defined for
+#'   \code{\link{load_allele_names}}.  if NULL only the names automatically
+#'   generated for the dataset summary will be used.
+#' @param name_args list of additional arguments to
+#'   \code{\link{make_allele_name}}.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
 #'   frame and \code{data} the per-sample data frames.
@@ -33,7 +41,9 @@ analyze_dataset <- function(dataset,
                             nrepeats,
                             ncores = 0,
                             summary_args,
-                            summary.function=summarize_sample) {
+                            summary.function=summarize_sample,
+                            known_alleles=NULL,
+                            name_args=list()) {
   if (ncores == 0) {
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
@@ -46,8 +56,10 @@ analyze_dataset <- function(dataset,
     return(list(summary = sample.summary, data = sample.data))
   }
   if (ncores > 1) {
-    # Set up the cluster and export required names.
-    cluster_names <- c("locus_attrs")
+    # Set up the cluster and export required names (those objects used in
+    # analyze.entry that are expected from the environment and not passed as
+    # arguments).
+    cluster_names <- c("locus_attrs", "nrepeats", "summary_args")
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
@@ -82,7 +94,13 @@ analyze_dataset <- function(dataset,
                          summary.function = summary.function)
   }
   # Recombined results into a summary data frame and a list of full sample data.
-  tidy_analyzed_dataset(dataset, raw.results)
+  results <- tidy_analyzed_dataset(dataset, raw.results)
+  # Add allele name columns to all data frames for any allele in the given
+  # known_alleles data frame or called in the current genotypes.
+  results <- name_known_sequences(results, known_alleles, name_args)
+  # Reorder entries to match locus_attrs.
+  results <- sort_results(results, locus_attrs)
+  results
 }
 
 #' Tidy raw analyzed dataset results
@@ -109,4 +127,85 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
   names(data)       <- rownames(dataset)
   summary <- cbind(dataset, summary)
   return(list(summary = summary, data = data))
+}
+
+#' Name known allele sequences
+#'
+#' For the given results list (pair of summary data frame and list of per-sample
+#' data frames as produced by \code{\link{tidy_analyzed_dataset}}), add columns
+#' to all data frames defining names for recognized sequences.  For the summary
+#' data frame this will be Allele1Name and Allele2Name.  For each sample data
+#' frame this will be SeqName, defined for any sequences represented in the
+#' summary or in a given known alleles set.
+#'
+#' @param results results list as produced by
+#'   \code{\link{tidy_analyzed_dataset}}.
+#' @param known_alleles data frame of custom allele names as defined for
+#'   \code{\link{load_allele_names}}.  if NULL only the names automatically
+#'   generated for the summary will be used.
+#' @param name_args list of additional arguments to
+#'   \code{\link{make_allele_name}}.
+#'
+#' @return list of results, with \code{summary} set to the single summary data
+#'   frame and \code{data} the per-sample data frames.  A "SeqName" column in
+#'   sample data frames and "Allele1Name" and "Allele2Name" columns in the
+#'   summary data frame will associate any sequence matching a known allele (for
+#'   either the given table or the current dataset) with a text name.
+name_known_sequences <- function(results, known_alleles, name_args) {
+  # Name all of the called alleles across samples
+  results$summary <- name_alleles_in_table(results$summary, known_alleles,
+                                           name_args)
+
+  # Create table of allele names for current dataset
+  a1 <- results$summary[, c("Locus", "Allele1Seq", "Allele1Name")]
+  a2 <- results$summary[, c("Locus", "Allele2Seq", "Allele2Name")]
+  colnames(a1) <- c("Locus", "Seq", "Name")
+  colnames(a2) <- c("Locus", "Seq", "Name")
+  a_combo <- rbind(a1, a2)
+  a_combo <- unique(a_combo[! is.na(a_combo$Seq), ])
+
+  # Merge into given known alleles table (if present)
+  known_alleles <- if (is.null(known_alleles)) {
+    a_combo
+  } else {
+    known_alleles <- known_alleles[, c("Locus", "Seq", "Name")]
+    known_alleles$Name <- as.character(known_alleles$Name)
+    unique(rbind(known_alleles, a_combo))
+  }
+
+  # Name recognized sequences in each sample data frame
+  results$data <- lapply(results$data, function(d) {
+    idx <- match(d$Seq, known_alleles$Seq)
+    d$SeqName <- known_alleles$Name[idx]
+    d
+  })
+
+  return(results)
+}
+
+#' Sort entries in results data frames
+#'
+#' Rearrange rows in the summary data frame and corresponding entries in the
+#' per-sample data frames list, matching locus order given in locus attributes.
+#' The Locus column of the summary data frame will be set to a factor to
+#' preserve the defined order.  Only levels remaining in that set are kept.
+#'
+#' @param results results list as produced by
+#'   \code{\link{tidy_analyzed_dataset}}.
+#' @param locus_attrs data frame of locus attributes as produced by
+#'   \code{\link{load_locus_attrs}}.
+#'
+#' @return list of results, with \code{summary} set to the single summary data
+#'   frame and \code{data} the per-sample data frames.  \code{summary$Locus} is
+#'   coerced to a factor with levels ordered according to their appearance in
+#'   \code{locus_attrs$Locus}.  Order of rows in \code{summary} and entries in
+#'   \code{data} are updated accordingly.
+sort_results <- function(results, locus_attrs) {
+  results$summary$Locus <- factor(results$summary$Locus,
+                                  levels = locus_attrs$Locus)
+  results$summary$Locus <- droplevels(results$summary$Locus)
+  ord <- order_entries(results$summary)
+  results$summary <- results$summary[ord, ]
+  results$data <- results$data[ord]
+  results
 }

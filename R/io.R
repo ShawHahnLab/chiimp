@@ -230,9 +230,9 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
   names(seq_file_attrs) <- n[c(1, 1 + ord)]
   data <- do.call(data.frame, c(seq_file_attrs, stringsAsFactors = FALSE))
   data$Filename <- seq_files
-  data$Replicate <- ifelse(data$Replicate == "",
-                           NA,
-                           as.integer(data$Replicate))
+  data$Replicate <- as.integer(ifelse(data$Replicate == "",
+                                      NA,
+                                      data$Replicate))
 
   # If specified, map the locus text into multiple loci per sample (e.g.
   # multiplexed)
