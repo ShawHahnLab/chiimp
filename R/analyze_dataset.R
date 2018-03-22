@@ -168,6 +168,7 @@ name_known_sequences <- function(results, known_alleles, name_args) {
   known_alleles <- if (is.null(known_alleles)) {
     aT
   } else {
+    known_alleles <- known_alleles[, c("Locus", "Seq", "Name")]
     known_alleles$Name <- as.character(known_alleles$Name)
     unique(rbind(known_alleles, aT))
   }
