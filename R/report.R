@@ -139,16 +139,13 @@ report_idents <- function(results,
   gt$Locus <- factor(gt$Locus, levels = levels(results$summary$Locus))
   # Add Allele1Name, Allele2Name columns
   gt <- name_alleles_in_table(data = gt, known_alleles = results$allele.names)
-  # Add additional grouping column to both sets
-  gt$DataSource <- "Known"
-  results$summary$DataSource <- "Experimental"
   # Create wide-format allele name table for experimental and known values
   results_summary <- results$summary
   tbl_exp <- tabulate_allele_names(data = results_summary,
-                    extra_cols = c("DataSource", "Sample", "Replicate"))
+                    extra_cols = c("Sample", "Replicate"))
 
   tbl_known <- tabulate_allele_names(data = gt,
-                    extra_cols = c("DataSource", "Name"))
+                    extra_cols = c("Name"))
 
 
   # Now, to group each row in tbl_exp with each set of nearby individuals in
@@ -163,7 +160,7 @@ report_idents <- function(results,
     idx_exp <- match(nm, tbl_exp$ID)
     cbind(Sample = tbl_exp[idx_exp, "Sample"],
           Replicate = tbl_exp[idx_exp, "Replicate"],
-          tbl_known[idx_known, ], # cols ID, Name, loci, DataSource
+          tbl_known[idx_known, ], # cols ID, Name, loci
           Distance = closest[[nm]])
   }))
 
@@ -171,17 +168,17 @@ report_idents <- function(results,
   # This will order by sample by distance, with observations first, before known
   # genotypes.
   tbl_combo <- tbl_exp
-  tbl_combo$Distance <- NA
+  tbl_combo$Distance <- -1
   tbl_combo$Name <- ""
   tbl_combo <- rbind(tbl_combo, tbl_closest)
   tbl_combo <- tbl_combo[order_entries(tbl_combo), ]
+  tbl_combo <- within(tbl_combo, Distance[Distance < 0] <- NA)
 
-  # Blank out NA distance entries for display purposes.
-  tbl_combo$Distance[is.na(tbl_combo$Distance)] <- ""
-
+  # Drop ID column
+  tbl_combo <- tbl_combo[, -match("ID", colnames(tbl_combo))]
   # If we have no replicates drop that column
   if (all(is.na(tbl_combo$Replicate)))
-    tbl_combo <- tbl_combo[, -2]
+    tbl_combo <- tbl_combo[, -match("Replicate", colnames(tbl_combo))]
   else
     tbl_combo$Replicate[is.na(tbl_combo$Replicate)] <- na.replicates
   # Blank out any remaining NA values
