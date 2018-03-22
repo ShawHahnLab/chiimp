@@ -4,7 +4,7 @@
 \alias{name_known_sequences}
 \title{Name known allele sequences}
 \usage{
-name_known_sequences(results, known_alleles)
+name_known_sequences(results, known_alleles, name_args)
 }
 \arguments{
 \item{results}{results list as produced by
@@ -13,6 +13,9 @@ name_known_sequences(results, known_alleles)
 \item{known_alleles}{data frame of custom allele names as defined for
 \code{\link{load_allele_names}}.  if NULL only the names automatically
 generated for the summary will be used.}
+
+\item{name_args}{list of additional arguments to
+\code{\link{make_allele_name}}.}
 }
 \value{
 list of results, with \code{summary} set to the single summary data

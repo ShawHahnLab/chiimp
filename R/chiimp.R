@@ -67,7 +67,8 @@ full_analysis <- function(config, dataset=NULL) {
                              ncores = cfg$dataset_analysis$ncores,
                              summary_args = cfg$sample_summary,
                              summary.function = sample_summary_func,
-                             known_alleles = allele.names)
+                             known_alleles = allele.names,
+                             name_args = cfg$dataset_analysis$name_args)
   results$allele.names <- allele.names
   results$locus_attrs <- locus_attrs
   if (cfg$verbose) logmsg("Summarizing results...")

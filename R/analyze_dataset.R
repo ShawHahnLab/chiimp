@@ -29,6 +29,8 @@
 #' @param known_alleles data frame of custom allele names as defined for
 #'   \code{\link{load_allele_names}}.  if NULL only the names automatically
 #'   generated for the dataset summary will be used.
+#' @param name_args list of additional arguments to
+#'   \code{\link{make_allele_name}}.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
 #'   frame and \code{data} the per-sample data frames.
@@ -40,7 +42,8 @@ analyze_dataset <- function(dataset,
                             ncores = 0,
                             summary_args,
                             summary.function=summarize_sample,
-                            known_alleles=NULL) {
+                            known_alleles=NULL,
+                            name_args=list()) {
   if (ncores == 0) {
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
@@ -92,7 +95,7 @@ analyze_dataset <- function(dataset,
   results <- tidy_analyzed_dataset(dataset, raw.results)
   # Add allele name columns to all data frames for any allele in the given
   # known_alleles data frame or called in the current genotypes.
-  results <- name_known_sequences(results, known_alleles)
+  results <- name_known_sequences(results, known_alleles, name_args)
   # Reorder entries to match locus_attrs.
   results <- sort_results(results, locus_attrs)
   results
@@ -138,15 +141,18 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
 #' @param known_alleles data frame of custom allele names as defined for
 #'   \code{\link{load_allele_names}}.  if NULL only the names automatically
 #'   generated for the summary will be used.
+#' @param name_args list of additional arguments to
+#'   \code{\link{make_allele_name}}.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
 #'   frame and \code{data} the per-sample data frames.  A "SeqName" column in
 #'   sample data frames and "Allele1Name" and "Allele2Name" columns in the
 #'   summary data frame will associate any sequence matching a known allele (for
 #'   either the given table or the current dataset) with a text name.
-name_known_sequences <- function(results, known_alleles) {
+name_known_sequences <- function(results, known_alleles, name_args) {
   # Name all of the called alleles across samples
-  results$summary <- name_alleles_in_table(results$summary, known_alleles)
+  results$summary <- name_alleles_in_table(results$summary, known_alleles,
+                                           name_args)
 
   # Create table of allele names for current dataset
   a1 <- results$summary[, c("Locus", "Allele1Seq", "Allele1Name")]

@@ -32,39 +32,44 @@ with(test_data, {
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
     with(results$summary, {
-      # These should just match what we fed in via dataset.
+      # First update ordering of dataset's rows.  The existing order should be
+      # correct except for the locus order definied via locus_attrs.
+      dataset <- dataset[order(match(dataset$Locus, locus_attrs$Locus)), ]
+      # Now, these should just match what we fed in via dataset.
       expect_equal(Filename,  dataset$Filename)
       expect_equal(Replicate, dataset$Replicate)
       expect_equal(Sample,    dataset$Sample)
-      expect_equal(Locus,     dataset$Locus)
+      expect_equal(as.character(Locus), dataset$Locus)
       # Skipping allele seqs here, but we should already be checking more than
       # enough and have that checked in test_summarize_sample.
-      expect_equal(Allele1Count, c(2794, 2041, 2909, 3035, 2902, 2288,
-                                   2803, 2394, 3971, 2489, 2656, 4082))
-      expect_equal(Allele1Length, c(272, 276, 276, 278, 346, 318,
-                                    162, 182, 174, 244, 212, 224))
-      expect_equal(Allele2Count, c(1055, 1402, 1004, 1142, 1088, 1270,
-                                   1300, 2003,   NA, 1304, 1059,   NA))
-      expect_equal(Allele2Length, c(260, 288, 252, 342, 314, 350,
-                                    194, 178,  NA, 220, 220,  NA))
+      expect_equal(Allele1Count, c(2803, 2394, 3971, 2489, 2656, 4082,
+                                   2794, 2041, 2909, 3035, 2902, 2288))
+      expect_equal(Allele1Length, c(162, 182, 174, 244, 212, 224,
+                                    272, 276, 276, 278, 346, 318))
+      expect_equal(Allele2Count, c(1300, 2003,   NA, 1304, 1059,   NA,
+                                   1055, 1402, 1004, 1142, 1088, 1270))
+      expect_equal(Allele2Length, c(194, 178,  NA, 220, 220,  NA,
+                                    260, 288, 252, 342, 314, 350))
       # Auto-generated names for all sequences.  NA entries in give NA out.
-      expect_equal(Allele1Name, c("272-292a2a", "276-ea279a", "276-ea279a",
-                                  "278-ae70f3", "346-b05233", "318-35b7b6",
-                                  "162-c6933c", "182-d679e1", "174-8a43ea",
-                                  "244-3c2ff2", "212-6d4afb", "224-053ec2"))
-      expect_equal(Allele2Name, c("260-9a01fc", "288-201179", "252-a5eee8",
-                                  "342-2e88c0", "314-ce2338", "350-4acdbb",
-                                  "194-fc013a", "178-d84dc0", NA,
-                                  "220-fb9a92", "220-fb9a92", NA))
+      expect_equal(Allele1Name, c("162-c6933c", "182-d679e1", "174-8a43ea",
+                                  "244-3c2ff2", "212-6d4afb", "224-053ec2",
+                                  "272-292a2a", "276-ea279a", "276-ea279a",
+                                  "278-ae70f3", "346-b05233", "318-35b7b6"))
+      expect_equal(Allele2Name, c("194-fc013a", "178-d84dc0", NA,
+                                  "220-fb9a92", "220-fb9a92", NA,
+                                  "260-9a01fc", "288-201179", "252-a5eee8",
+                                  "342-2e88c0", "314-ce2338", "350-4acdbb"))
       h <- logical(12)
-      h[c(9, 12)] <- TRUE
+      h[c(3, 6)] <- TRUE
       expect_equal(Homozygous, h)
       s <- logical(12)
-      s[c(9, 12)] <- TRUE
+      s[c(3, 6)] <- TRUE
       expect_equal(Stutter, s)
+      a <- logical(12)
+      expect_equal(Artifact, a)
       expect_equal(CountTotal, integer(12)+5000)
       expect_equal(CountLocus, integer(12)+4500)
-      expect_equal(ProminentSeqs,  c(2, 3, 2, 2, 2, 3, 2, 2, 1, 2, 3, 1))
+      expect_equal(ProminentSeqs,  c(2, 2, 1, 2, 3, 1, 2, 3, 2, 2, 2, 3))
     })
 
   })
@@ -96,15 +101,18 @@ with(test_data, {
 
     # Check that the resulting allele names match all the expected values
     with(results$summary, {
-      expect_equal(Allele1Name, c("272-a",      "276-ea279a", "276-ea279a",
-                                  "278-ae70f3", "346-b05233", "318-35b7b6",
-                                  "different_name_format", "182-d679e1",
-                                    "174-8a43ea",
-                                  "244-3c2ff2", "212-6d4afb", "224-053ec2"))
-      expect_equal(Allele2Name, c("260-X",      "288-201179", "252-a5eee8",
-                                  "342-2e88c0", "314-ce2338", "350-4acdbb",
-                                  "194-fc013a", "178-d84dc0", NA,
-                                  "220-fb9a92", "220-fb9a92", NA))
+      # expect_equal(Allele1Name, c("different_name_format", "182-d679e1", "174-8a43ea",
+      #                             NA, NA, NA,
+      #                             "272-a", "276-ea279a", "276-ea279a",
+      #                             "278-ae70f3", "346-b05233", "318-35b7b6"))
+      expect_equal(Allele1Name, c("different_name_format", "182-d679e1", "174-8a43ea",
+                                  "244-3c2ff2", "212-6d4afb", "224-053ec2",
+                                  "272-a", "276-ea279a", "276-ea279a",
+                                  "278-ae70f3", "346-b05233", "318-35b7b6"))
+      expect_equal(Allele2Name, c("194-fc013a", "178-d84dc0", NA,
+                                  "220-fb9a92", "220-fb9a92", NA,
+                                  "260-X", "288-201179", "252-a5eee8",
+                                  "342-2e88c0", "314-ce2338", "350-4acdbb"))
     })
 
     # Check that the resulting sequence names in the sample data frames match

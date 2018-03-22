@@ -106,7 +106,7 @@ with(test_data, {
   test_that("align_alleles produces sequence alignments", {
     with(results_summary_data, {
       alignments <- align_alleles(results$summary)
-      expect_equal(names(alignments), unique(results$summary$Locus))
+      expect_equal(names(alignments), levels(results$summary$Locus))
       expect_equal(names(as.character(alignments[["A"]])),
                    c("182_1", "194_1", "178_1", "174_2", "162_1"))
       expect_equal(as.character(alignments[["A"]])[[1]],
@@ -125,7 +125,7 @@ with(test_data, {
     # tests the other option.
     with(results_summary_data, {
       alignments <- align_alleles(results$summary, derep = FALSE)
-      expect_equal(names(alignments), unique(results$summary$Locus))
+      expect_equal(names(alignments), levels(results$summary$Locus))
       n1 <- paste(rownames(subset(results$summary, Locus == "A")), 1, sep = "_")
       n2 <- paste(rownames(subset(results$summary, Locus == "A")), 2, sep = "_")
       expect_equal(sort(names(as.character(alignments[["A"]]))),
@@ -138,12 +138,12 @@ with(test_data, {
     # called.
     with(results_summary_data, {
       # Empty out one entry for locus A
-      idx <- results$summary$Locus == "A"
+      idx <- which(results$summary$Locus == "A")
       results$summary[idx[1], "Allele1Seq"] <- NA
       results$summary[idx[1], "Allele2Seq"] <- NA
       # Locus A's alignment should be OK, just with one stub entry
       alignments <- align_alleles(results$summary)
-      expect_true(any(grepl("-", as.character(alignments$A))))
+      expect_true(any(grepl("^-+$", as.character(alignments$A))))
     })
   })
 

@@ -281,11 +281,13 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
 #'   summary.  Defaults to the sequence content for the two alleles.
 #'
 #' @return data frame of genotypes across samples and loci.
-#'
-#' @export
 summarize_genotypes <- function(results_summary,
                                 vars=c("Allele1Seq", "Allele2Seq")) {
-  combo <- results_summary[, c("Sample", "Replicate", "Locus", vars)]
+  # Create unique (aside from Locus) identifiers for each entry
+  results_summary$ID <- make_entry_id(results_summary[,
+                              - match("Locus", colnames(results_summary))])
+  combo <- results_summary[, c("ID", "Sample", "Replicate", "Locus", vars)]
+  # normalize extra vars
   combo[, vars[1]] <- as.character(combo[, vars[1]])
   combo[, vars[2]] <- as.character(combo[, vars[2]])
   # Repeat alleles for homozygous cases
@@ -310,16 +312,15 @@ summarize_genotypes <- function(results_summary,
                               paste0(combo[, vars[2]], "*"),
                               combo[, vars[2]])
   # Reshape into wide table
-  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
   tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
                         timevar = "Locus", direction = "wide")
-  tbl <- tbl[, -3]
+  rownames(tbl) <- tbl$ID
+  tbl <- tbl[, -match("ID", colnames(tbl))]
   allele_cols <- paste(rep(unique(combo$Locus), each = 2),
                        c(1, 2),
                        sep = "_")
   colnames(tbl) <- c("Sample", "Replicate", allele_cols)
   tbl <- tbl[order_entries(tbl), ]
-  rownames(tbl) <- make_rownames(tbl)
   tbl
 }
 
@@ -335,8 +336,6 @@ summarize_genotypes <- function(results_summary,
 #'   selection and column ordering.
 #'
 #' @return data frame of genotypes across individuals and loci.
-#'
-#' @export
 summarize_genotypes_known <- function(genotypes_known, tbl_genotypes=NULL) {
   # Kludgy workaround to make summarize_genotypes handle a different sort of
   # data frame

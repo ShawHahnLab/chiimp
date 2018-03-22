@@ -5,7 +5,8 @@
 \title{Analyze all samples in a dataset}
 \usage{
 analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
-  summary.function = summarize_sample, known_alleles = NULL)
+  summary.function = summarize_sample, known_alleles = NULL,
+  name_args = list())
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
@@ -32,6 +33,9 @@ details into the standard attributes.  Defaults to
 \item{known_alleles}{data frame of custom allele names as defined for
 \code{\link{load_allele_names}}.  if NULL only the names automatically
 generated for the dataset summary will be used.}
+
+\item{name_args}{list of additional arguments to
+\code{\link{make_allele_name}}.}
 }
 \value{
 list of results, with \code{summary} set to the single summary data

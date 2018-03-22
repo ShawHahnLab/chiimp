@@ -24,6 +24,11 @@ with(test_data, {
 
   test_that("tabulate_allele_names produces expected data frame", {
     fail("not implemented")
+    with(results_summary_data, {
+      tbl <- tabulate_allele_names(results$summary)
+      # TODO clean up stuff betwen analyze_dataset and summarize_dataset in
+      # chiimp.R and put the factoring/ordering code inside analyze_dataset (?)
+    })
   })
 
 })
