@@ -159,14 +159,34 @@ load_dataset <- function(fp, ...) {
   data
 }
 
+#' Save table of sample attributes
+#'
+#' Save a comma-separated table of sample attributes.
+#'
+#' @param data data frame of sample attributes as produced by
+#'   \code{\link{prepare_dataset}} or \code{\link{load_dataset}}.
+#' @param fp path to text file.
+#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#'
+#' @export
+save_dataset <- function(data, fp, ...) {
+  utils::write.table(data,
+                     file = fp,
+                     sep = ",",
+                     na = "",
+                     row.names = FALSE,
+                     ...)
+}
+
 #' Extract Sample Attributes from Filenames
 #'
 #' Find files matching a pattern in a given directory, and build a data frame of
 #' standard sample attributes from fields in the filenames.  Alternatively, use
 #' \code{\link{load_dataset}} to load a spreadsheet of sample attributes
-#' explicitly.  \code{load_dataset} should be used for cases where more than one
+#' explicitly.  \code{load_dataset} can be used for cases where more than one
 #' locus is to be analyzed from a single sequencer sample (i.e., multiplexed
-#' samples).
+#' samples), though the \code{locusmap} argument here can allow automatic
+#' matching of locus names for multiplexed samples.
 #'
 #' @param dp directory path to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.  There should
@@ -176,11 +196,20 @@ load_dataset <- function(fp, ...) {
 #'   Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 #' @param autorep logical allowing for automatic handling of any duplicates
 #'   found, labeling them as replicates.  FALSE by default.
+#' @param locusmap list of character vectors, each list item name being the
+#'   locus text given in the filenames, and each vector being a set of separate
+#'   locus names.  Each entry with a locus name text matching one of these list
+#'   items will be replaced in the final output with several separate entries,
+#'   one for each locus name in the corresponding vector.  (For example,
+#'   \code{locusmap=list(ABCD=c("A", "B", "C", "D"))} would take a filename with
+#'   "ABCD" in the locus field and split it out into four entries for the four
+#'   loci.)
 #'
 #' @return data frame of metadata for all files found
 #'
 #' @export
-prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
+prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
+                            locusmap=NULL) {
   # get all matching filenames and extract substrings
   seq_files <- list.files(path = dp,
                           pattern = pattern,
@@ -201,11 +230,31 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
   names(seq_file_attrs) <- n[c(1, 1 + ord)]
   data <- do.call(data.frame, c(seq_file_attrs, stringsAsFactors = FALSE))
   data$Filename <- seq_files
-  data$Replicate <- ifelse(data$Replicate == "",
-                           NA,
-                           as.integer(data$Replicate))
+  data$Replicate <- as.integer(ifelse(data$Replicate == "",
+                                      NA,
+                                      data$Replicate))
+
+  # If specified, map the locus text into multiple loci per sample (e.g.
+  # multiplexed)
+  if (! is.null(locusmap)) {
+    data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+      col_locus <- match("Locus", colnames(data))
+      cols <- as.list(data[i, -col_locus])
+      locus <- data[i, col_locus]
+      locus_new <- locusmap[[locus]]
+      if (is.null(locus_new)) {
+        locus_new <- locus
+      }
+      args <- c(cols,
+              Locus = list(locus_new),
+              stringsAsFactors = FALSE)
+      do.call(data.frame, args)
+    }))
+  }
+
   # order by locus/sample/replicate
   data <- data[order_entries(data), ]
+
   # If specified, automatically number duplicates as replicates, if they don't
   # have a replicate number already.
   if (autorep) {
@@ -220,6 +269,7 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
     }))
     data <- data[order_entries(data), ]
   }
+
   rownames(data) <- make_rownames(data)
   # complain if any replicate/sample/locus combo matches more than one entry
   if (max(table(paste(data$Replicate, data$Sample, data$Locus))) > 1) {

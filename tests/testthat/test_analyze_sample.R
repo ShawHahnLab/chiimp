@@ -80,7 +80,16 @@ with(test_data, {
   })
 
   test_that("analyze_sample marks artifact entries", {
-    skip("tets not yet implemented")
+    s <- seqs1$A
+    # Take that first stutter and make it an artifact instead
+    highest <- names(sort(table(s), decreasing = T)[1])
+    stutter <- names(sort(table(s), decreasing = T)[3])
+    idx <- s == stutter
+    s[idx] <- highest
+    substr(s[idx], nchar(stutter), nchar(stutter)) <- "X"
+    # Check that the third entry is marked an artifact of the first
+    sample.data <- analyze_sample(s, locus_attrs, 3)
+    expect_equal(sample.data$Artifact, c(NA, NA, 1)[1:14])
   })
 
 })

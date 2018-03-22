@@ -33,7 +33,7 @@ allele sequences.
 plot_heatmap_prominent_seqs(results)
 ```
 
-### Residual Reads from Other Sequnces
+### Proportion of Allele-Matching Reads
 
 These tables are color-coded by the proportion of locus-matching reads 
 represented by the called alleles per sample, running from red for 0% to white 

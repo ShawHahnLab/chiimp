@@ -5,7 +5,8 @@
 \title{Analyze all samples in a dataset}
 \usage{
 analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
-  summary.function = summarize_sample)
+  summary.function = summarize_sample, known_alleles = NULL,
+  name_args = list())
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
@@ -28,6 +29,13 @@ a minimum of 1.  If 1, the function will run without using the
 \item{summary.function}{function to use when summarizing each sample's full
 details into the standard attributes.  Defaults to
 \code{\link{summarize_sample}}.}
+
+\item{known_alleles}{data frame of custom allele names as defined for
+\code{\link{load_allele_names}}.  if NULL only the names automatically
+generated for the dataset summary will be used.}
+
+\item{name_args}{list of additional arguments to
+\code{\link{make_allele_name}}.}
 }
 \value{
 list of results, with \code{summary} set to the single summary data
@@ -35,5 +43,8 @@ list of results, with \code{summary} set to the single summary data
 }
 \description{
 Load all samples for a given dataset and produce a list of processed samples
-and a summary data frame showing each sample's summary row-by-row.
+and a summary data frame showing each sample's summary row-by-row.  The
+entries in the processed-samples list and the rows in the summary data frame
+will be sorted according to the ordering of loci in \code{locus_attrs} and
+by the sample attributes.
 }

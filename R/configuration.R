@@ -47,7 +47,13 @@ config.defaults <- list(
     dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
   ),
   ## Options for analyze_dataset
-  dataset_analysis = list(ncores = 0),
+  dataset_analysis = list(
+    # Number of CPU cores to use while processing samples in parallel.  Set to 0
+    # to automatically select a number, or 1 to disable parallel execution.
+    ncores = 0,
+    # Length of suffix on automated allele names in tables.
+    name_args = list(hash_len = 6)
+  ),
   ## Sample genotyping settings
   sample_analysis = list(nrepeats = 3),
   sample_summary_func = "summarize_sample",
@@ -61,8 +67,6 @@ config.defaults <- list(
   # Title and other metadata at top of the report.
   report.title = "Microsatellite Report",
   report.author = NULL,
-  # Length of suffix on automated allele names in tables.
-  report.hash_len = 6,
   # List of vectors of locus names to use to break up tables into reasonable
   # sizes and/or order locus names explicitly.
   report.locus_chunks = NULL,

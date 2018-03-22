@@ -110,11 +110,11 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
                          fmt="%s-%s.fasta") {
     if (! dir.exists(outdir))
       dir.create(outdir, recursive = TRUE)
-    for(sn in names(seq_sets)) {
+    for (sn in names(seq_sets)) {
       for (ln in names(seq_sets[[sn]])) {
         fp <- file.path(outdir, sprintf(fmt, sn, ln))
         n <- names(seq_sets[[sn]][[ln]])
-        if(is.null(n))
+        if (is.null(n))
           n <- seq_along(seq_sets[[sn]][[ln]])
         dnar::write.fa(names = n,
                        dna = seq_sets[[sn]][[ln]],
