@@ -14,7 +14,8 @@ normalize_alleles <- function(data) {
     }
     pair[is.na(pair)] <- pair[1]
     pair
-  })), stringsAsFactors = FALSE)
+  }
+  )), stringsAsFactors = FALSE)
 }
 
 #' Wide table of allele names vs loci

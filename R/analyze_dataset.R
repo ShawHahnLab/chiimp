@@ -161,16 +161,16 @@ name_known_sequences <- function(results, known_alleles, name_args) {
   a2 <- results$summary[, c("Locus", "Allele2Seq", "Allele2Name")]
   colnames(a1) <- c("Locus", "Seq", "Name")
   colnames(a2) <- c("Locus", "Seq", "Name")
-  aT <- rbind(a1, a2)
-  aT <- unique(aT[! is.na(aT$Seq), ])
+  a_combo <- rbind(a1, a2)
+  a_combo <- unique(a_combo[! is.na(a_combo$Seq), ])
 
   # Merge into given known alleles table (if present)
   known_alleles <- if (is.null(known_alleles)) {
-    aT
+    a_combo
   } else {
     known_alleles <- known_alleles[, c("Locus", "Seq", "Name")]
     known_alleles$Name <- as.character(known_alleles$Name)
-    unique(rbind(known_alleles, aT))
+    unique(rbind(known_alleles, a_combo))
   }
 
   # Name recognized sequences in each sample data frame
