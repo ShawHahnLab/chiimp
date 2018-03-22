@@ -56,8 +56,10 @@ analyze_dataset <- function(dataset,
     return(list(summary = sample.summary, data = sample.data))
   }
   if (ncores > 1) {
-    # Set up the cluster and export required names.
-    cluster_names <- c("locus_attrs")
+    # Set up the cluster and export required names (those objects used in
+    # analyze.entry that are expected from the environment and not passed as
+    # arguments).
+    cluster_names <- c("locus_attrs", "nrepeats", "summary_args")
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
