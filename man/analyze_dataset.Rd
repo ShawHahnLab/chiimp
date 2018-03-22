@@ -39,5 +39,8 @@ list of results, with \code{summary} set to the single summary data
 }
 \description{
 Load all samples for a given dataset and produce a list of processed samples
-and a summary data frame showing each sample's summary row-by-row.
+and a summary data frame showing each sample's summary row-by-row.  The
+entries in the processed-samples list and the rows in the summary data frame
+will be sorted according to the ordering of loci in \code{locus_attrs} and
+by the sample attributes.
 }

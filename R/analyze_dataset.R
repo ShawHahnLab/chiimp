@@ -6,7 +6,10 @@
 #' Analyze all samples in a dataset
 #'
 #' Load all samples for a given dataset and produce a list of processed samples
-#' and a summary data frame showing each sample's summary row-by-row.
+#' and a summary data frame showing each sample's summary row-by-row.  The
+#' entries in the processed-samples list and the rows in the summary data frame
+#' will be sorted according to the ordering of loci in \code{locus_attrs} and
+#' by the sample attributes.
 #'
 #' @param dataset data frame of sample details as produced by
 #'   \code{\link{prepare_dataset}}.
@@ -90,6 +93,8 @@ analyze_dataset <- function(dataset,
   # Add allele name columns to all data frames for any allele in the given
   # known_alleles data frame or called in the current genotypes.
   results <- name_known_sequences(results, known_alleles)
+  # Reorder entries to match locus_attrs.
+  results <- sort_results(results, locus_attrs)
   results
 }
 
@@ -167,4 +172,31 @@ name_known_sequences <- function(results, known_alleles) {
   })
 
   return(results)
+}
+
+#' Sort entries in results data frames
+#'
+#' Rearrange rows in the summary data frame and corresponding entries in the
+#' per-sample data frames list, matching locus order given in locus attributes.
+#' The Locus column of the summary data frame will be set to a factor to
+#' preserve the defined order.  Only levels remaining in that set are kept.
+#'
+#' @param results results list as produced by
+#'   \code{\link{tidy_analyzed_dataset}}.
+#' @param locus_attrs data frame of locus attributes as produced by
+#'   \code{\link{load_locus_attrs}}.
+#'
+#' @return list of results, with \code{summary} set to the single summary data
+#'   frame and \code{data} the per-sample data frames.  \code{summary$Locus} is
+#'   coerced to a factor with levels ordered according to their appearance in
+#'   \code{locus_attrs$Locus}.  Order of rows in \code{summary} and entries in
+#'   \code{data} are updated accordingly.
+sort_results <- function(results, locus_attrs) {
+  results$summary$Locus <- factor(results$summary$Locus,
+                                  levels = locus_attrs$Locus)
+  results$summary$Locus <- droplevels(results$summary$Locus)
+  ord <- order_entries(results$summary)
+  results$summary <- results$summary[ord, ]
+  results$data <- results$data[ord]
+  results
 }

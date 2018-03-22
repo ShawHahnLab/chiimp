@@ -69,16 +69,7 @@ full_analysis <- function(config, dataset=NULL) {
                              summary.function = sample_summary_func,
                              known_alleles = allele.names)
   results$allele.names <- allele.names
-  # Reorder entries to match locus_attrs.
-  # TODO merge these steps into analyze_dataset or summarize_dataset
-  results$summary$Locus <- factor(results$summary$Locus,
-                                  levels = locus_attrs$Locus)
-  results$summary$Locus <- droplevels(results$summary$Locus)
-  ord <- order_entries(results$summary)
-  results$summary <- results$summary[ord, ]
-  results$data <- results$data[ord]
   results$locus_attrs <- locus_attrs
-
   if (cfg$verbose) logmsg("Summarizing results...")
   genotypes.known <- NULL
   if (!is.null(cfg$fp_genotypes_known))
