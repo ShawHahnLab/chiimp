@@ -14,7 +14,7 @@ normalize_alleles <- function(data) {
     }
     pair[is.na(pair)] <- pair[1]
     pair
-  })))
+  })), stringsAsFactors = FALSE)
 }
 
 #' Wide table of allele names vs loci
@@ -43,7 +43,8 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
   long <- data.frame(ID = id,
                      Locus = data$Locus,
                      data[, extra_cols, drop = FALSE],
-                     nms)
+                     nms,
+                     stringsAsFactors = FALSE)
   long <- long[order_entries(long), ]
   # Switch to wide format, putting the allele names per locus across columns
   # (along with ID and whatever extra_cols were given).
