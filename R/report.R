@@ -220,6 +220,7 @@ histogram <- function(samp,
   hist_colors <- c(bar_unlabeled = "#000000FF", # non-locus sequences
                    bar_filtered  = "#888888FF", # matching allele conditions
                    bar_topcounts = "#FFAAAAFF", # , but just seq w/ max counts
+                   bar_topknown  = "#0000FFFF", # , but a known (allele) seq
                    bar_allele    = "#FF0000FF", # matching alleles in summary
                    line_cutoff   = "#00000080", # threshold for allele calls
                    rect_region   = "#0000001E") # region for filtered sequences
@@ -290,6 +291,15 @@ histogram <- function(samp,
                      col = hist_colors["bar_topcounts"],
                      lwd = lwd,
                      lend = 1)
+    # Draw bars for the highest identified sequence at each length
+    idx <- which(! is.na(samp.filt$SeqName))
+    idx <- match(samp.filt[idx, "Length"], samp.filt[idx, "Length"])
+    graphics::points(samp.filt[idx, "Length"],
+                     samp.filt[idx, "Count"],
+                     type = "h",
+                     col = hist_colors["bar_topknown"],
+                     lwd = lwd,
+                     lend = 1)
     # Shade the domain of the filtered data in gray
     xlim.filt <- range(samp.filt$Length)
     graphics::polygon(x = rep(xlim.filt, each = 2),
@@ -322,11 +332,12 @@ histogram <- function(samp,
          legend = c("Original",
                     "Filtered",
                     "Filtered, top unique Seq.",
+                    "Filtered, top unique Seq., Known",
                     "Called Alleles",
                     "Unique Seq. Threshold"),
-         col = hist_colors[1:5],
-         pch = c(15, 15, 15, 15, NA),
-         lty = c(NA, NA, NA, NA, 1))
+         col = hist_colors[1:6],
+         pch = c(15, 15, 15, 15, 15, NA),
+         lty = c(NA, NA, NA, NA, NA, 1))
 }
 
 #' Plot advanced histogram of STR sample
