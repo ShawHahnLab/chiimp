@@ -50,8 +50,8 @@ package along with R dependencies.  An icon for the program is created at
 
 ### Mac OS
 
-On Mac OS, run the `install_mac.sh` shell script to automatically install the 
-package along with R dependencies.  An icon for the program is created at
+On Mac OS, run the `install_mac.command` shell script to automatically install
+the package along with R dependencies.  An icon for the program is created at
 `$HOME/Desktop/CHIIMP`.
 
 ## Input Data Organization
