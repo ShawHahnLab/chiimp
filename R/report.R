@@ -198,9 +198,9 @@ report_idents <- function(results,
 #'
 #' @param samp data frame of dereplicated sequences.
 #' @param main title of the plot.
-#' @param locus.name name of the locus to match alleles for.  If unspecified the
-#'   locus with the highest matched counts will be used.  To disable the
-#'   matching entirely use \code{NA}.
+#' @param locus.name name of the locus to match alleles for.  If unspecified and
+#'   not listed in \code{sample.summary} the locus with the highest matched
+#'   counts will be used.  To disable the matching entirely use \code{NA}.
 #' @param sample.summary summary data frame as prepared by
 #'   \code{summarize_sample}.  Used to label the called alleles.
 #' @param cutoff_fraction numeric threshold for the fraction of locus-matching
@@ -255,16 +255,20 @@ histogram <- function(samp,
 
   # If no locus name was given, take whatever locus showed the highest counts.
   if (missing(locus.name)) {
-    cts <- with(samp, {
-      subset(samp, MatchingLocus != "") %>%
-        dplyr::group_by(MatchingLocus) %>%
-        dplyr::summarize(Count = sum(Count))
-    })
-    cts <- cts[order(cts$Count, decreasing = T), ]
-    locus.name <- if (nrow(cts) > 1) {
-      cts[[1, "MatchingLocus"]]
+    if (is.null(sample.summary[["Locus"]])) {
+      cts <- with(samp, {
+        subset(samp, MatchingLocus != "") %>%
+          dplyr::group_by(MatchingLocus) %>%
+          dplyr::summarize(Count = sum(Count))
+      })
+      cts <- cts[order(cts$Count, decreasing = T), ]
+      locus.name <- if (nrow(cts) > 1) {
+        cts[[1, "MatchingLocus"]]
+      } else {
+        NA
+      }
     } else {
-      NA
+      locus.name <- sample.summary[["Locus"]]
     }
   }
 
