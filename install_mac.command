@@ -49,6 +49,7 @@ if [ -d "$HOME/Desktop" ]; then
 	echo
 	echo "### Creating Desktop Symbolic Link"
 	echo
-	chiimp_path=$("$rexe" --slave -e "cat(system.file('bin','chiimp.command',package='chiimp'))")
+	chiimp_path=$("$rexe" --slave -e "cat(system.file('bin','chiimp.app',package='chiimp'))")
+	gunzip "$chiimp_path/Contents/MacOS/droplet.gz"
 	ln -s "$chiimp_path" $HOME/Desktop/CHIIMP
 fi

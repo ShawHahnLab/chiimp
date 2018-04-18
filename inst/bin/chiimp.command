@@ -7,7 +7,14 @@
 
 # This directory
 dir=$(dirname $BASH_SOURCE)
+cfg_dir=$(dirname "$1")
 
-Rscript "$dir/chiimp" $*
+which pandoc > /dev/null || export RSTUDIO_PANDOC=/Applications/RStudio.app/Contents/MacOS/pandoc/
+
+if [[ ! "$dir" =~ ^/ ]]; then
+	rel=$(pwd)
+fi
+cd "$cfg_dir"
+Rscript "$rel/$dir/chiimp" $*
 read -p "Press any key to continue... " -n1 -s
 echo
