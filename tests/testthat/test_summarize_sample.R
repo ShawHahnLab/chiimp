@@ -139,6 +139,40 @@ with(test_data, {
     })
   })
 
+  test_that("summarize_sample handles ambiguous sequences", {
+    # If sequences contain unexpected characters these should be interpreted as
+    # ambiguous and filtered.
+    # Replace the second-highest-count sequence to include an ambiguous base
+    # near the end.
+    idx <- nchar(seqs3$A) == 170
+    seqs3$A[idx] <- sub("AGCCAGTC$",
+                        "AGCCNAGTC",
+                        seqs3$A[idx])
+    sample.data <- analyze_sample(seqs3$A, locus_attrs, 3)
+    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+                                       fraction.min = 0.05, counts.min = 500)
+    with(sample.summary, {
+      expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
+                                      "TAGATAGATAGATAGATAGATAGATAGATA",
+                                      "GATAGATAGATAGATAGATAGATAGATAGA",
+                                      "TAGATAGATAGATAGATAGATAGATAGATA",
+                                      "GATAGATAGATAGATAGATAGATAGATAGA",
+                                      "TAGACACAGTTGTGTGAGCCAGTC"))
+      expect_equal(Allele1Count, 3971)
+      expect_equal(Allele1Length, 174)
+      expect_equal(Allele2Seq, as.character(NA))
+      expect_equal(Allele2Count, as.integer(NA))
+      expect_equal(Allele2Length, as.integer(NA))
+      expect_equal(Homozygous, TRUE)
+      expect_equal(Stutter, FALSE)
+      expect_equal(Artifact, FALSE)
+      expect_equal(Ambiguous, TRUE)
+      expect_equal(CountTotal, 5000)
+      expect_equal(CountLocus, 4500)
+      expect_equal(ProminentSeqs, 1)
+    })
+  })
+
   test_that("summarize_sample counts prominent sequences", {
     sample.data.1B       <- analyze_sample(seqs1$B, locus_attrs, 3)
     sample.summary.1B    <- summarize_sample(sample.data.1B,  list(Locus="B"),
