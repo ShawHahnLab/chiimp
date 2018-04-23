@@ -98,7 +98,7 @@ with(test_data, {
     # sequences that contain non-ACTG characters should be marked TRUE in the
     # Ambiguous column (interpreting those as "N" or similar).
     s <- seqs1$A
-    s[1] <- sub("AGCCAGTC", "AGCCANTC", s[1])
+    s[s == s[1]] <- sub("AGCCAGTC", "AGCCANTC", s[1])
     sample.data <- analyze_sample(s, locus_attrs, 3)
     expect_equal(sample.data$Ambiguous,
                  c(TRUE, rep(FALSE, nrow(sample.data) - 1)))
