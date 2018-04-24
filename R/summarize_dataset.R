@@ -406,7 +406,7 @@ tally_cts_per_locus <- function(results) {
   # known in locus_attrs.
   .levels <- match(results$locus_attrs$Locus, results$summary$Locus)
   .levels <- results$summary$Locus[.levels[!is.na(.levels)]]
-  tbl <- do.call(rbind, lapply(results$data, function(d) {
+  tbl <- do.call(rbind, lapply(results$samples, function(d) {
     d$MatchingLocus <- factor(d$MatchingLocus,
                               levels = .levels)
     sapply(split(d$Count, d$MatchingLocus), sum)

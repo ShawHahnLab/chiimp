@@ -143,19 +143,19 @@ with(test_data, {
       # First called allele for these cases should always be the first seq in
       # each table.
       expect_equal(results$summary[nm, "Allele1Name"],
-                   results$data[[nm]]$SeqName[1])
+                   results$samples[[nm]]$SeqName[1])
       # Second called allele, if present, will be below the first somewhere.
       # Remaining seqs will be unnamed.
       if (! results$summary[nm, "Homozygous"]) {
-        idx <- match(results$summary[nm, "Allele2Seq"], results$data[[nm]]$Seq)
+        idx <- match(results$summary[nm, "Allele2Seq"], results$samples[[nm]]$Seq)
         expect_equal(results$summary[nm, "Allele2Name"],
-                     results$data[[nm]]$SeqName[idx])
+                     results$samples[[nm]]$SeqName[idx])
       }
     })
 
     # One particular case: 3-B showed a stutter-rejected sequence that's the
     # called allele for another sample.
-    expect_equal(results$data[["3-B"]]$SeqName[2], "220-fb9a92")
+    expect_equal(results$samples[["3-B"]]$SeqName[2], "220-fb9a92")
   })
 
   test_that("analyze_dataset warns of missing loci", {

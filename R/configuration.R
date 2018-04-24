@@ -43,6 +43,7 @@ config.defaults <- list(
     dp_histograms = "histograms",  # Read count by length histograms
     dp_alignments = "alignments",  # Sequence alignments across alleles
     dp_alignment_images = "alignment-images",  # Images of alignments
+    dp_processed_files = "processed-files",  # Per-file data tables
     dp_processed_samples = "processed-samples",  # Sample data tables
     dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
   ),

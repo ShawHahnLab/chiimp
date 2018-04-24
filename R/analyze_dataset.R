@@ -5,11 +5,13 @@
 
 #' Analyze all samples in a dataset
 #'
-#' Load all samples for a given dataset and produce a list of processed samples
-#' and a summary data frame showing each sample's summary row-by-row.  The
-#' entries in the processed-samples list and the rows in the summary data frame
-#' will be sorted according to the ordering of loci in \code{locus_attrs} and
-#' by the sample attributes.
+#' Load all samples for a given dataset and produce a summary data frame showing
+#' each sample's summary row-by-row, a list of processed input files, and a list
+#' of processed samples.  The entries in the processed-samples list and the rows
+#' in the summary data frame will be sorted according to the ordering of loci in
+#' \code{locus_attrs} and by the sample attributes.  Processed files are stored
+#' separately (as there may be multiple samples per file) and named by input
+#' file path.
 #'
 #' @param dataset data frame of sample details as produced by
 #'   \code{\link{prepare_dataset}}.
@@ -33,7 +35,8 @@
 #'   \code{\link{make_allele_name}}.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
-#'   frame and \code{data} the per-sample data frames.
+#'   frame, \code{files} the processed sequence files, and \code{samples} the
+#'   per-sample data frames.
 #'
 #' @export
 analyze_dataset <- function(dataset,
@@ -47,9 +50,12 @@ analyze_dataset <- function(dataset,
   if (ncores == 0) {
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
-  analyze.entry <- function(entry, summary.function) {
-    seqs <- load_seqs(entry["Filename"])
+  analyze.file <- function(fp, locus_attrs, nrepeats) {
+    seqs <- load_seqs(fp)
     sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
+  }
+  analyze.entry <- function(entry, summary.function, analyzed_files) {
+    sample.data <- analyzed_files[[entry["Filename"]]]
     args <- c(list(sample.data = sample.data, sample.attrs = entry),
               summary_args)
     sample.summary <- do.call(summary.function, args)
@@ -83,18 +89,32 @@ analyze_dataset <- function(dataset,
       # Load, analyze, and summarize each sample across the cluster.  Each row
       # in the dataset data frame will be given as the entry argument to
       # analyze.entry.
+      fps <- unique(dataset$Filename)
+      analyzed_files <- parallel::parLapply(fps,
+                                            analyze.file,
+                                            locus_attrs = locus_attrs,
+                                            nrepeats = nrepeats)
+      names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
-                                        summary.function = summary.function)
+                                        summary.function = summary.function,
+                                        analyzed_files = analyzed_files)
     },
     finally = {
       parallel::stopCluster(cluster)
     })
   } else {
+    fps <- unique(dataset$Filename)
+    analyzed_files <- lapply(fps, analyze.file,
+                             locus_attrs = locus_attrs,
+                             nrepeats = nrepeats)
+    names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
-                         summary.function = summary.function)
+                         summary.function = summary.function,
+                         analyzed_files = analyzed_files)
   }
   # Recombined results into a summary data frame and a list of full sample data.
   results <- tidy_analyzed_dataset(dataset, raw.results)
+  results$files <- analyzed_files
   # Add allele name columns to all data frames for any allele in the given
   # known_alleles data frame or called in the current genotypes.
   results <- name_known_sequences(results, known_alleles, name_args)
@@ -121,12 +141,12 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
   summaries <- lapply(raw.results, function(s) {
     data.frame(s[[1]], stringsAsFactors = FALSE)
   })
-  data <- lapply(raw.results, `[[`, 2)
+  samples <- lapply(raw.results, `[[`, 2)
   summary <- do.call(rbind, summaries)
   rownames(summary) <- rownames(dataset)
-  names(data)       <- rownames(dataset)
+  names(samples)    <- rownames(dataset)
   summary <- cbind(dataset, summary)
-  return(list(summary = summary, data = data))
+  return(list(summary = summary, samples = samples))
 }
 
 #' Name known allele sequences
@@ -174,7 +194,7 @@ name_known_sequences <- function(results, known_alleles, name_args) {
   }
 
   # Name recognized sequences in each sample data frame
-  results$data <- lapply(results$data, function(d) {
+  results$samples <- lapply(results$samples, function(d) {
     idx <- match(d$Seq, known_alleles$Seq)
     d$SeqName <- known_alleles$Name[idx]
     d
@@ -206,6 +226,6 @@ sort_results <- function(results, locus_attrs) {
   results$summary$Locus <- droplevels(results$summary$Locus)
   ord <- order_entries(results$summary)
   results$summary <- results$summary[ord, ]
-  results$data <- results$data[ord]
+  results$samples <- results$samples[ord]
   results
 }
