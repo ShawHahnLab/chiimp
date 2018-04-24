@@ -17,8 +17,8 @@ with(test_data, {
 
 # test analyze_dataset ----------------------------------------------------
 
-  test_that("analyze_dataset processes samples correctly", {
-    # The general case for analyze_dataset.
+  test_that("analyze_dataset produces expected list structure", {
+    # Preliminary check on the data structure returned.
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     # prepare_dataset tested separately in test_io.R
@@ -31,6 +31,26 @@ with(test_data, {
                                ncores = 1)
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
+    # Check the overall structure
+    expect_equal(sapply(results, class),
+                 c(summary = "data.frame",
+                   data = "list"))
+  })
+
+  test_that("analyze_dataset processes samples correctly", {
+    # The general case for analyze_dataset.
+    data.dir <- tempfile()
+    write_seqs(seqs, data.dir)
+    dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+    results <- analyze_dataset(dataset, locus_attrs,
+                               summary_args = list(
+                                 fraction.min = 0.05,
+                                 counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1)
+    lapply(dataset$Filename, file.remove)
+    file.remove(data.dir)
+    # Check the summary data frame
     with(results$summary, {
       # First update ordering of dataset's rows.  The existing order should be
       # correct except for the locus order definied via locus_attrs.
