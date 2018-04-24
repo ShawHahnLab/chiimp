@@ -1,7 +1,7 @@
 # Create a summary list for a single sample, targeting a single locus.  See
 # summarize_sample below for the entries in the returned list.
 
-# Different versions summarize_sample to allow via configuration in
+# Different versions of summarize_sample to allow via configuration in
 # full_analysis.
 sample_summary_funcs <- c("summarize_sample",
                           "summarize_sample_guided",
@@ -24,7 +24,11 @@ sample_summary_funcs <- c("summarize_sample",
 #'    * Length: integer sequence length.
 #'  * Homozygous: If the sample appears homozygous (if so, the Allele2 entries
 #'  will be NA).
+#'  * Ambiguous: If a potential allele was ignored due to ambiguous bases in
+#'  sequence content (such as "N").
 #'  * Stutter: If a potential allele was ignored due to apparent PCR stutter.
+#'  * Artifact: If a potential allele was ignored due to apparent PCR artifact
+#'  (other than stutter).
 #'  * CountTotal: The total number of sequences in the original sample data.
 #'  * CountLocus: The number of sequences matching all criteria for the
 #'  specified locus in the original sample data.
@@ -61,6 +65,9 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   count.locus <- sum(chunk$Count)
   # Threshold potential alleles at minimum count
   chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
+  # Remove ambiguous sequences, if present.
+  ambig <- chunk[2, "Ambiguous"]
+  chunk <- chunk[! chunk[, "Ambiguous"], ]
   # Remove stutter, if present.
   stutter <- !is.na(chunk[2, "Stutter"])
   chunk <- chunk[is.na(chunk[, "Stutter"]), ]
@@ -87,6 +94,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   homozygous <- nrow(chunk) == 1
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
+                           Ambiguous = ambig,
                            Stutter = stutter,
                            Artifact = artifact,
                            CountTotal = count.total,
@@ -111,7 +119,11 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
 #'    * Length: integer sequence length.
 #'  * Homozygous: If the sample appears homozygous (if so, the Allele2 entries
 #'  will be NA).
+#'  * Ambiguous: If a potential allele was ignored due to ambiguous bases in
+#'  sequence content (such as "N").
 #'  * Stutter: If a potential allele was ignored due to apparent PCR stutter.
+#'  * Artifact: If a potential allele was ignored due to apparent PCR artifact
+#'  (other than stutter).
 #'  * CountTotal: The total number of sequences in the original sample data.
 #'  * CountLocus: The number of sequences matching all criteria for the
 #'  specified locus in the original sample data.
@@ -187,6 +199,9 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
     chunk <- chunk[idx, ]
   }
 
+  # Remove ambiguous sequences, if present.
+  ambig <- chunk[2, "Ambiguous"]
+  chunk <- chunk[! chunk[, "Ambiguous"], ]
   # Remove stutter, if present.
   stutter <- NA
   artifact <- NA
@@ -217,6 +232,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   homozygous <- nrow(chunk) == 1
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
+                           Ambiguous = ambig,
                            Stutter = stutter,
                            Artifact = artifact,
                            CountTotal = count.total,
@@ -263,6 +279,7 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
   homozygous <- nrow(chunk) == 1
   sample.summary <- c(allele1, allele2,
                       list(Homozygous = homozygous,
+                           Ambiguous = NA,
                            Stutter = NA,
                            Artifact = NA,
                            CountTotal = count.total,

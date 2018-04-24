@@ -14,12 +14,17 @@
 #'  * Length: integer sequence length
 #'  * MatchingLocus: factor for the name of the locus matching each sequence,
 #'    by checking the primer
-#'  * MotifMatch: logical -- are there are least \code{nrepeats} perfect
+#'  * MotifMatch: logical: are there are least \code{nrepeats} perfect
 #'    adjacent repeats of the STR motif for the matching locus?
-#'  * LengthMatch: logical -- is the sequence length within the expected range
+#'  * LengthMatch: logical: is the sequence length within the expected range
 #'    for the matching locus?
+#'  * Ambiguous: logical: are there unexpected characters in the sequence
+#'  content?
 #'  * Stutter: integer: for any sequence that looks like potential PCR stutter,
 #'    the index of the row that may be the source of the stutter band.
+#'  * Artifact: integer: for any sequence that looks like potential PCR artifact
+#'  (other than stutter), the index of the row that may be the source of the
+#'  stutter band.
 #'  * FractionOfTotal: numeric fraction of the number of sequences
 #'    represented by each unique sequence compared to the total.
 #'  * FractionOfLocus: numeric fraction of the number of sequences represented
@@ -58,6 +63,8 @@ analyze_sample <- function(seqs, locus_attrs, nrepeats) {
   # Label rows where the sequence length matches the matching locus" length
   # range.
   data$LengthMatch <- check_length(data, locus_attrs)
+  # Label rows that contain unexpected characters in the sequence content.
+  data$Ambiguous <- ! grepl("^[ACGT]*$", data$Seq, ignore.case = TRUE)
   # Label rows that look like PCR stutter or other artifacts of other rows.
   data$Stutter <- find_stutter(data, locus_attrs)
   data$Artifact <- find_artifact(data, locus_attrs)

@@ -42,7 +42,11 @@ Entries in the returned list:
 }
 \item Homozygous: If the sample appears homozygous (if so, the Allele2 entries
 will be NA).
+\item Ambiguous: If a potential allele was ignored due to ambiguous bases in
+sequence content (such as "N").
 \item Stutter: If a potential allele was ignored due to apparent PCR stutter.
+\item Artifact: If a potential allele was ignored due to apparent PCR artifact
+(other than stutter).
 \item CountTotal: The total number of sequences in the original sample data.
 \item CountLocus: The number of sequences matching all criteria for the
 specified locus in the original sample data.

@@ -14,6 +14,7 @@ with(test_data, {
       expect_equal(droplevels(MatchingLocus), factor(c("A", "A")))
       expect_equal(MotifMatch, c(T, T))
       expect_equal(LengthMatch, c(T, T))
+      expect_equal(Ambiguous, c(F, F))
       expect_equal(Stutter, as.integer(c(NA, NA)))
       expect_equal(Artifact, as.integer(c(NA, NA)))
     })
@@ -39,6 +40,7 @@ with(test_data, {
     expect_equal(droplevels(chunk$MatchingLocus), factor(NA, levels = c()))
     expect_equal(chunk$MotifMatch, FALSE)
     expect_equal(chunk$LengthMatch, NA)
+    expect_equal(chunk$Ambiguous, FALSE)
     expect_equal(chunk$Stutter, as.integer(NA))
     expect_equal(chunk$Artifact, as.integer(NA))
   })
@@ -90,6 +92,16 @@ with(test_data, {
     # Check that the third entry is marked an artifact of the first
     sample.data <- analyze_sample(s, locus_attrs, 3)
     expect_equal(sample.data$Artifact, c(NA, NA, 1)[1:14])
+  })
+
+  test_that("analyze_sample marks ambiguous entries", {
+    # sequences that contain non-ACTG characters should be marked TRUE in the
+    # Ambiguous column (interpreting those as "N" or similar).
+    s <- seqs1$A
+    s[s == s[1]] <- sub("AGCCAGTC", "AGCCANTC", s[1])
+    sample.data <- analyze_sample(s, locus_attrs, 3)
+    expect_equal(sample.data$Ambiguous,
+                 c(TRUE, rep(FALSE, nrow(sample.data) - 1)))
   })
 
 })
