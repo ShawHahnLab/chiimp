@@ -34,7 +34,8 @@ with(test_data, {
     # Check the overall structure
     expect_equal(sapply(results, class),
                  c(summary = "data.frame",
-                   data = "list"))
+                   samples = "list",
+                   files = "list"))
   })
 
   test_that("analyze_dataset processes samples correctly", {
