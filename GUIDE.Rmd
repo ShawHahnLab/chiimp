@@ -213,8 +213,9 @@ locus attributes described above.  First each locus' forward primer is compared
 with the sequence and the matching locus name is stored in a MatchingLocus 
 column.  The sequence is then checked for several tandem repeats of the motif 
 for that locus, and compared to the length range expected for that locus. 
-TRUE/FALSE values for these are stored in MotifMatch and LengthMatch columns
-respectively.
+TRUE/FALSE values for these are stored in MotifMatch and LengthMatch columns 
+respectively.  The Ambiguous column marks any sequences containing bases outside
+of A, C, T, and G (such as N).
 
 PCR artifacts can obscure real allele sequences with incorrect sequences.  There 
 are extra filters to attempt to remove these if possible or highlight cases that
@@ -266,6 +267,7 @@ homozygous; if two or more, heterozygous.)  The details kept are:
 
  * the sequence content, length, and counts for the one or two alleles
  * the zygosity of the sample
+ * whether the ambiguous-sequence filter removed a potential allele
  * whether the stutter and/or artifact filter removed a potential allele
  * The read counts of the entire sample before any filtering
  * The read counts of just those sequences matching the locus primer, motif, and
