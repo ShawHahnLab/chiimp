@@ -55,7 +55,6 @@ sample_summary_funcs <- c("summarize_sample",
 summarize_sample <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
   chunk <- analyze_sample(sample.data, sample.attrs, fraction.min)
-
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
@@ -73,7 +72,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
   sample.summary <- c(allele1, allele2,
-                      list(Homozygous    = sum(chunk$Category == "Allele") == 1,
+                      list(Homozygous  = sum(chunk$Category %in% "Allele") == 1,
                            Ambiguous     = "Ambiguous" %in% chunk$Category[2],
                            Stutter       = "Stutter"   %in% chunk$Category[2],
                            Artifact      = "Artifact"  %in% chunk$Category[2],
@@ -91,10 +90,6 @@ analyze_sample <- function(sample.data, sample.attrs, fraction.min) {
   locus.name <- sample.attrs[["Locus"]]
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
-  # Note that counts.locus is more restrictive than the total counts of all
-  # entries with MatchingLocus equal to the given locus name, since idx includes
-  # the extra checks above.
-  count.locus <- sum(chunk$Count)
   within(chunk, {
     Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
                                     "Ambiguous", "Stutter", "Artifact"))
@@ -249,7 +244,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
   sample.summary <- c(allele1, allele2,
-                      list(Homozygous    = sum(chunk$Category == "Allele") == 1,
+                      list(Homozygous  = sum(chunk$Category %in% "Allele") == 1,
                            Ambiguous     = "Ambiguous" %in% chunk$Category[2],
                            Stutter       = "Stutter"   %in% chunk$Category[2],
                            Artifact      = "Artifact"  %in% chunk$Category[2],
