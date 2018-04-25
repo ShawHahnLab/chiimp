@@ -54,53 +54,128 @@ sample_summary_funcs <- c("summarize_sample",
 #' @export
 summarize_sample <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
-  # extract sample data entries that meet all criteria for a potential allele
-  locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
-  chunk <- sample.data[idx, ]
-  # Note that counts.locus is more restrictive than the total counts of all
-  # entries with MatchingLocus equal to the given locus name, since idx includes
-  # the extra checks above.
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  # Threshold potential alleles at minimum count
-  chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-  # Remove ambiguous sequences, if present.
-  ambig <- chunk[2, "Ambiguous"]
-  chunk <- chunk[! chunk[, "Ambiguous"], ]
-  # Remove stutter, if present.
-  stutter <- !is.na(chunk[2, "Stutter"])
-  chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-  # Remove artifact-like sequences, if present.
-  artifact <- !is.na(chunk[2, "Artifact"])
-  chunk <- chunk[is.na(chunk[, "Artifact"]), ]
+  chunk <- analyze_sample(sample.data, sample.attrs, fraction.min)
 
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
-  prominent.seqs <- nrow(chunk)
-  # enforce count limit after all filtering (but before stutter removal or
-  # fraction thresholding)
+  prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
+  # Enforce count limit after all filtering
+  count.locus <- sum(chunk$Count)
   if (count.locus < counts.min) {
     chunk <- chunk[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected
   # attributes.
   attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
+  allele1 <- chunk[which(chunk$Category == "Allele")[1], attr.names]
+  allele2 <- chunk[which(chunk$Category == "Allele")[2], attr.names]
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  homozygous <- nrow(chunk) == 1
   sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Ambiguous = ambig,
-                           Stutter = stutter,
-                           Artifact = artifact,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
+                      list(Homozygous    = sum(chunk$Category == "Allele") == 1,
+                           Ambiguous     = "Ambiguous" %in% chunk$Category[2],
+                           Stutter       = "Stutter"   %in% chunk$Category[2],
+                           Artifact      = "Artifact"  %in% chunk$Category[2],
+                           CountTotal    = sum(sample.data$Count),
+                           CountLocus    = count.locus,
                            ProminentSeqs = prominent.seqs))
   return(sample.summary)
+}
+
+# TODO finish new version here
+# Take a data frame produced by analyze_seqs, restrict to a given locus, and add
+# a Category column to classify individual sequences.
+analyze_sample <- function(sample.data, sample.attrs, fraction.min) {
+  # Extract sample data entries that meet all criteria for a potential allele.
+  locus.name <- sample.attrs[["Locus"]]
+  idx <- which(allele_match(sample.data, locus.name))
+  chunk <- sample.data[idx, ]
+  # Note that counts.locus is more restrictive than the total counts of all
+  # entries with MatchingLocus equal to the given locus name, since idx includes
+  # the extra checks above.
+  count.locus <- sum(chunk$Count)
+  within(chunk, {
+    Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
+                                    "Ambiguous", "Stutter", "Artifact"))
+    # Threshold potential alleles at minimum count
+    Category[Count < fraction.min * count.locus] <- "Insignificant"
+    # Label ambiguous, stutter, artifact sequences, if present.
+    Category[is.na(Category) & Ambiguous] <- "Ambiguous"
+    Category[is.na(Category) & ! is.na(Stutter)] <- "Stutter"
+    Category[is.na(Category) & ! is.na(Artifact)] <- "Artifact"
+    # Top two remaining will be called alleles
+    Category[is.na(Category)][0:min(2, sum(is.na(Category)))] <- "Allele"
+    # The rest are prominent but not allele-level
+    Category[is.na(Category)] <- "Prominent"
+  })
+}
+
+analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
+  # Extract sample data entries that meet all criteria for a potential allele.
+  locus.name <- sample.attrs[["Locus"]]
+  idx <- which(allele_match(sample.data, locus.name))
+  chunk <- sample.data[idx, ]
+
+  # If specified, take the top two matching entries at the given expected
+  # lengths.  If there's just one length expected, this should be two entries at
+  # that one length.  Otherwise it will be two distinct lengths between the two
+  # entries.  We do this in a roundabout way to handle the length-homoplasy
+  # case, where only one sequence length is expected but there are two distinct
+  # alleles present at that same length.
+
+  # Tidy up expected lengths.
+  expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
+                        sample.attrs[["ExpectedLength2"]])
+  expected_lengths <- unique(expected_lengths[!is.na(expected_lengths)])
+  if (! is.null(expected_lengths) & length(expected_lengths) == 0)
+    expected_lengths <- NULL
+
+  categories <- c("Allele", "Prominent", "Insignificant",
+                  "Ambiguous", "Stutter", "Artifact")
+
+  switch(length(expected_lengths) + 1,
+         # Zero expected lengths: analyze as usual
+         analyze_sample(sample.data, sample.attrs, fraction.min),
+         # One expected length: may be homozygous or heterozygous.
+         {
+           # Find rows of interest, matching expected length.
+           idxl <- chunk$Length == expected_lengths
+           within(chunk, {
+             Category <- factor(, levels = categories)
+             # Exclude ambiguous sequences first.
+             Category[Ambiguous] <- "Ambiguous"
+             # Assign top seq at expected length as first allele.
+             Category[idxl & is.na(Category)][1] <- "Allele"
+             # Threshold potential alleles at minimum count.
+             Category[Count < fraction.min * count.locus] <- "Insignificant"
+             # Assign second seq at expected length as second allele, if there
+             # is one.
+             Category[idxl & is.na(Category)][1] <- "Allele"
+             # And that's it.  We make no comment on the remaining entries and
+             # leave them as NA.
+           })
+         },
+         # Two expected lengths: definitely heterozygous.  No need to consider
+         # fractions here.
+         {
+           within(chunk, {
+             Category <- factor(, levels = categories)
+             # Exclude ambiguous sequences first.
+             Category[Ambiguous] <- "Ambiguous"
+             # The highest-count non-ambiguous sequences at the expected lengths
+             # will be marked as the two alleles.
+             Category[! Ambiguous &
+                        Length == expected_lengths[1]
+                      ][1] <- "Allele"
+             Category[! Ambiguous &
+                        Length == expected_lengths[2]
+                      ][1] <- "Allele"
+             # And that's it.  We make no comment on the remaining entries and
+             # leave them as NA.
+           })
+         }
+         )
 }
 
 #' Summarize a processed STR sample Using Known Lengths
