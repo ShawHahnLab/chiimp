@@ -37,14 +37,14 @@ with(test_data, {
 # test summarize_sample ---------------------------------------------------
 
   test_that("summarize_sample summarizes sample attributes", {
-    sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
     sample.summary <- summarize_sample(sample.data, list(Locus="A"),
                                        fraction.min = 0.05, counts.min = 500)
     check.seqs1A_summary(sample.summary)
   })
 
   test_that("summarize_sample handles completely emtpy input sample data", {
-    sample.data <- analyze_sample(c(), locus_attrs, 3)
+    sample.data <- analyze_seqs(c(), locus_attrs, 3)
     sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
                                        fraction.min = 0.05, counts.min = 500)
     expect_equal(names(sample.summary), sample.summary.cols)
@@ -66,7 +66,7 @@ with(test_data, {
   test_that("summarize_sample handles empty sequences in input sample data", {
     seqs <- seqs1$A
     seqs[1:100] <- "" # empty out a segment of the vector
-    sample.data <- analyze_sample(seqs, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs, locus_attrs, 3)
     sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
                                        fraction.min = 0.05, counts.min = 500)
     # Nothing should change in the output, except that we zeroed out 90 reads that
@@ -79,7 +79,7 @@ with(test_data, {
   })
 
   test_that("summarize_sample marks stutter removal", {
-    sample.data <- analyze_sample(seqs3$A, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs3$A, locus_attrs, 3)
     sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
@@ -105,7 +105,7 @@ with(test_data, {
   test_that("summarize_sample handles multiple stutter sequences", {
     # If multiple candidate allele sequences are marked as potential stutter, they
     # should all be skipped, not just the first.
-    sample.data <- analyze_sample(seqs3$A, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs3$A, locus_attrs, 3)
     # Replace the third entry with a different stutter sequence.  Munge the counts
     # around to still total correctly.
     tot <- sum(sample.data$Count)
@@ -148,7 +148,7 @@ with(test_data, {
     seqs3$A[idx] <- sub("AGCCAGTC$",
                         "AGCCNAGTC",
                         seqs3$A[idx])
-    sample.data <- analyze_sample(seqs3$A, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs3$A, locus_attrs, 3)
     sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
@@ -174,16 +174,16 @@ with(test_data, {
   })
 
   test_that("summarize_sample counts prominent sequences", {
-    sample.data.1B       <- analyze_sample(seqs1$B, locus_attrs, 3)
+    sample.data.1B       <- analyze_seqs(seqs1$B, locus_attrs, 3)
     sample.summary.1B    <- summarize_sample(sample.data.1B,  list(Locus="B"),
                                            fraction.min = 0.05, counts.min = 500)
-    sample.data.2B       <- analyze_sample(seqs2$B, locus_attrs, 3)
+    sample.data.2B       <- analyze_seqs(seqs2$B, locus_attrs, 3)
     sample.summary.2B    <- summarize_sample(sample.data.2B, list(Locus="B"),
                                            fraction.min = 0.05, counts.min = 500)
-    sample.data.3B       <- analyze_sample(seqs3$B, locus_attrs, 3)
+    sample.data.3B       <- analyze_seqs(seqs3$B, locus_attrs, 3)
     sample.summary.3B    <- summarize_sample(sample.data.3B, list(Locus="B"),
                                            fraction.min = 0.05, counts.min = 500)
-    sample.data.empty    <- analyze_sample(c(), locus_attrs, 3)
+    sample.data.empty    <- analyze_seqs(c(), locus_attrs, 3)
     sample.summary.empty <- summarize_sample(sample.data.empty, list(Locus="B"),
                                            fraction.min = 0.05, counts.min = 500)
 
@@ -202,7 +202,7 @@ with(test_data, {
   })
 
   test_that("summarize_sample rejects low-count samples", {
-    sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
     # Here we check that the filtered-counts-thresholding is applied, by forcing
     # the counts to a low number.  This should still report some stats but should
     # leave out the allele1/allele2 information.
@@ -227,7 +227,7 @@ with(test_data, {
   test_that("summarize_sample warns of missing locus name", {
     # summarize_sample() should be able to tell if an invalid (as per the earlier
     # processing) locus name is given, because it won't be in the levels of the
-    # MatchingLocus factor of the data frame from analyze_sample().  I think this
+    # MatchingLocus factor of the data frame from analyze_seqs().  I think this
     # would only come about when locus names given by prepare.dataset() don't
     # match what's in locus_attrs.
     skip("test not yet implemented")

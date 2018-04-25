@@ -3,7 +3,7 @@
 #' Analyze a set of STR sequences
 #'
 #' Dereplicates the given sequences and annotates any STR sequences found,
-#' returning the processed sample as a data frame with one row per unique
+#' returning the processed data as a data frame with one row per unique
 #' sequence, sorted by count.  At this stage no information is filtered out, and
 #' all loci are treated equally.
 #'
@@ -40,7 +40,7 @@
 #' @return data frame of dereplicated sequences with added annotations.
 #'
 #' @export
-analyze_sample <- function(seqs, locus_attrs, nrepeats) {
+analyze_seqs <- function(seqs, locus_attrs, nrepeats) {
   # Dereplicate sequences
   tbl <- table(seqs)
   count <- as.integer(tbl)

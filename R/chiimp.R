@@ -160,8 +160,11 @@ save_data <- function(results, config) {
               file.path(config$output$dp, config$output$dp_alignments))
   save_alignment_images(results$alignments,
               file.path(config$output$dp, config$output$dp_alignment_images))
-  save_sample_data(results$data,
-              file.path(config$output$dp, config$output$dp_processed_samples))
+  save_seqfile_data(results$files,
+              file.path(config$output$dp, config$output$dp_processed_files))
+  save_sample_data(results$samples,
+                    file.path(config$output$dp,
+                              config$output$dp_processed_samples))
   save_allele_seqs(results$summary,
               file.path(config$output$dp, config$output$dp_allele_seqs))
   save_dist_mat(results$dist_mat,

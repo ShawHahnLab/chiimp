@@ -17,8 +17,8 @@ with(test_data, {
 
 # test analyze_dataset ----------------------------------------------------
 
-  test_that("analyze_dataset processes samples correctly", {
-    # The general case for analyze_dataset.
+  test_that("analyze_dataset produces expected list structure", {
+    # Preliminary check on the data structure returned.
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     # prepare_dataset tested separately in test_io.R
@@ -31,6 +31,27 @@ with(test_data, {
                                ncores = 1)
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
+    # Check the overall structure
+    expect_equal(sapply(results, class),
+                 c(summary = "data.frame",
+                   samples = "list",
+                   files = "list"))
+  })
+
+  test_that("analyze_dataset processes samples correctly", {
+    # The general case for analyze_dataset.
+    data.dir <- tempfile()
+    write_seqs(seqs, data.dir)
+    dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+    results <- analyze_dataset(dataset, locus_attrs,
+                               summary_args = list(
+                                 fraction.min = 0.05,
+                                 counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1)
+    lapply(dataset$Filename, file.remove)
+    file.remove(data.dir)
+    # Check the summary data frame
     with(results$summary, {
       # First update ordering of dataset's rows.  The existing order should be
       # correct except for the locus order definied via locus_attrs.
@@ -122,19 +143,19 @@ with(test_data, {
       # First called allele for these cases should always be the first seq in
       # each table.
       expect_equal(results$summary[nm, "Allele1Name"],
-                   results$data[[nm]]$SeqName[1])
+                   results$samples[[nm]]$SeqName[1])
       # Second called allele, if present, will be below the first somewhere.
       # Remaining seqs will be unnamed.
       if (! results$summary[nm, "Homozygous"]) {
-        idx <- match(results$summary[nm, "Allele2Seq"], results$data[[nm]]$Seq)
+        idx <- match(results$summary[nm, "Allele2Seq"], results$samples[[nm]]$Seq)
         expect_equal(results$summary[nm, "Allele2Name"],
-                     results$data[[nm]]$SeqName[idx])
+                     results$samples[[nm]]$SeqName[idx])
       }
     })
 
     # One particular case: 3-B showed a stutter-rejected sequence that's the
     # called allele for another sample.
-    expect_equal(results$data[["3-B"]]$SeqName[2], "220-fb9a92")
+    expect_equal(results$samples[["3-B"]]$SeqName[2], "220-fb9a92")
   })
 
   test_that("analyze_dataset warns of missing loci", {
