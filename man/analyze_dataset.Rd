@@ -16,7 +16,7 @@ analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
 \code{\link{load_locus_attrs}}.}
 
 \item{nrepeats}{number of repeats of each locus' motif to require for a
-match (see \code{\link{analyze_sample}}).}
+match (see \code{\link{analyze_seqs}}).}
 
 \item{ncores}{integer number of CPU cores to use in parallel for sample
 analysis.  Defaults to one less than half the number of detected cores with

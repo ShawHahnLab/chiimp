@@ -1,6 +1,6 @@
 # Analyze all samples in a dataset.
 
-# These functions handle parallel execution of analyze_sample and
+# These functions handle parallel execution of analyze_seqs and
 # summarize_sample and the binding sample summaries together in a data frame.
 
 #' Analyze all samples in a dataset
@@ -18,7 +18,7 @@
 #' @param locus_attrs data frame of locus attributes as produced by
 #'   \code{\link{load_locus_attrs}}.
 #' @param nrepeats number of repeats of each locus' motif to require for a
-#'   match (see \code{\link{analyze_sample}}).
+#'   match (see \code{\link{analyze_seqs}}).
 #' @param ncores integer number of CPU cores to use in parallel for sample
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
@@ -52,7 +52,7 @@ analyze_dataset <- function(dataset,
   }
   analyze.file <- function(fp, locus_attrs, nrepeats) {
     seqs <- load_seqs(fp)
-    sample.data <- analyze_sample(seqs, locus_attrs, nrepeats)
+    sample.data <- analyze_seqs(seqs, locus_attrs, nrepeats)
   }
   analyze.entry <- function(entry, summary.function, analyzed_files) {
     sample.data <- analyzed_files[[entry["Filename"]]]
@@ -133,7 +133,7 @@ analyze_dataset <- function(dataset,
 #'   \code{\link{prepare_dataset}}.
 #' @param raw.results list of pairs of sample summary and sample data data
 #'   frames (from \code{\link{summarize_sample}} and
-#'   \code{\link{analyze_sample}}).
+#'   \code{\link{analyze_seqs}}).
 #'
 #' @return list of results, with \code{summary} set to the single summary data
 #'   frame and \code{data} the per-sample data frames.

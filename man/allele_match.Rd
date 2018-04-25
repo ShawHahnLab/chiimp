@@ -8,7 +8,7 @@ allele_match(sample.data, locus.name)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by
-\code{\link{analyze_sample}}.}
+\code{\link{analyze_seqs}}.}
 
 \item{locus.name}{character name of locus to match against.}
 }

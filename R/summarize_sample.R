@@ -13,7 +13,7 @@ sample_summary_funcs <- c("summarize_sample",
 #' Converts a full STR sample data frame into a concise list of consistent
 #' attributes, suitable for binding together across samples for a dataset.  At
 #' this stage the summary is prepared for a single specific locus, in contrast
-#' to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
+#' to \code{\link{analyze_seqs}}.  The Allele1 entries correspond to the
 #' sequence with the highest count, Allele2 the second highest.
 #'
 #' @details
@@ -39,7 +39,7 @@ sample_summary_funcs <- c("summarize_sample",
 #' @md
 #'
 #' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#'   \code{\link{analyze_seqs}}.
 #' @param sample.attrs list of sample attributes, such as the rows produced by
 #'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
@@ -108,7 +108,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
 #' Converts a full STR sample data frame into a concise list of consistent
 #' attributes, suitable for binding together across samples for a dataset.  At
 #' this stage the summary is prepared for a single specific locus, in contrast
-#' to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
+#' to \code{\link{analyze_seqs}}.  The Allele1 entries correspond to the
 #' sequence with the highest count, Allele2 the second highest.
 #'
 #' @details
@@ -134,7 +134,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
 #' @md
 #'
 #' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#'   \code{\link{analyze_seqs}}.
 #' @param sample.attrs list of sample attributes, such as the rows produced by
 #'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on
 #'   and the sequence lengths to select.  If the ExpectedLength1 and
@@ -248,7 +248,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
 #' stutter removal.  Entries in the returned list are the same.
 #'
 #' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#'   \code{\link{analyze_seqs}}.
 #' @param sample.attrs list of sample attributes, such as the rows produced by
 #'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
@@ -294,7 +294,7 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
 #' length rather than identity.
 #'
 #' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#'   \code{\link{analyze_seqs}}.
 #' @param sample.attrs list of sample attributes, such as the rows produced by
 #'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
@@ -359,7 +359,7 @@ summarize_sample_by_length <- function (sample.data, sample.attrs,
 #' given locus.
 #'
 #' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#'   \code{\link{analyze_seqs}}.
 #' @param locus.name character name of locus to match against.
 #'
 #' @return logical vector of entries for potential alleles.

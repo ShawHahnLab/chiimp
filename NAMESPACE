@@ -2,7 +2,7 @@
 
 export(align_alleles)
 export(analyze_dataset)
-export(analyze_sample)
+export(analyze_seqs)
 export(calc_genotype_distance)
 export(config.defaults)
 export(find_closest_matches)

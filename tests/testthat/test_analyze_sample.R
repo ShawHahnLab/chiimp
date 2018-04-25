@@ -2,10 +2,12 @@ context("Test sample analysis")
 
 with(test_data, {
 
-# test analyze_sample -----------------------------------------------------
 
-  test_that("analyze_sample tabulates sequences", {
-    sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
+# test analyze_seqs -------------------------------------------------------
+
+
+  test_that("analyze_seqs tabulates sequences", {
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
     expect_equal(nrow(sample.data), 14)
     chunk <- sample.data[1:2, ]
     expect_equal(chunk[1, "Length"], 162)
@@ -20,16 +22,16 @@ with(test_data, {
     })
   })
 
-  test_that("analyze_sample handles completely emtpy input vector", {
-    sample.data <- analyze_sample(c(), locus_attrs, 3)
+  test_that("analyze_seqs handles completely emtpy input vector", {
+    sample.data <- analyze_seqs(c(), locus_attrs, 3)
     expect_equal(nrow(sample.data), 0)
     expect_equal(colnames(sample.data), sample.data.cols)
   })
 
-  test_that("analyze_sample handles empty sequences", {
+  test_that("analyze_seqs handles empty sequences", {
     seqs <- seqs1$A
     seqs[1:100] <- "" # empty out a segment of the vector
-    sample.data <- analyze_sample(seqs, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs, locus_attrs, 3)
     # Looking specifically at the entry for zero length
     chunk <- subset(sample.data, Length == 0)
     # There should be one row, accounting for all 100 original blank entries
@@ -45,9 +47,9 @@ with(test_data, {
     expect_equal(chunk$Artifact, as.integer(NA))
   })
 
-  test_that("analyze_sample checks for motif repeats", {
+  test_that("analyze_seqs checks for motif repeats", {
     seqs <- seqs1$A
-    sample.data <- analyze_sample(seqs, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs, locus_attrs, 3)
     chunk <- subset(sample.data, !MotifMatch)
     with(chunk, {
       expect_equal(sum(Count), 500)
@@ -58,9 +60,9 @@ with(test_data, {
     })
   })
 
-  test_that("analyze_sample checks for length", {
+  test_that("analyze_seqs checks for length", {
     seqs <- seqs1$A
-    sample.data <- analyze_sample(seqs, locus_attrs, 3)
+    sample.data <- analyze_seqs(seqs, locus_attrs, 3)
     chunk <- subset(sample.data, !LengthMatch)
     with(chunk, {
     expect_equal(sum(Count), 500)
@@ -72,8 +74,8 @@ with(test_data, {
     })
   })
 
-  test_that("analyze_sample marks stutter entries", {
-    sample.data <- analyze_sample(seqs1$A, locus_attrs, 3)
+  test_that("analyze_seqs marks stutter entries", {
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
     chunk <- subset(sample.data, !is.na(Stutter))
     expect_equal(chunk$Count, c(281, 116))
     expect_equal(chunk$Stutter, c(1, 2))
@@ -81,7 +83,7 @@ with(test_data, {
     # stutter
   })
 
-  test_that("analyze_sample marks artifact entries", {
+  test_that("analyze_seqs marks artifact entries", {
     s <- seqs1$A
     # Take that first stutter and make it an artifact instead
     highest <- names(sort(table(s), decreasing = T)[1])
@@ -90,16 +92,16 @@ with(test_data, {
     s[idx] <- highest
     substr(s[idx], nchar(stutter), nchar(stutter)) <- "X"
     # Check that the third entry is marked an artifact of the first
-    sample.data <- analyze_sample(s, locus_attrs, 3)
+    sample.data <- analyze_seqs(s, locus_attrs, 3)
     expect_equal(sample.data$Artifact, c(NA, NA, 1)[1:14])
   })
 
-  test_that("analyze_sample marks ambiguous entries", {
+  test_that("analyze_seqs marks ambiguous entries", {
     # sequences that contain non-ACTG characters should be marked TRUE in the
     # Ambiguous column (interpreting those as "N" or similar).
     s <- seqs1$A
     s[s == s[1]] <- sub("AGCCAGTC", "AGCCANTC", s[1])
-    sample.data <- analyze_sample(s, locus_attrs, 3)
+    sample.data <- analyze_seqs(s, locus_attrs, 3)
     expect_equal(sample.data$Ambiguous,
                  c(TRUE, rep(FALSE, nrow(sample.data) - 1)))
   })

@@ -8,7 +8,7 @@ summarize_sample(sample.data, sample.attrs, fraction.min, counts.min)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by
-\code{\link{analyze_sample}}.}
+\code{\link{analyze_seqs}}.}
 
 \item{sample.attrs}{list of sample attributes, such as the rows produced by
 \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.}
@@ -28,7 +28,7 @@ list of attributes describing the sample.
 Converts a full STR sample data frame into a concise list of consistent
 attributes, suitable for binding together across samples for a dataset.  At
 this stage the summary is prepared for a single specific locus, in contrast
-to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
+to \code{\link{analyze_seqs}}.  The Allele1 entries correspond to the
 sequence with the highest count, Allele2 the second highest.
 }
 \details{

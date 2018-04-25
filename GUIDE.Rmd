@@ -240,7 +240,7 @@ Lastly, the ratio of read counts for each sequence to the total reads in the
 sample and the reads with the same MatchingLocus value is stored in
 FractionOfTotal and FractionOfLocus columns respectively.
 
-This is the `analyze_sample` function in the R package.
+This is the `analyze_seqs` function in the R package.
 
 ### Genotype Calling
 
