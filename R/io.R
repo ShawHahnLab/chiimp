@@ -369,9 +369,9 @@ save_allele_seqs <- function(results_summary, dp) {
 save_seqfile_data <- function(results_file_data, dp) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
-  invisible(lapply(names(results_data), function(n) {
+  invisible(lapply(names(results_file_data), function(n) {
     fp <- file.path(dp, paste0(n, ".csv"))
-    utils::write.csv(results_data[[n]], fp, na = "", quote = FALSE)
+    utils::write.csv(results_file_data[[n]], fp, na = "", quote = FALSE)
   }))
 }
 
