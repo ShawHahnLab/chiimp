@@ -127,9 +127,7 @@ analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
   # Tidy up expected lengths.
   expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
                         sample.attrs[["ExpectedLength2"]])
-  expected_lengths <- unique(expected_lengths[!is.na(expected_lengths)])
-  if (! is.null(expected_lengths) & length(expected_lengths) == 0)
-    expected_lengths <- NULL
+  expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
 
   categories <- c("Allele", "Prominent", "Insignificant",
                   "Ambiguous", "Stutter", "Artifact")
@@ -228,90 +226,35 @@ analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
 #' @export
 summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
-  # extract sample data entries that meet all criteria for a potential allele
-  locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
-  chunk <- sample.data[idx, ]
-  # Note that counts.locus is more restrictive than the total counts of all
-  # entries with MatchingLocus equal to the given locus name, since idx includes
-  # the extra checks above.
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  # If specified, take the top two matching entries at the given expected
-  # lengths.  If there's just one length expected, this should be two entries at
-  # that one length.  Otherwise it will be two distinct lengths between the two
-  # entries.  We do this in a roundabout way to handle the length-homoplasy
-  # case, where only one sequence length is expected but there are two distinct
-  # alleles present at that same length.
   expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
                         sample.attrs[["ExpectedLength2"]])
-  expected_lengths <- unique(expected_lengths[!is.na(expected_lengths)])
-  if (!is.null(expected_lengths) & length(expected_lengths) == 0)
-    expected_lengths <- NULL
-  if (!is.null(expected_lengths)) {
-    idx <- match(expected_lengths, chunk$Length)
-    idx <- idx[!is.na(idx)]
-    if (length(idx) == 1)
-      idx <- c(idx, 1 + match(expected_lengths, chunk$Length[-idx]))
-    idx <- idx[!is.na(idx)]
-    chunk <- chunk[idx, ]
-  }
-
-  # Threshold potential alleles at minimum count.
-  # If two expected lengths were given, just take those two entries.
-  # If a single expected length was given, ensure we at least get one sequence
-  # at that length.
-  idx <- chunk$Count >= fraction.min * count.locus
-  if (is.null(expected_lengths)) {
-    chunk <- chunk[idx, ]
-  } else if (length(expected_lengths) == 1) {
-  # The only case where we should bother with this, if there are expected
-  # lengths given, is if there was only one length.  In that case we should
-  # narrow it down to either one or two sequences at that length.
-    # (If no rows would be selected, at least take the top entry.)
-    if (sum(idx) == 0)
-      idx <- 1
-    chunk <- chunk[idx, ]
-  }
-
-  # Remove ambiguous sequences, if present.
-  ambig <- chunk[2, "Ambiguous"]
-  chunk <- chunk[! chunk[, "Ambiguous"], ]
-  # Remove stutter, if present.
-  stutter <- NA
-  artifact <- NA
-  if (is.null(expected_lengths)) {
-    # Remove stutter, if present.
-    stutter <- !is.na(chunk[2, "Stutter"])
-    chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-    # Remove artifact-like sequences, if present.
-    artifact <- !is.na(chunk[2, "Artifact"])
-    chunk <- chunk[is.na(chunk[, "Artifact"]), ]
-  }
+  expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
+  
+  chunk <- analyze_sample_guided(sample.data, sample.attrs, fraction.min)
+  
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
-  prominent.seqs <- nrow(chunk)
-  # Enforce count limit after all filtering (but before accounting for the
-  # stutter removal or fraction thresholding above)
+  prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
+  # Enforce count limit after all filtering
+  count.locus <- sum(chunk$Count)
   if (is.null(expected_lengths) && count.locus < counts.min) {
     chunk <- chunk[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected
   # attributes.
   attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
+  allele1 <- chunk[which(chunk$Category == "Allele")[1], attr.names]
+  allele2 <- chunk[which(chunk$Category == "Allele")[2], attr.names]
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  homozygous <- nrow(chunk) == 1
   sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Ambiguous = ambig,
-                           Stutter = stutter,
-                           Artifact = artifact,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
+                      list(Homozygous    = sum(chunk$Category == "Allele") == 1,
+                           Ambiguous     = "Ambiguous" %in% chunk$Category[2],
+                           Stutter       = "Stutter"   %in% chunk$Category[2],
+                           Artifact      = "Artifact"  %in% chunk$Category[2],
+                           CountTotal    = sum(sample.data$Count),
+                           CountLocus    = count.locus,
                            ProminentSeqs = prominent.seqs))
   return(sample.summary)
 }
