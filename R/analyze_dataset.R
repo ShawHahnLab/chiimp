@@ -90,8 +90,7 @@ analyze_dataset <- function(dataset,
       # in the dataset data frame will be given as the entry argument to
       # analyze.entry.
       fps <- unique(dataset$Filename)
-      analyzed_files <- parallel::parLapply(fps,
-                                            analyze.file,
+      analyzed_files <- parallel::parLapply(cluster, fps, analyze.file,
                                             locus_attrs = locus_attrs,
                                             nrepeats = nrepeats)
       names(analyzed_files) <- fps
