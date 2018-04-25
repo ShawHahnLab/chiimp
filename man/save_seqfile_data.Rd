@@ -13,6 +13,10 @@ save_seqfile_data(results_file_data, dp)
 \item{dp}{output directory path to use for all files.}
 }
 \description{
-Save each per-file data frame produced by \code{\link{analyze_dataset}} to
-a separate file in the specified directory path, in CSV format.
+Save each per-file data frame produced by \code{\link{analyze_dataset}} to a
+separate file in the specified directory path, in CSV format.  The directory
+structure will start at the first shared directory of the input file paths.
+For example, if the inputs were /data/run1/file.fastq and
+/data/run2/file.fastq there will be run1 and run2 directories inside the
+given `dp` directory.
 }

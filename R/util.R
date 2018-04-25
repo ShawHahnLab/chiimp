@@ -137,6 +137,28 @@ name_alleles_in_table <- function(data, known_alleles=NULL, name_args=list()) {
 
 # Other -------------------------------------------------------------------
 
+#' Remove shared path from file paths
+#'
+#' For the given character vector of file paths, create a modified version with
+#' any common prefix path removed.
+#'
+#' @param fps_full character vector of file paths.
+#'
+#' @return character vector of same length as input, with any common directory
+#'   structure trimmed off.
+remove_shared_root_dir <- function(fps_full) {
+  fps <- normalizePath(fps_full, mustWork = FALSE)
+  chunks <- lapply(strsplit(fps, "/"), function(segs) segs[segs != ""])
+  minlen <- min(sapply(chunks, length))
+  dirs <- do.call(rbind, lapply(chunks, "[", 1:minlen))
+  dirs <- apply(dirs, 2, function(d) length(unique(d)))
+  diridx <- which(dirs > 1)[1]
+  fps_rel <- sapply(chunks, function(chunk) {
+    do.call(file.path, as.list(chunk[diridx:length(chunk)]))
+  })
+  names(fps_rel) <- fps_full
+  fps_rel
+}
 
 # Equivalent of /dev/null for the build platform.
 fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint
