@@ -99,7 +99,7 @@ analyze_sample <- function(sample.data, sample.attrs, fraction.min) {
     Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
                                     "Ambiguous", "Stutter", "Artifact"))
     # Threshold potential alleles at minimum count
-    Category[Count < fraction.min * count.locus] <- "Insignificant"
+    Category[Count < fraction.min * sum(Count)] <- "Insignificant"
     # Label ambiguous, stutter, artifact sequences, if present.
     Category[is.na(Category) & Ambiguous] <- "Ambiguous"
     Category[is.na(Category) & ! is.na(Stutter)] <- "Stutter"
@@ -146,7 +146,7 @@ analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
              # Assign top seq at expected length as first allele.
              Category[idxl & is.na(Category)][1] <- "Allele"
              # Threshold potential alleles at minimum count.
-             Category[Count < fraction.min * count.locus] <- "Insignificant"
+             Category[Count < fraction.min * sum(Count)] <- "Insignificant"
              # Assign second seq at expected length as second allele, if there
              # is one.
              Category[idxl & is.na(Category)][1] <- "Allele"
@@ -229,9 +229,9 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
                         sample.attrs[["ExpectedLength2"]])
   expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
-  
+
   chunk <- analyze_sample_guided(sample.data, sample.attrs, fraction.min)
-  
+
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
