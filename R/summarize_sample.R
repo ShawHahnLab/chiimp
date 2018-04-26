@@ -7,6 +7,22 @@ sample_summary_funcs <- c("summarize_sample",
                           "summarize_sample_guided",
                           "summarize_sample_naive")
 
+# Did a particular sequence get categorized as a non-allele when it otherwise
+# would have been called an allele? Given a sequence category factor and a
+# single level, check if that level occurs before a second allele (if any). This
+# implies a possible allele was not called due to that category level being
+# assigned instead.
+check_category <- function(category, lvl) {
+  # Stop at the second allele, but if none, check the full vector
+  idx_a2 <- which("Allele" == category)[2]
+  if (is.na(idx_a2))
+    idx_a2 <- length(category)
+  # Is there any occurrence of the given lvl in the section to be checked?
+  idx <- which(lvl == category[1:idx_a2])[1]
+  # Any index found implies TRUE, NA implies FALSE.
+  ! is.na(idx)
+}
+
 #' Summarize a processed STR sample
 #'
 #' Converts a full STR sample data frame into a concise list of consistent
@@ -58,7 +74,6 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   # this will be either one or two.
   prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
   # Enforce count limit after all filtering
-  # TODO can't we remove this now?  the categories should already be in place.
   count.locus <- sum(chunk$Count)
   if (count.locus < counts.min) {
     chunk <- chunk[0, ]
@@ -71,14 +86,15 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous  = sum(chunk$Category %in% "Allele") == 1,
-                           Ambiguous     = "Ambiguous" %in% chunk$Category[2],
-                           Stutter       = "Stutter"   %in% chunk$Category[2],
-                           Artifact      = "Artifact"  %in% chunk$Category[2],
-                           CountTotal    = sum(sample.data$Count),
-                           CountLocus    = count.locus,
-                           ProminentSeqs = prominent.seqs))
+  sample.summary <- with(chunk,
+                      c(allele1, allele2,
+                        list(Homozygous = sum(Category %in% "Allele") == 1,
+                             Ambiguous  = check_category(Category, "Ambiguous"),
+                             Stutter    = check_category(Category, "Stutter"),
+                             Artifact   = check_category(Category, "Artifact"),
+                             CountTotal = sum(sample.data$Count),
+                             CountLocus = count.locus,
+                             ProminentSeqs = prominent.seqs)))
   return(sample.summary)
 }
 
@@ -251,14 +267,15 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous  = sum(chunk$Category %in% "Allele") == 1,
-                           Ambiguous     = "Ambiguous" %in% chunk$Category[2],
-                           Stutter       = "Stutter"   %in% chunk$Category[2],
-                           Artifact      = "Artifact"  %in% chunk$Category[2],
-                           CountTotal    = sum(sample.data$Count),
-                           CountLocus    = count.locus,
-                           ProminentSeqs = prominent.seqs))
+  sample.summary <- with(chunk,
+                      c(allele1, allele2,
+                        list(Homozygous = sum(Category %in% "Allele") == 1,
+                             Ambiguous  = check_category(Category, "Ambiguous"),
+                             Stutter    = check_category(Category, "Stutter"),
+                             Artifact   = check_category(Category, "Artifact"),
+                             CountTotal = sum(sample.data$Count),
+                             CountLocus = count.locus,
+                             ProminentSeqs = prominent.seqs)))
   return(sample.summary)
 }
 
@@ -313,14 +330,15 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous    = sum(chunk$Category == "Allele") == 1,
-                           Ambiguous     = "Ambiguous" %in% chunk$Category[2],
-                           Stutter       = "Stutter"   %in% chunk$Category[2],
-                           Artifact      = "Artifact"  %in% chunk$Category[2],
-                           CountTotal    = sum(sample.data$Count),
-                           CountLocus    = count.locus,
-                           ProminentSeqs = prominent.seqs))
+  sample.summary <- with(chunk,
+                      c(allele1, allele2,
+                        list(Homozygous = sum(Category %in% "Allele") == 1,
+                             Ambiguous  = check_category(Category, "Ambiguous"),
+                             Stutter    = check_category(Category, "Stutter"),
+                             Artifact   = check_category(Category, "Artifact"),
+                             CountTotal = sum(sample.data$Count),
+                             CountLocus = count.locus,
+                             ProminentSeqs = prominent.seqs)))
   return(sample.summary)
 }
 
