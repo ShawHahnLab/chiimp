@@ -59,6 +59,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
   # this will be either one or two.
   prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
   # Enforce count limit after all filtering
+  # TODO can't we remove this now?  the categories should already be in place.
   count.locus <- sum(chunk$Count)
   if (count.locus < counts.min) {
     chunk <- chunk[0, ]
@@ -240,6 +241,14 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   attr.names <- c("Seq", "Count", "Length")
   allele1 <- chunk[which(chunk$Category == "Allele")[1], attr.names]
   allele2 <- chunk[which(chunk$Category == "Allele")[2], attr.names]
+  # If the expected lengths were given in the reverse order of the found
+  # alleles, flip the found alleles to match.
+  if (length(expected_lengths) == 2 &&
+      allele1[["Length"]] == expected_lengths[2]) {
+    allele_tmp <- allele1
+    allele1 <- allele2
+    allele2 <- allele_tmp
+  }
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
