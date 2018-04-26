@@ -244,7 +244,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   # If the expected lengths were given in the reverse order of the found
   # alleles, flip the found alleles to match.
   if (length(expected_lengths) == 2 &&
-      allele1[["Length"]] == expected_lengths[2]) {
+      expected_lengths[2] %in% allele1[["Length"]]) {
     allele_tmp <- allele1
     allele1 <- allele2
     allele2 <- allele_tmp
