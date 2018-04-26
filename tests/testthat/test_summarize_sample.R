@@ -56,7 +56,9 @@ with(test_data, {
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
       expect_equal(Homozygous, FALSE)
+      expect_equal(Ambiguous, FALSE)
       expect_equal(Stutter, FALSE)
+      expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 0)
       expect_equal(CountLocus, 0)
       expect_equal(ProminentSeqs, 0)
@@ -95,9 +97,35 @@ with(test_data, {
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
       expect_equal(Homozygous, TRUE)
+      expect_equal(Ambiguous, FALSE)
       expect_equal(Stutter, TRUE)
+      expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 5000)
       expect_equal(CountLocus, 4500)
+      expect_equal(ProminentSeqs, 1)
+    })
+  })
+
+  test_that("summarize_sample marks removal of multiple artifact types", {
+    # There are separate columns in the output for ambiguous/stutter/artifact
+    # sequences and each one can independently be TRUE if a sequence was skipped
+    # due to that particular aspect.  (Previously only the first would be
+    # marked, and it was incorrectly assumed that a secondary sequence was
+    # always the one that may have been filtered.)
+    # First take an example sample and split half of the "correct" reads with an
+    # ambiguous sequence.  This also leaves some existing stutter reads in
+    # place.
+    s <- seqs3$A
+    idx <- (which(s == s[1]))[c(TRUE, FALSE)] # every other matching index
+    s[idx] <- gsub(".$", "N", s[idx]) # replace last character with N
+    sample.data <- analyze_seqs(s, locus_attrs, 3)
+    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+                                       fraction.min = 0.05, counts.min = 500)
+    with(sample.summary, {
+      expect_equal(Homozygous, TRUE)
+      expect_equal(Ambiguous, TRUE)
+      expect_equal(Stutter, TRUE)
+      expect_equal(Artifact, FALSE)
       expect_equal(ProminentSeqs, 1)
     })
   })
@@ -132,7 +160,9 @@ with(test_data, {
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
       expect_equal(Homozygous, TRUE)
+      expect_equal(Ambiguous, FALSE)
       expect_equal(Stutter, TRUE)
+      expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 5000)
       expect_equal(CountLocus, 4910)
       expect_equal(ProminentSeqs, 1)
@@ -164,9 +194,9 @@ with(test_data, {
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
       expect_equal(Homozygous, TRUE)
+      expect_equal(Ambiguous, TRUE)
       expect_equal(Stutter, FALSE)
       expect_equal(Artifact, FALSE)
-      expect_equal(Ambiguous, TRUE)
       expect_equal(CountTotal, 5000)
       expect_equal(CountLocus, 4500)
       expect_equal(ProminentSeqs, 1)
@@ -217,7 +247,9 @@ with(test_data, {
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
       expect_equal(Homozygous, FALSE)
+      expect_equal(Ambiguous, FALSE)
       expect_equal(Stutter, FALSE)
+      expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 50)
       expect_equal(CountLocus, 45)
       expect_equal(ProminentSeqs, 2)
