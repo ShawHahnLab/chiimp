@@ -26,5 +26,5 @@ list of attributes describing the sample.
 }
 \description{
 Summarize as in \code{\link{summarize_sample}}, but skip allele_match and
-stutter removal.  Entries in the returned list are the same.
+stutter/artifact removal.  Entries in the returned list are the same.
 }

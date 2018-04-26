@@ -5,8 +5,7 @@
 # full_analysis.
 sample_summary_funcs <- c("summarize_sample",
                           "summarize_sample_guided",
-                          "summarize_sample_naive",
-                          "summarize_sample_by_length")
+                          "summarize_sample_naive")
 
 #' Summarize a processed STR sample
 #'
@@ -321,71 +320,6 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
                            Artifact      = "Artifact"  %in% chunk$Category[2],
                            CountTotal    = sum(sample.data$Count),
                            CountLocus    = count.locus,
-                           ProminentSeqs = prominent.seqs))
-  return(sample.summary)
-}
-
-#' Summarize a processed STR sample, Length Version
-#'
-#' Summarize as in \code{\link{summarize_sample}}, but group entries by sequence
-#' length rather than identity.
-#'
-#' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_seqs}}.
-#' @param sample.attrs list of sample attributes, such as the rows produced by
-#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
-#' @param counts.min numeric threshold for the minimum number of counts that
-#'   must be present, in total across entries passing all filters, for potential
-#'   alleles to be considered.
-#'
-#' @return list of attributes describing the sample.
-summarize_sample_by_length <- function (sample.data, sample.attrs,
-                                        fraction.min=0.15,
-                                        counts.min=500) {
-  locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
-  chunk <- sample.data[idx, ]
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  chunk <- with(chunk, {
-         chunk %>%
-         dplyr::group_by(Length, MatchingLocus, MotifMatch, LengthMatch) %>%
-           dplyr::summarize(Count = sum(Count),
-                            Seq = first(Seq),
-                            Stutter = first(Stutter))
-       })
-
-  chunk <- chunk[order(chunk$Count, decreasing = T), ]
-  chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-
-  # Remove stutter, if present.
-  stutter <- !is.na(chunk[2, "Stutter"])
-  chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-  # Remove artifact-like sequences, if present.
-  artifact <- !is.na(chunk[2, "Artifact"])
-  chunk <- chunk[is.na(chunk[, "Artifact"]), ]
-
-  prominent.seqs <- nrow(chunk)
-  # enforce count limit after all filtering
-  if (count.locus < counts.min)
-    chunk <- chunk[0, ]
-  # Take top to remaining entries as the two alleles and keep selected
-  # attributes.
-  attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
-  colnames(allele1) <- paste0("Allele1", colnames(allele1))
-  colnames(allele2) <- paste0("Allele2", colnames(allele2))
-  # Combine into summary list with additional attributes.
-  homozygous <- nrow(chunk) == 1
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Stutter = stutter,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
                            ProminentSeqs = prominent.seqs))
   return(sample.summary)
 }
