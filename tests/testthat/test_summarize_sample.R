@@ -7,30 +7,52 @@ with(test_data, {
   check.seqs1A_summary <- function(data,
                                    count.locus=4500,
                                    allele1.count=2803,
-                                   allele2.count=1300) {
+                                   allele2.count=1300,
+                                   ord = 1:2) {
     expect_equal(names(data), sample.summary.cols)
     with(data, {
-      expect_equal(Allele1Seq,
+      alleles <- c(Allele1Seq, Allele2Seq)[ord]
+      counts  <- c(Allele1Count, Allele2Count)[ord]
+      lengths <- c(Allele1Length, Allele2Length)[ord]
+      expect_equal(alleles[1],
                    gsub("[\n ]*", "",
                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
                         ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
                         TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACACAG
                         TTGTGTGAGCCAGTC"))
-      expect_equal(Allele2Seq,
+      expect_equal(alleles[2],
                    gsub("[\n ]*", "",
                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
                         ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
                         TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
                         AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, allele1.count)
-      expect_equal(Allele1Length, 162)
-      expect_equal(Allele2Count, allele2.count)
-      expect_equal(Allele2Length, 194)
-      expect_equal(Homozygous, FALSE)
-      expect_equal(Stutter, FALSE)
-      expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, count.locus)
+      expect_equal(counts[1],     allele1.count)
+      expect_equal(lengths[1],    162)
+      expect_equal(counts[2],     allele2.count)
+      expect_equal(lengths[2],    194)
+      expect_equal(Homozygous,    FALSE)
+      expect_equal(Stutter,       FALSE)
+      expect_equal(CountTotal,    5000)
+      expect_equal(CountLocus,    count.locus)
       expect_equal(ProminentSeqs, 2)
+    })
+  }
+
+  expect_empty <- function(sample.summary) {
+    with(sample.summary, {
+      expect_equal(Allele1Seq,    as.character(NA))
+      expect_equal(Allele1Count,  as.integer(NA))
+      expect_equal(Allele1Length, as.integer(NA))
+      expect_equal(Allele2Seq,    as.character(NA))
+      expect_equal(Allele2Count,  as.integer(NA))
+      expect_equal(Allele2Length, as.integer(NA))
+      expect_equal(Homozygous,    FALSE)
+      expect_equal(Ambiguous,     FALSE)
+      expect_equal(Stutter,       FALSE)
+      expect_equal(Artifact,      FALSE)
+      expect_equal(CountTotal,    0)
+      expect_equal(CountLocus,    0)
+      expect_equal(ProminentSeqs, 0)
     })
   }
 
@@ -38,41 +60,27 @@ with(test_data, {
 
   test_that("summarize_sample summarizes sample attributes", {
     sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample.summary <- summarize_sample(sample.data, list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data, list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     check.seqs1A_summary(sample.summary)
   })
 
-  test_that("summarize_sample handles completely emtpy input sample data", {
+  test_that("summarize_sample handles completely empty sample data", {
     sample.data <- analyze_seqs(c(), locus_attrs, 3)
-    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data,  list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     expect_equal(names(sample.summary), sample.summary.cols)
-    with(sample.summary, {
-      expect_equal(Allele1Seq, as.character(NA))
-      expect_equal(Allele1Count, as.integer(NA))
-      expect_equal(Allele1Length, as.integer(NA))
-      expect_equal(Allele2Seq, as.character(NA))
-      expect_equal(Allele2Count, as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous, FALSE)
-      expect_equal(Ambiguous, FALSE)
-      expect_equal(Stutter, FALSE)
-      expect_equal(Artifact, FALSE)
-      expect_equal(CountTotal, 0)
-      expect_equal(CountLocus, 0)
-      expect_equal(ProminentSeqs, 0)
-    })
+    expect_empty(sample.summary)
   })
 
   test_that("summarize_sample handles empty sequences in input sample data", {
     seqs <- seqs1$A
     seqs[1:100] <- "" # empty out a segment of the vector
     sample.data <- analyze_seqs(seqs, locus_attrs, 3)
-    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data,  list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
-    # Nothing should change in the output, except that we zeroed out 90 reads that
-    # would otherwise get counted (the rest were already set to off-target
+    # Nothing should change in the output, except that we zeroed out 90 reads
+    # that would otherwise get counted (the rest were already set to off-target
     # junk during setup).
     check.seqs1A_summary(sample.summary,
                          count.locus = 4414,
@@ -82,7 +90,7 @@ with(test_data, {
 
   test_that("summarize_sample marks stutter removal", {
     sample.data <- analyze_seqs(seqs3$A, locus_attrs, 3)
-    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data,  list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
       expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
@@ -119,7 +127,7 @@ with(test_data, {
     idx <- (which(s == s[1]))[c(TRUE, FALSE)] # every other matching index
     s[idx] <- gsub(".$", "N", s[idx]) # replace last character with N
     sample.data <- analyze_seqs(s, locus_attrs, 3)
-    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data,  list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
       expect_equal(Homozygous, TRUE)
@@ -131,21 +139,21 @@ with(test_data, {
   })
 
   test_that("summarize_sample handles multiple stutter sequences", {
-    # If multiple candidate allele sequences are marked as potential stutter, they
-    # should all be skipped, not just the first.
+    # If multiple candidate allele sequences are marked as potential stutter,
+    # they should all be skipped, not just the first.
     sample.data <- analyze_seqs(seqs3$A, locus_attrs, 3)
-    # Replace the third entry with a different stutter sequence.  Munge the counts
-    # around to still total correctly.
+    # Replace the third entry with a different stutter sequence.  Munge the
+    # counts around to still total correctly.
     tot <- sum(sample.data$Count)
     sample.data[3, ] <- sample.data[2, ]
     sample.data[3, "Seq"] <- sub("TAGA", "TACA", sample.data[3, "Seq"])
     sample.data[3, "Count"] <- 410
-    sample.data[3, "FractionOfTotal"] <- 410/tot
-    sample.data[3, "FractionOfLocus"] <- 410/tot
+    sample.data[3, "FractionOfTotal"] <- 410 / tot
+    sample.data[3, "FractionOfLocus"] <- 410 / tot
     sample.data[4:12, "Count"] <- 10
-    sample.data[4:12, "FractionOfTotal"] <- 10/tot
-    sample.data[4:12, "FractionOfLocus"] <- 10/tot
-    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+    sample.data[4:12, "FractionOfTotal"] <- 10 / tot
+    sample.data[4:12, "FractionOfLocus"] <- 10 / tot
+    sample.summary <- summarize_sample(sample.data,  list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
       expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
@@ -179,7 +187,7 @@ with(test_data, {
                         "AGCCNAGTC",
                         seqs3$A[idx])
     sample.data <- analyze_seqs(seqs3$A, locus_attrs, 3)
-    sample.summary <- summarize_sample(sample.data,  list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data,  list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
       expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
@@ -205,26 +213,34 @@ with(test_data, {
 
   test_that("summarize_sample counts prominent sequences", {
     sample.data.1B       <- analyze_seqs(seqs1$B, locus_attrs, 3)
-    sample.summary.1B    <- summarize_sample(sample.data.1B,  list(Locus="B"),
-                                           fraction.min = 0.05, counts.min = 500)
+    sample.summary.1B    <- summarize_sample(sample.data.1B,
+                                             list(Locus = "B"),
+                                             fraction.min = 0.05,
+                                             counts.min = 500)
     sample.data.2B       <- analyze_seqs(seqs2$B, locus_attrs, 3)
-    sample.summary.2B    <- summarize_sample(sample.data.2B, list(Locus="B"),
-                                           fraction.min = 0.05, counts.min = 500)
+    sample.summary.2B    <- summarize_sample(sample.data.2B,
+                                             list(Locus = "B"),
+                                             fraction.min = 0.05,
+                                             counts.min = 500)
     sample.data.3B       <- analyze_seqs(seqs3$B, locus_attrs, 3)
-    sample.summary.3B    <- summarize_sample(sample.data.3B, list(Locus="B"),
-                                           fraction.min = 0.05, counts.min = 500)
+    sample.summary.3B    <- summarize_sample(sample.data.3B,
+                                             list(Locus = "B"),
+                                             fraction.min = 0.05,
+                                             counts.min = 500)
     sample.data.empty    <- analyze_seqs(c(), locus_attrs, 3)
-    sample.summary.empty <- summarize_sample(sample.data.empty, list(Locus="B"),
-                                           fraction.min = 0.05, counts.min = 500)
+    sample.summary.empty <- summarize_sample(sample.data.empty,
+                                             list(Locus = "B"),
+                                             fraction.min = 0.05,
+                                             counts.min = 500)
 
     expect_equal(sample.summary.1B$ProminentSeqs,    2)
     expect_equal(sample.summary.2B$ProminentSeqs,    3)
     expect_equal(sample.summary.3B$ProminentSeqs,    1)
     expect_equal(sample.summary.empty$ProminentSeqs, 0)
-    # Despite having stutter-y peaks the first two did not have a potential allele
-    # removed, so Stutter == FALSE.  The third had stutter large enough to look
-    # like an allele so it was removed.  The last one was empty so there was
-    # nothing to have stutter from.
+    # Despite having stutter-y peaks the first two did not have a potential
+    # allele removed, so Stutter == FALSE.  The third had stutter large enough
+    # to look like an allele so it was removed.  The last one was empty so there
+    # was nothing to have stutter from.
     expect_equal(sample.summary.1B$Stutter,    FALSE)
     expect_equal(sample.summary.2B$Stutter,    FALSE)
     expect_equal(sample.summary.3B$Stutter,    TRUE)
@@ -234,10 +250,10 @@ with(test_data, {
   test_that("summarize_sample rejects low-count samples", {
     sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
     # Here we check that the filtered-counts-thresholding is applied, by forcing
-    # the counts to a low number.  This should still report some stats but should
-    # leave out the allele1/allele2 information.
+    # the counts to a low number.  This should still report some stats but
+    # should leave out the allele1/allele2 information.
     sample.data$Count <- sample.data$Count / 100
-    sample.summary <- summarize_sample(sample.data, list(Locus="A"),
+    sample.summary <- summarize_sample(sample.data, list(Locus = "A"),
                                        fraction.min = 0.05, counts.min = 500)
     with(sample.summary, {
       expect_equal(Allele1Seq, as.character(NA))
@@ -256,13 +272,83 @@ with(test_data, {
     })
   })
 
+  test_that("summarize_sample works with vector for sample attrs", {
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    sample.summary <- summarize_sample(sample.data, c(Locus = "A"),
+                                       fraction.min = 0.05, counts.min = 500)
+    check.seqs1A_summary(sample.summary)
+  })
+
   test_that("summarize_sample warns of missing locus name", {
-    # summarize_sample() should be able to tell if an invalid (as per the earlier
-    # processing) locus name is given, because it won't be in the levels of the
-    # MatchingLocus factor of the data frame from analyze_seqs().  I think this
-    # would only come about when locus names given by prepare.dataset() don't
-    # match what's in locus_attrs.
+    # summarize_sample() should be able to tell if an invalid (as per the
+    # earlier processing) locus name is given, because it won't be in the levels
+    # of the MatchingLocus factor of the data frame from analyze_seqs().  I
+    # think this would only come about when locus names given by
+    # prepare.dataset() don't match what's in locus_attrs.
     skip("test not yet implemented")
+  })
+
+# test summarize_sample_guided --------------------------------------------
+
+  # So do the summarize_ functions take lists or vectors for sample.attrs?  Make
+  # that explicit and consistent!
+
+  test_that("summarize_sample_guided summarizes sample attributes", {
+    # This should have the same behavior as summarize_sample above.
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    sample.summary <- summarize_sample_guided(sample.data, list(Locus = "A"),
+                                      fraction.min = 0.05, counts.min = 500)
+    check.seqs1A_summary(sample.summary)
+  })
+
+  test_that("summarize_sample_guided handles completely empty sample data", {
+    # This should have the same behavior as summarize_sample above.
+    sample.data <- analyze_seqs(c(), locus_attrs, 3)
+    sample.summary <- summarize_sample_guided(sample.data,  list(Locus = "A"),
+                                       fraction.min = 0.05, counts.min = 500)
+    expect_equal(names(sample.summary), sample.summary.cols)
+    expect_empty(sample.summary)
+  })
+
+  test_that("summarize_sample_guided uses expected_lengths", {
+    # This should give allele sequences matching the given expected_lengths,
+    # including order.
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    # Flip the order of alleles here to check that aspect
+    sample.attrs <- list(Locus = "A",
+                         ExpectedLength1 = 194,
+                         ExpectedLength2 = 162)
+    sample.summary <- summarize_sample_guided(sample.data, sample.attrs,
+                                              fraction.min = 0.05,
+                                              counts.min = 500)
+    check.seqs1A_summary(sample.summary, ord = 2:1)
+  })
+
+  test_that("summarize_sample_guided works with vector for sample attrs", {
+    # It's "supposed" to be a list, but when used with functions like apply with
+    # a data frame it gets munged into a vector.  So let's make sure that works
+    # too.
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    # Flip the order of alleles here to check that aspect too
+    sample.attrs <- unlist(list(Locus = "A",
+                         ExpectedLength1 = 194,
+                         ExpectedLength2 = 162))
+    sample.summary <- summarize_sample_guided(sample.data, sample.attrs,
+                                              fraction.min = 0.05,
+                                              counts.min = 500)
+    check.seqs1A_summary(sample.summary, ord = 2:1)
+  })
+
+  test_that("summarize_sample_guided works with blank expected_lengths", {
+    # This should have the same behavior as summarize_sample above.
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    sample.attrs <- list(Locus = "A",
+                         ExpectedLength1 = NA,
+                         ExpectedLength2 = NA)
+    sample.summary <- summarize_sample_guided(sample.data, sample.attrs,
+                                              fraction.min = 0.05,
+                                              counts.min = 500)
+    check.seqs1A_summary(sample.summary)
   })
 
 })
