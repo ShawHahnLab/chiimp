@@ -248,7 +248,7 @@ summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
   prominent.seqs <- sum(chunk$Category %in% c("Allele", "Prominent"))
   # Enforce count limit after all filtering
   count.locus <- sum(chunk$Count)
-  if (is.null(expected_lengths) && count.locus < counts.min) {
+  if (length(expected_lengths) == 0 && count.locus < counts.min) {
     chunk <- chunk[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected
