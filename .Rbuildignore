@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis.yml$
+.utils
 environment.yml
 install_linux_conda.sh
 install_linux.sh
