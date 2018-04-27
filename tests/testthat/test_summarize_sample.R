@@ -31,7 +31,9 @@ with(test_data, {
       expect_equal(counts[2],     allele2.count)
       expect_equal(lengths[2],    194)
       expect_equal(Homozygous,    FALSE)
+      expect_equal(Ambiguous,     FALSE)
       expect_equal(Stutter,       FALSE)
+      expect_equal(Artifact,      FALSE)
       expect_equal(CountTotal,    5000)
       expect_equal(CountLocus,    count.locus)
       expect_equal(ProminentSeqs, 2)
@@ -322,6 +324,48 @@ with(test_data, {
                                               fraction.min = 0.05,
                                               counts.min = 500)
     check.seqs1A_summary(sample.summary, ord = 2:1)
+  })
+
+  test_that("summarize_sample_guided ignores counts.min for expected lengths", {
+    # This should give allele sequences matching the given expected_lengths,
+    # including order, despite the counts.min value.
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    # Flip the order of alleles here to check that aspect
+    sample.attrs <- list(Locus = "A",
+                         ExpectedLength1 = 194,
+                         ExpectedLength2 = 162)
+    sample.summary <- summarize_sample_guided(sample.data, sample.attrs,
+                                              fraction.min = 0.05,
+                                              counts.min = 5000)
+    check.seqs1A_summary(sample.summary, ord = 2:1)
+  })
+
+  test_that("summarize_sample_guided uses counts.min if no expected lengths", {
+    # This should not report alleles if total filtered read count is below
+    # counts.min threshold.
+    sample.data <- analyze_seqs(seqs1$A, locus_attrs, 3)
+    # Flip the order of alleles here to check that aspect
+    sample.attrs <- list(Locus = "A",
+                         ExpectedLength1 = NA,
+                         ExpectedLength2 = NA)
+    sample.summary <- summarize_sample_guided(sample.data, sample.attrs,
+                                              fraction.min = 0.05,
+                                              counts.min = 5000)
+    with(sample.summary, {
+      expect_equal(Allele1Seq,    as.character(NA))
+      expect_equal(Allele1Count,  as.integer(NA))
+      expect_equal(Allele1Length, as.integer(NA))
+      expect_equal(Allele2Seq,    as.character(NA))
+      expect_equal(Allele2Count,  as.integer(NA))
+      expect_equal(Allele2Length, as.integer(NA))
+      expect_equal(Homozygous,    FALSE)
+      expect_equal(Ambiguous,     FALSE)
+      expect_equal(Stutter,       FALSE)
+      expect_equal(Artifact,      FALSE)
+      expect_equal(CountTotal,    5000)
+      expect_equal(CountLocus,    4500)
+      expect_equal(ProminentSeqs, 2)
+    })
   })
 
   test_that("summarize_sample_guided works with vector for sample attrs", {
