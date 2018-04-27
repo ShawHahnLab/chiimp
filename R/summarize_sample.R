@@ -103,7 +103,7 @@ summarize_sample <- function(sample.data, sample.attrs, fraction.min,
 # a Category column to classify individual sequences.
 analyze_sample <- function(sample.data, sample.attrs, fraction.min) {
   # Extract sample data entries that meet all criteria for a potential allele.
-  locus.name <- sample.attrs[["Locus"]]
+  locus.name <- unlist(sample.attrs["Locus"])
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
   within(chunk, {
@@ -124,7 +124,7 @@ analyze_sample <- function(sample.data, sample.attrs, fraction.min) {
 
 analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
   # Extract sample data entries that meet all criteria for a potential allele.
-  locus.name <- sample.attrs[["Locus"]]
+  locus.name <- unlist(sample.attrs["Locus"])
   idx <- which(allele_match(sample.data, locus.name))
   chunk <- sample.data[idx, ]
 
@@ -136,7 +136,8 @@ analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
   # alleles present at that same length.
 
   # Tidy up expected lengths.
-  expected_lengths <- sample.attrs[c("ExpectedLength1", "ExpectedLength2")]
+  expected_lengths <- as.integer(unlist(sample.attrs[c("ExpectedLength1",
+                                                       "ExpectedLength2")]))
   expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
 
   categories <- c("Allele", "Prominent", "Insignificant",
@@ -236,7 +237,8 @@ analyze_sample_guided <- function(sample.data, sample.attrs, fraction.min) {
 #' @export
 summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
                              counts.min) {
-  expected_lengths <- sample.attrs[c("ExpectedLength1", "ExpectedLength2")]
+  expected_lengths <- as.integer(unlist(sample.attrs[c("ExpectedLength1",
+                                                       "ExpectedLength2")]))
   expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
 
   chunk <- analyze_sample_guided(sample.data, sample.attrs, fraction.min)
