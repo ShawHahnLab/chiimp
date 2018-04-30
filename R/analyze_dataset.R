@@ -23,9 +23,13 @@
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
 #'   \code{parallel} package.
-#' @param summary_args list of supplemental arguments to
-#'   \code{summary.function}.
-#' @param summary.function function to use when summarizing each sample's full
+#' @param analysis_opts list of supplemental arguments to
+#'   \code{analysis_function}.
+#' @param summary_opts list of supplemental arguments to
+#'   \code{summary_function}.
+#' @param analysis_function function to use when analyzing each sample's data
+#'   frame into the filtered version  Defaults to \code{\link{analyze_sample}}.
+#' @param summary_function function to use when summarizing each sample's full
 #'   details into the standard attributes.  Defaults to
 #'   \code{\link{summarize_sample}}.
 #' @param known_alleles data frame of custom allele names as defined for
@@ -43,8 +47,10 @@ analyze_dataset <- function(dataset,
                             locus_attrs,
                             nrepeats,
                             ncores = 0,
-                            summary_args,
-                            summary.function=summarize_sample,
+                            analysis_opts,
+                            summary_opts,
+                            analysis_function=analyze_sample,
+                            summary_function=summarize_sample,
                             known_alleles=NULL,
                             name_args=list()) {
   if (ncores == 0) {
@@ -52,20 +58,29 @@ analyze_dataset <- function(dataset,
   }
   analyze.file <- function(fp, locus_attrs, nrepeats) {
     seqs <- load_seqs(fp)
-    sample.data <- analyze_seqs(seqs, locus_attrs, nrepeats)
+    sample_data <- analyze_seqs(seqs, locus_attrs, nrepeats)
   }
-  analyze.entry <- function(entry, summary.function, analyzed_files) {
-    sample.data <- analyzed_files[[entry["Filename"]]]
-    args <- c(list(sample.data = sample.data, sample.attrs = entry),
-              summary_args)
-    sample.summary <- do.call(summary.function, args)
-    return(list(summary = sample.summary, data = sample.data))
+  analyze.entry <- function(entry, analysis_opts, summary_opts,
+                            analysis_function, summary_function,
+                            analyzed_files) {
+    # Get all data from the relevant file
+    seq_data <- analyzed_files[[entry["Filename"]]]
+    # Process into single-sample data frame
+    analysis_args <- c(list(seq_data = seq_data, sample.attrs = entry),
+                       analysis_opts)
+    sample_data <- do.call(analysis_function, analysis_args)
+    # Process into single-sample summary list
+    summary_args <- c(list(sample_data = sample_data, sample.attrs = entry),
+                      summary_opts)
+    sample.summary <- do.call(summary_function, summary_args)
+    # Return the processed per-sample data
+    return(list(summary = sample.summary, data = sample_data))
   }
   if (ncores > 1) {
     # Set up the cluster and export required names (those objects used in
     # analyze.entry that are expected from the environment and not passed as
     # arguments).
-    cluster_names <- c("locus_attrs", "nrepeats", "summary_args")
+    cluster_names <- c("locus_attrs", "nrepeats")
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
@@ -95,7 +110,10 @@ analyze_dataset <- function(dataset,
                                             nrepeats = nrepeats)
       names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
-                                        summary.function = summary.function,
+                                        analysis_opts = analysis_opts,
+                                        summary_opts = summary_opts,
+                                        analysis_function = analysis_function,
+                                        summary_function = summary_function,
                                         analyzed_files = analyzed_files)
     },
     finally = {
@@ -108,7 +126,10 @@ analyze_dataset <- function(dataset,
                              nrepeats = nrepeats)
     names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
-                         summary.function = summary.function,
+                         analysis_opts = analysis_opts,
+                         summary_opts = summary_opts,
+                         analysis_function = analysis_function,
+                         summary_function = summary_function,
                          analyzed_files = analyzed_files)
   }
   # Recombined results into a summary data frame and a list of full sample data.

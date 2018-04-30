@@ -4,8 +4,9 @@
 \alias{analyze_dataset}
 \title{Analyze all samples in a dataset}
 \usage{
-analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
-  summary.function = summarize_sample, known_alleles = NULL,
+analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, analysis_opts,
+  summary_opts, analysis_function = analyze_sample,
+  summary_function = summarize_sample, known_alleles = NULL,
   name_args = list())
 }
 \arguments{
@@ -23,10 +24,16 @@ analysis.  Defaults to one less than half the number of detected cores with
 a minimum of 1.  If 1, the function will run without using the
 \code{parallel} package.}
 
-\item{summary_args}{list of supplemental arguments to
-\code{summary.function}.}
+\item{analysis_opts}{list of supplemental arguments to
+\code{analysis_function}.}
 
-\item{summary.function}{function to use when summarizing each sample's full
+\item{summary_opts}{list of supplemental arguments to
+\code{summary_function}.}
+
+\item{analysis_function}{function to use when analyzing each sample's data
+frame into the filtered version  Defaults to \code{\link{analyze_sample}}.}
+
+\item{summary_function}{function to use when summarizing each sample's full
 details into the standard attributes.  Defaults to
 \code{\link{summarize_sample}}.}
 

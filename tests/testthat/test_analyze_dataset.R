@@ -24,9 +24,8 @@ with(test_data, {
     # prepare_dataset tested separately in test_io.R
     dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
     results <- analyze_dataset(dataset, locus_attrs,
-                               summary_args = list(
-                                 fraction.min = 0.05,
-                                 counts.min = 500),
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500),
                                nrepeats = 3,
                                ncores = 1)
     lapply(dataset$Filename, file.remove)
@@ -44,9 +43,8 @@ with(test_data, {
     write_seqs(seqs, data.dir)
     dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
     results <- analyze_dataset(dataset, locus_attrs,
-                               summary_args = list(
-                                 fraction.min = 0.05,
-                                 counts.min = 500),
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500),
                                nrepeats = 3,
                                ncores = 1)
     lapply(dataset$Filename, file.remove)
@@ -111,9 +109,8 @@ with(test_data, {
                                          "260-X",
                                          "different_name_format"))
     results <- analyze_dataset(dataset, locus_attrs,
-                               summary_args = list(
-                                 fraction.min = 0.05,
-                                 counts.min = 500),
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500),
                                nrepeats = 3,
                                ncores = 1,
                                known_alleles = known_alleles)

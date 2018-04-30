@@ -56,10 +56,11 @@ config.defaults <- list(
     name_args = list(hash_len = 6)
   ),
   ## Sample genotyping settings
-  sample_analysis = list(nrepeats = 3),
+  seq_analysis = list(nrepeats = 3),
+  sample_analysis_func = "analyze_sample",
+  sample_analysis_opts = list(fraction.min = 0.05),
   sample_summary_func = "summarize_sample",
-  sample_summary = list(fraction.min = 0.05,
-                        counts.min = 500),
+  sample_summary_opts = list(counts.min = 500),
   ## Report generation settings
   # Should a report be generated?
   report = TRUE,

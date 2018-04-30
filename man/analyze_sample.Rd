@@ -6,14 +6,14 @@
 \alias{analyze_sample_naive}
 \title{Analyze sequence table and categorize sequences}
 \usage{
-analyze_sample(sample.data, sample.attrs, fraction.min)
+analyze_sample(seq_data, sample.attrs, fraction.min)
 
-analyze_sample_guided(sample.data, sample.attrs, fraction.min)
+analyze_sample_guided(seq_data, sample.attrs, fraction.min)
 
-analyze_sample_naive(sample.data, sample.attrs, fraction.min)
+analyze_sample_naive(seq_data, sample.attrs, fraction.min)
 }
 \arguments{
-\item{sample.data}{data frame of processed data for sample as produced by
+\item{seq_data}{data frame of processed data for sample as produced by
 \code{\link{analyze_seqs}}.}
 
 \item{sample.attrs}{list of sample attributes, such as the rows produced by
@@ -24,7 +24,7 @@ given entry must have, compared to the total matching all criteria for that
 locus, to be considered as a potential allele.}
 }
 \value{
-filtered version of \code{sample.data} with added Category column.
+filtered version of \code{seq_data} with added Category column.
 }
 \description{
 Converts a full STR sequence data frame into a per-locus version and adds a
@@ -47,25 +47,30 @@ artifactual, and are above a given fraction of filtered reads).
 threshold.
 \item Ambiguous: Sequences passing the \code{fraction.min} threshold but with
 non-ACTG characters such as N, as defined by the Ambiguous column of
-\code{sample.data}.
+\code{seq_data}.
 \item Stutter: Sequences passing the \code{fraction.min} threshold but matching
 stutter sequence criteria as defined by the Stutter column of
-\code{sample.data}.
+\code{seq_data}.
 \item Artifact: Sequences passing the \code{fraction.min} threshold but matching
 non-stutter artifact sequence criteria as defined by the Artifact column of
-\code{sample.data}.
+\code{seq_data}.
 }
 }
 \section{Functions}{
 \itemize{
-\item \code{analyze_sample}: default version of sample analysis.
+\item \code{analyze_sample}: default version of sample analysis.  From here use
+\code{\link{summarize_sample}}.
 
 \item \code{analyze_sample_guided}: version of sample analysis guided by expected
-sequence length values.  ExpectedLength1 and optionally ExpectedLength2 can
-be supplied as items in the \code{sample.attrs} list.  If NA or missing the
-behavior will match \code{analyze_sample}.
+sequence length values.  Additional items ExpectedLength1 and optionally
+ExpectedLength2 can be supplied in the \code{sample.attrs} list.  If NA or
+missing the behavior will match \code{analyze_sample}.  If two expected
+lengths are given, the fraction.min argument is ignored.  If at least one
+expected length is given, the stutter/artifact filtering is disabled.  From
+here use \code{\link{summarize_sample_guided}}.
 
 \item \code{analyze_sample_naive}: version of sample analysis without
-stutter/artifact filtering.
+stutter/artifact filtering.  From here use \code{\link{summarize_sample}}
+as for \code{analyze_sample}.
 }}
 
