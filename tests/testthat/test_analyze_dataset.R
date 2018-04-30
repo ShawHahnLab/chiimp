@@ -22,7 +22,7 @@ with(test_data, {
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     # prepare_dataset tested separately in test_io.R
-    dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+    dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
     results <- analyze_dataset(dataset, locus_attrs,
                                analysis_opts = list(fraction.min = 0.05),
                                summary_opts = list(counts.min = 500),
@@ -41,7 +41,7 @@ with(test_data, {
     # The general case for analyze_dataset.
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
-    dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+    dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
     results <- analyze_dataset(dataset, locus_attrs,
                                analysis_opts = list(fraction.min = 0.05),
                                summary_opts = list(counts.min = 500),
@@ -86,8 +86,8 @@ with(test_data, {
       expect_equal(Stutter, s)
       a <- logical(12)
       expect_equal(Artifact, a)
-      expect_equal(CountTotal, integer(12)+5000)
-      expect_equal(CountLocus, integer(12)+4500)
+      expect_equal(CountTotal, integer(12) + 5000)
+      expect_equal(CountLocus, integer(12) + 4500)
       expect_equal(ProminentSeqs,  c(2, 2, 1, 2, 3, 1, 2, 3, 2, 2, 2, 3))
     })
 
@@ -100,7 +100,7 @@ with(test_data, {
     # First, set up example as above, but using known_alleles data frame
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
-    dataset <- prepare_dataset(data.dir, '()(\\d+)-([A-Za-z0-9]+).fasta')
+    dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
     known_alleles <- data.frame(Locus = c("1", "1", "A"),
                                 Seq = c("ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT",
                                         "ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT",

@@ -58,7 +58,7 @@ analyze_dataset <- function(dataset,
   }
   analyze.file <- function(fp, locus_attrs, nrepeats) {
     seqs <- load_seqs(fp)
-    sample_data <- analyze_seqs(seqs, locus_attrs, nrepeats)
+    analyze_seqs(seqs, locus_attrs, nrepeats)
   }
   analyze.entry <- function(entry, analysis_opts, summary_opts,
                             analysis_function, summary_function,
