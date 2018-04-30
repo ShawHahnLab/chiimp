@@ -222,6 +222,10 @@ summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
   return(sample.summary)
 }
 
+
+# Util --------------------------------------------------------------------
+
+
 # Did a particular sequence get categorized as a non-allele when it otherwise
 # would have been called an allele? Given a sequence category factor and a
 # single level, check if that level occurs before a second allele (if any). This

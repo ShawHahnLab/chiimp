@@ -2,9 +2,15 @@
 % Please edit documentation in R/analyze_sample.R
 \name{analyze_sample}
 \alias{analyze_sample}
+\alias{analyze_sample_guided}
+\alias{analyze_sample_naive}
 \title{Analyze sequence table and categorize sequences}
 \usage{
 analyze_sample(sample.data, sample.attrs, fraction.min)
+
+analyze_sample_guided(sample.data, sample.attrs, fraction.min)
+
+analyze_sample_naive(sample.data, sample.attrs, fraction.min)
 }
 \arguments{
 \item{sample.data}{data frame of processed data for sample as produced by
@@ -24,10 +30,13 @@ filtered version of \code{sample.data} with added Category column.
 Converts a full STR sequence data frame into a per-locus version and adds a
 Category factor column to designate which sequences look like alleles,
 artifacts, etc.  At this stage the summary is prepared for a single specific
-locus, in contrast to \code{\link{analyze_seqs}}.
+locus, in contrast to \code{\link{analyze_seqs}}.  See the Details section
+below for a description of the factor levels in the new Category column, and
+see the Functions section below for how specific variants of this function
+behave.
 }
 \details{
-Factor levels in the added Category column:
+Factor levels in the added Category column, in order:
 \itemize{
 \item Allele: An identified allele sequence.  There will be between zero and two
 of these.
@@ -37,10 +46,26 @@ artifactual, and are above a given fraction of filtered reads).
 \item Insignificant: Sequences with counts below the \code{fraction.min}
 threshold.
 \item Ambiguous: Sequences passing the \code{fraction.min} threshold but with
-non-ACTG characters such as N, as defined by the Ambiguous column.
+non-ACTG characters such as N, as defined by the Ambiguous column of
+\code{sample.data}.
 \item Stutter: Sequences passing the \code{fraction.min} threshold but matching
-stutter sequence criteria as defined by the Stutter column.
+stutter sequence criteria as defined by the Stutter column of
+\code{sample.data}.
 \item Artifact: Sequences passing the \code{fraction.min} threshold but matching
-non-stutter artifact sequence criteria as defined by the Artifact column.
+non-stutter artifact sequence criteria as defined by the Artifact column of
+\code{sample.data}.
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{analyze_sample}: default version of sample analysis.
+
+\item \code{analyze_sample_guided}: version of sample analysis guided by expected
+sequence length values.  ExpectedLength1 and optionally ExpectedLength2 can
+be supplied as items in the \code{sample.attrs} list.  If NA or missing the
+behavior will match \code{analyze_sample}.
+
+\item \code{analyze_sample_naive}: version of sample analysis without
+stutter/artifact filtering.
+}}
+
