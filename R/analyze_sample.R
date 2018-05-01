@@ -116,12 +116,13 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
              # Exclude ambiguous sequences first.
              Category[Ambiguous] <- "Ambiguous"
              # Assign top seq at expected length as first allele.
-             Category[idxl & is.na(Category)][1] <- "Allele"
+             Category[is.na(Category) & idxl][1] <- "Allele"
              # Threshold potential alleles at minimum count.
-             Category[Count < fraction.min * sum(Count)] <- "Insignificant"
+             Category[is.na(Category) & Count < fraction.min * sum(Count)] <-
+               "Insignificant"
              # Assign second seq at expected length as second allele, if there
              # is one.
-             Category[idxl & is.na(Category)][1] <- "Allele"
+             Category[is.na(Category) & idxl][1] <- "Allele"
              # And that's it.  We make no comment on the remaining entries and
              # leave them as NA.
            })
