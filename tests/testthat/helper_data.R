@@ -22,13 +22,13 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
   rm(f.locus_attrs)
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
-                        "LengthMatch", "Stutter", "Artifact", "FractionOfTotal",
-                        "FractionOfLocus")
+                        "LengthMatch", "Ambiguous", "Stutter", "Artifact",
+                        "FractionOfTotal", "FractionOfLocus")
   sample.summary.cols <- c("Allele1Seq", "Allele1Count",
                            "Allele1Length", "Allele2Seq",
                            "Allele2Count", "Allele2Length",
-                           "Homozygous", "Stutter", "Artifact", "CountTotal",
-                           "CountLocus", "ProminentSeqs")
+                           "Homozygous", "Ambiguous", "Stutter", "Artifact",
+                           "CountTotal", "CountLocus", "ProminentSeqs")
 
   make.seq_junk <- function(N) {
     nucleotides <- c("A", "T", "C", "G")
@@ -127,10 +127,9 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
-    results <- analyze_dataset(dataset, locus_attrs,
-                               summary_args = list(fraction.min = 0.05,
-                                                   counts.min = 500),
-                               nrepeats = 3, ncores = 1)
+    results <- analyze_dataset(dataset, locus_attrs, nrepeats = 3, ncores = 1,
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500))
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
     return(list(dataset = dataset, results = results))

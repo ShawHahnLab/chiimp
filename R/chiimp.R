@@ -59,14 +59,18 @@ full_analysis <- function(config, dataset=NULL) {
   if (cfg$verbose) logmsg("Analyzing samples...")
   idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
   sample_summary_func <- get(sample_summary_funcs[idx])
+  idx <- match(cfg$sample_analysis_func, sample_analysis_funcs, nomatch = 1)
+  sample_analysis_func <- get(sample_analysis_funcs[idx])
   allele.names <- NULL
   if (!is.null(cfg$fp_allele_names))
     allele.names <- load_allele_names(cfg$fp_allele_names)
   results <- analyze_dataset(dataset, locus_attrs,
-                             nrepeats = cfg$sample_analysis$nrepeats,
+                             nrepeats = cfg$seq_analysis$nrepeats,
                              ncores = cfg$dataset_analysis$ncores,
-                             summary_args = cfg$sample_summary,
-                             summary.function = sample_summary_func,
+                             analysis_opts = cfg$sample_analysis_opts,
+                             summary_opts = cfg$sample_summary_opts,
+                             analysis_function = sample_analysis_func,
+                             summary_function = sample_summary_func,
                              known_alleles = allele.names,
                              name_args = cfg$dataset_analysis$name_args)
   results$allele.names <- allele.names
@@ -160,8 +164,11 @@ save_data <- function(results, config) {
               file.path(config$output$dp, config$output$dp_alignments))
   save_alignment_images(results$alignments,
               file.path(config$output$dp, config$output$dp_alignment_images))
-  save_sample_data(results$data,
-              file.path(config$output$dp, config$output$dp_processed_samples))
+  save_seqfile_data(results$files,
+              file.path(config$output$dp, config$output$dp_processed_files))
+  save_sample_data(results$samples,
+                    file.path(config$output$dp,
+                              config$output$dp_processed_samples))
   save_allele_seqs(results$summary,
               file.path(config$output$dp, config$output$dp_allele_seqs))
   save_dist_mat(results$dist_mat,

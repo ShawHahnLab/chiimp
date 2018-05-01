@@ -2,45 +2,75 @@
 % Please edit documentation in R/analyze_sample.R
 \name{analyze_sample}
 \alias{analyze_sample}
-\title{Analyze a set of STR sequences}
+\alias{analyze_sample_guided}
+\alias{analyze_sample_naive}
+\title{Analyze sequence table and categorize sequences}
 \usage{
-analyze_sample(seqs, locus_attrs, nrepeats)
+analyze_sample(seq_data, sample.attrs, fraction.min)
+
+analyze_sample_guided(seq_data, sample.attrs, fraction.min)
+
+analyze_sample_naive(seq_data, sample.attrs, fraction.min)
 }
 \arguments{
-\item{seqs}{character vector containing sequences.}
+\item{seq_data}{data frame of processed data for sample as produced by
+\code{\link{analyze_seqs}}.}
 
-\item{locus_attrs}{data frame of attributes for loci to look for.}
+\item{sample.attrs}{list of sample attributes, such as the rows produced by
+\code{\link{prepare_dataset}}.  Used to select the locus name to filter on.}
 
-\item{nrepeats}{number of repeats of each locus' motif to require for a
-match.}
+\item{fraction.min}{numeric threshold for the minimum proportion of counts a
+given entry must have, compared to the total matching all criteria for that
+locus, to be considered as a potential allele.}
 }
 \value{
-data frame of dereplicated sequences with added annotations.
+filtered version of \code{seq_data} with added Category column.
 }
 \description{
-Dereplicates the given sequences and annotates any STR sequences found,
-returning the processed sample as a data frame with one row per unique
-sequence, sorted by count.  At this stage no information is filtered out, and
-all loci are treated equally.
+Converts a full STR sequence data frame into a per-locus version and adds a
+Category factor column to designate which sequences look like alleles,
+artifacts, etc.  At this stage the summary is prepared for a single specific
+locus, in contrast to \code{\link{analyze_seqs}}.  See the Details section
+below for a description of the factor levels in the new Category column, and
+see the Functions section below for how specific variants of this function
+behave.
 }
 \details{
-Columns in the returned data frame:
+Factor levels in the added Category column, in order:
 \itemize{
-\item Seq: sequence text for each unique sequence
-\item Count: integer count of occurrences of this exact sequence
-\item Length: integer sequence length
-\item MatchingLocus: factor for the name of the locus matching each sequence,
-by checking the primer
-\item MotifMatch: logical -- are there are least \code{nrepeats} perfect
-adjacent repeats of the STR motif for the matching locus?
-\item LengthMatch: logical -- is the sequence length within the expected range
-for the matching locus?
-\item Stutter: integer: for any sequence that looks like potential PCR stutter,
-the index of the row that may be the source of the stutter band.
-\item FractionOfTotal: numeric fraction of the number of sequences
-represented by each unique sequence compared to the total.
-\item FractionOfLocus: numeric fraction of the number of sequences represented
-by each unique sequence compared to the total for that particular
-matching locus.
+\item Allele: An identified allele sequence.  There will be between zero and two
+of these.
+\item Prominent: Any additional sequences beyond two called alleles that match
+all requirements (sequences that match all locus attributes, do not appear
+artifactual, and are above a given fraction of filtered reads).
+\item Insignificant: Sequences with counts below the \code{fraction.min}
+threshold.
+\item Ambiguous: Sequences passing the \code{fraction.min} threshold but with
+non-ACTG characters such as N, as defined by the Ambiguous column of
+\code{seq_data}.
+\item Stutter: Sequences passing the \code{fraction.min} threshold but matching
+stutter sequence criteria as defined by the Stutter column of
+\code{seq_data}.
+\item Artifact: Sequences passing the \code{fraction.min} threshold but matching
+non-stutter artifact sequence criteria as defined by the Artifact column of
+\code{seq_data}.
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{analyze_sample}: default version of sample analysis.  From here use
+\code{\link{summarize_sample}}.
+
+\item \code{analyze_sample_guided}: version of sample analysis guided by expected
+sequence length values.  Additional items ExpectedLength1 and optionally
+ExpectedLength2 can be supplied in the \code{sample.attrs} list.  If NA or
+missing the behavior will match \code{analyze_sample}.  If two expected
+lengths are given, the fraction.min argument is ignored.  If at least one
+expected length is given, the stutter/artifact filtering is disabled.  From
+here use \code{\link{summarize_sample_guided}}.
+
+\item \code{analyze_sample_naive}: version of sample analysis without
+stutter/artifact filtering.  From here use \code{\link{summarize_sample}}
+as for \code{analyze_sample}.
+}}
+

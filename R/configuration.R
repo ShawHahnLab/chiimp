@@ -43,6 +43,7 @@ config.defaults <- list(
     dp_histograms = "histograms",  # Read count by length histograms
     dp_alignments = "alignments",  # Sequence alignments across alleles
     dp_alignment_images = "alignment-images",  # Images of alignments
+    dp_processed_files = "processed-files",  # Per-file data tables
     dp_processed_samples = "processed-samples",  # Sample data tables
     dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
   ),
@@ -55,10 +56,11 @@ config.defaults <- list(
     name_args = list(hash_len = 6)
   ),
   ## Sample genotyping settings
-  sample_analysis = list(nrepeats = 3),
+  seq_analysis = list(nrepeats = 3),
+  sample_analysis_func = "analyze_sample",
+  sample_analysis_opts = list(fraction.min = 0.05),
   sample_summary_func = "summarize_sample",
-  sample_summary = list(fraction.min = 0.05,
-                        counts.min = 500),
+  sample_summary_opts = list(counts.min = 500),
   ## Report generation settings
   # Should a report be generated?
   report = TRUE,

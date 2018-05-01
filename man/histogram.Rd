@@ -13,9 +13,9 @@ histogram(samp, main = "Number of Reads by Sequence Length",
 
 \item{main}{title of the plot.}
 
-\item{locus.name}{name of the locus to match alleles for.  If unspecified the
-locus with the highest matched counts will be used.  To disable the
-matching entirely use \code{NA}.}
+\item{locus.name}{name of the locus to match alleles for.  If unspecified and
+not listed in \code{sample.summary} the locus with the highest matched
+counts will be used.  To disable the matching entirely use \code{NA}.}
 
 \item{sample.summary}{summary data frame as prepared by
 \code{summarize_sample}.  Used to label the called alleles.}

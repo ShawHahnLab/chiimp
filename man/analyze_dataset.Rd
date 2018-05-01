@@ -4,8 +4,9 @@
 \alias{analyze_dataset}
 \title{Analyze all samples in a dataset}
 \usage{
-analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
-  summary.function = summarize_sample, known_alleles = NULL,
+analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, analysis_opts,
+  summary_opts, analysis_function = analyze_sample,
+  summary_function = summarize_sample, known_alleles = NULL,
   name_args = list())
 }
 \arguments{
@@ -16,17 +17,23 @@ analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, summary_args,
 \code{\link{load_locus_attrs}}.}
 
 \item{nrepeats}{number of repeats of each locus' motif to require for a
-match (see \code{\link{analyze_sample}}).}
+match (see \code{\link{analyze_seqs}}).}
 
 \item{ncores}{integer number of CPU cores to use in parallel for sample
 analysis.  Defaults to one less than half the number of detected cores with
 a minimum of 1.  If 1, the function will run without using the
 \code{parallel} package.}
 
-\item{summary_args}{list of supplemental arguments to
-\code{summary.function}.}
+\item{analysis_opts}{list of supplemental arguments to
+\code{analysis_function}.}
 
-\item{summary.function}{function to use when summarizing each sample's full
+\item{summary_opts}{list of supplemental arguments to
+\code{summary_function}.}
+
+\item{analysis_function}{function to use when analyzing each sample's data
+frame into the filtered version  Defaults to \code{\link{analyze_sample}}.}
+
+\item{summary_function}{function to use when summarizing each sample's full
 details into the standard attributes.  Defaults to
 \code{\link{summarize_sample}}.}
 
@@ -39,12 +46,15 @@ generated for the dataset summary will be used.}
 }
 \value{
 list of results, with \code{summary} set to the single summary data
-  frame and \code{data} the per-sample data frames.
+  frame, \code{files} the processed sequence files, and \code{samples} the
+  per-sample data frames.
 }
 \description{
-Load all samples for a given dataset and produce a list of processed samples
-and a summary data frame showing each sample's summary row-by-row.  The
-entries in the processed-samples list and the rows in the summary data frame
-will be sorted according to the ordering of loci in \code{locus_attrs} and
-by the sample attributes.
+Load all samples for a given dataset and produce a summary data frame showing
+each sample's summary row-by-row, a list of processed input files, and a list
+of processed samples.  The entries in the processed-samples list and the rows
+in the summary data frame will be sorted according to the ordering of loci in
+\code{locus_attrs} and by the sample attributes.  Processed files are stored
+separately (as there may be multiple samples per file) and named by input
+file path.
 }

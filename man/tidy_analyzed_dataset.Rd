@@ -12,7 +12,7 @@ tidy_analyzed_dataset(dataset, raw.results)
 
 \item{raw.results}{list of pairs of sample summary and sample data data
 frames (from \code{\link{summarize_sample}} and
-\code{\link{analyze_sample}}).}
+\code{\link{analyze_seqs}}).}
 }
 \value{
 list of results, with \code{summary} set to the single summary data

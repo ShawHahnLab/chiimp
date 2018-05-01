@@ -5,7 +5,7 @@ environment.yml
 install_linux_conda.sh
 install_linux.sh
 install_windows.cmd
-install_mac.sh
+install_mac.command
 README.md
 GUIDE.Rmd
 GUIDE.pdf

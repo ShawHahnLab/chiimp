@@ -356,6 +356,35 @@ save_allele_seqs <- function(results_summary, dp) {
   }))
 }
 
+#' Save per-file processed data to text files
+#'
+#' Save each per-file data frame produced by \code{\link{analyze_dataset}} to a
+#' separate file in the specified directory path, in CSV format.  The directory
+#' structure will start at the first shared directory of the input file paths.
+#' For example, if the inputs were /data/run1/file.fastq and
+#' /data/run2/file.fastq there will be run1 and run2 directories inside the
+#' given `dp` directory.
+#'
+#' @param results_file_data list of per-file data frames as produced by
+#'   \code{\link{analyze_dataset}}.
+#' @param dp output directory path to use for all files.
+#'
+#' @export
+save_seqfile_data <- function(results_file_data, dp) {
+  fps_rel <- remove_shared_root_dir(names(results_file_data))
+  invisible(lapply(names(results_file_data), function(n) {
+    fp_this <- fps_rel[n]
+    dp_this <- ifelse (dirname(fp_this) != ".",
+                       file.path(dp, dirname(fp_this)),
+                       dp)
+    if (! dir.exists(dp_this)) {
+      dir.create(dp_this, recursive = TRUE)
+    }
+    fp <- file.path(dp, paste0(fp_this, ".csv"))
+    utils::write.csv(results_file_data[[n]], fp, na = "", quote = FALSE)
+  }))
+}
+
 #' Save per-sample processed data to text files
 #'
 #' Save each per-sample data frame produced by \code{\link{analyze_dataset}} to
@@ -455,7 +484,7 @@ save_histograms <- function(results, dp, image.func="png",
                             width=1600, height=1200, res=150) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
-  invisible(lapply(names(results$data), function(entry) {
+  invisible(lapply(names(results$samples), function(entry) {
     fp <- file.path(dp, paste(entry, image.func, sep = "."))
     img.call <- call(image.func,
                      fp,
@@ -463,7 +492,7 @@ save_histograms <- function(results, dp, image.func="png",
                      height = height,
                      res = res)
     eval(img.call)
-    histogram(results$data[[entry]],
+    histogram(results$samples[[entry]],
               locus.name = as.character(results$summary[entry, "Locus"]),
               sample.summary = results$summary[entry, ],
               main = entry)
