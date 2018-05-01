@@ -127,10 +127,9 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
-    results <- analyze_dataset(dataset, locus_attrs,
-                               summary_args = list(fraction.min = 0.05,
-                                                   counts.min = 500),
-                               nrepeats = 3, ncores = 1)
+    results <- analyze_dataset(dataset, locus_attrs, nrepeats = 3, ncores = 1,
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500))
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
     return(list(dataset = dataset, results = results))

@@ -2,20 +2,19 @@
 % Please edit documentation in R/summarize_sample.R
 \name{summarize_sample}
 \alias{summarize_sample}
+\alias{summarize_sample_guided}
 \title{Summarize a processed STR sample}
 \usage{
-summarize_sample(sample.data, sample.attrs, fraction.min, counts.min)
+summarize_sample(sample_data, sample.attrs, counts.min)
+
+summarize_sample_guided(sample_data, sample.attrs, counts.min)
 }
 \arguments{
-\item{sample.data}{data frame of processed data for sample as produced by
-\code{\link{analyze_seqs}}.}
+\item{sample_data}{data frame of processed data for one sample as produced by
+\code{\link{analyze_samples}}.}
 
 \item{sample.attrs}{list of sample attributes, such as the rows produced by
-\code{\link{prepare_dataset}}.  Used to select the locus name to filter on.}
-
-\item{fraction.min}{numeric threshold for the minimum proportion of counts a
-given entry must have, compared to the total matching all criteria for that
-locus, to be considered as a potential allele.}
+\code{\link{prepare_dataset}}.}
 
 \item{counts.min}{numeric threshold for the minimum number of counts that
 must be present, in total across entries passing all filters, for potential
@@ -25,11 +24,13 @@ alleles to be considered.}
 list of attributes describing the sample.
 }
 \description{
-Converts a full STR sample data frame into a concise list of consistent
-attributes, suitable for binding together across samples for a dataset.  At
-this stage the summary is prepared for a single specific locus, in contrast
-to \code{\link{analyze_seqs}}.  The Allele1 entries correspond to the
-sequence with the highest count, Allele2 the second highest.
+Converts an STR sample data frame as produced by \code{\link{analyze_sample}}
+into a concise list of consistent attributes, suitable for binding together
+across samples for a dataset.  At this stage the summary is prepared for a
+single specific locus as in \code{\link{analyze_sample}} but as a list with a
+fixed length.  The Allele1 entries correspond to the sequence with the
+highest count, Allele2 the second highest.  See the Functions section below
+for how specific variants of this function behave.
 }
 \details{
 Entries in the returned list:
@@ -56,3 +57,13 @@ all filtering.  This should be either one (for a homozygous sample) or two
 contamination or excessive PCR stutter can lead to more than two.
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{summarize_sample}: Default version of sample summary.
+
+\item \code{summarize_sample_guided}: Summarize a processed STR sample Using known
+lengths.  If ExpectedLength1 and optionally ExpectedLength2 are given in
+\code{sample.attrs}, the \code{counts.min} threshold is ignored.  See also
+\code{\link{analyze_sample_guided}}.
+}}
+
