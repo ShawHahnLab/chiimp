@@ -1,9 +1,6 @@
 # TODO:
-# test with empty seq_data
-# test with just seq_data
-# test with seq_data + sample_data
-# test with seq_data + empty sample_data
-
+# mark top edges of allele sequences (to handle the same-length case)
+# label bars$topknown by name? positioning may get tricky.
 str_hist <- function(seq_data,
                      sample_data = NULL,
                      main = "Number of Reads by Sequence Length",
@@ -11,7 +8,7 @@ str_hist <- function(seq_data,
                      cutoff_fraction = NULL,
                      render = TRUE) {
   bars <- str_hist_setup(seq_data, sample_data)
-  if (render) {
+  if (render & nrow(seq_data) > 0) {
     if (is.null(cutoff_fraction)) {
       cutoff_fraction <- attr(sample_data, "fraction.min")
     }
@@ -21,27 +18,48 @@ str_hist <- function(seq_data,
 }
 
 str_hist_setup <- function(seq_data, sample_data = NULL) {
+  vec_to_df <- function(data, cols=c("Length", "Count")) {
+    if (length(data) == 0) {
+      df <- data.frame(Length = as.integer(NA), Count = as.integer(NA))[0, ]
+    } else {
+      df <- data.frame(as.integer(names(data)), data)
+    }
+    colnames(df) <- cols
+    df
+  }
   bars <- list()
-  bars$orig <- sapply(split(seq_data, seq_data$Length),
-                      function(chunk) sum(chunk$Count))
+  bars$orig <- vec_to_df(sapply(split(seq_data, seq_data$Length),
+                      function(chunk) sum(chunk$Count)))
 
   if (!is.null(sample_data)) {
-    bars$filt <- sapply(split(sample_data, sample_data$Length),
-                        function(chunk) sum(chunk$Count))
-    bars$topcounts <- sapply(split(sample_data, sample_data$Length),
-                             function(chunk) max(chunk$Count))
-    bars$topknown <- unlist(sapply(split(sample_data, sample_data$Length),
-                                   function(chunk) {
-                                     chunk <- subset(chunk, ! is.na(SeqName))
-                                     if (nrow(chunk) == 0)
-                                       return()
-                                     max(chunk$Count)
-                                   }))
-    bars$allele <- sample_data[sample_data$Category == "Allele",
-                               "Count"]
-    names(bars$allele) <- sample_data[sample_data$Category == "Allele",
-                                      "Length"]
+    bars$filt <- vec_to_df(sapply(split(sample_data, sample_data$Length),
+                        function(chunk) sum(chunk$Count)))
+    bars$topcounts <- vec_to_df(sapply(split(sample_data, sample_data$Length),
+                             function(chunk) max(chunk$Count)))
+    bars$topknown <- do.call(rbind, c(list(data.frame(Length = as.integer(NA),
+                                               Count = as.integer(NA),
+                                               SeqName = as.character(NA),
+                                               stringsAsFactors = FALSE)[0, ]),
+                             lapply(split(sample_data,
+                                                 sample_data$Length),
+                                 function(chunk) {
+                                   chunk <- chunk[ ! is.na(chunk$SeqName), ]
+                                   if (nrow(chunk) == 0)
+                                     return()
+                                   idx <- which(chunk$Count == max(chunk$Count))
+                                   chunk[idx, c("Length", "Count", "SeqName")]
+                                 })))
+    bars$allele <- data.frame(Length = sample_data[sample_data$Category ==
+                                                     "Allele",
+                                                   "Length"],
+                              Count = sample_data[sample_data$Category ==
+                                                    "Allele",
+                                                  "Count"])
   }
+  bars <- lapply(bars, function(b) {
+      rownames(b) <- NULL
+      b
+    })
   bars
 }
 
@@ -49,7 +67,7 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
 
   categories <- str_hist_setup_legend(bars)
 
-  ylim <- range(bars$orig)
+  ylim <- range(bars$orig$Count)
   graphics::plot(c(),
                  c(),
                  main = main,
@@ -62,8 +80,8 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
   lwd <- max(1, get_px_width()) # at least one pixel
 
   for (nm in names(bars)) {
-    graphics::points(names(bars[[nm]]),
-                     bars[[nm]],
+    graphics::points(bars[[nm]]$Length,
+                     bars[[nm]]$Count,
                      type = "h",
                      col = categories[nm, "col"],
                      lend = 1,
@@ -72,14 +90,18 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
 
   if (! is.null(bars$filt)) {
     # Draw threshold
-    cutoff <- (cutoff_fraction * sum(bars$filt))[1]
+    cutoff <- (cutoff_fraction * sum(bars$filt$Count))[1]
     if (! is.na(cutoff)) {
       categories["threshold", "Render"] <- TRUE
-      points(1:xlim[2], rep(cutoff, xlim[2]), pch='.')
+      xlim_view <- par("usr")[1:2]
+      xlim_view[1] <- floor(xlim_view[1])
+      xlim_view[2] <- ceiling(xlim_view[2])
+      points(xlim_view[1]:xlim_view[2],
+             rep(cutoff, diff(xlim_view) + 1), pch = ".")
     }
     # Draw domain of sample data
-    ymax <- max(bars$orig)
-    xlim_filt <- range(as.integer(names(bars$filt)))
+    ymax <- max(bars$orig$Count)
+    xlim_filt <- range(as.integer(bars$filt$Length))
     graphics::polygon(x = rep(xlim_filt, each = 2),
                       y = c(0, ymax, ymax, 0),
                       col = "#0000001E",
@@ -87,7 +109,7 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
   }
 
   # Draw legend
-  leg <- subset(categories, Render)[, c("legend", "col", "pch", "lty")]
+  leg <- categories[categories$Render, c("legend", "col", "pch", "lty")]
   filt <- sapply(leg, function(x) all(is.na(x)))
   leg <- leg[! filt]
   do.call(graphics::legend,
@@ -120,8 +142,8 @@ str_hist_setup_legend <- function(bars) {
 # https://stackoverflow.com/questions/17213293/how-to-get-r-plot-window-size
 get_px_width <- function() {
   px_width_fig <- dev.size("px")[1] # width of whole figure in pixels
-  px_width_plt <- diff(par('plt')[1:2] * px_width_fig) # just the plot region
-  width_plt <- diff(par('usr')[1:2]) # width of plot region in plot units
+  px_width_plt <- diff(par("plt")[1:2] * px_width_fig) # just the plot region
+  width_plt <- diff(par("usr")[1:2]) # width of plot region in plot units
   step_width <- px_width_plt / width_plt # pixels per plot unit increment
   step_width
 }
