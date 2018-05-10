@@ -5,9 +5,9 @@ with(test_data, {
 # util --------------------------------------------------------------------
 
   check.seqs1A_summary <- function(data,
-                                   count.locus=4500,
-                                   allele1.count=2803,
-                                   allele2.count=1300,
+                                   count.locus=4466,
+                                   allele1.count=2783,
+                                   allele2.count=1290,
                                    ord = 1:2) {
     expect_equal(names(data), sample.summary.cols)
     with(data, {
@@ -89,9 +89,9 @@ with(test_data, {
     # that would otherwise get counted (the rest were already set to off-target
     # junk during setup).
     check.seqs1A_summary(sample_summary,
-                         count.locus = 4414,
-                         allele1.count = 2748,
-                         allele2.count = 1276)
+                         count.locus = 4378,
+                         allele1.count = 2727,
+                         allele2.count = 1269)
   })
 
   test_that("summarize_sample marks stutter removal", {
@@ -105,9 +105,9 @@ with(test_data, {
                                       "GATAGATAGATAGATAGATAGATAGATAGA",
                                       "TAGATAGATAGATAGATAGATAGATAGATA",
                                       "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, 3971)
-      expect_equal(Allele1Length, 174)
+                                      "TAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
+      expect_equal(Allele1Count, 3415)
+      expect_equal(Allele1Length, 182)
       expect_equal(Allele2Seq, as.character(NA))
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
@@ -116,7 +116,7 @@ with(test_data, {
       expect_equal(Stutter, TRUE)
       expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, 4500)
+      expect_equal(CountLocus, 4466)
       expect_equal(ProminentSeqs, 1)
     })
   })
@@ -130,11 +130,11 @@ with(test_data, {
     # First take an example sample and split half of the "correct" reads with an
     # ambiguous sequence.  This also leaves some existing stutter reads in
     # place.
-    s <- seqs3$A
+    s <- seqs2$`2`
     idx <- (which(s == s[1]))[c(TRUE, FALSE)] # every other matching index
     s[idx] <- gsub(".$", "N", s[idx]) # replace last character with N
     seq_data <- analyze_seqs(s, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data,  list(Locus = "A"), 0.05)
+    sample_data <- analyze_sample(seq_data,  list(Locus = "2"), 0.05)
     sample_summary <- summarize_sample(sample_data, counts.min = 500)
     with(sample_summary, {
       expect_equal(Homozygous, TRUE)
@@ -169,9 +169,9 @@ with(test_data, {
                                       "GATAGATAGATAGATAGATAGATAGATAGA",
                                       "TAGATAGATAGATAGATAGATAGATAGATA",
                                       "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, 3971)
-      expect_equal(Allele1Length, 174)
+                                      "TAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
+      expect_equal(Allele1Count, 3415)
+      expect_equal(Allele1Length, 182)
       expect_equal(Allele2Seq, as.character(NA))
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
@@ -180,7 +180,7 @@ with(test_data, {
       expect_equal(Stutter, TRUE)
       expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, 4910)
+      expect_equal(CountLocus, 4876)
       expect_equal(ProminentSeqs, 1)
     })
   })
@@ -190,7 +190,7 @@ with(test_data, {
     # ambiguous and filtered.
     # Replace the second-highest-count sequence to include an ambiguous base
     # near the end.
-    idx <- nchar(seqs3$A) == 170
+    idx <- nchar(seqs3$A) == 178
     seqs3$A[idx] <- sub("AGCCAGTC$",
                         "AGCCNAGTC",
                         seqs3$A[idx])
@@ -203,9 +203,9 @@ with(test_data, {
                                       "GATAGATAGATAGATAGATAGATAGATAGA",
                                       "TAGATAGATAGATAGATAGATAGATAGATA",
                                       "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, 3971)
-      expect_equal(Allele1Length, 174)
+                                      "TAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
+      expect_equal(Allele1Count, 3415)
+      expect_equal(Allele1Length, 182)
       expect_equal(Allele2Seq, as.character(NA))
       expect_equal(Allele2Count, as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
@@ -214,7 +214,7 @@ with(test_data, {
       expect_equal(Stutter, FALSE)
       expect_equal(Artifact, FALSE)
       expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, 4500)
+      expect_equal(CountLocus, 4466)
       expect_equal(ProminentSeqs, 1)
     })
   })
@@ -242,18 +242,17 @@ with(test_data, {
     sample_summary_empty <- summarize_sample(sample_data_empty,
                                              list(Locus = "B"),
                                              counts.min = 500)
-
-    expect_equal(sample_summary_1B$ProminentSeqs,    2)
-    expect_equal(sample_summary_2B$ProminentSeqs,    3)
-    expect_equal(sample_summary_3B$ProminentSeqs,    1)
+    expect_equal(sample_summary_1B$ProminentSeqs,    4)
+    expect_equal(sample_summary_2B$ProminentSeqs,    2)
+    expect_equal(sample_summary_3B$ProminentSeqs,    3)
     expect_equal(sample_summary_empty$ProminentSeqs, 0)
-    # Despite having stutter-y peaks the first two did not have a potential
-    # allele removed, so Stutter == FALSE.  The third had stutter large enough
-    # to look like an allele so it was removed.  The last one was empty so there
-    # was nothing to have stutter from.
+    # Despite having stutter-y peaks the first one did not have a potential
+    # allele removed and next two are homozygous, so Stutter == FALSE.  The last
+    # one was empty so there was nothing to have stutter from.
+    # TODO re-add a situation with stutter.
     expect_equal(sample_summary_1B$Stutter,    FALSE)
     expect_equal(sample_summary_2B$Stutter,    FALSE)
-    expect_equal(sample_summary_3B$Stutter,    TRUE)
+    expect_equal(sample_summary_3B$Stutter,    FALSE)
     expect_equal(sample_summary_empty$Stutter, FALSE)
   })
 
@@ -262,7 +261,7 @@ with(test_data, {
     # Here we check that the filtered-counts-thresholding is applied, by forcing
     # the counts to a low number.  This should still report some stats but
     # should leave out the allele1/allele2 information.
-    seq_data$Count <- seq_data$Count / 100
+    seq_data$Count <- round(seq_data$Count / 100)
     sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
     sample_summary <- summarize_sample(sample_data, list(Locus = "A"),
                                        counts.min = 500)
@@ -371,7 +370,7 @@ with(test_data, {
                         TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
                         AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
       expect_equal(Allele2Seq,    as.character(NA))
-      expect_equal(Allele1Count,  1300)
+      expect_equal(Allele1Count,  1290)
       expect_equal(Allele1Length, 194)
       expect_equal(Allele2Count,  as.integer(NA))
       expect_equal(Allele2Length, as.integer(NA))
@@ -380,7 +379,7 @@ with(test_data, {
       expect_equal(Stutter,       FALSE)
       expect_equal(Artifact,      FALSE)
       expect_equal(CountTotal,    5000)
-      expect_equal(CountLocus,    4500)
+      expect_equal(CountLocus,    4466)
       expect_equal(ProminentSeqs, 1)
     })
 
@@ -408,7 +407,7 @@ with(test_data, {
       expect_equal(Stutter,       FALSE)
       expect_equal(Artifact,      FALSE)
       expect_equal(CountTotal,    5000)
-      expect_equal(CountLocus,    4500)
+      expect_equal(CountLocus,    4466)
       expect_equal(ProminentSeqs, 2)
     })
   })
