@@ -9,9 +9,13 @@ with(test_data, {
     # together in a list; more rigorous checks are below since those are public
     # functions too.
     with(results_summary_data, {
+      results$locus_attrs <- locus_attrs # TODO remove this dependency
       results_mod <- summarize_dataset(results)
       names_observed <- names(results_mod)
-      names_expected <- c(names(results), "alignments", "dist_mat")
+      names_expected <- c(names(results),
+                          "cts_per_locus",
+                          "alignments",
+                          "dist_mat")
       expect_equal(names_observed,
                    names_expected)
     })
@@ -29,8 +33,6 @@ with(test_data, {
       # For our test data samples are far apart from each other, but with no
       # missing entries the diagonal is zero.
       dists <- matrix(7, nrow = length(samps), ncol = length(samps))
-      dists[1, 3] <- 8
-      dists[3, 1] <- 8
       diag(dists) <- 0
       expect_true(all(dist_mat == dists))
     })
@@ -108,7 +110,7 @@ with(test_data, {
       alignments <- align_alleles(results$summary)
       expect_equal(names(alignments), levels(results$summary$Locus))
       expect_equal(names(as.character(alignments[["A"]])),
-                   c("182_1", "194_1", "178_1", "174_2", "162_1"))
+                   c("182_2", "194_1", "162_2", "178_1"))
       expect_equal(as.character(alignments[["A"]])[[1]],
                    paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
                           "TAGATAGATAGATAGATAGATAGATAGATA",
@@ -182,9 +184,25 @@ with(test_data, {
 # test_tally_cts_per_locus ------------------------------------------------
 
   test_that("tally_cts_per_locus counts matches per locus per sample", {
-    # Right now the function is called in full_analysis, but it really should be
-    # rolled into summarize_dataset.
-    skip("test not yet implemented")
+    with(results_summary_data, {
+      results$locus_attrs <- locus_attrs # TODO remove this dependency
+      cts_observed <- tally_cts_per_locus(results)
+      cts_expected <- data.frame(Total = 5000,
+                                 Matching = 5000 - 17*3,
+                                 A   = as.integer(rep(17, 12)),
+                                 B   = as.integer(rep(17, 12)),
+                                 `1` = as.integer(rep(17, 12)),
+                                 `2` = as.integer(rep(17, 12)),
+                                 check.names = FALSE)
+      cts_expected$A[1:3]     <- as.integer(5000 - 17*3)
+      cts_expected$B[4:6]     <- as.integer(5000 - 17*3)
+      cts_expected$`1`[7:9]   <- as.integer(5000 - 17*3)
+      cts_expected$`2`[10:12] <- as.integer(5000 - 17*3)
+      rownames(cts_expected) <- paste(rep(1:3, times = 4),
+                                      rep(c("A", "B", "1", "2"), each = 3),
+                                      sep = "-")
+      expect_equal(cts_observed, cts_expected)
+    })
   })
 
 })

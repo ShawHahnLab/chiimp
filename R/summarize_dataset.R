@@ -28,6 +28,7 @@
 #'
 #' @export
 summarize_dataset <- function(results, genotypes.known=NULL) {
+  results$cts_per_locus <- tally_cts_per_locus(results)
   results$alignments <- align_alleles(results$summary)
   results$dist_mat <- make_dist_mat(results$summary)
   if (!missing(genotypes.known) & !is.null(genotypes.known)) {

@@ -84,7 +84,6 @@ full_analysis <- function(config, dataset=NULL) {
     results$closest_matches <- find_closest_matches(results$dist_mat_known,
                                                 range = cfg$report.dist_range,
                                                 maximum = cfg$report.dist_max)
-  results$cts_per_locus <- tally_cts_per_locus(results)
   results$config <- config_full
   if (cfg$verbose) logmsg("Saving output files...")
     save_data(results, results$config)
