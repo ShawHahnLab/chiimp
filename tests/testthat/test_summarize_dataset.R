@@ -9,7 +9,6 @@ with(test_data, {
     # together in a list; more rigorous checks are below since those are public
     # functions too.
     with(results_summary_data, {
-      results$locus_attrs <- locus_attrs # TODO remove this dependency
       results_mod <- summarize_dataset(results)
       names_observed <- names(results_mod)
       names_expected <- c(names(results),
@@ -185,8 +184,9 @@ with(test_data, {
 
   test_that("tally_cts_per_locus counts matches per locus per sample", {
     with(results_summary_data, {
-      results$locus_attrs <- locus_attrs # TODO remove this dependency
       cts_observed <- tally_cts_per_locus(results)
+      # We should see 5000 reads total, and then 17 split away for each of the
+      # four other loci.  Rownames should match sample row IDs.
       cts_expected <- data.frame(Total = 5000,
                                  Matching = 5000 - 17*3,
                                  A   = as.integer(rep(17, 12)),
