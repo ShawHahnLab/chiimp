@@ -205,4 +205,39 @@ with(test_data, {
     })
   })
 
+  test_that("tally_cts_per_locus uses only loci present in samples", {
+    with(results_summary_data, {
+      # What if we drop Locus 2 from the results, as though we'd only analyzed
+      # three loci even though we have four defined in the attributes table?
+      # Locus 2 should not show up in the cts_per_locus data frame.
+      # NOTE: Currently the Total column shows the total across the loci shown,
+      # not the grand total of reads in the raw file.
+      ids_rm <- c("1-2", "2-2", "3-2")
+      results$summary <- results$summary[-match(ids_rm,
+                                                rownames(results$summary)), ]
+      results$samples <- results$samples[-match(ids_rm,
+                                                names(results$samples))]
+      results$summary$Locus <- droplevels(results$summary$Locus)
+      # (This is a slightly goofy way of testing this outcome since each data
+      # frame in results$files still will have "2" in the MatchingLocus column,
+      # but it should work.)
+      cts_observed <- tally_cts_per_locus(results)
+      # We should see 5000 reads total, and then 17 split away for each of the
+      # four other loci.  Rownames should match sample row IDs.
+      cts_expected <- data.frame(Total = 5000 - 17,
+                                 Matching = 5000 - 17*3,
+                                 A   = as.integer(rep(17, 9)),
+                                 B   = as.integer(rep(17, 9)),
+                                 `1` = as.integer(rep(17, 9)),
+                                 check.names = FALSE)
+      cts_expected$A[1:3]     <- as.integer(5000 - 17*3)
+      cts_expected$B[4:6]     <- as.integer(5000 - 17*3)
+      cts_expected$`1`[7:9]   <- as.integer(5000 - 17*3)
+      rownames(cts_expected) <- paste(rep(1:3, times = 3),
+                                      rep(c("A", "B", "1"), each = 3),
+                                      sep = "-")
+      expect_equal(cts_observed, cts_expected)
+    })
+  })
+
 })
