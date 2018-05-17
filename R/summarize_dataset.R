@@ -410,6 +410,8 @@ tally_cts_per_locus <- function(results) {
     # Match sample to original, unfiltered data from sequence file
     fp <- results$summary[id, "Filename"]
     seqs <- results$files[[fp]]
+    # Just keep loci actually analyzed in this set
+    levels(seqs$MatchingLocus) <- levels(results$summary$Locus)
     # Sum counts for each locus
     sapply(split(seqs$Count, seqs$MatchingLocus), sum)
   }))
