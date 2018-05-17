@@ -28,6 +28,7 @@
 #'
 #' @export
 summarize_dataset <- function(results, genotypes.known=NULL) {
+  results$cts_per_locus <- tally_cts_per_locus(results)
   results$alignments <- align_alleles(results$summary)
   results$dist_mat <- make_dist_mat(results$summary)
   if (!missing(genotypes.known) & !is.null(genotypes.known)) {
@@ -395,22 +396,27 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
 #'   frames as produced by \code{\link{analyze_dataset}}.
 #'
 #' @return Data frame of read counts with samples on rows and loci on columns.
-#'   Addition columns at the left specify the number of reads matching any known
-#'   locus (\code{Total}) and the number of reads matching the expected locus
-#'   (\code{Matching}).
+#'   Additional columns at the left specify the number of reads matching any
+#'   known locus (\code{Total}) and the number of reads matching the expected
+#'   locus (\code{Matching}).  Note that this data frame is per-sample rather
+#'   than per-file, so multiplexed samples will have sets of identical rows.
 #'
 #' @export
 tally_cts_per_locus <- function(results) {
   # Create table of counts of sequences that match each possible locus across
   # samples.  Only include loci we expect from the metadata, rather than any
   # known in locus_attrs.
-  .levels <- match(results$locus_attrs$Locus, results$summary$Locus)
-  .levels <- results$summary$Locus[.levels[!is.na(.levels)]]
-  tbl <- do.call(rbind, lapply(results$samples, function(d) {
-    d$MatchingLocus <- factor(d$MatchingLocus,
-                              levels = .levels)
-    sapply(split(d$Count, d$MatchingLocus), sum)
+  tbl <- do.call(rbind, lapply(names(results$samples), function(id) {
+    # Match sample to original, unfiltered data from sequence file
+    fp <- results$summary[id, "Filename"]
+    seqs <- results$files[[fp]]
+    # Just keep loci actually analyzed in this set
+    seqs$MatchingLocus <- factor(seqs$MatchingLocus,
+                                levels = levels(results$summary$Locus))
+    # Sum counts for each locus
+    sapply(split(seqs$Count, seqs$MatchingLocus), sum)
   }))
+  rownames(tbl) <- names(results$samples)
   # Make some extra columns for total sequences and sequences matching the
   # expected locus.  Bind these to the original data to force the heatmap to use
   # a uniform scale.

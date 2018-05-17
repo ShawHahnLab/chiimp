@@ -8,7 +8,7 @@ with(test_data, {
 
   test_that("analyze_seqs tabulates sequences", {
     seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    expect_equal(nrow(seq_data), 14)
+    expect_equal(nrow(seq_data), 24)
     chunk <- seq_data[1:2, ]
     expect_equal(chunk[1, "Length"], 162)
     expect_equal(chunk[2, "Length"], 194)
@@ -52,7 +52,7 @@ with(test_data, {
     seq_data <- analyze_seqs(seqs, locus_attrs, 3)
     chunk <- subset(seq_data, !MotifMatch)
     with(chunk, {
-      expect_equal(sum(Count), 500)
+      expect_equal(sum(Count), 483)
       expect_equal(range(Length), c(45, 57))
       expect_equal(droplevels(unique(MatchingLocus)), factor("A"))
       expect_true(all(is.na(Stutter)))
@@ -65,7 +65,7 @@ with(test_data, {
     seq_data <- analyze_seqs(seqs, locus_attrs, 3)
     chunk <- subset(seq_data, !LengthMatch)
     with(chunk, {
-    expect_equal(sum(Count), 500)
+    expect_equal(sum(Count), 483)
     expect_equal(range(Length), c(45, 57))
     expect_equal(droplevels(unique(MatchingLocus)), factor("A"))
     expect_true(all(!(MotifMatch)))
@@ -77,8 +77,8 @@ with(test_data, {
   test_that("analyze_seqs marks stutter entries", {
     seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
     chunk <- subset(seq_data, !is.na(Stutter))
-    expect_equal(chunk$Count, c(281, 116))
-    expect_equal(chunk$Stutter, c(1, 2))
+    expect_equal(chunk$Count, c(279, 114, 2, 2, 2))
+    expect_equal(chunk$Stutter, c(1, 2, 2, 2, 2))
     # TODO add expectation for high-count case that should not be marked as
     # stutter
   })
@@ -93,7 +93,7 @@ with(test_data, {
     substr(s[idx], nchar(stutter), nchar(stutter)) <- "X"
     # Check that the third entry is marked an artifact of the first
     seq_data <- analyze_seqs(s, locus_attrs, 3)
-    expect_equal(seq_data$Artifact, c(NA, NA, 1)[1:14])
+    expect_equal(seq_data$Artifact, c(NA, NA, 1)[1:24])
   })
 
   test_that("analyze_seqs marks ambiguous entries", {
