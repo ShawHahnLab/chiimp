@@ -58,6 +58,7 @@ analyze_sample <- function(seq_data, sample.attrs, fraction.min) {
   locus.name <- unlist(sample.attrs["Locus"])
   idx <- which(allele_match(seq_data, locus.name))
   chunk <- seq_data[idx, ]
+  attr(chunk, "fraction.min") <- fraction.min
   within(chunk, {
     Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
                                     "Ambiguous", "Stutter", "Artifact"))
@@ -88,6 +89,7 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
   locus.name <- unlist(sample.attrs["Locus"])
   idx <- which(allele_match(seq_data, locus.name))
   chunk <- seq_data[idx, ]
+  attr(chunk, "fraction.min") <- fraction.min
 
   # If specified, take the top two matching entries at the given expected
   # lengths.  If there's just one length expected, this should be two entries at
@@ -157,6 +159,7 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
 analyze_sample_naive <- function(seq_data, sample.attrs, fraction.min) {
   idxl <- with(seq_data, LengthMatch & ! is.na(LengthMatch))
   chunk <- seq_data[idxl, ]
+  attr(chunk, "fraction.min") <- fraction.min
   within(chunk, {
     Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
                                     "Ambiguous", "Stutter", "Artifact"))

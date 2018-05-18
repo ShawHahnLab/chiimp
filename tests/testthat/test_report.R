@@ -19,7 +19,6 @@ with(test_data, {
     })
   })
 
-
 # test tabulate_allele_names ----------------------------------------------
 
   test_that("tabulate_allele_names produces expected data frame", {

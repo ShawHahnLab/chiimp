@@ -1,4 +1,4 @@
-context("Test sample analysis")
+context("Test sequence set analysis")
 
 with(test_data, {
 

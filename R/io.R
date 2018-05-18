@@ -491,10 +491,12 @@ save_histograms <- function(results, dp, image.func="png",
                      width = width,
                      height = height,
                      res = res)
+    fn <- results$summary[entry, "Filename"]
+    seq_data <- results$files[[fn]]
+    sample_data <- results$samples[[entry]]
     eval(img.call)
-    histogram(results$samples[[entry]],
-              locus.name = as.character(results$summary[entry, "Locus"]),
-              sample.summary = results$summary[entry, ],
+    histogram(seq_data = seq_data,
+              sample_data = sample_data,
               main = entry)
     grDevices::dev.off()
   }))
