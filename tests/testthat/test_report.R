@@ -37,6 +37,20 @@ with(test_data, {
     })
   })
 
+  test_that("tabulate_allele_names works on completely blank set", {
+    # What if we have a dataset where nothing worked?  The table should be
+    # created but should be completely blank.
+    tbl_known <- data.frame(ID = as.character(1:3), stringsAsFactors = FALSE)
+    for (locus in c("A", "B", "1", "2")) {
+      tbl_known[paste(locus, c("1", "2"), sep="_")] <- ""
+    }
+    with(results_summary_data, {
+      results$summary[, c("Allele1Name", "Allele2Name")] <- NA
+      tbl <- tabulate_allele_names(results$summary)
+      expect_equivalent(tbl, tbl_known)
+    })
+  })
+
   test_that("tabulate_allele_names keeps selected columns", {
     tbl_known <- data.frame(ID = as.character(1:3),
                             Sample = as.character(1:3),
@@ -47,6 +61,28 @@ with(test_data, {
                                    extra_cols = c("Sample", "Replicate"))
       tbl <- tbl[, 1:3]
       expect_equivalent(tbl, tbl_known)
+    })
+  })
+
+  # test plot_cts_per_locus -------------------------------------------------
+
+  test_that("plot_cts_per_locus plots heatmap of counts per matched locus", {
+    # It doesn't return anything useful right now, but it should run without
+    # errors, at least.
+    with(results_summary_data, {
+      results <- summarize_dataset(results)
+      output <- plot_cts_per_locus(results$cts_per_locus, render = FALSE)
+      expect_null(output)
+    })
+  })
+
+  test_that("plot_cts_per_locus works on completely blank set", {
+    # It should still run without errors
+    with(results_summary_data, {
+      results <- summarize_dataset(results)
+      results$cts_per_locus[,] <- 0
+      output <- plot_cts_per_locus(results$cts_per_locus, render = FALSE)
+      expect_null(output)
     })
   })
 
