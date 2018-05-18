@@ -13,7 +13,7 @@ normalize_alleles <- function(data) {
       pair[1] <- ""
     }
     pair[is.na(pair)] <- pair[1]
-    pair
+    unname(pair)
   }
   )), stringsAsFactors = FALSE)
 }
@@ -501,17 +501,22 @@ plot_heatmap_proportions <- function(results, ...) {
 #' @param idx.row Optional vector of sample row indices to use.  (Using this
 #'   argument rather than filtering the input allows the same plot scale to be
 #'   used across plots.)
+#' @param render Should the plot be drawn to the display device?
 #' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
 #'
 #' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
-plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, ...) {
+plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, render=TRUE, ...) {
   # Switch to log scale
   cts_per_locus[cts_per_locus == 0] <- NA
   cts_per_locus <- log10(cts_per_locus)
   # Break on powers of ten (since we already log10'd above)
-  breaks <- 0:ceiling(max(cts_per_locus, na.rm = T))
+  if (all(is.na(cts_per_locus))) {
+    breaks <- 0:1 # handle the all-zero case
+  } else {
+    breaks <- 0:ceiling(max(cts_per_locus, na.rm = T))
+  }
   color <- viridis::viridis(max(breaks))
 
   if (! missing(idx.row)) {
@@ -525,5 +530,7 @@ plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, ...) {
                      breaks = breaks,
                      legend_breaks = breaks,
                      legend_labels = paste0("10^", breaks),
+                     silent = ! render,
                      ...)
+  invisible()
 }
