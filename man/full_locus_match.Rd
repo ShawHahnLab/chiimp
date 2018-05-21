@@ -7,10 +7,10 @@
 full_locus_match(sample_data, locus_name)
 }
 \arguments{
-\item{sample.data}{data frame of processed data for sample as produced by
+\item{sample_data}{data frame of processed data for sample as produced by
 \code{\link{analyze_sample}}.}
 
-\item{locus.name}{character name of locus to match against.}
+\item{locus_name}{character name of locus to match against.}
 }
 \value{
 logical vector of entries for potential alleles.

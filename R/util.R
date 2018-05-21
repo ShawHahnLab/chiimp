@@ -7,9 +7,9 @@
 #' Check the entries in a processed sample data frame for potential matches to a
 #' given locus.
 #'
-#' @param sample.data data frame of processed data for sample as produced by
+#' @param sample_data data frame of processed data for sample as produced by
 #'   \code{\link{analyze_sample}}.
-#' @param locus.name character name of locus to match against.
+#' @param locus_name character name of locus to match against.
 #'
 #' @return logical vector of entries for potential alleles.
 full_locus_match <- function(sample_data, locus_name) {

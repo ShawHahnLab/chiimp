@@ -10,13 +10,14 @@ sample_summary_funcs <- c("summarize_sample",
 
 #' Summarize a processed STR sample
 #'
-#' Converts an STR sample data frame as produced by \code{\link{analyze_sample}}
-#' into a concise list of consistent attributes, suitable for binding together
-#' across samples for a dataset.  At this stage the summary is prepared for a
-#' single specific locus as in \code{\link{analyze_sample}} but as a list with a
-#' fixed length.  The Allele1 entries correspond to the sequence with the
-#' highest count, Allele2 the second highest.  See the Functions section below
-#' for how specific variants of this function behave.
+#' Converts an STR sample data frame as produced by
+#' \code{\link{analyze_sample}} into a concise list of consistent attributes,
+#' suitable for binding together across samples for a dataset.  At this stage
+#' the summary is prepared for a single specific locus as in
+#' \code{\link{analyze_sample}} but as a list with a fixed length.  The Allele1
+#' entries correspond to the sequence with the highest count, Allele2 the
+#' second highest.  See the Functions section below for how specific variants
+#' of this function behave.
 #'
 #' @details
 #' Entries in the returned list:
@@ -41,7 +42,7 @@ sample_summary_funcs <- c("summarize_sample",
 #' @md
 #'
 #' @param sample_data data frame of processed data for one sample as produced by
-#'   \code{\link{analyze_samples}}.
+#'   \code{\link{analyze_sample}}.
 #' @param sample.attrs list of sample attributes, such as the rows produced by
 #'   \code{\link{prepare_dataset}}.
 #' @param counts.min numeric threshold for the minimum number of counts that
