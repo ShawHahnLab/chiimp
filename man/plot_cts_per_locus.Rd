@@ -4,7 +4,7 @@
 \alias{plot_cts_per_locus}
 \title{Plot heatmap of read counts matching each locus primer}
 \usage{
-plot_cts_per_locus(cts_per_locus, idx.row = NULL, ...)
+plot_cts_per_locus(cts_per_locus, idx.row = NULL, render = TRUE, ...)
 }
 \arguments{
 \item{cts_per_locus}{data frame as produced by
@@ -13,6 +13,8 @@ plot_cts_per_locus(cts_per_locus, idx.row = NULL, ...)
 \item{idx.row}{Optional vector of sample row indices to use.  (Using this
 argument rather than filtering the input allows the same plot scale to be
 used across plots.)}
+
+\item{render}{Should the plot be drawn to the display device?}
 
 \item{...}{additional arguments passed to \code{\link[pheatmap]{pheatmap}}.}
 }

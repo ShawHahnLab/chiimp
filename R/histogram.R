@@ -39,7 +39,13 @@ histogram <- function(seq_data,
 
 #' Prepare histogram data
 #'
-#' Create the counts-by-length data frames for \code{\link{histogram}}.
+#' @param seq_data data frame of dereplicated sequences as created by
+#'   \code{\link{analyze_seqs}}.
+#' @param sample_data data frame of filtered and categorized sequences as
+#'   created by \code{\link{analyze_sample}}.
+#'
+#' @return list of data frames for the sets of counts-versus-length bars drawn
+#'   in the plot, split by category.
 str_hist_setup <- function(seq_data, sample_data = NULL) {
   vec_to_df <- function(data, cols=c("Length", "Count")) {
     if (length(data) == 0) {
@@ -89,6 +95,14 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
 #' Draw prepared histogram data
 #'
 #' Render prepared histogram data to the display device.
+#'
+#' @param bars data frames of counts-vs-lengths as prepared by
+#' \code{\link{str_hist_setup}}.
+#' @param main title of the plot.
+#' @param xlim numeric range for x-axis.
+#' @param cutoff_fraction numeric threshold for the fraction of locus-matching
+#'   counts needed to call an allele.  Used to draw a horizontal line if
+#'   \code{sample_data} is given.
 str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
 
   categories <- str_hist_setup_legend(bars)
@@ -147,6 +161,11 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
 #' Setup display attributes for STR histogram
 #'
 #' Create data frame of plot attributes to use in STR histogram.
+#'
+#' @param bars data frames of counts-vs-lengths as prepared by
+#' \code{\link{str_hist_setup}}.
+#'
+#' @return data frame of plot attributes by category.
 str_hist_setup_legend <- function(bars) {
   categories <- data.frame(
     Name = c("orig", "filt", "topcounts", "topknown", "allele", "threshold"),

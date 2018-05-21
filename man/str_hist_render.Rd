@@ -6,6 +6,18 @@
 \usage{
 str_hist_render(bars, main, xlim, cutoff_fraction)
 }
+\arguments{
+\item{bars}{data frames of counts-vs-lengths as prepared by
+\code{\link{str_hist_setup}}.}
+
+\item{main}{title of the plot.}
+
+\item{xlim}{numeric range for x-axis.}
+
+\item{cutoff_fraction}{numeric threshold for the fraction of locus-matching
+counts needed to call an allele.  Used to draw a horizontal line if
+\code{sample_data} is given.}
+}
 \description{
 Render prepared histogram data to the display device.
 }

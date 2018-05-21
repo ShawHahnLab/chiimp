@@ -6,6 +6,17 @@
 \usage{
 str_hist_setup(seq_data, sample_data = NULL)
 }
+\arguments{
+\item{seq_data}{data frame of dereplicated sequences as created by
+\code{\link{analyze_seqs}}.}
+
+\item{sample_data}{data frame of filtered and categorized sequences as
+created by \code{\link{analyze_sample}}.}
+}
+\value{
+list of data frames for the sets of counts-versus-length bars drawn
+  in the plot, split by category.
+}
 \description{
-Create the counts-by-length data frames for \code{\link{histogram}}.
+Prepare histogram data
 }
