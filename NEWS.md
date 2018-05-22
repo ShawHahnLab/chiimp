@@ -33,7 +33,7 @@
      filtering of sequences with non-ACTG characters.
 
 [#7]: https://github.com/ShawHahnLab/chiimp/issues/7
-[#5]: https://github.com/ShawHahnLab/chiimp/issues/6
+[#5]: https://github.com/ShawHahnLab/chiimp/issues/5
 [#4]: https://github.com/ShawHahnLab/chiimp/issues/4
 [#3]: https://github.com/ShawHahnLab/chiimp/issues/3
 
