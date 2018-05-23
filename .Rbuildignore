@@ -10,4 +10,3 @@ install_mac.command
 README.md
 GUIDE.Rmd
 GUIDE.pdf
-prep_release.sh
