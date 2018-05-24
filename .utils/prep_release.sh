@@ -17,3 +17,10 @@ sed -i "s/Version: .*$/Version: $VERSION/" DESCRIPTION
 
 R --slave --vanilla -e "$chiimp_check"
 R --slave --vanilla -e "rmarkdown::render('GUIDE.Rmd', output_file = 'GUIDE.pdf', quiet = TRUE)"
+
+# Create bundled ZIP and TGZ versions without hidden top level files (such as
+# the git and travis stuff) and with the GUIDE.pdf.
+pushd ..
+zip -r chiimp-v${VERISON}.zip chiimp/*
+tar czvf chiimp-v${VERSION}.tgz chiimp/*
+popd
