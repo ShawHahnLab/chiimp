@@ -159,14 +159,34 @@ load_dataset <- function(fp, ...) {
   data
 }
 
+#' Save table of sample attributes
+#'
+#' Save a comma-separated table of sample attributes.
+#'
+#' @param data data frame of sample attributes as produced by
+#'   \code{\link{prepare_dataset}} or \code{\link{load_dataset}}.
+#' @param fp path to text file.
+#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#'
+#' @export
+save_dataset <- function(data, fp, ...) {
+  utils::write.table(data,
+                     file = fp,
+                     sep = ",",
+                     na = "",
+                     row.names = FALSE,
+                     ...)
+}
+
 #' Extract Sample Attributes from Filenames
 #'
 #' Find files matching a pattern in a given directory, and build a data frame of
 #' standard sample attributes from fields in the filenames.  Alternatively, use
 #' \code{\link{load_dataset}} to load a spreadsheet of sample attributes
-#' explicitly.  \code{load_dataset} should be used for cases where more than one
+#' explicitly.  \code{load_dataset} can be used for cases where more than one
 #' locus is to be analyzed from a single sequencer sample (i.e., multiplexed
-#' samples).
+#' samples), though the \code{locusmap} argument here can allow automatic
+#' matching of locus names for multiplexed samples.
 #'
 #' @param dp directory path to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.  There should
@@ -176,11 +196,20 @@ load_dataset <- function(fp, ...) {
 #'   Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 #' @param autorep logical allowing for automatic handling of any duplicates
 #'   found, labeling them as replicates.  FALSE by default.
+#' @param locusmap list of character vectors, each list item name being the
+#'   locus text given in the filenames, and each vector being a set of separate
+#'   locus names.  Each entry with a locus name text matching one of these list
+#'   items will be replaced in the final output with several separate entries,
+#'   one for each locus name in the corresponding vector.  (For example,
+#'   \code{locusmap=list(ABCD=c("A", "B", "C", "D"))} would take a filename with
+#'   "ABCD" in the locus field and split it out into four entries for the four
+#'   loci.)
 #'
 #' @return data frame of metadata for all files found
 #'
 #' @export
-prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
+prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
+                            locusmap=NULL) {
   # get all matching filenames and extract substrings
   seq_files <- list.files(path = dp,
                           pattern = pattern,
@@ -201,11 +230,31 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
   names(seq_file_attrs) <- n[c(1, 1 + ord)]
   data <- do.call(data.frame, c(seq_file_attrs, stringsAsFactors = FALSE))
   data$Filename <- seq_files
-  data$Replicate <- ifelse(data$Replicate == "",
-                           NA,
-                           as.integer(data$Replicate))
+  data$Replicate <- as.integer(ifelse(data$Replicate == "",
+                                      NA,
+                                      data$Replicate))
+
+  # If specified, map the locus text into multiple loci per sample (e.g.
+  # multiplexed)
+  if (! is.null(locusmap)) {
+    data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+      col_locus <- match("Locus", colnames(data))
+      cols <- as.list(data[i, -col_locus])
+      locus <- data[i, col_locus]
+      locus_new <- locusmap[[locus]]
+      if (is.null(locus_new)) {
+        locus_new <- locus
+      }
+      args <- c(cols,
+              Locus = list(locus_new),
+              stringsAsFactors = FALSE)
+      do.call(data.frame, args)
+    }))
+  }
+
   # order by locus/sample/replicate
   data <- data[order_entries(data), ]
+
   # If specified, automatically number duplicates as replicates, if they don't
   # have a replicate number already.
   if (autorep) {
@@ -220,6 +269,7 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE) {
     }))
     data <- data[order_entries(data), ]
   }
+
   rownames(data) <- make_rownames(data)
   # complain if any replicate/sample/locus combo matches more than one entry
   if (max(table(paste(data$Replicate, data$Sample, data$Locus))) > 1) {
@@ -303,6 +353,35 @@ save_allele_seqs <- function(results_summary, dp) {
     })
     fp <- file.path(dp, paste0(r[".row"], ".fasta"))
     dnar::write.fa(seq.names, seqs, fp)
+  }))
+}
+
+#' Save per-file processed data to text files
+#'
+#' Save each per-file data frame produced by \code{\link{analyze_dataset}} to a
+#' separate file in the specified directory path, in CSV format.  The directory
+#' structure will start at the first shared directory of the input file paths.
+#' For example, if the inputs were /data/run1/file.fastq and
+#' /data/run2/file.fastq there will be run1 and run2 directories inside the
+#' given `dp` directory.
+#'
+#' @param results_file_data list of per-file data frames as produced by
+#'   \code{\link{analyze_dataset}}.
+#' @param dp output directory path to use for all files.
+#'
+#' @export
+save_seqfile_data <- function(results_file_data, dp) {
+  fps_rel <- remove_shared_root_dir(names(results_file_data))
+  invisible(lapply(names(results_file_data), function(n) {
+    fp_this <- fps_rel[n]
+    dp_this <- ifelse (dirname(fp_this) != ".",
+                       file.path(dp, dirname(fp_this)),
+                       dp)
+    if (! dir.exists(dp_this)) {
+      dir.create(dp_this, recursive = TRUE)
+    }
+    fp <- file.path(dp, paste0(fp_this, ".csv"))
+    utils::write.csv(results_file_data[[n]], fp, na = "", quote = FALSE)
   }))
 }
 
@@ -405,17 +484,19 @@ save_histograms <- function(results, dp, image.func="png",
                             width=1600, height=1200, res=150) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
-  invisible(lapply(names(results$data), function(entry) {
+  invisible(lapply(names(results$samples), function(entry) {
     fp <- file.path(dp, paste(entry, image.func, sep = "."))
     img.call <- call(image.func,
                      fp,
                      width = width,
                      height = height,
                      res = res)
+    fn <- results$summary[entry, "Filename"]
+    seq_data <- results$files[[fn]]
+    sample_data <- results$samples[[entry]]
     eval(img.call)
-    histogram(results$data[[entry]],
-              locus.name = as.character(results$summary[entry, "Locus"]),
-              sample.summary = results$summary[entry, ],
+    histogram(seq_data = seq_data,
+              sample_data = sample_data,
               main = entry)
     grDevices::dev.off()
   }))

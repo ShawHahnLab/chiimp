@@ -4,22 +4,13 @@
 \alias{report_idents}
 \title{Create identification summary table}
 \usage{
-report_idents(results, closest, allele.names = NULL, hash.len = 6,
-  na.replicates = "")
+report_idents(results, closest, na.replicates = "")
 }
 \arguments{
 \item{results}{results list as produced by \code{\link{summarize_dataset}}.}
 
 \item{closest}{list of closest matches as produced by
 \code{\link{find_closest_matches}}.}
-
-\item{allele.names}{optional data frame of custom allele names.  If present
-the columns "Seq" and "Name" will be used to map exact sequences to custom
-names.}
-
-\item{hash.len}{number of characters of the sequence has to include when
-auto-generating allele names.  If set to zero the hash suffix is not
-included.}
 
 \item{na.replicates}{text to replace NA entries with for the Replicates
 column.}
@@ -30,6 +21,6 @@ data frame showing summary of sample genotypes with interleved
 }
 \description{
 Report the genotypes present in a processed dataset, paired with close
-matches to known individuals, converting sequences to short names with
-optional custom naming via \code{\link{report_genotypes}}.
+matches to known individuals, converting sequences to short names.  This is a
+more detailed view than given by \code{\link{report_genotypes}}.
 }

@@ -4,12 +4,12 @@
 \alias{make_allele_name}
 \title{Create Short Allele Names}
 \usage{
-make_allele_name(data, hash.len = 6)
+make_allele_name(data, hash_len = 6)
 }
 \arguments{
 \item{data}{character vector of sequences}
 
-\item{hash.len}{number of characters of alphanumeric hash to include as a
+\item{hash_len}{number of characters of alphanumeric hash to include as a
 suffix.  (See \code{\link[openssl]{md5}}.)}
 }
 \value{

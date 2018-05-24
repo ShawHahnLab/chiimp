@@ -51,25 +51,29 @@ full_analysis <- function(config, dataset=NULL) {
       dataset <- load_dataset(cfg$fp_dataset)
     }
   }
+
   if (cfg$verbose)
     logmsg(paste0("Loading locus attrs: ", cfg$fp_locus_attrs, "..."))
   locus_attrs <- load_locus_attrs(cfg$fp_locus_attrs)
+
   if (cfg$verbose) logmsg("Analyzing samples...")
   idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
   sample_summary_func <- get(sample_summary_funcs[idx])
+  idx <- match(cfg$sample_analysis_func, sample_analysis_funcs, nomatch = 1)
+  sample_analysis_func <- get(sample_analysis_funcs[idx])
+  allele.names <- NULL
+  if (!is.null(cfg$fp_allele_names))
+    allele.names <- load_allele_names(cfg$fp_allele_names)
   results <- analyze_dataset(dataset, locus_attrs,
-                             nrepeats = cfg$sample_analysis$nrepeats,
+                             nrepeats = cfg$seq_analysis$nrepeats,
                              ncores = cfg$dataset_analysis$ncores,
-                             summary_args = cfg$sample_summary,
-                             summary.function = sample_summary_func)
-  # Reorder entries to match locus_attrs.
-  # TODO merge these steps into analyze_dataset or summarize_dataset
-  results$summary$Locus <- factor(results$summary$Locus,
-                                  levels = locus_attrs$Locus)
-  results$summary$Locus <- droplevels(results$summary$Locus)
-  ord <- order_entries(results$summary)
-  results$summary <- results$summary[ord, ]
-  results$data <- results$data[ord]
+                             analysis_opts = cfg$sample_analysis_opts,
+                             summary_opts = cfg$sample_summary_opts,
+                             analysis_function = sample_analysis_func,
+                             summary_function = sample_summary_func,
+                             known_alleles = allele.names,
+                             name_args = cfg$dataset_analysis$name_args)
+  results$allele.names <- allele.names
   results$locus_attrs <- locus_attrs
   if (cfg$verbose) logmsg("Summarizing results...")
   genotypes.known <- NULL
@@ -80,11 +84,7 @@ full_analysis <- function(config, dataset=NULL) {
     results$closest_matches <- find_closest_matches(results$dist_mat_known,
                                                 range = cfg$report.dist_range,
                                                 maximum = cfg$report.dist_max)
-  results$cts_per_locus <- tally_cts_per_locus(results)
   results$config <- config_full
-  results$allele.names <- NULL
-  if (!is.null(cfg$fp_allele_names))
-    results$allele.names <- load_allele_names(cfg$fp_allele_names)
   if (cfg$verbose) logmsg("Saving output files...")
     save_data(results, results$config)
   if (cfg$report) {
@@ -163,8 +163,11 @@ save_data <- function(results, config) {
               file.path(config$output$dp, config$output$dp_alignments))
   save_alignment_images(results$alignments,
               file.path(config$output$dp, config$output$dp_alignment_images))
-  save_sample_data(results$data,
-              file.path(config$output$dp, config$output$dp_processed_samples))
+  save_seqfile_data(results$files,
+              file.path(config$output$dp, config$output$dp_processed_files))
+  save_sample_data(results$samples,
+                    file.path(config$output$dp,
+                              config$output$dp_processed_samples))
   save_allele_seqs(results$summary,
               file.path(config$output$dp, config$output$dp_allele_seqs))
   save_dist_mat(results$dist_mat,

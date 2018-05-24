@@ -28,6 +28,7 @@
 #'
 #' @export
 summarize_dataset <- function(results, genotypes.known=NULL) {
+  results$cts_per_locus <- tally_cts_per_locus(results)
   results$alignments <- align_alleles(results$summary)
   results$dist_mat <- make_dist_mat(results$summary)
   if (!missing(genotypes.known) & !is.null(genotypes.known)) {
@@ -281,11 +282,13 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
 #'   summary.  Defaults to the sequence content for the two alleles.
 #'
 #' @return data frame of genotypes across samples and loci.
-#'
-#' @export
 summarize_genotypes <- function(results_summary,
                                 vars=c("Allele1Seq", "Allele2Seq")) {
-  combo <- results_summary[, c("Sample", "Replicate", "Locus", vars)]
+  # Create unique (aside from Locus) identifiers for each entry
+  results_summary$ID <- make_entry_id(results_summary[,
+                              - match("Locus", colnames(results_summary))])
+  combo <- results_summary[, c("ID", "Sample", "Replicate", "Locus", vars)]
+  # normalize extra vars
   combo[, vars[1]] <- as.character(combo[, vars[1]])
   combo[, vars[2]] <- as.character(combo[, vars[2]])
   # Repeat alleles for homozygous cases
@@ -310,16 +313,15 @@ summarize_genotypes <- function(results_summary,
                               paste0(combo[, vars[2]], "*"),
                               combo[, vars[2]])
   # Reshape into wide table
-  combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
   tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
                         timevar = "Locus", direction = "wide")
-  tbl <- tbl[, -3]
+  rownames(tbl) <- tbl$ID
+  tbl <- tbl[, -match("ID", colnames(tbl))]
   allele_cols <- paste(rep(unique(combo$Locus), each = 2),
                        c(1, 2),
                        sep = "_")
   colnames(tbl) <- c("Sample", "Replicate", allele_cols)
   tbl <- tbl[order_entries(tbl), ]
-  rownames(tbl) <- make_rownames(tbl)
   tbl
 }
 
@@ -335,8 +337,6 @@ summarize_genotypes <- function(results_summary,
 #'   selection and column ordering.
 #'
 #' @return data frame of genotypes across individuals and loci.
-#'
-#' @export
 summarize_genotypes_known <- function(genotypes_known, tbl_genotypes=NULL) {
   # Kludgy workaround to make summarize_genotypes handle a different sort of
   # data frame
@@ -396,22 +396,27 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
 #'   frames as produced by \code{\link{analyze_dataset}}.
 #'
 #' @return Data frame of read counts with samples on rows and loci on columns.
-#'   Addition columns at the left specify the number of reads matching any known
-#'   locus (\code{Total}) and the number of reads matching the expected locus
-#'   (\code{Matching}).
+#'   Additional columns at the left specify the number of reads matching any
+#'   known locus (\code{Total}) and the number of reads matching the expected
+#'   locus (\code{Matching}).  Note that this data frame is per-sample rather
+#'   than per-file, so multiplexed samples will have sets of identical rows.
 #'
 #' @export
 tally_cts_per_locus <- function(results) {
   # Create table of counts of sequences that match each possible locus across
   # samples.  Only include loci we expect from the metadata, rather than any
   # known in locus_attrs.
-  .levels <- match(results$locus_attrs$Locus, results$summary$Locus)
-  .levels <- results$summary$Locus[.levels[!is.na(.levels)]]
-  tbl <- do.call(rbind, lapply(results$data, function(d) {
-    d$MatchingLocus <- factor(d$MatchingLocus,
-                              levels = .levels)
-    sapply(split(d$Count, d$MatchingLocus), sum)
+  tbl <- do.call(rbind, lapply(names(results$samples), function(id) {
+    # Match sample to original, unfiltered data from sequence file
+    fp <- results$summary[id, "Filename"]
+    seqs <- results$files[[fp]]
+    # Just keep loci actually analyzed in this set
+    seqs$MatchingLocus <- factor(seqs$MatchingLocus,
+                                levels = levels(results$summary$Locus))
+    # Sum counts for each locus
+    sapply(split(seqs$Count, seqs$MatchingLocus), sum)
   }))
+  rownames(tbl) <- names(results$samples)
   # Make some extra columns for total sequences and sequences matching the
   # expected locus.  Bind these to the original data to force the heatmap to use
   # a uniform scale.

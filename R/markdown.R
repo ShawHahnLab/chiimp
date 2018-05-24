@@ -47,18 +47,14 @@ kable_genotypes <- function(data, group_samples=FALSE) {
 }
 
 # Write markdown tables to standard output for report_genotypes()
-rmd_kable_genotypes <- function(results, hash.len,
-                                allele.names=NULL,
+rmd_kable_genotypes <- function(results,
                                 na.replicates="",
                                 locus_chunks=NULL,
                                 group_samples=FALSE,
                                 closest=NULL) {
-  tbl.g <- summarize_genotypes(results$summary)
-  tbl <- report_genotypes(tbl.g,
-                          allele.names = allele.names,
-                          hash.len = hash.len,
-                          na.replicates = na.replicates,
-                          closest = closest)
+  tbl <- report_genotypes(results = results,
+                   na.replicates = na.replicates,
+                   closest = closest)
   if (!is.null(locus_chunks)) {
     chunk_up(data = tbl,
              locus_chunks = locus_chunks,
@@ -100,14 +96,10 @@ kable_idents <- function(tbl, closest) {
 
 # Write markdown tables to standard output for report_idents()
 rmd_kable_idents <- function(results,
-                             allele.names,
-                             hash.len,
                              na.replicates,
                              locus_chunks=NULL) {
   tbl.combo <- report_idents(results,
                              closest = results$closest_matches,
-                             allele.names = allele.names,
-                             hash.len = hash.len,
                              na.replicates = na.replicates)
   if (!is.null(locus_chunks)) {
     chunk_up(data = tbl.combo,

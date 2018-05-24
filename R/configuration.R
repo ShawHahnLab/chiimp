@@ -43,16 +43,24 @@ config.defaults <- list(
     dp_histograms = "histograms",  # Read count by length histograms
     dp_alignments = "alignments",  # Sequence alignments across alleles
     dp_alignment_images = "alignment-images",  # Images of alignments
+    dp_processed_files = "processed-files",  # Per-file data tables
     dp_processed_samples = "processed-samples",  # Sample data tables
     dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
   ),
   ## Options for analyze_dataset
-  dataset_analysis = list(ncores = 0),
+  dataset_analysis = list(
+    # Number of CPU cores to use while processing samples in parallel.  Set to 0
+    # to automatically select a number, or 1 to disable parallel execution.
+    ncores = 0,
+    # Length of suffix on automated allele names in tables.
+    name_args = list(hash_len = 6)
+  ),
   ## Sample genotyping settings
-  sample_analysis = list(nrepeats = 3),
+  seq_analysis = list(nrepeats = 3),
+  sample_analysis_func = "analyze_sample",
+  sample_analysis_opts = list(fraction.min = 0.05),
   sample_summary_func = "summarize_sample",
-  sample_summary = list(fraction.min = 0.05,
-                        counts.min = 500),
+  sample_summary_opts = list(counts.min = 500),
   ## Report generation settings
   # Should a report be generated?
   report = TRUE,
@@ -61,8 +69,6 @@ config.defaults <- list(
   # Title and other metadata at top of the report.
   report.title = "Microsatellite Report",
   report.author = NULL,
-  # Length of suffix on automated allele names in tables.
-  report.hash_len = 6,
   # List of vectors of locus names to use to break up tables into reasonable
   # sizes and/or order locus names explicitly.
   report.locus_chunks = NULL,

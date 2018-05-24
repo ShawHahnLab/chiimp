@@ -4,7 +4,8 @@
 \alias{prepare_dataset}
 \title{Extract Sample Attributes from Filenames}
 \usage{
-prepare_dataset(dp, pattern, ord = c(1, 2, 3), autorep = FALSE)
+prepare_dataset(dp, pattern, ord = c(1, 2, 3), autorep = FALSE,
+  locusmap = NULL)
 }
 \arguments{
 \item{dp}{directory path to search for matching data files.}
@@ -18,6 +19,15 @@ Replicate and Sample, set \code{ord=c(3, 1, 2)}.}
 
 \item{autorep}{logical allowing for automatic handling of any duplicates
 found, labeling them as replicates.  FALSE by default.}
+
+\item{locusmap}{list of character vectors, each list item name being the
+locus text given in the filenames, and each vector being a set of separate
+locus names.  Each entry with a locus name text matching one of these list
+items will be replaced in the final output with several separate entries,
+one for each locus name in the corresponding vector.  (For example,
+\code{locusmap=list(ABCD=c("A", "B", "C", "D"))} would take a filename with
+"ABCD" in the locus field and split it out into four entries for the four
+loci.)}
 }
 \value{
 data frame of metadata for all files found
@@ -26,7 +36,8 @@ data frame of metadata for all files found
 Find files matching a pattern in a given directory, and build a data frame of
 standard sample attributes from fields in the filenames.  Alternatively, use
 \code{\link{load_dataset}} to load a spreadsheet of sample attributes
-explicitly.  \code{load_dataset} should be used for cases where more than one
+explicitly.  \code{load_dataset} can be used for cases where more than one
 locus is to be analyzed from a single sequencer sample (i.e., multiplexed
-samples).
+samples), though the \code{locusmap} argument here can allow automatic
+matching of locus names for multiplexed samples.
 }

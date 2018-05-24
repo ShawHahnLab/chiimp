@@ -11,7 +11,10 @@ with(test_data, {
     with(results_summary_data, {
       results_mod <- summarize_dataset(results)
       names_observed <- names(results_mod)
-      names_expected <- c(names(results), "alignments", "dist_mat")
+      names_expected <- c(names(results),
+                          "cts_per_locus",
+                          "alignments",
+                          "dist_mat")
       expect_equal(names_observed,
                    names_expected)
     })
@@ -29,8 +32,6 @@ with(test_data, {
       # For our test data samples are far apart from each other, but with no
       # missing entries the diagonal is zero.
       dists <- matrix(7, nrow = length(samps), ncol = length(samps))
-      dists[1, 3] <- 8
-      dists[3, 1] <- 8
       diag(dists) <- 0
       expect_true(all(dist_mat == dists))
     })
@@ -106,9 +107,9 @@ with(test_data, {
   test_that("align_alleles produces sequence alignments", {
     with(results_summary_data, {
       alignments <- align_alleles(results$summary)
-      expect_equal(names(alignments), unique(results$summary$Locus))
+      expect_equal(names(alignments), levels(results$summary$Locus))
       expect_equal(names(as.character(alignments[["A"]])),
-                   c("182_1", "194_1", "178_1", "174_2", "162_1"))
+                   c("182_2", "194_1", "162_2", "178_1"))
       expect_equal(as.character(alignments[["A"]])[[1]],
                    paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
                           "TAGATAGATAGATAGATAGATAGATAGATA",
@@ -125,7 +126,7 @@ with(test_data, {
     # tests the other option.
     with(results_summary_data, {
       alignments <- align_alleles(results$summary, derep = FALSE)
-      expect_equal(names(alignments), unique(results$summary$Locus))
+      expect_equal(names(alignments), levels(results$summary$Locus))
       n1 <- paste(rownames(subset(results$summary, Locus == "A")), 1, sep = "_")
       n2 <- paste(rownames(subset(results$summary, Locus == "A")), 2, sep = "_")
       expect_equal(sort(names(as.character(alignments[["A"]]))),
@@ -138,12 +139,12 @@ with(test_data, {
     # called.
     with(results_summary_data, {
       # Empty out one entry for locus A
-      idx <- results$summary$Locus == "A"
+      idx <- which(results$summary$Locus == "A")
       results$summary[idx[1], "Allele1Seq"] <- NA
       results$summary[idx[1], "Allele2Seq"] <- NA
       # Locus A's alignment should be OK, just with one stub entry
       alignments <- align_alleles(results$summary)
-      expect_true(any(grepl("-", as.character(alignments$A))))
+      expect_true(any(grepl("^-+$", as.character(alignments$A))))
     })
   })
 
@@ -182,9 +183,61 @@ with(test_data, {
 # test_tally_cts_per_locus ------------------------------------------------
 
   test_that("tally_cts_per_locus counts matches per locus per sample", {
-    # Right now the function is called in full_analysis, but it really should be
-    # rolled into summarize_dataset.
-    skip("test not yet implemented")
+    with(results_summary_data, {
+      cts_observed <- tally_cts_per_locus(results)
+      # We should see 5000 reads total, and then 17 split away for each of the
+      # four other loci.  Rownames should match sample row IDs.
+      cts_expected <- data.frame(Total = 5000,
+                                 Matching = 5000 - 17*3,
+                                 A   = as.integer(rep(17, 12)),
+                                 B   = as.integer(rep(17, 12)),
+                                 `1` = as.integer(rep(17, 12)),
+                                 `2` = as.integer(rep(17, 12)),
+                                 check.names = FALSE)
+      cts_expected$A[1:3]     <- as.integer(5000 - 17*3)
+      cts_expected$B[4:6]     <- as.integer(5000 - 17*3)
+      cts_expected$`1`[7:9]   <- as.integer(5000 - 17*3)
+      cts_expected$`2`[10:12] <- as.integer(5000 - 17*3)
+      rownames(cts_expected) <- paste(rep(1:3, times = 4),
+                                      rep(c("A", "B", "1", "2"), each = 3),
+                                      sep = "-")
+      expect_equal(cts_observed, cts_expected)
+    })
+  })
+
+  test_that("tally_cts_per_locus uses only loci present in samples", {
+    with(results_summary_data, {
+      # What if we drop Locus 2 from the results, as though we'd only analyzed
+      # three loci even though we have four defined in the attributes table?
+      # Locus 2 should not show up in the cts_per_locus data frame.
+      # NOTE: Currently the Total column shows the total across the loci shown,
+      # not the grand total of reads in the raw file.
+      ids_rm <- c("1-2", "2-2", "3-2")
+      results$summary <- results$summary[-match(ids_rm,
+                                                rownames(results$summary)), ]
+      results$samples <- results$samples[-match(ids_rm,
+                                                names(results$samples))]
+      results$summary$Locus <- droplevels(results$summary$Locus)
+      # (This is a slightly goofy way of testing this outcome since each data
+      # frame in results$files still will have "2" in the MatchingLocus column,
+      # but it should work.)
+      cts_observed <- tally_cts_per_locus(results)
+      # We should see 5000 reads total, and then 17 split away for each of the
+      # four other loci.  Rownames should match sample row IDs.
+      cts_expected <- data.frame(Total = 5000 - 17,
+                                 Matching = 5000 - 17*3,
+                                 A   = as.integer(rep(17, 9)),
+                                 B   = as.integer(rep(17, 9)),
+                                 `1` = as.integer(rep(17, 9)),
+                                 check.names = FALSE)
+      cts_expected$A[1:3]     <- as.integer(5000 - 17*3)
+      cts_expected$B[4:6]     <- as.integer(5000 - 17*3)
+      cts_expected$`1`[7:9]   <- as.integer(5000 - 17*3)
+      rownames(cts_expected) <- paste(rep(1:3, times = 3),
+                                      rep(c("A", "B", "1"), each = 3),
+                                      sep = "-")
+      expect_equal(cts_observed, cts_expected)
+    })
   })
 
 })

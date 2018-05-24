@@ -1,20 +1,23 @@
-# Create a summary list for a single sample, targeting a single locus.  See
-# summarize_sample below for the entries in the returned list.
-
-# Different versions summarize_sample to allow via configuration in
-# full_analysis.
+#' Versions of summarize_sample
+#'
+#' This list shows the different versions of \code{\link{summarize_sample}}
+#' recognized for use via configuration in full_analysis.  See also
+#' \code{\link{sample_analysis_funcs}} and \code{\link{config.defaults}}.
+#'
+#' @export
 sample_summary_funcs <- c("summarize_sample",
-                          "summarize_sample_guided",
-                          "summarize_sample_naive",
-                          "summarize_sample_by_length")
+                          "summarize_sample_guided")
 
 #' Summarize a processed STR sample
 #'
-#' Converts a full STR sample data frame into a concise list of consistent
-#' attributes, suitable for binding together across samples for a dataset.  At
-#' this stage the summary is prepared for a single specific locus, in contrast
-#' to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
-#' sequence with the highest count, Allele2 the second highest.
+#' Converts an STR sample data frame as produced by
+#' \code{\link{analyze_sample}} into a concise list of consistent attributes,
+#' suitable for binding together across samples for a dataset.  At this stage
+#' the summary is prepared for a single specific locus as in
+#' \code{\link{analyze_sample}} but as a list with a fixed length.  The Allele1
+#' entries correspond to the sequence with the highest count, Allele2 the
+#' second highest.  See the Functions section below for how specific variants
+#' of this function behave.
 #'
 #' @details
 #' Entries in the returned list:
@@ -24,7 +27,11 @@ sample_summary_funcs <- c("summarize_sample",
 #'    * Length: integer sequence length.
 #'  * Homozygous: If the sample appears homozygous (if so, the Allele2 entries
 #'  will be NA).
+#'  * Ambiguous: If a potential allele was ignored due to ambiguous bases in
+#'  sequence content (such as "N").
 #'  * Stutter: If a potential allele was ignored due to apparent PCR stutter.
+#'  * Artifact: If a potential allele was ignored due to apparent PCR artifact
+#'  (other than stutter).
 #'  * CountTotal: The total number of sequences in the original sample data.
 #'  * CountLocus: The number of sequences matching all criteria for the
 #'  specified locus in the original sample data.
@@ -34,306 +41,120 @@ sample_summary_funcs <- c("summarize_sample",
 #'  contamination or excessive PCR stutter can lead to more than two.
 #' @md
 #'
-#' @param sample.data data frame of processed data for sample as produced by
+#' @param sample_data data frame of processed data for one sample as produced by
 #'   \code{\link{analyze_sample}}.
 #' @param sample.attrs list of sample attributes, such as the rows produced by
-#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
+#'   \code{\link{prepare_dataset}}.
 #' @param counts.min numeric threshold for the minimum number of counts that
 #'   must be present, in total across entries passing all filters, for potential
 #'   alleles to be considered.
 #'
 #' @return list of attributes describing the sample.
+#'
+#' @describeIn summarize_sample Default version of sample summary.
 #'
 #' @export
-summarize_sample <- function(sample.data, sample.attrs, fraction.min,
-                             counts.min) {
-  # extract sample data entries that meet all criteria for a potential allele
-  locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
-  chunk <- sample.data[idx, ]
-  # Note that counts.locus is more restrictive than the total counts of all
-  # entries with MatchingLocus equal to the given locus name, since idx includes
-  # the extra checks above.
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  # Threshold potential alleles at minimum count
-  chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-  # Remove stutter, if present.
-  stutter <- !is.na(chunk[2, "Stutter"])
-  chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-  # Remove artifact-like sequences, if present.
-  artifact <- !is.na(chunk[2, "Artifact"])
-  chunk <- chunk[is.na(chunk[, "Artifact"]), ]
-
+summarize_sample <- function(sample_data, sample.attrs, counts.min) {
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
-  prominent.seqs <- nrow(chunk)
-  # enforce count limit after all filtering (but before stutter removal or
-  # fraction thresholding)
+  prominent.seqs <- sum(sample_data$Category %in% c("Allele", "Prominent"))
+  # Enforce count limit after all filtering
+  count.total <- as.integer(sample_data$Count[1] /
+                            sample_data$FractionOfTotal[1])
+  if (is.na(count.total))
+    count.total <- 0
+  count.locus <- sum(sample_data$Count)
   if (count.locus < counts.min) {
-    chunk <- chunk[0, ]
+    sample_data <- sample_data[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected
   # attributes.
   attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
+  allele1 <- sample_data[which(sample_data$Category == "Allele")[1], attr.names]
+  allele2 <- sample_data[which(sample_data$Category == "Allele")[2], attr.names]
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  homozygous <- nrow(chunk) == 1
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Stutter = stutter,
-                           Artifact = artifact,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
-                           ProminentSeqs = prominent.seqs))
+  sample.summary <- with(sample_data,
+                      c(allele1, allele2,
+                        list(Homozygous = sum(Category %in% "Allele") == 1,
+                             Ambiguous  = check_category(Category, "Ambiguous"),
+                             Stutter    = check_category(Category, "Stutter"),
+                             Artifact   = check_category(Category, "Artifact"),
+                             CountTotal = count.total,
+                             CountLocus = count.locus,
+                             ProminentSeqs = prominent.seqs)))
   return(sample.summary)
 }
 
-#' Summarize a processed STR sample Using Known Lengths
-#'
-#' Converts a full STR sample data frame into a concise list of consistent
-#' attributes, suitable for binding together across samples for a dataset.  At
-#' this stage the summary is prepared for a single specific locus, in contrast
-#' to \code{\link{analyze_sample}}.  The Allele1 entries correspond to the
-#' sequence with the highest count, Allele2 the second highest.
-#'
-#' @details
-#' Entries in the returned list:
-#'  * For Allele1 and Allele2:
-#'    * Seq: sequence text for each allele.
-#'    * Count: integer count of occrrences of this exact sequence.
-#'    * Length: integer sequence length.
-#'  * Homozygous: If the sample appears homozygous (if so, the Allele2 entries
-#'  will be NA).
-#'  * Stutter: If a potential allele was ignored due to apparent PCR stutter.
-#'  * CountTotal: The total number of sequences in the original sample data.
-#'  * CountLocus: The number of sequences matching all criteria for the
-#'  specified locus in the original sample data.
-#'  * ProminentSeqs: The number of entries above the specified threshold after
-#'  all filtering.  This should be either one (for a homozygous sample) or two
-#'  (for a heterozygous sample) but conditions such as cross-sample
-#'  contamination or excessive PCR stutter can lead to more than two.
-#' @md
-#'
-#' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
-#' @param sample.attrs list of sample attributes, such as the rows produced by
-#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on
-#'   and the sequence lengths to select.  If the ExpectedLength1 and
-#'   ExpectedLength2 columns are given, \code{counts.min} and the stutter
-#'   filtering are ignored. \code{fraction.min} is also ignored if two lengths
-#'   are given.
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
-#' @param counts.min numeric threshold for the minimum number of counts that
-#'   must be present, in total across entries passing all filters, for potential
-#'   alleles to be considered.
-#'
-#' @return list of attributes describing the sample.
+#' @describeIn summarize_sample Summarize a processed STR sample Using known
+#'   lengths.  If ExpectedLength1 and optionally ExpectedLength2 are given in
+#'   \code{sample.attrs}, the \code{counts.min} threshold is ignored.  See also
+#'   \code{\link{analyze_sample_guided}}.
 #'
 #' @export
-summarize_sample_guided <- function(sample.data, sample.attrs, fraction.min,
-                             counts.min) {
-  # extract sample data entries that meet all criteria for a potential allele
-  locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
-  chunk <- sample.data[idx, ]
-  # Note that counts.locus is more restrictive than the total counts of all
-  # entries with MatchingLocus equal to the given locus name, since idx includes
-  # the extra checks above.
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  # If specified, take the top two matching entries at the given expected
-  # lengths.  If there's just one length expected, this should be two entries at
-  # that one length.  Otherwise it will be two distinct lengths between the two
-  # entries.  We do this in a roundabout way to handle the length-homoplasy
-  # case, where only one sequence length is expected but there are two distinct
-  # alleles present at that same length.
-  expected_lengths <- c(sample.attrs[["ExpectedLength1"]],
-                        sample.attrs[["ExpectedLength2"]])
-  expected_lengths <- unique(expected_lengths[!is.na(expected_lengths)])
-  if (!is.null(expected_lengths) & length(expected_lengths) == 0)
-    expected_lengths <- NULL
-  if (!is.null(expected_lengths)) {
-    idx <- match(expected_lengths, chunk$Length)
-    idx <- idx[!is.na(idx)]
-    if (length(idx) == 1)
-      idx <- c(idx, 1 + match(expected_lengths, chunk$Length[-idx]))
-    idx <- idx[!is.na(idx)]
-    chunk <- chunk[idx, ]
-  }
-
-  # Threshold potential alleles at minimum count.
-  # If two expected lengths were given, just take those two entries.
-  # If a single expected length was given, ensure we at least get one sequence
-  # at that length.
-  idx <- chunk$Count >= fraction.min * count.locus
-  if (is.null(expected_lengths)) {
-    chunk <- chunk[idx, ]
-  } else if (length(expected_lengths) == 1) {
-  # The only case where we should bother with this, if there are expected
-  # lengths given, is if there was only one length.  In that case we should
-  # narrow it down to either one or two sequences at that length.
-    # (If no rows would be selected, at least take the top entry.)
-    if (sum(idx) == 0)
-      idx <- 1
-    chunk <- chunk[idx, ]
-  }
-
-  # Remove stutter, if present.
-  stutter <- NA
-  artifact <- NA
-  if (is.null(expected_lengths)) {
-    # Remove stutter, if present.
-    stutter <- !is.na(chunk[2, "Stutter"])
-    chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-    # Remove artifact-like sequences, if present.
-    artifact <- !is.na(chunk[2, "Artifact"])
-    chunk <- chunk[is.na(chunk[, "Artifact"]), ]
-  }
+summarize_sample_guided <- function(sample_data, sample.attrs, counts.min) {
+  expected_lengths <- as.integer(unlist(sample.attrs[c("ExpectedLength1",
+                                                       "ExpectedLength2")]))
+  expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
-  prominent.seqs <- nrow(chunk)
-  # Enforce count limit after all filtering (but before accounting for the
-  # stutter removal or fraction thresholding above)
-  if (is.null(expected_lengths) && count.locus < counts.min) {
-    chunk <- chunk[0, ]
+  prominent.seqs <- sum(sample_data$Category %in% c("Allele", "Prominent"))
+  # Enforce count limit after all filtering
+  count.total <- as.integer(sample_data$Count[1] /
+                              sample_data$FractionOfTotal[1])
+  if (is.na(count.total))
+    count.total <- 0
+  count.locus <- sum(sample_data$Count)
+  if (length(expected_lengths) == 0 && count.locus < counts.min) {
+    sample_data <- sample_data[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected
   # attributes.
   attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
-  colnames(allele1) <- paste0("Allele1", colnames(allele1))
-  colnames(allele2) <- paste0("Allele2", colnames(allele2))
-  # Combine into summary list with additional attributes.
-  homozygous <- nrow(chunk) == 1
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Stutter = stutter,
-                           Artifact = artifact,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
-                           ProminentSeqs = prominent.seqs))
-  return(sample.summary)
-}
-
-
-#' Summarize a processed STR sample, Simple Version
-#'
-#' Summarize as in \code{\link{summarize_sample}}, but skip allele_match and
-#' stutter removal.  Entries in the returned list are the same.
-#'
-#' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
-#' @param sample.attrs list of sample attributes, such as the rows produced by
-#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
-#' @param counts.min numeric threshold for the minimum number of counts that
-#'   must be present, in total across entries passing all filters, for potential
-#'   alleles to be considered.
-#'
-#' @return list of attributes describing the sample.
-summarize_sample_naive <- function(sample.data, sample.attrs, fraction.min,
-                                   counts.min) {
-  locus.name <- sample.attrs[["Locus"]]
-  chunk <- with(sample.data,
-                sample.data[LengthMatch & ! is.na(LengthMatch), ])
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-  prominent.seqs <- nrow(chunk)
-  if (count.locus < counts.min) {
-    chunk <- chunk[0, ]
+  allele1 <- sample_data[which(sample_data$Category == "Allele")[1], attr.names]
+  allele2 <- sample_data[which(sample_data$Category == "Allele")[2], attr.names]
+  # If the expected lengths were given in the reverse order of the found
+  # alleles, flip the found alleles to match.
+  if (length(expected_lengths) == 2 &&
+      expected_lengths[2] %in% allele1[["Length"]]) {
+    allele_tmp <- allele1
+    allele1 <- allele2
+    allele2 <- allele_tmp
   }
-  attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
-  colnames(allele1) <- paste0("Allele1", colnames(allele1))
-  colnames(allele2) <- paste0("Allele2", colnames(allele2))
-  homozygous <- nrow(chunk) == 1
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Stutter = NA,
-                           Artifact = NA,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
-                           ProminentSeqs = prominent.seqs))
-  return(sample.summary)
-}
-
-#' Summarize a processed STR sample, Length Version
-#'
-#' Summarize as in \code{\link{summarize_sample}}, but group entries by sequence
-#' length rather than identity.
-#'
-#' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
-#' @param sample.attrs list of sample attributes, such as the rows produced by
-#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
-#' @param counts.min numeric threshold for the minimum number of counts that
-#'   must be present, in total across entries passing all filters, for potential
-#'   alleles to be considered.
-#'
-#' @return list of attributes describing the sample.
-summarize_sample_by_length <- function (sample.data, sample.attrs,
-                                        fraction.min=0.15,
-                                        counts.min=500) {
-  locus.name <- sample.attrs[["Locus"]]
-  idx <- which(allele_match(sample.data, locus.name))
-  chunk <- sample.data[idx, ]
-  count.total <- sum(sample.data$Count)
-  count.locus <- sum(chunk$Count)
-  chunk <- with(chunk, {
-         chunk %>%
-         dplyr::group_by(Length, MatchingLocus, MotifMatch, LengthMatch) %>%
-           dplyr::summarize(Count = sum(Count),
-                            Seq = first(Seq),
-                            Stutter = first(Stutter))
-       })
-
-  chunk <- chunk[order(chunk$Count, decreasing = T), ]
-  chunk <- chunk[chunk$Count >= fraction.min * count.locus, ]
-
-  # Remove stutter, if present.
-  stutter <- !is.na(chunk[2, "Stutter"])
-  chunk <- chunk[is.na(chunk[, "Stutter"]), ]
-  # Remove artifact-like sequences, if present.
-  artifact <- !is.na(chunk[2, "Artifact"])
-  chunk <- chunk[is.na(chunk[, "Artifact"]), ]
-
-  prominent.seqs <- nrow(chunk)
-  # enforce count limit after all filtering
-  if (count.locus < counts.min)
-    chunk <- chunk[0, ]
-  # Take top to remaining entries as the two alleles and keep selected
-  # attributes.
-  attr.names <- c("Seq", "Count", "Length")
-  allele1 <- chunk[1, attr.names]
-  allele2 <- chunk[2, attr.names]
   colnames(allele1) <- paste0("Allele1", colnames(allele1))
   colnames(allele2) <- paste0("Allele2", colnames(allele2))
   # Combine into summary list with additional attributes.
-  homozygous <- nrow(chunk) == 1
-  sample.summary <- c(allele1, allele2,
-                      list(Homozygous = homozygous,
-                           Stutter = stutter,
-                           CountTotal = count.total,
-                           CountLocus = count.locus,
-                           ProminentSeqs = prominent.seqs))
+  sample.summary <- with(sample_data,
+                      c(allele1, allele2,
+                        list(Homozygous = sum(Category %in% "Allele") == 1,
+                             Ambiguous  = check_category(Category, "Ambiguous"),
+                             Stutter    = check_category(Category, "Stutter"),
+                             Artifact   = check_category(Category, "Artifact"),
+                             CountTotal = count.total,
+                             CountLocus = count.locus,
+                             ProminentSeqs = prominent.seqs)))
   return(sample.summary)
+}
+
+
+# Util --------------------------------------------------------------------
+
+
+# Did a particular sequence get categorized as a non-allele when it otherwise
+# would have been called an allele? Given a sequence category factor and a
+# single level, check if that level occurs before a second allele (if any). This
+# implies a possible allele was not called due to that category level being
+# assigned instead.
+check_category <- function(category, lvl) {
+  # Stop at the second allele, but if none, check the full vector
+  idx_a2 <- which("Allele" == category)[2]
+  if (is.na(idx_a2))
+    idx_a2 <- length(category)
+  # Is there any occurrence of the given lvl in the section to be checked?
+  idx <- which(lvl == category[1:idx_a2])[1]
+  # Any index found implies TRUE, NA implies FALSE.
+  ! is.na(idx)
 }
 
 #' Check Sample Data for Potential Allele Matches
@@ -341,13 +162,13 @@ summarize_sample_by_length <- function (sample.data, sample.attrs,
 #' Check the entries in a processed sample data frame for potential matches to a
 #' given locus.
 #'
-#' @param sample.data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#' @param sample_data data frame of processed data for sample as produced by
+#'   \code{\link{analyze_seqs}}.
 #' @param locus.name character name of locus to match against.
 #'
 #' @return logical vector of entries for potential alleles.
-allele_match <- function(sample.data, locus.name) {
-  with(sample.data,
+allele_match <- function(sample_data, locus.name) {
+  with(sample_data,
        as.character(MatchingLocus) == locus.name &
          MotifMatch &
          LengthMatch)

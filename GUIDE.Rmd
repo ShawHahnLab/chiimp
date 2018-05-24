@@ -198,9 +198,9 @@ receive a different suffix when the name is assigned.
 CHIIMP breaks the genotyping process into two parts.  First a sample file is 
 de-replicated and a table of unique sequences is created, with no filtering yet 
 applied.  Second the table is filtered to just candidate allele sequences, and 
-up to sequences are reported as the genotype.  Both the per-sample table and the
-final genotypes are saved in the final output, as spreadsheets in the
-`processed-samples` directory and as the `summary.csv` spreadsheet.
+up to two sequences are reported as the genotype.  Both the per-sequence table
+and the final genotypes are saved in the final output, as spreadsheets in the 
+`processed-files` directory and as the `summary.csv` spreadsheet.
 
 ### Sample Processing
 
@@ -213,8 +213,9 @@ locus attributes described above.  First each locus' forward primer is compared
 with the sequence and the matching locus name is stored in a MatchingLocus 
 column.  The sequence is then checked for several tandem repeats of the motif 
 for that locus, and compared to the length range expected for that locus. 
-TRUE/FALSE values for these are stored in MotifMatch and LengthMatch columns
-respectively.
+TRUE/FALSE values for these are stored in MotifMatch and LengthMatch columns 
+respectively.  The Ambiguous column marks any sequences containing bases outside
+of A, C, T, and G (such as N).
 
 PCR artifacts can obscure real allele sequences with incorrect sequences.  There 
 are extra filters to attempt to remove these if possible or highlight cases that
@@ -239,7 +240,7 @@ Lastly, the ratio of read counts for each sequence to the total reads in the
 sample and the reads with the same MatchingLocus value is stored in
 FractionOfTotal and FractionOfLocus columns respectively.
 
-This is the `analyze_sample` function in the R package.
+This is the `analyze_seqs` function in the R package.
 
 ### Genotype Calling
 
@@ -254,31 +255,36 @@ LengthMatch columns).  If the resulting total read count is below a minimum
 value (by default `r config.defaults$sample_summary$counts.min`, customizable
 via the `sample_summary: counts.min` setting) no genotyping will be attempted. 
 Next only those sequences accounting for at least a minimum fraction of the
-remaining reads are kept.  (The default value is
-`r config.defaults$sample_summary$fraction.min`.  This can be changed via the 
-`sample_summary: fraction.min` setting.)  Sequences that are marked as potential
-stutter or other artifacts (via the Stutter and Artifact columns of the table)
-are removed next.
+remaining reads are considered.  (The default value is
+`r config.defaults$sample_analysis$fraction.min`.  This can be changed via the 
+`sample_analysis: fraction.min` setting.)  Sequences that are marked as
+potential stutter or other artifacts (via the Stutter and Artifact columns of 
+the table) or contain ambiguous sequence content (via the Ambiguous column) are
+excluded next.
 
 After these filters are applied, the top one or two remaining sequences are 
-reported as the alleles.  (If only one sequence remains, the sample is labeled 
-homozygous; if two or more, heterozygous.)  The details kept are:
+labeled as the alleles.  (If only one sequence remains, the sample is labeled 
+homozygous; if two or more, heterozygous.)  The final details kept for each
+sample are:
 
  * the sequence content, length, and counts for the one or two alleles
  * the zygosity of the sample
+ * whether the ambiguous-sequence filter removed a potential allele
  * whether the stutter and/or artifact filter removed a potential allele
  * The read counts of the entire sample before any filtering
  * The read counts of just those sequences matching the locus primer, motif, and
  length range
 
-This is the `summarize_sample` function in the R package.
+These tasks (the filtering and categorizing of each sequence in the table and
+the short genotype summary) are the `analyze_sample` and `summarize_sample`
+functions in the R package.
 
 ### Summary and Reporting
 
 The genotype and details identified in the previous step for each sample are 
 aggregated into a spreadsheet with a row for each sample.  This summary 
-spreadsheet and the more detailed per-sample tables are all saved in the final
-output.
+spreadsheet and the more detailed per-file and per-sample tables are all saved
+in the final output.
 
 For inter-sample comparisons, the alleles identified across samples for each 
 locus are aligned to one another.  The genotypes for each sample are clustered 
@@ -358,11 +364,16 @@ A the end of an analysis CHIIMP creates a directory of files with all results.
  dataset spreadsheet including locus, replicate, and sample identifiers, the 
  sequences, sequence lengths, and counts of the identified allele(s), and
  several additional attributes.
- * `processed-samples`: directory of spreadsheets for each sample.  Each
+ * `processed-files`: directory of spreadsheets for each input data file.  Each 
  spreadsheet contains one unique sequence per row with attributes on columns. 
- These represent the intermediate data CHIIMP uses to call a genotype for each
- sample, and each spreadsheet here corresponds to a single row in the
- `summary.csv` file.
+ At this stage no filtering for sample/locus-specific attributes has been
+ applied.  (This is particularly relevant for sequencer-multiplexed samples as
+ one input data file may contain data for multiple samples.)
+ * `processed-samples`: directory of spreadsheets for each sample.  As for 
+ `processed-files`, each spreadsheet contains one unique sequence per row with 
+ attributes on columns.  These represent the intermediate sample-specific data
+ CHIIMP uses to call a genotype for each sample, and each spreadsheet here
+ corresponds to a single row in the `summary.csv` file.
  * `histograms`: directory of counts-versus-length histograms for each sample. 
  Counts are tallied on a by-sequence basis rather than by-length for alleles, so
  the bars for called alleles (in red) are generally shorter than the bars for
