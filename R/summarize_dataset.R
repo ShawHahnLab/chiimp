@@ -35,6 +35,12 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
     results$genotypes.known <- genotypes.known
+    if ("Name" %in% colnames(results$summary)) {
+      results$summary <- cbind(results$summary,
+                match_known_genotypes(results$summary, results$genotypes.known))
+      results$summary$GenotypeResult <- categorize_genotype_results(
+        results$summary)
+    }
   }
   return(results)
 }
