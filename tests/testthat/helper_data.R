@@ -156,6 +156,6 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
   kg2 <- subset(results_summary_data$results$summary,
                 Sample == 2)[, c("Locus", "Allele1Seq", "Allele2Seq")]
   kg2 <- cbind(Name = "ID001", kg2)
-  genotypes_known <- rbind(kg1, kg2)
+  genotypes_known <- rbind(kg2, kg1)
 
 })
