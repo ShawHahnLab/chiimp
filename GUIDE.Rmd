@@ -290,9 +290,13 @@ For inter-sample comparisons, the alleles identified across samples for each
 locus are aligned to one another.  The genotypes for each sample are clustered 
 by number of matching alleles, showing similarity between samples.  If a 
 spreadsheet of known genotypes was given, the sample genotypes are also compared
-to the known genotypes, with any close matches reported.  A single report 
-document summarizes the genotyping and these other details.  See the Output Data
-Organization section below for more information on the output.
+to the known genotypes, with any close matches reported.  If a Name column was
+provided with the sample definition table as well as a known genotypes
+spreadsheet, the known-correct genotypes will be paired with applicable samples
+and a column tracking the result of the genotyping (Correct, Incorrect, Blank,
+or Dropped Allele) will be added.  A single report document summarizes the
+genotyping and these other details.  See the Output Data Organization section
+below for more information on the output.
 
 These steps are handled by the `full_analysis` function in the R package.
 

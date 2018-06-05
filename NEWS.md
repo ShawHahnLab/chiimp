@@ -1,3 +1,14 @@
+# chiimp dev
+
+ * Added automatic categorization of genotyping results for samples from known
+ individuals ([#8]).
+   * Added function to pair samples with known correct genotypes,
+   `match_known_genotypes`.
+   * Added function to categorize results of genotyping for known individuals,
+   `categorize_genotype_results`.
+   * Enabled categorization features in `summarize_dataset` when Name column is
+   supplied in results summary data frame.
+
 # chiimp 0.2.0
 
  * Restructured code to avoid analyzing multiplexed samples more than once ([#3]).

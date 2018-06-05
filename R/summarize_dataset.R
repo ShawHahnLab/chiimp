@@ -15,6 +15,19 @@
 #'   * dist_mat_known: if genotypes.known is given, this distance matrix of
 #'     sample-to-individual values will be present, from
 #'     \code{\link{make_dist_mat_known}}.
+#'
+#' If genotypes.known is given *and* a Name column is present in
+#' \code{results$summary}, samples will be matched with the genotypes in
+#' genotypes.known and additional columns will be present in the summary data
+#' frame:
+#'   * CorrectAllele1Seq: One correct allele sequence for the individual.  The
+#'   order of this and \code{CorrectAllele2Seq} will be matched to
+#'   \code{Allele1Seq} and \code{Allele2Seq} if possible.  See
+#'   \code{\link{match_known_genotypes}}.
+#'   * CorrectAllele2Seq: A second correct allele sequence, as above.
+#'   * GenotypeResult: Categorization for each entry as Correct, Incorrect,
+#'   Blank, or Dropped Allele.  See \code{\link{categorize_genotype_results}}.
+#'
 #' @md
 #'
 #' @param results list containing summary data frame and sample-specific data
@@ -35,6 +48,12 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
     results$genotypes.known <- genotypes.known
+    if ("Name" %in% colnames(results$summary)) {
+      results$summary <- cbind(results$summary,
+                match_known_genotypes(results$summary, results$genotypes.known))
+      results$summary$GenotypeResult <- categorize_genotype_results(
+        results$summary)
+    }
   }
   return(results)
 }
