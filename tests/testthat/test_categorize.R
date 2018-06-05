@@ -83,7 +83,73 @@ with(test_data, {
 
 
   test_that("categorize_genotype_results categorizes results", {
-    fail("not yet implemented")
+    # A basic test to make sure we get the right factor back with the expected
+    # values for a simple case.
+    with(results_summary_data, {
+      results$summary$Name <- c("ID002", "ID001")[
+        as.integer(results$summary$Sample)]
+      output <- match_known_genotypes(results$summary, genotypes_known)
+      results$summary <- cbind(results$summary, output)
+      categories <- categorize_genotype_results(results$summary)
+      # The output will use four defined categories, in this order.
+      expect_equal(levels(categories),
+                   c("Correct", "Dropped Allele", "Blank", "Incorrect"))
+      # In this simple case we have some Correct, and some with no comment since
+      # we don't have an individual in our set with that identifier.
+      expect_equal(as.character(categories),
+                   rep(c("Correct", "Correct", NA), 4))
+    })
+  })
+
+  test_that("categorize_genotype_results identifies dropped alleles", {
+    with(results_summary_data, {
+      results$summary$Name <- c("ID002", "ID001")[
+        as.integer(results$summary$Sample)]
+      # We'll drop one allele each from the first two entries, trying both the
+      # first and second alleles.
+      results$summary[1, "Allele2Seq"] <- NA
+      results$summary[2, "Allele1Seq"] <- NA
+      output <- match_known_genotypes(results$summary, genotypes_known)
+      results$summary <- cbind(results$summary, output)
+      categories <- categorize_genotype_results(results$summary)
+      expect_equal(as.character(categories[1:2]),
+                   rep("Dropped Allele", 2))
+    })
+  })
+
+  test_that("categorize_genotype_results identifies blanks", {
+    with(results_summary_data, {
+      results$summary$Name <- c("ID002", "ID001")[
+        as.integer(results$summary$Sample)]
+      # We'll drop one full allele pair from the first entry, and also the
+      # third.  The third has no known individual to match to, so that result
+      # should still stay NA, though.
+      results$summary[1, c("Allele1Seq", "Allele2Seq")] <- NA
+      results$summary[3, c("Allele1Seq", "Allele2Seq")] <- NA
+      output <- match_known_genotypes(results$summary, genotypes_known)
+      results$summary <- cbind(results$summary, output)
+      categories <- categorize_genotype_results(results$summary)
+      expect_equal(as.character(categories[c(1, 3)]),
+                   c("Blank", NA))
+    })
+  })
+
+  test_that("categorize_genotype_results identifies incorrect alleles", {
+    with(results_summary_data, {
+      results$summary$Name <- c("ID002", "ID001")[
+        as.integer(results$summary$Sample)]
+      # We'll change the allele sequence for one allele of the first entry, one
+      # of the second, and both of the fourth.  All of these should then be
+      # Incorrect.
+      results$summary[1, "Allele1Seq"] <- "ACTG"
+      results$summary[2, "Allele2Seq"] <- "ACTG"
+      results$summary[4, "Allele2Seq"] <- "ACTG"
+      output <- match_known_genotypes(results$summary, genotypes_known)
+      results$summary <- cbind(results$summary, output)
+      categories <- categorize_genotype_results(results$summary)
+      expect_equal(as.character(categories[1:4]),
+                   c("Incorrect", "Incorrect", NA, "Incorrect"))
+    })
   })
 
 })
