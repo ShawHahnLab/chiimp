@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis.yml$
+.utils
 environment.yml
 install_linux_conda.sh
 install_linux.sh
@@ -10,4 +11,3 @@ install_mac.command
 README.md
 GUIDE.Rmd
 GUIDE.pdf
-prep_release.sh
