@@ -12,9 +12,10 @@ frames as produced by \code{\link{analyze_dataset}}.}
 }
 \value{
 Data frame of read counts with samples on rows and loci on columns.
-  Addition columns at the left specify the number of reads matching any known
-  locus (\code{Total}) and the number of reads matching the expected locus
-  (\code{Matching}).
+  Additional columns at the left specify the number of reads matching any
+  known locus (\code{Total}) and the number of reads matching the expected
+  locus (\code{Matching}).  Note that this data frame is per-sample rather
+  than per-file, so multiplexed samples will have sets of identical rows.
 }
 \description{
 Produce a table of read counts matching (by primer) each locus per sample.

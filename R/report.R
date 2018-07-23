@@ -13,7 +13,7 @@ normalize_alleles <- function(data) {
       pair[1] <- ""
     }
     pair[is.na(pair)] <- pair[1]
-    pair
+    unname(pair)
   }
   )), stringsAsFactors = FALSE)
 }
@@ -190,265 +190,6 @@ report_idents <- function(results,
 
 # Plots -------------------------------------------------------------------
 
-#' Plot basic histogram of STR sample
-#'
-#' Given a processed STR sample, plot a histogram of counts per sequence length.
-#' If selected, bars for the counts of sequences matching a selected locus, and
-#' the counts of sequences representing called alleles, will be overlayed.
-#'
-#' @param samp data frame of dereplicated sequences.
-#' @param main title of the plot.
-#' @param locus.name name of the locus to match alleles for.  If unspecified the
-#'   locus with the highest matched counts will be used.  To disable the
-#'   matching entirely use \code{NA}.
-#' @param sample.summary summary data frame as prepared by
-#'   \code{summarize_sample}.  Used to label the called alleles.
-#' @param cutoff_fraction numeric threshold for the fraction of locus-matching
-#'   counts needed to call an allele.  To disable display use \code{NA}.
-#' @param xlim numeric range for x-axis.
-#'
-#' @export
-#' @importFrom magrittr "%>%"
-histogram <- function(samp,
-                      main="Number of Reads by Sequence Length",
-                      locus.name=NULL,
-                      sample.summary=NULL,
-                      cutoff_fraction=0.05,
-                      xlim=range(samp$Length)) {
-
-  ## Define colors and other plot parameters
-  # The non-locus sequences
-  col.unlabeled   <- "#000000"
-  # Locus-labeled and matching all allele conditions
-  col.filtered    <- "#FFAAAA"
-  # Sequences matching alleles in sample.summary
-  col.allele      <- "#FF0000"
-  # Line showing threshold for allele calls
-  col.cutoff <- grDevices::rgb(0, 0, 0, 0.5)
-  # Shaded region for filtered sequences
-  col.region <- grDevices::rgb(0, 0, 0, 30, maxColorValue = 255)
-  lwd <- 5
-
-  ## If there were no sequences at all, don't bother plotting.
-  if (nrow(samp) == 0)
-    return(NULL)
-
-  ## Group sequences by length
-  heights <- with(samp, {
-    samp %>%
-    dplyr::group_by(Length) %>%
-    dplyr::summarize(TotalCount = sum(Count))
-  })
-  ymax <- max(heights$TotalCount)
-
-  # Plot bars for all counts
-  ylim <- range(heights$TotalCount)
-  graphics::plot(heights$Length,
-       heights$TotalCount,
-       type = "h",
-       xlim = xlim,
-       ylim = ylim,
-       main = main,
-       col = col.unlabeled,
-       xlab = "Length (nt)",
-       ylab = "Sequence Count",
-       lwd = lwd,
-       lend = 1)
-
-  # If no locus name was given, take whatever locus showed the highest counts.
-  if (missing(locus.name)) {
-    cts <- with(samp, {
-      subset(samp, MatchingLocus != "") %>%
-        dplyr::group_by(MatchingLocus) %>%
-        dplyr::summarize(Count = sum(Count))
-    })
-    cts <- cts[order(cts$Count, decreasing = T), ]
-    locus.name <- if (nrow(cts) > 1) {
-      cts[[1, "MatchingLocus"]]
-    } else {
-      NA
-    }
-  }
-
-  # Define subset of sample data that matches all locus conditions
-  samp.filt <- with(samp,
-                 subset(samp, MatchingLocus == locus.name &
-                              MotifMatch &
-                              LengthMatch))
-
-  # Just the matching sequences, if there are any.
-  if (nrow(samp.filt) > 0) {
-    heights.filt <- with(samp.filt, {
-      samp.filt %>%
-        dplyr::group_by(Length) %>%
-        dplyr::summarize(TotalCount = sum(Count))
-    })
-    graphics::points(heights.filt$Length,
-           heights.filt$TotalCount,
-           type = "h",
-           col = col.filtered,
-           lwd = lwd,
-           lend = 1)
-    # Shade the domain of the filtered data in gray
-    xlim.filt <- range(samp.filt$Length)
-    graphics::polygon(x = rep(xlim.filt, each = 2),
-            y = c(0, ymax, ymax, 0),
-            col = col.region,
-            border = NA)
-    # Draw a line to mark the cutoff value for what's considered a prominent
-    # count
-    cutoff <- cutoff_fraction * sum(samp.filt$Count)
-    graphics::abline(h = cutoff, col = col.cutoff)
-  }
-
-  # Draw bars for the exact allele sequences identified
-  if (!is.null(sample.summary)) {
-    pts.x <- c(sample.summary$Allele1Length, sample.summary$Allele2Length)
-    pts.y <- c(sample.summary$Allele1Count, sample.summary$Allele2Count)
-    pts.x <- pts.x[!is.na(pts.x)]
-    pts.y <- pts.y[!is.na(pts.y)]
-    if (length(pts.x) > 0)
-      graphics::points(pts.x,
-             pts.y,
-             type = "h",
-             col = col.allele,
-             lwd = lwd,
-             lend = 1)
-  }
-
-  # Legend
-  graphics::legend(x = "topright", bty = "n",
-         legend = c("Original",
-                    "Filtered",
-                    "Called Alleles",
-                    "Unique Seq. Threshold"),
-         col = c(col.unlabeled, col.filtered, col.allele, col.cutoff),
-         pch = c(15, 15, 15, NA),
-         lty = c(NA, NA, NA, 1))
-}
-
-#' Plot advanced histogram of STR sample
-#'
-#' Given a processed STR sample, plot a histogram of counts per unique sequence.
-#' This is a more complicated version of \code{histogram}.
-#'
-#' @param samp data frame of dereplicated sequences.
-#' @param stacked should bars be stacked together to add up to the total count
-#'   for each length?  Otherwise they will be overlaid, so each bar height only
-#'   corresponds to the count for that exact sequence.
-#' @param main title of the plot.
-#' @param locus.name name of the locus to match alleles for.  If unspecified the
-#'   locus with the highest matched counts will be used.
-#' @param sample.summary summary data frame as prepared by
-#'   \code{summarize_sample}
-#'
-#' @export
-#' @importFrom magrittr "%>%"
-histogram2 <- function(samp,
-                      stacked=TRUE,
-                      main=NULL,
-                      locus.name=NULL,
-                      sample.summary=NULL) {
-  col.unlabeled   <- "#DDDDDD" # The non-locus sequences
-  # Locus-labeled sequences
-  col.labeled     <- "#999999"
-  border.labled   <- "#000000"
-  # Locus-labeled and matching all allele conditions
-  col.filtered    <- "#FFDDDD"
-  border.filtered <- "#990000"
-  # Sequences matching alleles in sample.summary
-  col.allele      <- "#FF0000"
-  border.allele   <- "#FF0000"
-  lwd <- 5
-
-  if (missing(locus.name)) {
-    cts <- with(samp, {
-      subset(samp, MatchingLocus != "") %>%
-        dplyr::group_by(MatchingLocus) %>%
-        dplyr::summarize(Count = sum(Count))
-    })
-    cts <- cts[order(cts$Count, decreasing = T), ]
-    locus.name <- cts[[1, "MatchingLocus"]]
-  }
-
-  # TODO:
-  #   support for showing stutter
-  #   locus-specific options?
-  #   un-stacked version
-  #      show threshold
-
-  if (stacked) {
-    if (missing(main))
-      main <- "Histogram of Sequence Lengths"
-    # total counts at each length
-    heights <- with(samp, {
-        samp %>%
-        dplyr::group_by(Length) %>%
-        dplyr::summarize(TotalCount = sum(Count))
-      })
-    # Total ranges for stacked counts
-    xlim <- range(heights$Length)
-    ylim <- range(heights$TotalCount)
-    heights.loci <- with(samp, {
-      samp %>%
-      subset(MatchingLocus != "") %>%
-      dplyr::group_by(Length) %>%
-      dplyr::summarize(TotalCount = sum(Count))
-    })
-
-    # Plot histogram of total counts, gray in background
-    graphics::plot(heights$Length,
-         heights$TotalCount,
-         type = "h",
-         xlim = xlim,
-         ylim = ylim,
-         main = main,
-         col = col.unlabeled,
-         xlab = "Length (nt)",
-         ylab = "Sequence Count",
-         lwd = lwd,
-         lend = 1)
-
-    # Stack counts for individual sequences for the locus-labeled cases.  If any
-    # rows match specific conditions, color those rectangles separately.
-    for (len in unique(samp$Length)) {
-      idx <- with(samp, Length == len & MatchingLocus != "")
-      chunk <- samp[idx, ]
-      if (nrow(chunk) < 1)
-        next
-      chunk <- chunk[order(chunk$Count), ]
-      chunk$Cumsum <- cumsum(chunk$Count)
-      for (n in 1:nrow(chunk)) {
-        x <- c(len - lwd / 10,
-               len - lwd / 10,
-               len + lwd / 10,
-               len + lwd / 10)
-        y <- c(chunk[n, "Cumsum"] - chunk[n, "Count"],
-               chunk[n, "Cumsum"],
-               chunk[n, "Cumsum"],
-               chunk[n, "Cumsum"] - chunk[n, "Count"])
-        # Is the sequence matching all criteria for a candidate allele?
-        am <- allele_match(chunk[n, ], locus.name)
-        if (is.na(am)) am <- F
-        # Is the sequence an exact match for an identified allele?
-        is_allele <- chunk[n, "Seq"] %in%
-          unlist(sample.summary[c("Allele1Seq", "Allele2Seq")])
-        # Color each rectangle according to its category as defined by the
-        # above.  The default will be the locus-labeled colors.
-        col <- col.labeled
-        col.border <- border.labled
-        if (is_allele) {
-          col <- col.allele
-          col.border <- border.allele
-        } else if (am) {
-          col <- col.filtered
-          col.border <- border.filtered
-        }
-        graphics::polygon(x, y, col = col, border = col.border, lwd = 0.5)
-      }
-    }
-  }
-}
 
 #' Plot Sequence Alignments
 #'
@@ -760,17 +501,22 @@ plot_heatmap_proportions <- function(results, ...) {
 #' @param idx.row Optional vector of sample row indices to use.  (Using this
 #'   argument rather than filtering the input allows the same plot scale to be
 #'   used across plots.)
+#' @param render Should the plot be drawn to the display device?
 #' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
 #'
 #' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
-plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, ...) {
+plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, render=TRUE, ...) {
   # Switch to log scale
   cts_per_locus[cts_per_locus == 0] <- NA
   cts_per_locus <- log10(cts_per_locus)
   # Break on powers of ten (since we already log10'd above)
-  breaks <- 0:ceiling(max(cts_per_locus, na.rm = T))
+  if (all(is.na(cts_per_locus))) {
+    breaks <- 0:1 # handle the all-zero case
+  } else {
+    breaks <- 0:ceiling(max(cts_per_locus, na.rm = T))
+  }
   color <- viridis::viridis(max(breaks))
 
   if (! missing(idx.row)) {
@@ -784,5 +530,7 @@ plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, ...) {
                      breaks = breaks,
                      legend_breaks = breaks,
                      legend_labels = paste0("10^", breaks),
+                     silent = ! render,
                      ...)
+  invisible()
 }

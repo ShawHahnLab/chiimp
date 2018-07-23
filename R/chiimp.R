@@ -59,14 +59,18 @@ full_analysis <- function(config, dataset=NULL) {
   if (cfg$verbose) logmsg("Analyzing samples...")
   idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
   sample_summary_func <- get(sample_summary_funcs[idx])
+  idx <- match(cfg$sample_analysis_func, sample_analysis_funcs, nomatch = 1)
+  sample_analysis_func <- get(sample_analysis_funcs[idx])
   allele.names <- NULL
   if (!is.null(cfg$fp_allele_names))
     allele.names <- load_allele_names(cfg$fp_allele_names)
   results <- analyze_dataset(dataset, locus_attrs,
-                             nrepeats = cfg$sample_analysis$nrepeats,
+                             nrepeats = cfg$seq_analysis$nrepeats,
                              ncores = cfg$dataset_analysis$ncores,
-                             summary_args = cfg$sample_summary,
-                             summary.function = sample_summary_func,
+                             analysis_opts = cfg$sample_analysis_opts,
+                             summary_opts = cfg$sample_summary_opts,
+                             analysis_function = sample_analysis_func,
+                             summary_function = sample_summary_func,
                              known_alleles = allele.names,
                              name_args = cfg$dataset_analysis$name_args)
   results$allele.names <- allele.names
@@ -80,7 +84,6 @@ full_analysis <- function(config, dataset=NULL) {
     results$closest_matches <- find_closest_matches(results$dist_mat_known,
                                                 range = cfg$report.dist_range,
                                                 maximum = cfg$report.dist_max)
-  results$cts_per_locus <- tally_cts_per_locus(results)
   results$config <- config_full
   if (cfg$verbose) logmsg("Saving output files...")
     save_data(results, results$config)

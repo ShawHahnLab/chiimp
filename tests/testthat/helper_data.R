@@ -38,7 +38,7 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
   }
 
   simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
-                            off_target_ratio=10) {
+                            off_target_ratio=10, cross_contam_ratio=100) {
     attrs <- locus_attrs[locus_name, ]
     L.min <- attrs$LengthMin - nchar(attrs$Primer)
     L.max <- attrs$LengthMax - nchar(attrs$Primer)
@@ -75,9 +75,22 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
                                                 L[2] - nchar(attrs$Motif)),
                                       attrs$ReversePrimer)
     ## Mix in off target amplification
-    idx <- seq(1, length(seqs), off_target_ratio)
-    seqs[idx] <- paste0(attrs$Primer, make.seq_junk(10), attrs$ReversePrimer)
-    ## TODO add contam
+    if (off_target_ratio > 0) {
+      idx <- seq(1, length(seqs), off_target_ratio)
+      seqs[idx] <- paste0(attrs$Primer, make.seq_junk(10), attrs$ReversePrimer)
+    }
+    ## Mix in other loci
+    if (cross_contam_ratio > 0) {
+      others <- locus_attrs[-match(locus_name, rownames(locus_attrs)), ]
+      for (i in 1:nrow(others)) {
+        idx <- seq(i, length(seqs), cross_contam_ratio*nrow(others))
+        seqs[idx] <- simulate.seqs(locus_name = others$Locus[i],
+                                   locus_attrs = locus_attrs,
+                                   N = length(idx),
+                                   off_target_ratio = 0,
+                                   cross_contam_ratio = 0)
+      }
+    }
     ## TODO munge up the reads a bit
 
     ## Shuffle vector
@@ -127,15 +140,22 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
     data.dir <- tempfile()
     write_seqs(seqs, data.dir)
     dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
-    results <- analyze_dataset(dataset, locus_attrs,
-                               summary_args = list(fraction.min = 0.05,
-                                                   counts.min = 500),
-                               nrepeats = 3, ncores = 1)
+    results <- analyze_dataset(dataset, locus_attrs, nrepeats = 3, ncores = 1,
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500))
     lapply(dataset$Filename, file.remove)
     file.remove(data.dir)
     return(list(dataset = dataset, results = results))
   }
 
   results_summary_data <- prepare_for_summary()
+
+  kg1 <- subset(results_summary_data$results$summary,
+         Sample == 1)[, c("Locus", "Allele1Seq", "Allele2Seq")]
+  kg1 <- cbind(Name = "ID002", kg1)
+  kg2 <- subset(results_summary_data$results$summary,
+                Sample == 2)[, c("Locus", "Allele1Seq", "Allele2Seq")]
+  kg2 <- cbind(Name = "ID001", kg2)
+  genotypes_known <- rbind(kg2, kg1)
 
 })
