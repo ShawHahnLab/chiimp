@@ -259,4 +259,77 @@ with(test_data, {
     expect_equal(dataset, dataset_known)
   })
 
+
+# test save_seqfile_data --------------------------------------------------
+
+
+  test_that("save_seqfile_data saves per-file information", {
+    # Just make sure the expected files are created based on the existing
+    # filenames.  The names should be the existing names with an added csv
+    # extension with a flat directory structure.
+    data.dir <- tempfile()
+    write_seqs(seqs, data.dir)
+    dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
+    results <- analyze_dataset(dataset, locus_attrs,
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1)
+    dp_out <- file.path(data.dir, "results", "processed_files")
+    save_seqfile_data(results$files, dp_out)
+    fps_expected <- sort(paste0(names(results$files), ".csv"))
+    fps_observed <- sort(file.path(data.dir,
+                                   list.files(dp_out, recursive = TRUE)))
+    expect_equal(fps_observed, fps_expected)
+  })
+
+  test_that("save_seqfile_data works with directory trees", {
+    # In this case we should get two sub-directories in the output.
+    data.dir <- tempfile()
+    dp1 <- file.path(data.dir, "set1")
+    dp2 <- file.path(data.dir, "set2")
+    write_seqs(seqs, dp1)
+    write_seqs(seqs, dp2)
+    dataset <- prepare_dataset(data.dir,
+                               pattern = "()(\\d+)-([A-Za-z0-9]+).fasta",
+                               autorep = TRUE)
+    results <- analyze_dataset(dataset, locus_attrs,
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1)
+    dp_out <- file.path(data.dir, "results", "processed_files")
+    save_seqfile_data(results$files, dp_out)
+    fps_expected <- sort(paste0(names(results$files), ".csv"))
+    fps_observed <- sort(file.path(data.dir,
+                                   list.files(dp_out, recursive = TRUE)))
+    expect_equal(fps_observed, fps_expected)
+  })
+
+  test_that("save_seqfile_data works with Windows-style paths", {
+    # This should behave the same as the above test despite the backslashes
+    # substituted in for path separators.
+    data.dir <- tempfile()
+    dp1 <- file.path(data.dir, "set1")
+    dp2 <- file.path(data.dir, "set2")
+    write_seqs(seqs, dp1)
+    write_seqs(seqs, dp2)
+    dataset <- prepare_dataset(data.dir,
+                               pattern = "()(\\d+)-([A-Za-z0-9]+).fasta",
+                               autorep = TRUE)
+    results <- analyze_dataset(dataset, locus_attrs,
+                               analysis_opts = list(fraction.min = 0.05),
+                               summary_opts = list(counts.min = 500),
+                               nrepeats = 3,
+                               ncores = 1)
+    dp_out <- file.path(data.dir, "results", "processed_files")
+    names(results$files) <- gsub("/", "\\\\", names(results$files))
+    save_seqfile_data(results$files, dp_out)
+    names(results$files) <- gsub("\\\\", "/", names(results$files))
+    fps_expected <- sort(paste0(names(results$files), ".csv"))
+    fps_observed <- sort(file.path(data.dir,
+                                   list.files(dp_out, recursive = TRUE)))
+    expect_equal(fps_observed, fps_expected)
+  })
+
 })

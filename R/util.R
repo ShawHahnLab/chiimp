@@ -156,14 +156,16 @@ name_alleles_in_table <- function(data, known_alleles=NULL, name_args=list()) {
 #' Remove shared path from file paths
 #'
 #' For the given character vector of file paths, create a modified version with
-#' any common prefix path removed.
+#' any common prefix path removed.  Forward slashes are used as the path
+#' separator on all platforms.
 #'
 #' @param fps_full character vector of file paths.
 #'
 #' @return character vector of same length as input, with any common directory
 #'   structure trimmed off.
 remove_shared_root_dir <- function(fps_full) {
-  fps <- normalizePath(fps_full, mustWork = FALSE)
+  fps <- gsub("\\\\", "/", fps_full)
+  fps <- normalizePath(fps, mustWork = FALSE, winslash = "/")
   chunks <- lapply(strsplit(fps, "/"), function(segs) segs[segs != ""])
   minlen <- min(sapply(chunks, length))
   dirs <- do.call(rbind, lapply(chunks, "[", 1:minlen))
