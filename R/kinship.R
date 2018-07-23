@@ -73,6 +73,19 @@ match_kin <- function(results_summary,
   return(result)
 }
 
+# TODO add helper function to convert kinship data into structure ready to be
+# passed into kinship2::pedigree().  This should be a data frame with columns
+# id, dadid, momid (these apparently can be character vectors), sex (seems OK
+# with character M and F for this), and any others we want to include via the
+# "affected" matrix of 0/1/NA values.  But how to handle attributes with many
+# possible values, like alleles?  These can be extra arguments at plot time,
+# like to "col"; maybe these can be shuttled along with the pedigree object as
+# attributes and then passed into plot().
+#
+# Test this whole idea with a set of Gombe samples for one locus, calling
+# match_kin against the individual attributes (need to include the sex info),
+# then through the helper function, and then along to the plot function.  We
+# should be able to re-create Hannah's family tree from the paper.
 
 # Messy First Pass --------------------------------------------------------
 
@@ -260,6 +273,232 @@ kinship_worked_example <- function(kg, individual_attrs) {
   example_graph_locus(d_sub, "NMS2")
 }
 
+# There are other graph structures that may be useful besides kinship.  For
+# example, a representation of the all-to-all distance matrix.
+
+# does this work like I think it does?  Not sure.
+distmat_subset <- function(dm, name, cutoff=8, dist=1) {
+  nms <- name
+  for (i in 1:dist) {
+    nms2 <- nms
+    for (nm in nms) {
+      x <- dm[nm, ]
+      nms2 <- c(nms2, names(x[x<cutoff]))
+    }
+    nms <- unique(nms2)
+  }
+  dm[nms, nms]
+}
+
+distmat_worked_example <- function(kg) {
+  d <- make_dist_mat(subset(kg,
+                            Locus %in% c("A", "B", "C", "D", 1, 2, 3, 4) &
+                              Location == "Gombe"))
+
+  #d_sub <- distmat_subset(d, "Ch-095", 8, 3)
+
+  nms <- colnames(d)[(d["Ch-095", ] < 12)]
+  d_sub <- d[nms, nms]
+
+  # Translate the distance value integer into a closeness value decimal, from an
+  # arbitrary 1 to 1000.  (This seems to work nicely with the layout functions.)
+  adj_sub <- 10^((16-d_sub)/16*3)
+
+  g <- igraph::graph_from_adjacency_matrix(adj_sub,
+                                           mode = "undirected",
+                                           weighted = TRUE,
+                                           diag = FALSE)
+  # Use a range of 1 to 10 for the displayed edge thickness, but still on that
+  # log scale.
+  width_min <- 1
+  width_max <- 20
+  width_from_weights <- function(w) {
+    (w - min(w))/(max(w) - min(w))*(width_max - width_min) + width_min
+  }
+  E(g)$width <- width_from_weights(E(g)$weight)
+
+  # Use a range of (0.5 to 1)*255 for the displayed edge alpha transparency, but
+  # still on that log scale.
+  alpha_min <- 15
+  alpha_max <- 255
+  color_from_weights <- function(w) {
+    alpha <- (w - min(w))/(max(w) - min(w))*(alpha_max - alpha_min) + alpha_min
+    rgb(0, 0, 0, alpha, maxColorValue = 255)
+  }
+
+  # Fade the edges
+  E(g)$color <- color_from_weights(E(g)$weight)
+
+  g <- add_layout_(g, with_fr())
+
+  plot(g)
+
+  g
+}
+
+# !!!! We can define clustering with this!  Perfect for seeing where a given
+# individual gets assigned.  Does it make more sense to define graphs with
+# number of edges as the number of matches instead of using weights?  Not sure.
+# https://stackoverflow.com/questions/9471906/what-are-the-differences-between-community-detection-algorithms-in-igraph/
+community_detection <- function(kg) {
+  LOCI <-  c("A", "B", "C", "D",
+             1, 2, 3, 4,
+             "FP1", "FP2", "FP3", "FP4",
+             "NMS2", "NMS5", "NMS11", "AMEL")
+  d <- make_dist_mat(subset(kg,
+                            Locus %in% LOCI))
+  d_sub <- d
+
+  # ##############################
+  # All this as above...
+  weighted <- TRUE
+  if (weighted) {
+    adj_sub <- 10^((length(LOCI)*2-d_sub)/(length(LOCI)*2)*3)
+    g <- igraph::graph_from_adjacency_matrix(adj_sub,
+                                             mode = "undirected",
+                                             weighted = TRUE,
+                                             diag = FALSE)
+  } else {
+    adj_sub <- max(d_sub) - d_sub
+    g <- igraph::graph_from_adjacency_matrix(adj_sub,
+                                             mode = "undirected",
+                                             weighted = NULL,
+                                             diag = FALSE)
+  }
+
+  width_min <- 1
+  width_max <- 20
+  width_from_weights <- function(w) {
+    (w - min(w))/(max(w) - min(w))*(width_max - width_min) + width_min
+  }
+  E(g)$width <- width_from_weights(E(g)$weight)
+  alpha_min <- 15
+  alpha_max <- 255
+  color_from_weights <- function(w) {
+    alpha <- (w - min(w))/(max(w) - min(w))*(alpha_max - alpha_min) + alpha_min
+    rgb(0, 0, 0, alpha, maxColorValue = 255)
+  }
+  E(g)$color <- color_from_weights(E(g)$weight)
+  g <- add_layout_(g, with_fr())
+
+
+  # Since it's huge, shrink things down a bit.
+  V(g)$size <- 0.1
+  E(g)$width <- E(g)$width/5
+  V(g)$label.cex <- 0.7
+
+
+  x <- cluster_fast_greedy(g)
+
+  cols <- c("black", "red", "green", "blue", "yellow", "purple")
+  V(g)$label.color <- cols[membership(x)]
+
+  plot(g)
+  g
+}
+
+
+# kinship2 ----------------------------------------------------------------
+
+# Helper functions for working with the pedigree objects from the kinship2
+# package.
+
+pedigree_setup <- function(d) {
+  idx <- is.na(d$Mother) | is.na(d$Father)
+  d$Mother[idx] <- NA
+  d$Father[idx] <- NA
+  kinship2::pedigree(id = d$Name,
+                     dadid = d$Father,
+                     momid = d$Mother,
+                     sex = d$Sex)
+}
+
+# subset a kinship2 pedigree object from a named individual out to a given
+# distance.
+pedigree_subset <- function(p, name, dist=1) {
+  nms <- name
+  d <- as.data.frame(p)
+  d$dadid[d$dadid == 0] <- NA
+  d$momid[d$momid == 0] <- NA
+  for (i in 1:dist) {
+    d_sub <- subset(d, id %in% nms | dadid %in% nms | momid %in% nms)
+    nms <- list(d_sub$id, d_sub$momid, d_sub$dadid)
+    nms <- unique(unlist(lapply(nms, function(nm) as.character(nm[!is.na(nm)]))))
+  }
+  d_sub <- subset(d, id %in% nms |
+                    id %in% momid & ! is.na(momid) |
+                    id %in% dadid & ! is.na(dadid))
+  idx_parents_outside <-
+    (! d_sub$momid %in% d_sub$id) |
+    (! d_sub$dadid %in% d_sub$id)
+  d_sub$momid[idx_parents_outside] <- NA
+  d_sub$dadid[idx_parents_outside] <- NA
+  do.call(pedigree, d_sub)
+}
+
+# proof of concept showing an approximation of the family tree shown in the
+# paper for Locus 3.  With some more work we could make filled polygons and
+# match it even better.
+figure_from_paper <- function(p, kg, chimp_attrs) {
+  cols <- c(
+    "234-a" = "yellow",
+    "234-b" = "blue",
+    "234-c" = "red",
+    "234-d" = "green",
+    "226-a" = "gray"
+    )
+  p2 <- pedigree_subset(p, "Glama", 2)
+
+  kg_kin <- cbind(kg, match_kin(kg, chimp_attrs))
+  idx <- match(paste(p2$id, "3"), paste(kg_kin$Name, kg_kin$Locus))
+  x <- normalize_alleles(kg_kin[idx, c("Allele1Name", "Allele2Name")])
+
+  items <- plot(p2)
+  points(items$x-items$boxw/4, items$y+items$boxh/2, pch=19, cex=2, col=cols[x$V1])
+  points(items$x+items$boxw/4, items$y+items$boxh/2, pch=19, cex=2, col=cols[x$V2])
+}
+
+# plot an example pedigree tree for a given locus and mark those individuals who
+# have mismatches with a parent.
+# TODO finish this; draw filled half squares/circles with labels like Hannah
+# did.
+figure_with_mismatches <- function(locus="NMS2") {
+  kg <- load_genotypes("~/analysis/chimp-microsat-combined/from-google/known_genotypes.csv")
+  chimp_attrs <- load_genotypes("~/analysis/chimp-microsat-combined/from-google/individual_attrs.csv")
+  kg_kin <- cbind(kg, match_kin(kg, chimp_attrs))
+
+  chimp_attrs$Mother[chimp_attrs$Name %in% c("Baroza", "Bahati")] <- NA
+  chimp_attrs$Father[chimp_attrs$Name %in% c("Baroza", "Bahati")] <- NA
+  chimp_attrs$Sex[chimp_attrs$Name == "Baroza"] <- "F"
+  p <- pedigree_setup(chimp_attrs)
+
+  p2 <- pedigree_subset(p, "Nyota", 3)
+
+
+  idx <- match(paste(p2$id, locus), paste(kg_kin$Name, kg_kin$Locus))
+
+  idx2 <- kg_kin$MotherAllele[idx] %in% "Neither" | kg_kin$FatherAllele[idx] %in% "Neither"
+  mismatched <- rep(0, length(idx))
+  mismatched[idx2] <- 1
+
+  x <- normalize_alleles(kg_kin[idx, c("Allele1Name", "Allele2Name")])
+  lvls <- unique(c(x$V1, x$V2))
+  x$V1 <- factor(x$V1, levels = lvls)
+  x$V2 <- factor(x$V2, levels = lvls)
+  cols <- rainbow(length(levels(x$V1)))
+  cols[lvls == ""] <- "#ffffff"
+
+  items <- plot(p2, col=mismatched+1, lwd=2)
+  # Draw color-coded dots for all known alleles.  Note that we need to use
+  # xpd=TRUE to prevent clipping of things drawn at the edges.
+  #
+  # Still not sure how best to manage the duplicated shapes. items$plist$nid
+  # shows them but not items$x, y.
+  points(items$x-items$boxw/4, items$y+items$boxh/2, pch=19, cex=2, col=cols[x$V1], xpd=T)
+  points(items$x+items$boxw/4, items$y+items$boxh/2, pch=19, cex=2, col=cols[x$V2], xpd=T)
+  points(items$x[mismatched==1], items$y[mismatched==1], pch=1, cex=2, col="red")
+  items
+}
 
 # Old Stuff ---------------------------------------------------------------
 
