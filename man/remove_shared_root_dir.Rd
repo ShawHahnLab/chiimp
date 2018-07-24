@@ -15,5 +15,6 @@ character vector of same length as input, with any common directory
 }
 \description{
 For the given character vector of file paths, create a modified version with
-any common prefix path removed.
+any common prefix path removed.  Forward slashes are used as the path
+separator on all platforms.
 }

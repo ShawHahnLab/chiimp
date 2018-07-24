@@ -32,4 +32,18 @@ Additional entries in the returned list:
 sample-to-individual values will be present, from
 \code{\link{make_dist_mat_known}}.
 }
+
+If genotypes.known is given \emph{and} a Name column is present in
+\code{results$summary}, samples will be matched with the genotypes in
+genotypes.known and additional columns will be present in the summary data
+frame:
+\itemize{
+\item CorrectAllele1Seq: One correct allele sequence for the individual.  The
+order of this and \code{CorrectAllele2Seq} will be matched to
+\code{Allele1Seq} and \code{Allele2Seq} if possible.  See
+\code{\link{match_known_genotypes}}.
+\item CorrectAllele2Seq: A second correct allele sequence, as above.
+\item GenotypeResult: Categorization for each entry as Correct, Incorrect,
+Blank, or Dropped Allele.  See \code{\link{categorize_genotype_results}}.
+}
 }

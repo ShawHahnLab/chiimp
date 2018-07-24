@@ -150,4 +150,12 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
 
   results_summary_data <- prepare_for_summary()
 
+  kg1 <- subset(results_summary_data$results$summary,
+         Sample == 1)[, c("Locus", "Allele1Seq", "Allele2Seq")]
+  kg1 <- cbind(Name = "ID002", kg1)
+  kg2 <- subset(results_summary_data$results$summary,
+                Sample == 2)[, c("Locus", "Allele1Seq", "Allele2Seq")]
+  kg2 <- cbind(Name = "ID001", kg2)
+  genotypes_known <- rbind(kg2, kg1)
+
 })

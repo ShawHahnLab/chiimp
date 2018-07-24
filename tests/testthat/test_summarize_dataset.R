@@ -20,6 +20,40 @@ with(test_data, {
     })
   })
 
+  test_that("summarize_dataset works with known genotypes", {
+    # Several additional things should happen if genotypes.known is given to
+    # summarize_dataset.  The extra data frame should be appended to the results
+    # list, and a new distance matrix should be present comparing samples to
+    # known genotypes.
+    # For cases where a Name column is present in the dataset data frame at the
+    # start (and so is now present in the results summary data frame) the
+    # summary data frame will be expanded with three additional columns.
+    # Two (CorrectAllele1Seq and CorrectAllele2Seq) will track the correct
+    # sequences, ordered to match the called alleles where possible.
+    # GenotypeResult will provide a category for each case (row): Correct,
+    # Incorrect, Dropped Allele, and Blank.
+    with(results_summary_data, {
+      # Two known, one unknown
+      results$summary$Name <- c("ID002", "ID001")[
+        as.integer(results$summary$Sample)]
+      results_mod <- summarize_dataset(results,
+                                       genotypes.known = genotypes_known)
+      names_observed <- names(results_mod)
+      names_expected <- c(names(results),
+                          "cts_per_locus",
+                          "alignments",
+                          "dist_mat",
+                          "dist_mat_known",
+                          "genotypes.known")
+      expect_equal(names_observed,
+                   names_expected)
+      col_names_expected <- c(colnames(results$summary),
+                              "CorrectAllele1Seq", "CorrectAllele2Seq",
+                              "GenotypeResult")
+      expect_equal(colnames(results_mod$summary), col_names_expected)
+    })
+  })
+
 # test_make_dist_mat ------------------------------------------------------
 
   test_that("make_dist_mat produces a valid distance matrix", {

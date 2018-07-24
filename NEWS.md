@@ -1,3 +1,24 @@
+# chiimp 0.2.1
+
+ * Minor improvements to release process ([#14]).
+ * Fixed install script for Mac OS ([#13]).
+ * Fixed file-saving on Windows ([#12]).
+ * Fixed installation on Windows for usernames with spaces ([#11]).
+ * Added automatic categorization of genotyping results for samples from known
+ individuals ([#8]).
+   * Added function to pair samples with known correct genotypes,
+   `match_known_genotypes`.
+   * Added function to categorize results of genotyping for known individuals,
+   `categorize_genotype_results`.
+   * Enabled categorization features in `summarize_dataset` when Name column is
+   supplied in results summary data frame.
+
+[#14]: https://github.com/ShawHahnLab/chiimp/issues/14
+[#13]: https://github.com/ShawHahnLab/chiimp/issues/13
+[#12]: https://github.com/ShawHahnLab/chiimp/issues/12
+[#11]: https://github.com/ShawHahnLab/chiimp/issues/11
+[#8]: https://github.com/ShawHahnLab/chiimp/issues/8
+
 # chiimp 0.2.0
 
  * Restructured code to avoid analyzing multiplexed samples more than once ([#3]).
