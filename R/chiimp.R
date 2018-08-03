@@ -4,6 +4,62 @@
 #' Analyze Microsatellites
 #'
 #' Analyze DNA microsatellites in high-throughput sequencing datasets.
+#'
+#' @details
+#'
+#' Starting from file inputs and producing file outputs, the overall workflow
+#' (handled by \code{\link{full_analysis}} as a configuration-driven wrapper for
+#' the entire process) is:
+#'
+#' * Load input data
+#'   * Load data frame of sample information from a spreadsheet via
+#'     \code{\link{load_dataset}} or directly from filenames via
+#'     \code{\link{prepare_dataset}}.
+#'   * Load data frame of locus attributes via \code{\link{load_locus_attrs}}
+#'   * Optionally, load data frame of names for allele sequences via
+#'     \code{\link{load_allele_names}}.
+#'   * Optionally, load data frame of known genotypes for named individuals via
+#'     \code{\link{load_genotypes}}.
+#' * Analyze dataset via \code{\link{analyze_dataset}}
+#'   * Load each sequence data file into a character vector with
+#'     \code{\link{load_seqs}} and process into a dereplicated data frame with
+#'     \code{\link{analyze_seqs}}.
+#'   * For each sample, filter the sequences from the relevant per-file data
+#'     frame to just those matching the expected locus and identify possible
+#'     alleles, via \code{\link{analyze_sample}}.  (There may be a many-to-one
+#'     relationship of samples to files, for example with sequencer
+#'     multiplexing.)
+#'   * Process each per-sample data frames into a summary list of attributes
+#'     giving alleles identified and related information, via
+#'     \code{\link{summarize_sample}}.
+#'   * Organize \code{analyze_dataset} results into a list of per-file data
+#'     frames, a list of per-sample data frames, and a single summary data
+#'     frame across all samples.
+#' * Summarize results and add additional comparisons (cross-sample and to
+#'   known-individual) via \code{\link{summarize_dataset}}.
+#'   * Tabulate sequence counts per sample matching each locus' primer via
+#'     \code{\link{tally_cts_per_locus}}.
+#'   * Align identified alleles for each locus via
+#'     \code{\link{align_alleles}}.
+#'   * Create a sample-to-sample distance matrix of allele mismatches via
+#'     \code{\link{make_dist_mat}}.
+#'   * If genotypes for known individuals were provided, create a
+#'     sample-to-known-individual distance matrix via
+#'     \code{\link{make_dist_mat_known}}.
+#'   * If identities of samples were provided, score genotyping success via
+#'     \code{\link{match_known_genotypes}} and
+#'     \code{\link{categorize_genotype_results}}.
+#' * Save analysis results to files.
+#' * Create an HTML report document summarizing all results.
+#'
+#' The workflow above outlines CHIIMP's behavior when called as a standalone
+#' program, where \code{\link{main}} loads a configuration file into a nested
+#' list of options and calls \code{\link{full_analysis}}.  The public functions
+#' linked above can also be used idependently; see the documentation and code
+#' examples for the individual functions for more information.
+#'
+#' @md
+#'
 "_PACKAGE"
 
 # Analysis ----------------------------------------------------------------
