@@ -63,5 +63,4 @@ num_adjacent_repeats <- 3
 seq_data <- analyze_seqs(raw_seq_vector,
                          locus_attrs,
                          num_adjacent_repeats)
-
 }

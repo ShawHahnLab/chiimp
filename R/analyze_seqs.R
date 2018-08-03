@@ -55,8 +55,6 @@
 #' seq_data <- analyze_seqs(raw_seq_vector,
 #'                          locus_attrs,
 #'                          num_adjacent_repeats)
-#'
-#' @export
 analyze_seqs <- function(seqs, locus_attrs, nrepeats) {
   # Dereplicate sequences
   tbl <- table(seqs)
