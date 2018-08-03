@@ -11,7 +11,8 @@
 #' (handled by \code{\link{full_analysis}} as a configuration-driven wrapper for
 #' the entire process) is:
 #'
-#' * Load input data
+#' * Load input data.  The input spreadsheets are text files using
+#'   comma-separated values (CSV).
 #'   * Load data frame of sample information from a spreadsheet via
 #'     \code{\link{load_dataset}} or directly from filenames via
 #'     \code{\link{prepare_dataset}}.
@@ -49,8 +50,15 @@
 #'   * If identities of samples were provided, score genotyping success via
 #'     \code{\link{match_known_genotypes}} and
 #'     \code{\link{categorize_genotype_results}}.
-#' * Save analysis results to files.
+#' * Save analysis results to files.  Spreadsheets are in CSV format for output
+#'   as well as input.  Some output files are in FASTA format (alignments and
+#'   alleles) or are PNG images (alignment visualization and sequence count
+#'   histograms).  If specified in the configuration, \code{\link{saveRDS}} is
+#'   called on the entire output as well, saving to \code{results.rds} by
+#'   default.
 #' * Create an HTML report document summarizing all results.
+#'
+#' For defaults used in the configuration, see \code{\link{config.defaults}}.
 #'
 #' The workflow above outlines CHIIMP's behavior when called as a standalone
 #' program, where \code{\link{main}} loads a configuration file into a nested
