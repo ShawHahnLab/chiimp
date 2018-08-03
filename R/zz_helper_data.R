@@ -1,14 +1,20 @@
 # simulated data for testing ----------------------------------------------
 
 
-# I'm shoving all this into a list to keep it separate from all the other
-# objects devtools::load_all() dumps into the namespace.  Users loading via
-# devtools otherwise end up with a bunch of extra objects that are only relevant
-# during testing.
+# I'm shoving all this into a list to keep it separate from the non-test-related
+# objects in the namespace, but still have it available to both the unit tests
+# and regular use.
+# Note that having an object stored directly in the package like this (and
+# forcing it to be the last file loaded when building) isn't ideal since it gets
+# created and stored at build time even though the code is mixed in with the
+# regular R functions.  A better way might be to explicitly build the test_data
+# list and store it in data/ as Hadley describes:
+# http://r-pkgs.had.co.nz/data.html
 
 #' Helper Data for Tests
 #'
 #' This list is a bundle of shared data and functions for running unit tests.
+#' @export
 test_data <- within(list(), {
   txt.locus_attrs <- "Locus   LengthMin  LengthMax    LengthBuffer   Motif   Primer                  ReversePrimer
 A        131        179          20             TAGA    TATCACTGGTGTTAGTCCTCTG  CACAGTTGTGTGAGCCAGTC
