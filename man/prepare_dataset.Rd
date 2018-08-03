@@ -34,10 +34,11 @@ data frame of metadata for all files found
 }
 \description{
 Find files matching a pattern in a given directory, and build a data frame of
-standard sample attributes from fields in the filenames.  Alternatively, use
-\code{\link{load_dataset}} to load a spreadsheet of sample attributes
-explicitly.  \code{load_dataset} can be used for cases where more than one
-locus is to be analyzed from a single sequencer sample (i.e., multiplexed
-samples), though the \code{locusmap} argument here can allow automatic
-matching of locus names for multiplexed samples.
+standard sample attributes from fields in the filenames.  Nested directory
+structures are supported.  Alternatively, use \code{\link{load_dataset}} to
+load a spreadsheet of sample attributes explicitly.  \code{load_dataset} can
+be used for cases where more than one locus is to be analyzed from a single
+sequencer sample (i.e., multiplexed samples), though the \code{locusmap}
+argument here can allow automatic matching of locus names for multiplexed
+samples.
 }

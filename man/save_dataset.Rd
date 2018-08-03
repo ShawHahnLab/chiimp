@@ -15,5 +15,6 @@ save_dataset(data, fp, ...)
 \item{...}{additional arguments passed to \code{\link[utils]{read.table}}.}
 }
 \description{
-Save a comma-separated table of sample attributes.
+Save a comma-separated table of sample attributes.  (This is a convenience
+function not used automatically in the analysis.)
 }

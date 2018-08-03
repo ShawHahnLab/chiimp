@@ -13,6 +13,7 @@ save_sample_data(results_data, dp)
 \item{dp}{output directory path to use for all files.}
 }
 \description{
-Save each per-sample data frame produced by \code{\link{analyze_dataset}} to
-a separate file in the specified directory path, in CSV format.
+Save each per-sample data frame produced by \code{\link{analyze_dataset}}
+(via \code{\link{analyze_sample}}) to a separate file in the specified
+directory path, in CSV format.
 }
