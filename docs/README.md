@@ -75,9 +75,9 @@ The text should look something like this:
     Done.                                                        2018-11-06 16:25:58
     Press any key to continue . . .
 
-If the text shows "Done" near the bottom the software ran successfully.  A new
-folder should appear alongside the example spreadsheets and data folder called
-`results`.
+If the text shows "Done" near the bottom the software ran successfully, and you
+can close the window.  A new folder should appear alongside the example
+spreadsheets and data folder called `results`.
 
 (**If no results folder appears or there are errors, please
 [email](mailto:ancon@upenn.edu) or [report an issue] and we can help
