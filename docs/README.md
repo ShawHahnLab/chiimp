@@ -97,8 +97,10 @@ In this case a table of names for alleles was configured (`known_alleles.csv`)
 so a short name is given in both the report and this spreadsheet for recognized
 alleles.  In this spreadsheet the alleles are *not* duplicated for homozygous
 cases, as the columns specifically refer to the unique sequences identified in
-the data for the first and second most prominent candidate sequence.  (In the
-report, candidate homozygous cases have the same allele shown twice.)
+the data for the first and second most prominent candidate sequences.  (In the
+report, candidate homozygous cases do have the same allele shown twice.)
+
+**Have a look at the other files and folders in `results/`.**
 
 The other output files and folders provide *much* more detail, down to the
 level of each unique sequence identified.  Except for the alignment and
@@ -106,7 +108,8 @@ histogram images, the data is saved in FASTA and CSV formats so it's easy to
 work with from this point on. `results.rds` was defined in this configuration
 file to save the full set of output data in an R-compatible binary format, so
 any later analysis in R can easily load the results in one step.  Alternatively
-the individual files can be loaded in Geneious, Excel, etc for post-processing.
+the individual files can be loaded in Geneious, Excel, etc. for
+post-processing.
 
 ## Sample Details via Filename Matching
 
