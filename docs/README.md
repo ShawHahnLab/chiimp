@@ -40,6 +40,8 @@ The columns, from left to right:
    config file (more on this below).  If absolute (like C:\folder\file.fastq.gz
    or /home/user/file.fastq.gz) it will be taken as-is.
 
+**Close `samples.csv` and have a look at the other files.**
+
 The other three spreadsheets (`known_alleles.csv`, `known_genotypes.csv`, and
 `locus_attrs.csv`) are laid out similarly and are described more in the
 [user guide].  The `data/` folder contains the sequence data (adapter-trimmed
@@ -47,14 +49,16 @@ forward reads from a MiSeq run).
 
 The configuration file, `config.yml`, is a simple text file that will tell the
 software where to find these spreadsheet and data files and how to do the
-analysis.  The built-in text editor in RStudio (installed during the CHIIMP
-setup) can edit this format and will provide some features like color-coding
-and automatic indentation for sub-sections.  Other text editors are fine too,
-though Windows doesn't come with a particularly useful text editor, so it may
-be helpful to install one yourself such as [Notepad++].  After a default
-install you can simply right-click on a CHIIMP config file and click "Edit with
-Notepad++". On Mac OS TextEdit will work if kept in plain text mode.  For now
-you don't need to worry about the contents of the configuration file.
+analysis.  For now you don't need to worry about the contents of the
+configuration file, but for your own analyses you'll need to do some
+customization.  The built-in text editor in RStudio (installed during the
+CHIIMP setup) can edit this format and will provide some features like
+color-coding and automatic indentation for sub-sections.  Other text editors
+are fine too, though Windows doesn't come with a particularly useful text
+editor, so it may be helpful to install one yourself such as [Notepad++].
+After a default install you can simply right-click on a CHIIMP config file and
+click "Edit with Notepad++". On Mac OS TextEdit will work if kept in plain text
+mode.
 
 **Drag and drop `config.yml` onto the CHIIMP icon on the Desktop.**
 
@@ -101,7 +105,7 @@ cases, as the columns specifically refer to the unique sequences identified in
 the data for the first and second most prominent candidate sequences.  (In the
 report, candidate homozygous cases do have the same allele shown twice.)
 
-**Have a look at the other files and folders in `results/`.**
+**Close `summary.csv` and have a look at the other files and folders in `results/`.**
 
 The other output files and folders provide *much* more detail, down to the
 level of each unique sequence identified.  Except for the alignment and
