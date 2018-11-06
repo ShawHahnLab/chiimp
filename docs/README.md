@@ -75,10 +75,11 @@ If the text shows "Done" near the bottom the software ran successfully.  A new
 folder should appear alongside the example spreadsheets and data folder called
 `results`.
 
-(**If no results folder appears or there are errors, please [report an issue]
-and we can help investigate.**)
+(**If no results folder appears or there are errors, please
+[email](mailto:ancon@upenn.edu) or [report an issue] and we can help
+investigate.**)
 
-**Inside the results folder, double-click `report.html`.**
+**Inside the `results/` folder, double-click `report.html`.**
 
 The report is an HTML document summarizing the results of an analysis.  It
 should open automatically in your default web browser.  The most basic summary
