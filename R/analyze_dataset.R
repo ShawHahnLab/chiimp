@@ -11,7 +11,8 @@
 #' in the summary data frame will be sorted according to the ordering of loci in
 #' \code{locus_attrs} and by the sample attributes.  Processed files are stored
 #' separately (as there may be multiple samples per file) and named by input
-#' file path.
+#' file path.  An error is thrown if any locus entries in the given dataset are
+#' not found in the locus attributes data frame.
 #'
 #' @param dataset data frame of sample details as produced by
 #'   \code{\link{prepare_dataset}}.
@@ -53,6 +54,12 @@ analyze_dataset <- function(dataset,
                             summary_function=summarize_sample,
                             known_alleles=NULL,
                             name_args=list()) {
+  if (! all(dataset$Locus %in% locus_attrs$Locus)) {
+    rogue_loci <- unique(dataset$Locus[! dataset$Locus %in% locus_attrs$Locus])
+    msg <- paste("ERROR: Locus names in dataset not in attributes table:",
+                 paste(rogue_loci, collapse = ", "))
+    stop(msg)
+  }
   if (ncores == 0) {
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
