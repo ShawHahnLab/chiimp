@@ -153,10 +153,22 @@ with(test_data, {
     expect_equal(results$samples[["3-B"]]$SeqName[2], "220-fb9a92")
   })
 
-  test_that("analyze_dataset warns of missing loci", {
+  test_that("analyze_dataset handles missing loci", {
     # If there are locus names in dataset$Locus that are not present in the
-    # rownames of locus_attrs, it should throw a warning.
-    skip("test not yet implemented")
+    # rownames of locus_attrs, it should throw an error.
+    data.dir <- tempfile()
+    # the names are case-sensitive!
+    seqs <- lapply(seqs, function(s) {names(s) <- c("a", "b", 1, 2); s})
+    write_seqs(seqs, data.dir)
+    # prepare_dataset tested separately in test_io.R
+    dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
+    expect_error({
+      results <- analyze_dataset(dataset, locus_attrs,
+                                 analysis_opts = list(fraction.min = 0.05),
+                                 summary_opts = list(counts.min = 500),
+                                 nrepeats = 3,
+                                 ncores = 1)
+    }, "ERROR: Locus names in dataset not in attributes table: a, b")
   })
 
 })
