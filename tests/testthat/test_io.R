@@ -3,10 +3,6 @@ context("Test input/output functions")
 
 # helpers -------------------------------------------------------------------
 
-# append an empty string to each the given files
-touch <- function(fps) {
-  lapply(fps, function(fp) cat("", file = fp, append = TRUE))
-}
 
 # Take a version of the raw locus_attrs text from helper_data.R, save it to a
 # temporary file in TSV format, and return the path.
