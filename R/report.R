@@ -352,7 +352,7 @@ plot_heatmap <- function(results,
   if (all(is.na(data)))
     data[, ] <- 0
   if (min(data, na.rm = T) == max(data, na.rm = T))
-    breaks <- range(c(0, max(data), 1))
+    breaks <- range(c(0, max(data, na.rm = TRUE), 1))
 
   pheatmap::pheatmap(data,
                      cluster_rows = F,
