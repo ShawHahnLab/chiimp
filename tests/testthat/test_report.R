@@ -64,7 +64,81 @@ with(test_data, {
     })
   })
 
-  # test plot_cts_per_locus -------------------------------------------------
+
+# test plot_heatmap -------------------------------------------------------
+
+  # empty out columns of a results summary data frame
+  zero_summary <- function(results_summary) {
+    for (x in c("Seq", "Count", "Length", "Name")) {
+      results_summary[, paste0(c("Allele1", "Allele2"), x)] <- NA
+    }
+    for (x in c("Homozygous", "Ambiguous", "Stutter", "Artifact")) {
+      results_summary[[x]] <- FALSE
+    }
+    for (x in c("ProminentSeqs")) {
+      results_summary[[x]] <- 0
+    }
+    return(results_summary)
+  }
+
+  test_that("plot_heatmap renders heatmap of attribute", {
+    # basic test of plot_heatmap.  It should return a pheatmap object.
+    with(results_summary_data, {
+      fp_img <- tempfile()
+      png(fp_img)
+      plot_data <- plot_heatmap(results, "Stutter")
+      dev.off()
+      expect_equal(class(plot_data), "pheatmap")
+    })
+  })
+
+  test_that("plot_heatmap handles empty results", {
+    # heatmap rendering should still work for a completely empty dataset (all NA
+    # entries)
+
+    with(results_summary_data, {
+      fp_img <- tempfile()
+      # empty out certain columns
+      results$summary <- zero_summary(results$summary)
+      # the function should still work as before
+      png(fp_img)
+      plot_data <- plot_heatmap(results, "Stutter")
+      dev.off()
+      expect_equal(class(plot_data), "pheatmap")
+    })
+  })
+
+  test_that("plot_heatmap handles single-value case", {
+    # heatmap rendering should still work for a dataset with only one unique
+    # value
+    with(results_summary_data, {
+      fp_img <- tempfile()
+      # force all entries to a single value
+      results$summary$Stutter <- TRUE
+      png(fp_img)
+      plot_data <- plot_heatmap(results, "Stutter")
+      dev.off()
+      expect_equal(class(plot_data), "pheatmap")
+    })
+  })
+
+  test_that("plot_heatmap handles single-value case with blanks", {
+    # heatmap rendering should still work for a dataset with only one unique
+    # value plus some NA entries
+    with(results_summary_data, {
+      fp_img <- tempfile()
+      # force all entries to a single value
+      results$summary$Stutter <- TRUE
+      results$summary[1:4, ] <- zero_summary(results$summary[1:4, ])
+      png(fp_img)
+      plot_data <- plot_heatmap(results, "Stutter")
+      dev.off()
+      expect_equal(class(plot_data), "pheatmap")
+    })
+  })
+
+# test plot_cts_per_locus -------------------------------------------------
+
 
   test_that("plot_cts_per_locus plots heatmap of counts per matched locus", {
     # It doesn't return anything useful right now, but it should run without
