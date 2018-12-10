@@ -73,11 +73,6 @@ full_analysis <- function(config, dataset=NULL) {
                              summary_function = sample_summary_func,
                              known_alleles = allele.names,
                              name_args = cfg$dataset_analysis$name_args)
-  empties <- sum(sapply(results$files, nrow) == 0)
-  if (empties) {
-    logmsg(paste("WARNING: Zero reads for", empties, "of",
-           length(results$files), "data files"))
-  }
   results$allele.names <- allele.names
   results$locus_attrs <- locus_attrs
   if (cfg$verbose) logmsg("Summarizing results...")

@@ -139,6 +139,14 @@ analyze_dataset <- function(dataset,
                          summary_function = summary_function,
                          analyzed_files = analyzed_files)
   }
+
+  # Check if any of the raw data files had no reads to start with.
+  empties <- sum(sapply(analyzed_files, nrow) == 0)
+  if (empties) {
+    logmsg(paste("WARNING: Zero reads for", empties, "of",
+                 length(analyzed_files), "data files"))
+  }
+
   # Recombined results into a summary data frame and a list of full sample data.
   results <- tidy_analyzed_dataset(dataset, raw.results)
   results$files <- analyzed_files
