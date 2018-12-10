@@ -39,5 +39,6 @@ standard sample attributes from fields in the filenames.  Alternatively, use
 explicitly.  \code{load_dataset} can be used for cases where more than one
 locus is to be analyzed from a single sequencer sample (i.e., multiplexed
 samples), though the \code{locusmap} argument here can allow automatic
-matching of locus names for multiplexed samples.
+matching of locus names for multiplexed samples.  If the directory path given
+does not exist or if no matching files are found, an error is thrown.
 }
