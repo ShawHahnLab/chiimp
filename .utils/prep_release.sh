@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
+# NOTE: assumes working directory is the project directory
+
 set -e
 
 VERSION=$1
 
 chiimp_check='x<-devtools::check();quit(save="no",status=length(c(x$errors,x$warnings)))'
+
+# Run lint script
+./.utils/lint.R
 
 # Update version in download link in README
 VER_MSG="The most recent released version is"
@@ -26,7 +31,9 @@ zip -r chiimp-v${VERISON}.zip chiimp/*
 tar czvf chiimp-v${VERSION}.tgz chiimp/*
 popd
 
-# TODO show reminder of checks before tagging a release:
-# * full test on all three platforms
-# * make sure NEWS.md contains all updates under a heading matching this version
-# * make sure GUIDE.Rmd is up-to-date and the rendered GUIDE.pdf is correct
+echo "REMINDER BEFORE TAGGING RELEASE $VERSION:"
+echo
+echo " * Run full test on Mac OS, Windows, and Linux"
+echo " * Update NEWS.md with all updates under a heading matching this version"
+echo " * Make sure GUIDE.Rmd is up-to-date and rendered GUIDE.pdf is correct"
+echo
