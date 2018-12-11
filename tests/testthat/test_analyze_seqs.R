@@ -14,9 +14,9 @@ with(test_data, {
     expect_equal(chunk[2, "Length"], 194)
     with(chunk, {
       expect_equal(droplevels(MatchingLocus), factor(c("A", "A")))
-      expect_equal(MotifMatch, c(T, T))
-      expect_equal(LengthMatch, c(T, T))
-      expect_equal(Ambiguous, c(F, F))
+      expect_equal(MotifMatch, c(TRUE, TRUE))
+      expect_equal(LengthMatch, c(TRUE, TRUE))
+      expect_equal(Ambiguous, c(FALSE, FALSE))
       expect_equal(Stutter, as.integer(c(NA, NA)))
       expect_equal(Artifact, as.integer(c(NA, NA)))
     })
@@ -86,8 +86,8 @@ with(test_data, {
   test_that("analyze_seqs marks artifact entries", {
     s <- seqs1$A
     # Take that first stutter and make it an artifact instead
-    highest <- names(sort(table(s), decreasing = T)[1])
-    stutter <- names(sort(table(s), decreasing = T)[3])
+    highest <- names(sort(table(s), decreasing = TRUE)[1])
+    stutter <- names(sort(table(s), decreasing = TRUE)[3])
     idx <- s == stutter
     s[idx] <- highest
     substr(s[idx], nchar(stutter), nchar(stutter)) <- "X"

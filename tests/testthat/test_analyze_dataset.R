@@ -102,12 +102,21 @@ with(test_data, {
     write_seqs(seqs, data.dir)
     dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
     known_alleles <- data.frame(Locus = c("1", "1", "A"),
-                                Seq = c("ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT",
-                                        "ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT",
-                                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"),
-                                Name = c("280-a",
-                                         "260-X",
-                                         "different_name_format"))
+      Seq = c(paste0("ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+                     "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+                     "TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+                     "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+                     "TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCA",
+                     "AAAGCTGAAT"),
+              paste0("ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+                     "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+                     "TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+                     "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+                     "TATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT"),
+              paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAGATAGA",
+                     "TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATA",
+                     "GATAGATAGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC")),
+      Name = c("280-a", "260-X", "different_name_format"))
     results <- analyze_dataset(dataset, locus_attrs,
                                analysis_opts = list(fraction.min = 0.05),
                                summary_opts = list(counts.min = 500),
@@ -142,7 +151,8 @@ with(test_data, {
       # Second called allele, if present, will be below the first somewhere.
       # Remaining seqs will be unnamed.
       if (! results$summary[nm, "Homozygous"]) {
-        idx <- match(results$summary[nm, "Allele2Seq"], results$samples[[nm]]$Seq)
+        idx <- match(results$summary[nm, "Allele2Seq"],
+                     results$samples[[nm]]$Seq)
         expect_equal(results$summary[nm, "Allele2Name"],
                      results$samples[[nm]]$SeqName[idx])
       }
@@ -158,7 +168,10 @@ with(test_data, {
     # rownames of locus_attrs, it should throw an error.
     data.dir <- tempfile()
     # the names are case-sensitive!
-    seqs <- lapply(seqs, function(s) {names(s) <- c("a", "b", 1, 2); s})
+    seqs <- lapply(seqs, function(s) {
+      names(s) <- c("a", "b", 1, 2)
+      s
+      })
     write_seqs(seqs, data.dir)
     # prepare_dataset tested separately in test_io.R
     dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")

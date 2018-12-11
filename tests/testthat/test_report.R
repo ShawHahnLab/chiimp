@@ -42,7 +42,7 @@ with(test_data, {
     # created but should be completely blank.
     tbl_known <- data.frame(ID = as.character(1:3), stringsAsFactors = FALSE)
     for (locus in c("A", "B", "1", "2")) {
-      tbl_known[paste(locus, c("1", "2"), sep="_")] <- ""
+      tbl_known[paste(locus, c("1", "2"), sep = "_")] <- ""
     }
     with(results_summary_data, {
       results$summary[, c("Allele1Name", "Allele2Name")] <- NA
@@ -154,7 +154,7 @@ with(test_data, {
     # It should still run without errors
     with(results_summary_data, {
       results <- summarize_dataset(results)
-      results$cts_per_locus[,] <- 0
+      results$cts_per_locus[, ] <- 0
       output <- plot_cts_per_locus(results$cts_per_locus, render = FALSE)
       expect_null(output)
     })
