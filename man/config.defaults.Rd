@@ -22,7 +22,9 @@ Notable Options:
 \itemize{
 \item dp: directory path to input sequence files
 \item pattern: regular expression for the input filename pattern
-\item ord: order of fields in the input filename pattern
+\item ord: order of fields Replicate, Sample, and Locus in in the input
+filename pattern.  For example, if Locus is the first field followed by
+Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 }
 \item output:
 \itemize{

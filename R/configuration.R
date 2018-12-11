@@ -10,7 +10,9 @@
 #'   * dataset_opts:
 #'     * dp: directory path to input sequence files
 #'     * pattern: regular expression for the input filename pattern
-#'     * ord: order of fields in the input filename pattern
+#'     * ord: order of fields Replicate, Sample, and Locus in in the input
+#'     filename pattern.  For example, if Locus is the first field followed by
+#'     Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 #'   * output:
 #'     * dp: directory path for saving output data
 #'   * fp_dataset: file path to table of sample attributes to use, rather than
