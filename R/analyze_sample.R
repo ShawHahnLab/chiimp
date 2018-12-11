@@ -108,9 +108,8 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
 
   switch(length(expected_lengths) + 1,
          # Zero expected lengths: analyze as usual
-         analyze_sample(seq_data, sample.attrs, fraction.min),
+         analyze_sample(seq_data, sample.attrs, fraction.min), {
          # One expected length: may be homozygous or heterozygous.
-         {
            # Find rows of interest, matching expected length.
            idxl <- chunk$Length == expected_lengths
            within(chunk, {
@@ -128,10 +127,9 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
              # And that's it.  We make no comment on the remaining entries and
              # leave them as NA.
            })
-         },
+         }, {
          # Two expected lengths: definitely heterozygous.  No need to consider
          # fractions here.
-         {
            within(chunk, {
              Category <- factor(, levels = categories)
              # Exclude ambiguous sequences first.

@@ -52,7 +52,7 @@ analyze_seqs <- function(seqs, locus_attrs, nrepeats) {
                      Count = count,
                      Length = nchar(seqs),
                      stringsAsFactors = FALSE)
-  data <- data[order(data$Count, decreasing = T), ]
+  data <- data[order(data$Count, decreasing = TRUE), ]
   rownames(data) <- NULL
   # Label rows with the apparent locus by checking primer sequences.  Note that
   # this uses the first matching locus for each row.
@@ -74,7 +74,7 @@ analyze_seqs <- function(seqs, locus_attrs, nrepeats) {
   data$FractionOfTotal <- data$Count / sum(data$Count)
   data$FractionOfLocus <- with(data, {
     total_per_locus <- unlist(lapply(levels(MatchingLocus), function(loc)
-      sum(data[MatchingLocus == loc, "Count"], na.rm = T)))
+      sum(data[MatchingLocus == loc, "Count"], na.rm = TRUE)))
     names(total_per_locus) <- levels(MatchingLocus)
     Count / total_per_locus[MatchingLocus]
   })
@@ -96,7 +96,7 @@ find_matching_primer <- function(sample.data, locus_attrs) {
   matches <- do.call(cbind, lapply(rownames(locus_attrs), function(locus_name) {
     primer <- as.character(locus_attrs[locus_name, "Primer"])
     result <- grepl(primer, substr(sample.data$Seq, 1, nchar(primer) + 10))
-    c(locus_name)[as.numeric( (! result) + 1)]
+    c(locus_name)[as.numeric((! result) + 1)]
   }))
   # Collapse that set down to just the first match for each entry.
   first.matches <- apply(matches, 1, function(m) m[match(TRUE, !is.na(m))])
@@ -172,7 +172,7 @@ find_stutter <- function(sample.data, locus_attrs,
   # across rows for this locus,
   for (locus_name in rownames(locus_attrs)) {
     idxl_main <- sample.data$MatchingLocus == locus_name
-    idxl_main[is.na(idxl_main)] <- F
+    idxl_main[is.na(idxl_main)] <- FALSE
     d <- sample.data[idxl_main, ]
     motif.len <- nchar(as.character(locus_attrs[locus_name, "Motif"]))
     # Any given index in d could be stutter.
@@ -221,7 +221,7 @@ find_artifact <- function(sample.data, locus_attrs,
   # across rows for this locus,
   for (locus_name in rownames(locus_attrs)) {
     idxl_main <- sample.data$MatchingLocus == locus_name
-    idxl_main[is.na(idxl_main)] <- F
+    idxl_main[is.na(idxl_main)] <- FALSE
     d <- sample.data[idxl_main, ]
     # for each length it's the index of the first (highest-count) entry with
     # that length.

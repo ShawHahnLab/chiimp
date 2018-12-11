@@ -109,7 +109,7 @@ load_allele_names <- function(fp, ...) {
 #' @export
 load_genotypes <- function(fp, ...) {
   data <- utils::read.table(fp,
-                            header = T,
+                            header = TRUE,
                             sep = ",",
                             colClasses = "character",
                             na.strings = "",
@@ -145,7 +145,7 @@ load_genotypes <- function(fp, ...) {
 #' @export
 load_dataset <- function(fp, ...) {
   data <- utils::read.table(fp,
-                            header = T,
+                            header = TRUE,
                             sep = ",",
                             colClasses = "character",
                             na.strings = "",
@@ -388,9 +388,9 @@ save_seqfile_data <- function(results_file_data, dp) {
   fps_rel <- remove_shared_root_dir(names(results_file_data))
   invisible(lapply(names(results_file_data), function(n) {
     fp_this <- fps_rel[n]
-    dp_this <- ifelse (dirname(fp_this) != ".",
-                       file.path(dp, dirname(fp_this)),
-                       dp)
+    dp_this <- ifelse(dirname(fp_this) != ".",
+                      file.path(dp, dirname(fp_this)),
+                      dp)
     if (! dir.exists(dp_this)) {
       dir.create(dp_this, recursive = TRUE)
     }
