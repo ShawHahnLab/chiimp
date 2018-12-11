@@ -72,7 +72,7 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
                              lapply(split(sample_data,
                                                  sample_data$Length),
                                  function(chunk) {
-                                   chunk <- chunk[ ! is.na(chunk$SeqName), ]
+                                   chunk <- chunk[! is.na(chunk$SeqName), ]
                                    if (nrow(chunk) == 0)
                                      return()
                                    idx <- which(chunk$Count == max(chunk$Count))

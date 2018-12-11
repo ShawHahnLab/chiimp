@@ -193,4 +193,3 @@ format_pandoc_args <- function(metadata) {
                            function(s) paste0("\"", s, "\"")), sep = ":")
   paste("--metadata=", metadata, sep = "")
 }
-

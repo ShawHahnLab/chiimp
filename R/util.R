@@ -34,8 +34,8 @@ make_entry_id <- function(data) {
   cols.idx <- cols.idx[!is.na(cols.idx)]
   cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
     !all(is.na(data[, x]))
-  }) )]
-  data.names <- data[, cols.idx, drop = F]
+  }))]
+  data.names <- data[, cols.idx, drop = FALSE]
   sapply(1:nrow(data.names), function(nr) {
     entries <- lapply(data.names[nr, !is.na(data.names[nr, ])], as.character)
     do.call(paste, as.list(c(entries, sep = "-")))

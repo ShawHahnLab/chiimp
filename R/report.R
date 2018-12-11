@@ -248,7 +248,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
     graphics::axis(4,
          at = 1:length(seqs),
          labels = labels,
-         tick = F,
+         tick = FALSE,
          padj = -2.5,
          cex.axis = 0.6)
   return(list(seqs = seqs, groups = groups, labels = labels))
@@ -259,7 +259,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
 
 # A skewed 0 -> 1 scale for color-coding distance tables
 make.dist_scale <- function(n) {
-  ( (0:n) / n) ** (1 / 3)
+  ((0:n) / n) ** (1 / 3)
 }
 
 #' Plot Distance Matrix
@@ -351,12 +351,12 @@ plot_heatmap <- function(results,
   # Handle edge cases where all the values are the same and/or all NA
   if (all(is.na(data)))
     data[, ] <- 0
-  if (min(data, na.rm = T) == max(data, na.rm = T))
+  if (min(data, na.rm = TRUE) == max(data, na.rm = TRUE))
     breaks <- range(c(0, max(data, na.rm = TRUE), 1))
 
   pheatmap::pheatmap(data,
-                     cluster_rows = F,
-                     cluster_cols = F,
+                     cluster_rows = FALSE,
+                     cluster_cols = FALSE,
                      display_numbers = labels,
                      breaks = breaks,
                      color = color,
@@ -472,7 +472,7 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
 #' @export
 plot_heatmap_proportions <- function(results, ...) {
   cts <- results$summary[, c("Allele1Count", "Allele2Count")]
-  prop.counted <- rowSums(cts, na.rm = T) / results$summary$CountLocus
+  prop.counted <- rowSums(cts, na.rm = TRUE) / results$summary$CountLocus
   results$summary$ProportionCounted <- prop.counted
   # A color scale going from red at 0 to white at 1, but values skewed toward
   # white.
@@ -515,7 +515,7 @@ plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, render=TRUE, ...) {
   if (all(is.na(cts_per_locus))) {
     breaks <- 0:1 # handle the all-zero case
   } else {
-    breaks <- 0:ceiling(max(cts_per_locus, na.rm = T))
+    breaks <- 0:ceiling(max(cts_per_locus, na.rm = TRUE))
   }
   color <- viridis::viridis(max(breaks))
 
@@ -523,8 +523,8 @@ plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, render=TRUE, ...) {
     cts_per_locus <- cts_per_locus[idx.row, ]
   }
   pheatmap::pheatmap(cts_per_locus,
-                     cluster_rows = F,
-                     cluster_cols = F,
+                     cluster_rows = FALSE,
+                     cluster_cols = FALSE,
                      gaps_col = c(1, 2),
                      color = color,
                      breaks = breaks,
