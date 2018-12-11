@@ -1,3 +1,19 @@
+# chiimp dev
+
+ * Fixed heatmap plotting via updated `plot_heatmap` for cases with blank
+   results and only one unique non-blank value ([#22]).
+ * Added check in `analyze_dataset` for locus name mismatches between dataset
+   table and locus attributes table ([#21]).
+ * Added check in `prepare_dataset` for missing data directory ([#20]).
+ * Added check in `prepare_dataset` for zero-detected-files case.
+ * Added check in `load_dataset` for missing data files.
+ * Added check in `full_analysis` to warn if any input data files are
+   completely empty.
+
+[#22]: https://github.com/ShawHahnLab/chiimp/issues/22
+[#21]: https://github.com/ShawHahnLab/chiimp/issues/21
+[#20]: https://github.com/ShawHahnLab/chiimp/issues/20
+
 # chiimp 0.2.1
 
  * Minor improvements to release process ([#14]).
