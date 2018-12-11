@@ -15,6 +15,23 @@ list of results, with the full configuration list included as
   "config."
 }
 \description{
-Read configuration from command-line arguments and run
-\code{\link{full_analysis}}.
+A small wrapper function to read a configuration file path from command-line
+arguments, load the configuration data (see \code{\link{load_config}}), and
+run \code{\link{full_analysis}}.
+}
+\examples{
+# Set up a temporary copy of the CHIIMP test data
+example_dir <- tempfile()
+dir.create(example_dir)
+setwd(example_dir)
+test_data$write_seqs(test_data$seqs,
+                     "str-dataset",
+                      "Replicate1-Sample\%s-\%s.fasta")
+locus_attrs_path <- system.file("example_locus_attrs.csv",
+                                package = "chiimp")
+file.copy(locus_attrs_path, "locus_attrs.csv")
+# Run the example analysis
+config_path <- system.file("example_config.yml", package = "chiimp")
+results <- main(config_path)
+
 }

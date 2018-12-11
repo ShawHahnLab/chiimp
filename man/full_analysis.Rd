@@ -21,3 +21,21 @@ list of results, with the full configuration list included as
 Given a list of configuration options, run all aspects of a microsatellite
 analysis, and save the corresponding output files.
 }
+\examples{
+# Set up a temporary copy of the CHIIMP test data
+example_dir <- tempfile()
+dir.create(example_dir)
+setwd(example_dir)
+test_data$write_seqs(test_data$seqs,
+                     "str-dataset",
+                      "Replicate1-Sample\%s-\%s.fasta")
+locus_attrs_path <- system.file("example_locus_attrs.csv",
+                                package = "chiimp")
+file.copy(locus_attrs_path, "locus_attrs.csv")
+# Run the example analysis
+config_path <- system.file("example_config.yml", package = "chiimp")
+config <- load_config(config_path)
+results <- full_analysis(config)
+
+
+}
