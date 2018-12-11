@@ -9,6 +9,7 @@ VERSION=$1
 chiimp_check='x<-devtools::check();quit(save="no",status=length(c(x$errors,x$warnings)))'
 
 # Run lint script
+echo "Running lint check"
 ./.utils/lint.R
 
 # Update version in download link in README
@@ -31,6 +32,7 @@ zip -r chiimp-v${VERISON}.zip chiimp/*
 tar czvf chiimp-v${VERSION}.tgz chiimp/*
 popd
 
+echo
 echo "REMINDER BEFORE TAGGING RELEASE $VERSION:"
 echo
 echo " * Run full test on Mac OS, Windows, and Linux"
