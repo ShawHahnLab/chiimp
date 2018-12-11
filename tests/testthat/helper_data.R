@@ -16,7 +16,7 @@ test_data <- within(list(), {
   # will.
   f.locus_attrs <- unique(system.file(c("inst/example_locus_attrs.csv",
                                         "example_locus_attrs.csv"),
-                                      package = getPackageName()))
+                                      package = methods::getPackageName()))
   txt.locus_attrs <- readChar(f.locus_attrs,
                               nchars = file.info(f.locus_attrs)$size)
   locus_attrs <- read.table(f.locus_attrs,
