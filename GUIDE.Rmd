@@ -4,7 +4,7 @@
 
 title: "CHIIMP User Guide"
 author: "Jesse Connell"
-date: "2018/07/23"
+date: "2018/11/07"
 output:
   pdf_document:
     toc: true
@@ -42,16 +42,19 @@ are installed, follow the specific instructions below for your operating system.
 On Windows, double-click the `install_windows.cmd` script.  This will install
 the package and R dependencies, and create a desktop shortcut.
 
+### Mac OS
+
+On Mac OS, double-click the `install_mac.command` shell script to automatically
+install the package along with R dependencies and create a desktop alias.  If
+the install script won't open because of a security warning, you can
+right-click (control+click) and select "Open" in the menu that appears.
+Apple has specific instructions [here](https://support.apple.com/kb/PH25088?locale=en_US)
+about these security setings.
+
 ### Linux
 
 On Linux, run the `install_linux.sh` shell script to automatically install the 
 package along with R dependencies.  An icon for the program is created at 
-`$HOME/Desktop/CHIIMP`.
-
-### Mac OS
-
-On Mac OS, run the `install_mac.command` shell script to automatically install
-the package along with R dependencies.  An icon for the program is created at
 `$HOME/Desktop/CHIIMP`.
 
 ## Input Data Organization

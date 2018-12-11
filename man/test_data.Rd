@@ -4,7 +4,7 @@
 \name{test_data}
 \alias{test_data}
 \title{Helper Data for Tests}
-\format{An object of class \code{list} of length 17.}
+\format{An object of class \code{list} of length 18.}
 \usage{
 test_data
 }

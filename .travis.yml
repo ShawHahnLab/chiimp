@@ -11,3 +11,4 @@ script:
   - R CMD build .
   - R CMD check *tar.gz
   - ./inst/bin/demo.sh
+  - ./inst/bin/demo_empty.sh

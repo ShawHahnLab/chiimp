@@ -125,7 +125,7 @@ load_allele_names <- function(fp, ...) {
 #' @export
 load_genotypes <- function(fp, ...) {
   data <- utils::read.table(fp,
-                            header = T,
+                            header = TRUE,
                             sep = ",",
                             colClasses = "character",
                             na.strings = "",
@@ -166,14 +166,19 @@ load_genotypes <- function(fp, ...) {
 #' @export
 load_dataset <- function(fp, ...) {
   data <- utils::read.table(fp,
-                            header = T,
+                            header = TRUE,
                             sep = ",",
                             colClasses = "character",
                             na.strings = "",
                             ...)
   col.missing <- is.na(match(dataset_cols, colnames(data)))
+  files.missing <- ! file.exists(data$Filename)
+  if (any(files.missing)) {
+    logmsg(paste("WARNING: Missing", sum(files.missing), "of",
+                 length(files.missing), "data files"))
+  }
   if (any(col.missing)) {
-    warning(paste("Missing columns in genotypes table:",
+    warning(paste("Missing columns in dataset table:",
                   dataset_cols[col.missing]))
   }
   rownames(data) <- make_rownames(data)
@@ -202,14 +207,15 @@ save_dataset <- function(data, fp, ...) {
 
 #' Extract Sample Attributes from Filenames
 #'
-#' Find files matching a pattern in a given directory, and build a data frame of
-#' standard sample attributes from fields in the filenames.  Nested directory
-#' structures are supported.  Alternatively, use \code{\link{load_dataset}} to
-#' load a spreadsheet of sample attributes explicitly.  \code{load_dataset} can
-#' be used for cases where more than one locus is to be analyzed from a single
-#' sequencer sample (i.e., multiplexed samples), though the \code{locusmap}
-#' argument here can allow automatic matching of locus names for multiplexed
-#' samples.
+#' Find files matching a pattern in a given directory, and build a data frame
+#' of standard sample attributes from fields in the filenames.  Nested
+#' directory structures are supported.  Alternatively, use
+#' \code{\link{load_dataset}} to load a spreadsheet of sample attributes
+#' explicitly.  \code{load_dataset} can be used for cases where more than one
+#' locus is to be analyzed from a single sequencer sample (i.e., multiplexed
+#' samples), though the \code{locusmap} argument here can allow automatic
+#' matching of locus names for multiplexed samples.  If the directory path
+#' given does not exist or if no matching files are found, an error is thrown.
 #'
 #' @param dp directory path to search for matching data files.
 #' @param pattern regular expression to use for parsing filenames.  There should
@@ -233,12 +239,20 @@ save_dataset <- function(data, fp, ...) {
 #' @export
 prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
                             locusmap=NULL) {
+  if (! dir.exists(dp)) {
+    stop(paste("ERROR: directory path for data files does not exist:",
+               dp))
+  }
   # get all matching filenames and extract substrings
   seq_files <- list.files(path = dp,
                           pattern = pattern,
                           full.names = TRUE,
                           recursive = TRUE,
                           include.dirs = FALSE)
+  if (! length(seq_files)) {
+    stop(paste("ERROR: no data files found:",
+               dp))
+  }
   seq_file_attrs <- stringr::str_match_all(seq_files, pattern)
   if (! all(sapply(seq_file_attrs, length) == length(ord) + 1)) {
     warning("Some filenames did not match the given pattern")
@@ -398,9 +412,9 @@ save_seqfile_data <- function(results_file_data, dp) {
   fps_rel <- remove_shared_root_dir(names(results_file_data))
   invisible(lapply(names(results_file_data), function(n) {
     fp_this <- fps_rel[n]
-    dp_this <- ifelse (dirname(fp_this) != ".",
-                       file.path(dp, dirname(fp_this)),
-                       dp)
+    dp_this <- ifelse(dirname(fp_this) != ".",
+                      file.path(dp, dirname(fp_this)),
+                      dp)
     if (! dir.exists(dp_this)) {
       dir.create(dp_this, recursive = TRUE)
     }

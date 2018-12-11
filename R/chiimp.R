@@ -257,20 +257,3 @@ format_pandoc_args <- function(metadata) {
                            function(s) paste0("\"", s, "\"")), sep = ":")
   paste("--metadata=", metadata, sep = "")
 }
-
-#' Write Log Message
-#'
-#' Print a log message to the standard error stream.
-#'
-#' @param msg text to print.
-#' @param col2 extra text to show at right margin; defaults to current time.
-#' @param end ending to concatenate to message; defaults to newline character.
-logmsg <- function(msg, col2=as.character(Sys.time()), end="\n") {
-  if (!is.null(col2)) {
-    # right-justify col2, aim to fit total msg within 80 characters
-    pad <- max(1, 80 - nchar(msg) - nchar(col2))
-    msg <- paste0(msg, paste(rep(" ", pad),  collapse = ""), col2)
-  }
-  # stderr: file descriptor 2
-  cat(paste0(msg, end), file = 2)
-}
