@@ -10,7 +10,13 @@
 #'
 #' This list is a bundle of shared data and functions for running unit tests.
 test_data <- within(list(), {
-  f.locus_attrs <- devtools::package_file("inst", "example_locus_attrs.csv")
+  # Careful!  When running via a package check we might be in temporary
+  # installed copy in /tmp or elsewhere, and probably won't have the "inst"
+  # directory anymore.  Alternatively when running with devtools::test() we
+  # will.
+  f.locus_attrs <- unique(system.file(c("inst/example_locus_attrs.csv",
+                                        "example_locus_attrs.csv"),
+                                      package = getPackageName()))
   txt.locus_attrs <- readChar(f.locus_attrs,
                               nchars = file.info(f.locus_attrs)$size)
   locus_attrs <- read.table(f.locus_attrs,
@@ -18,7 +24,6 @@ test_data <- within(list(), {
                             stringsAsFactors = FALSE,
                             sep = ",")
   rownames(locus_attrs) <- locus_attrs$Locus
-  rm(f.locus_attrs)
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
                         "LengthMatch", "Ambiguous", "Stutter", "Artifact",
