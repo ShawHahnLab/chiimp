@@ -92,7 +92,7 @@ with(test_data, {
 
   test_that("load_locus_attrs complains for repeated loci", {
     # It should throw a warning if any Locus names are repeated.
-    txt.wrong <- gsub("\nB ", "\nA ", txt.locus_attrs)
+    txt.wrong <- gsub("\nB,", "\nA,", txt.locus_attrs)
     fp <- write_locus_attrs(txt.wrong)
     expect_warning({
       locus_attrs_test <- load_locus_attrs(fp)
@@ -120,7 +120,7 @@ with(test_data, {
     touch(dataset_known$Filename)
     # Write dataset CSV
     fp <- tempfile()
-    write.csv(dataset_known, file = fp, na = "", row.names = F)
+    write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
     expect_silent({
       dataset <- load_dataset(fp)
     })
@@ -135,7 +135,7 @@ with(test_data, {
     dir.create(data.dir)
     setwd(data.dir)
     fp <- tempfile()
-    write.csv(dataset_known, file = fp, na = "", row.names = F)
+    write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
     # expect_message and capture_messages both do NOT catch text send to stderr,
     # though capture.output(..., type = "message") does.
     msg <- capture.output({
@@ -270,8 +270,8 @@ with(test_data, {
     # move both sets into a single parent directory
     dp <- tempfile()
     dir.create(dp)
-    file.copy(data1$dp, dp, recursive=TRUE)
-    file.copy(data2$dp, dp, recursive=TRUE)
+    file.copy(data1$dp, dp, recursive = TRUE)
+    file.copy(data2$dp, dp, recursive = TRUE)
     # build dataset from parent directory
     dataset <- prepare_dataset(dp, data1$pattern)
     expect_equal(colnames(dataset),

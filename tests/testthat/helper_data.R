@@ -10,15 +10,14 @@
 #'
 #' This list is a bundle of shared data and functions for running unit tests.
 test_data <- within(list(), {
-  txt.locus_attrs <- "Locus   LengthMin  LengthMax    LengthBuffer   Motif   Primer                  ReversePrimer
-A        131        179          20             TAGA    TATCACTGGTGTTAGTCCTCTG  CACAGTTGTGTGAGCCAGTC
-B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    TAGGAGCCTGTGGTCCTGTT
-1        232        270          20             TATC    ACAGTCAAGAATAACTGCCC    CTGTGGCTCAAAAGCTGAAT
-2        218        337          20             TCCA    TTGTCTCCCCAGTTGCTA      TCTGTCATAAACCGTCTGCA"
-  f.locus_attrs <- textConnection(txt.locus_attrs)
-  locus_attrs <- read.table(f.locus_attrs, header = T, stringsAsFactors = F)
+  f.locus_attrs <- devtools::package_file("inst", "example_locus_attrs.csv")
+  txt.locus_attrs <- readChar(f.locus_attrs,
+                              nchars = file.info(f.locus_attrs)$size)
+  locus_attrs <- read.table(f.locus_attrs,
+                            header = TRUE,
+                            stringsAsFactors = FALSE,
+                            sep = ",")
   rownames(locus_attrs) <- locus_attrs$Locus
-  close(f.locus_attrs)
   rm(f.locus_attrs)
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
@@ -33,7 +32,7 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
   make.seq_junk <- function(N) {
     nucleotides <- c("A", "T", "C", "G")
     vapply(runif(N, min = 1, max = 20), function(L)
-      paste0(sample(nucleotides, L, replace = T), collapse = ""),
+      paste0(sample(nucleotides, L, replace = TRUE), collapse = ""),
       "character")
   }
 
@@ -83,7 +82,7 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
     if (cross_contam_ratio > 0) {
       others <- locus_attrs[-match(locus_name, rownames(locus_attrs)), ]
       for (i in 1:nrow(others)) {
-        idx <- seq(i, length(seqs), cross_contam_ratio*nrow(others))
+        idx <- seq(i, length(seqs), cross_contam_ratio * nrow(others))
         seqs[idx] <- simulate.seqs(locus_name = others$Locus[i],
                                    locus_attrs = locus_attrs,
                                    N = length(idx),
