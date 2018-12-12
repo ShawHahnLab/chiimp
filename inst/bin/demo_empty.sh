@@ -16,5 +16,4 @@ done
 cp "$dir/../example_locus_attrs.csv" "$scratch/locus_attrs.csv"
 cp "$dir/../example_config.yml" "$scratch/config.yml"
 cd "$scratch"
-echo "dataset_analysis: { ncores: 1 }" >> "config.yml"
 "$dir/chiimp" "config.yml"
