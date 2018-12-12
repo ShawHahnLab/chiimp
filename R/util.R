@@ -124,7 +124,7 @@ order_alleles <- function(nms) {
 #' the given data frame.  Names from the given known_alleles data frame will be
 #' used for recognized sequences.
 #'
-#' @param data data frame containing Allele1Seq and Allele2Seq colums such as
+#' @param data data frame containing Allele1Seq and Allele2Seq columns such as
 #'   the first list item produced by \code{\link{analyze_dataset}}.
 #' @param known_alleles data frame of custom allele names as defined for
 #'   \code{\link{load_allele_names}}.  if NULL only automatically generated

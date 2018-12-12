@@ -37,5 +37,4 @@ config_path <- system.file("example_config.yml", package = "chiimp")
 config <- load_config(config_path)
 results <- full_analysis(config)
 
-
 }

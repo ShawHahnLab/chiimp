@@ -16,10 +16,10 @@ factor defining genotyping result category for every row of the input
 data frame.
 }
 \description{
-For a given results summary data frame that has CorrectAllele1Seq and Correct
-Allele2Seq columns (such as produced by \code{\link{match_known_genotypes}})
-added, create a factor labeling every row of the input data frame by its
-genotyping outcome.
+For a given results summary data frame that has \code{CorrectAllele1Seq} and
+\code{CorrectAllele2Seq} columns (such as produced by
+\code{\link{match_known_genotypes}}) added, create a factor labeling every
+row of the input data frame by its genotyping outcome.
 }
 \details{
 Levels in the returned factor, in order:
@@ -32,6 +32,6 @@ were supplied.
 but no second allele was called.
 }
 
-Cases that should not occur, such as CorrectAllele1Seq and CorrectAllele2Seq
-both set to NA, map to NA in the returned factor.
+Cases that should not occur, such as \code{CorrectAllele1Seq} and
+\code{CorrectAllele2Seq} both set to NA, map to NA in the returned factor.
 }

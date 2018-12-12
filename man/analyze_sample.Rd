@@ -62,12 +62,13 @@ non-stutter artifact sequence criteria as defined by the Artifact column of
 \code{\link{summarize_sample}}.
 
 \item \code{analyze_sample_guided}: version of sample analysis guided by expected
-sequence length values.  Additional items ExpectedLength1 and optionally
-ExpectedLength2 can be supplied in the \code{sample.attrs} list.  If NA or
-missing the behavior will match \code{analyze_sample}.  If two expected
-lengths are given, the fraction.min argument is ignored.  If at least one
-expected length is given, the stutter/artifact filtering is disabled.  From
-here use \code{\link{summarize_sample_guided}}.
+sequence length values.  Additional items \code{ExpectedLength1} and
+optionally \code{ExpectedLength2} can be supplied in the
+\code{sample.attrs} list.  If NA or missing the behavior will match
+\code{analyze_sample}.  If two expected lengths are given, the fraction.min
+argument is ignored.  If at least one expected length is given, the
+stutter/artifact filtering is disabled.  From here use
+\code{\link{summarize_sample_guided}}.
 
 \item \code{analyze_sample_naive}: version of sample analysis without
 stutter/artifact filtering.  From here use \code{\link{summarize_sample}}

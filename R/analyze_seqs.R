@@ -9,27 +9,27 @@
 #'
 #' @details
 #' Columns in the returned data frame:
-#'  * Seq: sequence text for each unique sequence
-#'  * Count: integer count of occurrences of this exact sequence
-#'  * Length: integer sequence length
-#'  * MatchingLocus: factor for the name of the locus matching each sequence,
-#'    by checking the primer
-#'  * MotifMatch: logical: are there are least \code{nrepeats} perfect
+#'  * \code{Seq}: sequence text for each unique sequence
+#'  * \code{Count}: integer count of occurrences of this exact sequence
+#'  * \code{Length}: integer sequence length
+#'  * \code{MatchingLocus}: factor for the name of the locus matching each
+#'  sequence, by checking the primer
+#'  * \code{MotifMatch}: logical: are there are least \code{nrepeats} perfect
 #'    adjacent repeats of the STR motif for the matching locus?
-#'  * LengthMatch: logical: is the sequence length within the expected range
-#'    for the matching locus?
-#'  * Ambiguous: logical: are there unexpected characters in the sequence
+#'  * \code{LengthMatch}: logical: is the sequence length within the expected
+#'  range for the matching locus?
+#'  * \code{Ambiguous}: logical: are there unexpected characters in the sequence
 #'  content?
-#'  * Stutter: integer: for any sequence that looks like potential PCR stutter,
-#'    the index of the row that may be the source of the stutter band.
-#'  * Artifact: integer: for any sequence that looks like potential PCR artifact
-#'  (other than stutter), the index of the row that may be the source of the
-#'  stutter band.
-#'  * FractionOfTotal: numeric fraction of the number of sequences
+#'  * \code{Stutter}: integer: for any sequence that looks like potential PCR
+#'  stutter, the index of the row that may be the source of the stutter band.
+#'  * \code{Artifact}: integer: for any sequence that looks like potential PCR
+#'  artifact (other than stutter), the index of the row that may be the source
+#'  of the stutter band.
+#'  * \code{FractionOfTotal}: numeric fraction of the number of sequences
 #'    represented by each unique sequence compared to the total.
-#'  * FractionOfLocus: numeric fraction of the number of sequences represented
-#'    by each unique sequence compared to the total for that particular
-#'    matching locus.
+#'  * \code{FractionOfLocus}: numeric fraction of the number of sequences
+#'  represented by each unique sequence compared to the total for that
+#'  particular matching locus.
 #' @md
 #'
 #' @param seqs character vector containing sequences.
@@ -214,8 +214,8 @@ find_stutter <- function(sample.data, locus_attrs,
 #' Searches a processed STR sample for entries that may be PCR artifacts, other
 #' than stutter, from another entry in the sample.  Potential artifacts are
 #' sequences with counts lower than another sequence by a given ratio and
-#' sequence length within 1 bp of the other sequence.  This only considers
-#' STR-labeled rows and requires a given entry to have counts at most
+#' sequence length within 1 nucleotide of the other sequence.  This only
+#' considers STR-labeled rows and requires a given entry to have counts at most
 #' \code{count.ratio_max} compared to the candidate "source" entry to be
 #' considered an artifact.  Sequence content is not currently considered, just
 #' relative sequence lengths and counts.

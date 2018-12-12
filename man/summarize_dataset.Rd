@@ -25,11 +25,12 @@ additional entries for inter-sample and inter-locus analyses.
 \details{
 Additional entries in the returned list:
 \itemize{
-\item alignments: inter-allele alignments for each locus, from
+\item \code{alignments}: inter-allele alignments for each locus, from
 \code{\link{align_alleles}}.
-\item dist_mat: inter-sample distance matrix, from \code{\link{make_dist_mat}}.
-\item dist_mat_known: if genotypes.known is given, this distance matrix of
-sample-to-individual values will be present, from
+\item \code{dist_mat}: inter-sample distance matrix, from
+\code{\link{make_dist_mat}}.
+\item \code{dist_mat_known}: if genotypes.known is given, this distance matrix
+of sample-to-individual values will be present, from
 \code{\link{make_dist_mat_known}}.
 }
 
@@ -38,12 +39,13 @@ If genotypes.known is given \emph{and} a Name column is present in
 genotypes.known and additional columns will be present in the summary data
 frame:
 \itemize{
-\item CorrectAllele1Seq: One correct allele sequence for the individual.  The
-order of this and \code{CorrectAllele2Seq} will be matched to
+\item \code{CorrectAllele1Seq}: One correct allele sequence for the individual.
+The order of this and \code{CorrectAllele2Seq} will be matched to
 \code{Allele1Seq} and \code{Allele2Seq} if possible.  See
 \code{\link{match_known_genotypes}}.
-\item CorrectAllele2Seq: A second correct allele sequence, as above.
-\item GenotypeResult: Categorization for each entry as Correct, Incorrect,
-Blank, or Dropped Allele.  See \code{\link{categorize_genotype_results}}.
+\item \code{CorrectAllele2Seq}: A second correct allele sequence, as above.
+\item \code{GenotypeResult}: Categorization for each entry as Correct,
+Incorrect, Blank, or Dropped Allele.  See
+\code{\link{categorize_genotype_results}}.
 }
 }

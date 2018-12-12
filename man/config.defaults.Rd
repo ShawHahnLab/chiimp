@@ -19,22 +19,22 @@ itself to see all of the build-time defaults.
 \details{
 Notable Options:
 \itemize{
-\item dataset_opts:
+\item \code{dataset_opts}:
 \itemize{
-\item dp: directory path to input sequence files
-\item pattern: regular expression for the input filename pattern
-\item ord: order of fields Replicate, Sample, and Locus in in the input
-filename pattern.  For example, if Locus is the first field followed by
-Replicate and Sample, set \code{ord=c(3, 1, 2)}.
+\item \code{dp}: directory path to input sequence files
+\item \code{pattern}: regular expression for the input filename pattern
+\item \code{ord}: order of fields Replicate, Sample, and Locus in in the
+input filename pattern.  For example, if Locus is the first field
+followed by Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 }
-\item output:
+\item \code{output}:
 \itemize{
-\item dp: directory path for saving output data
+\item \code{dp}: directory path for saving output data
 }
-\item fp_dataset: file path to table of sample attributes to use, rather than
-detecting via dataset_opts
-\item fp_locus_attrs: file path to locus attributes CSV file
-\item fp_genotypes_known: file path to known genotypes CSV file
+\item \code{fp_dataset}: file path to table of sample attributes to use, rather
+than detecting via dataset_opts
+\item \code{fp_locus_attrs}: file path to locus attributes CSV file
+\item \code{fp_genotypes_known}: file path to known genotypes CSV file
 }
 }
 \keyword{datasets}
