@@ -1,9 +1,117 @@
 # Run a full microsatellite analysis and handle configuration and command-line
 # execution.
 
-#' Analyze Microsatellites
+#' CHIIMP
 #'
-#' Analyze DNA microsatellites in high-throughput sequencing datasets.
+#' Computational, High-throughput Individual Identification through
+#' Microsatellite Profiling.  For a conceptual overview see the latest
+#' [user guide](https://shawhahnlab.github.io/chiimp/GUIDE.pdf) and
+#' [additional documentation](https://shawhahnlab.github.io/chiimp/docs/) at
+#' <https://shawhahnlab.github.io/chiimp/>.
+#'
+#' @details
+#'
+#' Starting from file inputs and producing file outputs, the overall workflow
+#' (handled by \code{\link{full_analysis}} as a configuration-driven wrapper for
+#' the entire process) is:
+#'
+#' * Load input data.  The input spreadsheets are text files using
+#'   comma-separated values (CSV).
+#'   * Load data frame of sample information from a spreadsheet via
+#'     \code{\link{load_dataset}} or directly from filenames via
+#'     \code{\link{prepare_dataset}}.
+#'   * Load data frame of locus attributes via \code{\link{load_locus_attrs}}
+#'   * Optionally, load data frame of names for allele sequences via
+#'     \code{\link{load_allele_names}}.
+#'   * Optionally, load data frame of known genotypes for named individuals via
+#'     \code{\link{load_genotypes}}.
+#' * Analyze dataset via \code{\link{analyze_dataset}}
+#'   * Load each sequence data file into a character vector with
+#'     \code{\link{load_seqs}} and process into a dereplicated data frame with
+#'     \code{\link{analyze_seqs}}.
+#'   * For each sample, filter the sequences from the relevant per-file data
+#'     frame to just those matching the expected locus and identify possible
+#'     alleles, via \code{\link{analyze_sample}}.  (There may be a many-to-one
+#'     relationship of samples to files, for example with sequencer
+#'     multiplexing.)
+#'   * Process each per-sample data frames into a summary list of attributes
+#'     giving alleles identified and related information, via
+#'     \code{\link{summarize_sample}}.
+#'   * Organize \code{analyze_dataset} results into a list of per-file data
+#'     frames, a list of per-sample data frames, and a single summary data
+#'     frame across all samples.
+#' * Summarize results and add additional comparisons (cross-sample and to
+#'   known-individual) via \code{\link{summarize_dataset}}.
+#'   * Tabulate sequence counts per sample matching each locus' primer via
+#'     \code{\link{tally_cts_per_locus}}.
+#'   * Align identified alleles for each locus via
+#'     \code{\link{align_alleles}}.
+#'   * Create a sample-to-sample distance matrix of allele mismatches via
+#'     \code{\link{make_dist_mat}}.
+#'   * If genotypes for known individuals were provided, create a
+#'     sample-to-known-individual distance matrix via
+#'     \code{\link{make_dist_mat_known}}.
+#'   * If identities of samples were provided, score genotyping success via
+#'     \code{\link{match_known_genotypes}} and
+#'     \code{\link{categorize_genotype_results}}.
+#' * Save analysis results to files.  Spreadsheets are in CSV format for output
+#'   as well as input.  Some output files are in FASTA format (alignments and
+#'   alleles) or are PNG images (alignment visualization and sequence count
+#'   histograms).  If specified in the configuration, \code{\link{saveRDS}} is
+#'   called on the entire output as well, saving to \code{results.rds} by
+#'   default.
+#' * Create an HTML report document summarizing all results.
+#'
+#' For defaults used in the configuration, see \code{\link{config.defaults}}.
+#'
+#' The workflow above outlines CHIIMP's behavior when called as a standalone
+#' program, where \code{\link{main}} loads a configuration file into a nested
+#' list of options and calls \code{\link{full_analysis}}.  The public functions
+#' linked above can also be used idependently; see the documentation and code
+#' examples for the individual functions for more information.
+#'
+#'
+#' **The Package structure of the source files, grouped by topic:**
+#'  * Main Interface:
+#'    * chiimp.R: Main entry point for command-line usage (\code{\link{main}})
+#'      and R usage (\code{\link{full_analysis}}).
+#'  * Data Analysis:
+#'    * analyze_dataset.R: High-level interface to analyze all samples across a
+#'      given dataset (\code{\link{analyze_dataset}}); used by
+#'      \code{\link{full_analysis}} to manage the main part of the processing.
+#'    * summarize_dataset.R: High-level interface to provide inter-sample and
+#'      inter-locus analyses (\code{\link{summarize_dataset}}); used by
+#'      \code{\link{full_analysis}} to manage the second stage of the
+#'      processing.
+#'    * analyze_seqs.R: Low-level interface to convert raw sequence input to a
+#'      data frame of unique sequences (\code{\link{analyze_seqs}}); used by
+#'      \code{\link{analyze_dataset}}.
+#'    * analyze_sample.R: Low-level interface to extract per-locus details from
+#'      a data frame of unique sequences (\code{\link{analyze_sample}}); used by
+#'      \code{\link{analyze_dataset}}.
+#'    * summarize_sample.R: Low-level interface to condense each sample data
+#'      frame into a a concise list of consistent attributes, suitable for
+#'      binding together across samples for a dataset
+#'      (\code{\link{summarize_sample}}); used by \code{\link{analyze_dataset}}.
+#'    * categorize.R: Low-level helper functions used by
+#'      \code{\link{summarize_dataset}} for samples with known identity.
+#'  * Plotting and reporting:
+#'    * report.R: Various plotting and summarizing functions used when rendering
+#'      a report in \code{\link{full_analysis}}.
+#'    * histogram.R: Sequence histogram plotting tools (\code{\link{histogram}})
+#'      as used during \code{\link{full_analysis}}.
+#'    * markdown.R: Various helper functions for adding tables and plots to an R
+#'      Markdown report as used in \code{\link{full_analysis}}.
+#'  * Utility Functions and Configuration:
+#'    * configuration.R: The default configuration options
+#'    (\code{\link{config.defaults}}) used by \code{\link{full_analysis}}.
+#'    * io.R: various helper input/output functions used loading and saving
+#'    sequence data files, spreadsheets, and plots used in multiple parts of the
+#'    package.
+#'    * util.R: Various helper functions used in multiple parts of the package.
+#'
+#' @md
+#'
 "_PACKAGE"
 
 # Analysis ----------------------------------------------------------------
@@ -20,6 +128,22 @@
 #'
 #' @return list of results, with the full configuration list included as
 #'   "config."
+#'
+#' @examples
+#' # Set up a temporary copy of the CHIIMP test data
+#' example_dir <- tempfile()
+#' dir.create(example_dir)
+#' setwd(example_dir)
+#' test_data$write_seqs(test_data$seqs,
+#'                      "str-dataset",
+#'                       "Replicate1-Sample%s-%s.fasta")
+#' locus_attrs_path <- system.file("example_locus_attrs.csv",
+#'                                 package = "chiimp")
+#' file.copy(locus_attrs_path, "locus_attrs.csv")
+#' # Run the example analysis
+#' config_path <- system.file("example_config.yml", package = "chiimp")
+#' config <- load_config(config_path)
+#' results <- full_analysis(config)
 #'
 #' @export
 full_analysis <- function(config, dataset=NULL) {
@@ -97,14 +221,30 @@ full_analysis <- function(config, dataset=NULL) {
 
 #' Handle full microsatellite analysis from command-line
 #'
-#' Read configuration from command-line arguments and run
-#' \code{\link{full_analysis}}.
+#' A small wrapper function to read a configuration file path from command-line
+#' arguments, load the configuration data (see \code{\link{load_config}}), and
+#' run \code{\link{full_analysis}}.
 #'
 #' @param args optional character vector of arguments to use rather than those
 #'   detected with \code{\link[base]{commandArgs}}.
 #'
 #' @return list of results, with the full configuration list included as
 #'   "config."
+#'
+#' @examples
+#' # Set up a temporary copy of the CHIIMP test data
+#' example_dir <- tempfile()
+#' dir.create(example_dir)
+#' setwd(example_dir)
+#' test_data$write_seqs(test_data$seqs,
+#'                      "str-dataset",
+#'                       "Replicate1-Sample%s-%s.fasta")
+#' locus_attrs_path <- system.file("example_locus_attrs.csv",
+#'                                 package = "chiimp")
+#' file.copy(locus_attrs_path, "locus_attrs.csv")
+#' # Run the example analysis
+#' config_path <- system.file("example_config.yml", package = "chiimp")
+#' results <- main(config_path)
 #'
 #' @export
 main <- function(args=NULL) {

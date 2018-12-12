@@ -4,7 +4,8 @@
 #' aspects of the microsatellite analysis.  These can be overridden by passing a
 #' list to \code{\link{full_analysis}} with entries of the same names, or via
 #' the configuration file passed to \code{\link{main}} and read via
-#' \code{\link{load_config}}.
+#' \code{\link{load_config}}.  Check the contents of \code{config.defaults}
+#' itself to see all of the build-time defaults.
 #'
 #' Notable Options:
 #'   * dataset_opts:

@@ -16,14 +16,19 @@ data frame of sample attributes for the dataset.
 }
 \description{
 Load a comma-separated table of sample attributes for the dataset to be
-anlayzed.  Columns should be Filename (the path to each data file), Replicate
-(an identifier for repeated samples; use blanks if not applicable), Sample
-(identifier for a given biological sample), and Locus (a locus identifier
-matching that used in the locus attributes table).
+analyzed.  Alternatively, use \code{\link{prepare_dataset}} to automatically
+read sample attributes from filenames.  If more than one locus is to be
+analyzed from a single sequencer sample (i.e., multiplexed samples), either
+the \code{locusmap} argument to \code{prepare_dataset} can be used, or
+\code{load_dataset} with an explicit mapping of loci to files.
 }
 \details{
-Alternatively, use \code{\link{prepare_dataset}} to automatically read sample
-attributes from filenames.  If more than one locus is to be analyzed from a
-single sequencer sample (i.e., multiplexed samples), \code{load_dataset}
-should be used.
+Columns Required:
+\itemize{
+\item Filename: path to each data file
+\item Replicate: identifier for repeated samples; use blanks if not applicable
+\item Sample: identifier for a given biological sample
+\item Locus: locus identifier matching that used in the locus attributes table
+(see \code{\link{load_locus_attrs}})
+}
 }

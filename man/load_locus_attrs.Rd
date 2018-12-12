@@ -15,7 +15,10 @@ load_locus_attrs(fp.locus_attrs, ...)
 data frame of locus attributes
 }
 \description{
-Load a comma-separated table of locus attributes to use for analysis.
+Load a comma-separated table of locus attributes to use for analysis.  This
+is called automatically during \code{\link{full_analysis}}, with the data
+frame then used by \code{\link{analyze_seqs}} within
+\code{\link{analyze_dataset}}.
 }
 \details{
 Columns Required:
@@ -29,4 +32,8 @@ LengthMax to accept for a candidate allele
 matching sequences to loci
 \item ReversePrimer: The reverse PCR primer sequence
 }
+}
+\examples{
+filename <- system.file("example_locus_attrs.csv", package = "chiimp")
+locus_attrs <- load_locus_attrs(filename)
 }

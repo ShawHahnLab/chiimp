@@ -13,6 +13,11 @@
 dataset_opts:
   dp: str-dataset
   pattern: Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+)
+# "dataset_analysis" defines options passed to analyze_dataset() by
+# full_analysis().  Here we'll just ensure that any example analysis run with
+# this configuration is single-threaded.
+dataset_analysis:
+  ncores: 1
 # "output" defines options related to analysis output.
 #   "dp" defines the directory that will contain all output files.
 output:
