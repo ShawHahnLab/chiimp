@@ -1,4 +1,4 @@
-# chiimp dev
+# chiimp 0.2.2
 
  * Fixed heatmap plotting via updated `plot_heatmap` for cases with blank
    results and only one unique non-blank value ([#22]).
