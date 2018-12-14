@@ -15,5 +15,11 @@ list of configuration options
 \description{
 Load a YAML-formatted text file of configuration options for microsatellite
 analysis.  This is currently just a wrapper around
-\code{\link[yaml]{yaml.load}}.
+\code{\link[yaml]{yaml.load}}.  The \code{\link{main}} function loads
+configuration options with this for use by \code{\link{full_analysis}}.
+}
+\examples{
+filename <- system.file("example_config.yml", package = "chiimp")
+config <- load_config(filename)
+# And then: full_analysis(config)
 }

@@ -40,7 +40,7 @@ kable_genotypes <- function(data, group_samples=FALSE) {
   k <- knitr::kable(data, row.names = FALSE, format = "html")
   k <- kableExtra::kable_styling(k,
                                  bootstrap_options = bootstrap_options,
-                                 full_width = F)
+                                 full_width = FALSE)
   if (group_samples)
     k <- k_group_rows(k, grouping)
   k
@@ -78,7 +78,7 @@ kable_idents <- function(tbl, closest) {
   k <- knitr::kable(tbl, row.names = FALSE, format = "html")
   k <- kableExtra::kable_styling(k,
                                  bootstrap_options = bootstrap_options,
-                                 full_width = F)
+                                 full_width = FALSE)
 
   # Group rows by sample
   obs.select <- tbl$Distance == ""

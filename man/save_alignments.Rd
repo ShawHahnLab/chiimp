@@ -16,5 +16,6 @@ of each alignment will be used for its filename.}
 \description{
 Take a list of alignments, one per locus, and save each to a separate fasta
 file in a specified directory.  If any of the per-locus alignment objects is
-NA it will be skipped.
+NA it will be skipped.  These are produced by \code{\link{summarize_dataset}}
+via \code{\link{align_alleles}}.
 }

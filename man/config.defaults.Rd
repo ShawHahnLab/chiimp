@@ -13,7 +13,8 @@ The entries in this list show the build-time configuration defaults for all
 aspects of the microsatellite analysis.  These can be overridden by passing a
 list to \code{\link{full_analysis}} with entries of the same names, or via
 the configuration file passed to \code{\link{main}} and read via
-\code{\link{load_config}}.
+\code{\link{load_config}}.  Check the contents of \code{config.defaults}
+itself to see all of the build-time defaults.
 }
 \details{
 Notable Options:
@@ -22,7 +23,9 @@ Notable Options:
 \itemize{
 \item dp: directory path to input sequence files
 \item pattern: regular expression for the input filename pattern
-\item ord: order of fields in the input filename pattern
+\item ord: order of fields Replicate, Sample, and Locus in in the input
+filename pattern.  For example, if Locus is the first field followed by
+Replicate and Sample, set \code{ord=c(3, 1, 2)}.
 }
 \item output:
 \itemize{

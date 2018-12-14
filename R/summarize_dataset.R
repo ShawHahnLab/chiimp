@@ -184,8 +184,8 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   alleles <- cbind(alleles1, alleles2)
   alleles
   sum(apply(alleles, 1,
-            function(row) min(sum(row[1:2] != row[3:4], na.rm = T),
-                              sum(row[2:1] != row[3:4]), na.rm = T)))
+            function(row) min(sum(row[1:2] != row[3:4], na.rm = TRUE),
+                              sum(row[2:1] != row[3:4]), na.rm = TRUE)))
 }
 
 #' Find closest matches in distance matrix
@@ -206,8 +206,8 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
   entries <- lapply(1:nrow(dist_mat), function(nr) {
     m <- min(dist_mat[nr, ])
     nearby <- dist_mat[nr, dist_mat[nr, ] < m + range &
-                         dist_mat[nr, ] < maximum, drop = F]
-    nearby <- nearby[1, order(nearby), drop = F]
+                         dist_mat[nr, ] < maximum, drop = FALSE]
+    nearby <- nearby[1, order(nearby), drop = FALSE]
     nm <- colnames(nearby)
     nearby <- nearby[1, ]
     names(nearby) <- nm
@@ -318,19 +318,19 @@ summarize_genotypes <- function(results_summary,
   # integers (otherwise we're just sorting text)
   if (is.character(combo[[vars[1]]])) {
     idx <- nchar(combo[[vars[1]]]) > nchar(combo[[vars[2]]]) |
-      ( nchar(combo[[vars[1]]]) == nchar(combo[[vars[2]]]) &
-          combo[[vars[1]]] > combo[[vars[2]]] )
+      (nchar(combo[[vars[1]]]) == nchar(combo[[vars[2]]]) &
+          combo[[vars[1]]] > combo[[vars[2]]])
   } else {
     idx <- combo[[vars[1]]] > combo[[vars[2]]]
   }
-  idx[is.na(idx)] <- F
+  idx[is.na(idx)] <- FALSE
   combo[idx, vars] <- combo[idx, rev(vars)]
   # Mark those cases that are not homozygous but just happen to have the same
   # short name (i.e. allele sequence length)
-  combo[, vars[2]] <- ifelse( !(results_summary$Homozygous) &
-                                combo[, vars[1]] == combo[, vars[2]],
-                              paste0(combo[, vars[2]], "*"),
-                              combo[, vars[2]])
+  combo[, vars[2]] <- ifelse(!(results_summary$Homozygous) &
+                               combo[, vars[1]] == combo[, vars[2]],
+                               paste0(combo[, vars[2]], "*"),
+                               combo[, vars[2]])
   # Reshape into wide table
   tbl <- stats::reshape(combo, v.names = vars, idvar = "ID",
                         timevar = "Locus", direction = "wide")
@@ -392,7 +392,7 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
   combo$ID <- paste(combo$Sample, combo$Replicate, sep = "-")
   # reshape into wide table
   tbl <- stats::reshape(combo,
-                        v.names = make.names(attrib_rep, unique = T),
+                        v.names = make.names(attrib_rep, unique = TRUE),
                         idvar = "ID",
                         timevar = "Locus", direction = "wide")
   tbl <- tbl[, -3]

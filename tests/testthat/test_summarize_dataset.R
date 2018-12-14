@@ -71,7 +71,8 @@ with(test_data, {
     })
   })
 
-  test_that("make_dist_mat_known produces sample-to-individual distance matrix", {
+  test_that(
+    "make_dist_mat_known produces sample-to-individual distance matrix", {
     skip("test not yet implemented")
   })
 
@@ -86,7 +87,7 @@ with(test_data, {
 
   test_that("calc_genotype_distance handles multiple data types", {
     # As written it should work with character, numeric, whatever-- it just uses
-    # the != operator.
+    # the not-equal operator.
     g.num <- c(1, 2, 3, 4)
     g.alpha <- c("a", "b", "c", "d")
     d <- calc_genotype_distance(g.num, g.alpha)
@@ -156,8 +157,8 @@ with(test_data, {
   })
 
   test_that("align_alleles produces per-allele alignments", {
-    # By default the allele sequences are dereplicated and then aligned, but this
-    # tests the other option.
+    # By default the allele sequences are dereplicated and then aligned, but
+    # this tests the other option.
     with(results_summary_data, {
       alignments <- align_alleles(results$summary, derep = FALSE)
       expect_equal(names(alignments), levels(results$summary$Locus))
@@ -203,7 +204,8 @@ with(test_data, {
     with(results_summary_data, {
       # Overwrite Locus A seqs with same content
       idx <- which(results$summary$Locus == "A")
-      results$summary[idx, "Allele1Seq"] <- results$summary[idx[1], "Allele1Seq"]
+      results$summary[idx, "Allele1Seq"] <- results$summary[idx[1],
+                                                            "Allele1Seq"]
       results$summary[idx, "Allele2Seq"] <- NA
       alignments <- align_alleles(results$summary)
       # This should still work, just with the same sequence back for A's
@@ -222,16 +224,16 @@ with(test_data, {
       # We should see 5000 reads total, and then 17 split away for each of the
       # four other loci.  Rownames should match sample row IDs.
       cts_expected <- data.frame(Total = 5000,
-                                 Matching = 5000 - 17*3,
+                                 Matching = 5000 - 17 * 3,
                                  A   = as.integer(rep(17, 12)),
                                  B   = as.integer(rep(17, 12)),
                                  `1` = as.integer(rep(17, 12)),
                                  `2` = as.integer(rep(17, 12)),
                                  check.names = FALSE)
-      cts_expected$A[1:3]     <- as.integer(5000 - 17*3)
-      cts_expected$B[4:6]     <- as.integer(5000 - 17*3)
-      cts_expected$`1`[7:9]   <- as.integer(5000 - 17*3)
-      cts_expected$`2`[10:12] <- as.integer(5000 - 17*3)
+      cts_expected$A[1:3]     <- as.integer(5000 - 17 * 3)
+      cts_expected$B[4:6]     <- as.integer(5000 - 17 * 3)
+      cts_expected$`1`[7:9]   <- as.integer(5000 - 17 * 3)
+      cts_expected$`2`[10:12] <- as.integer(5000 - 17 * 3)
       rownames(cts_expected) <- paste(rep(1:3, times = 4),
                                       rep(c("A", "B", "1", "2"), each = 3),
                                       sep = "-")
@@ -259,14 +261,14 @@ with(test_data, {
       # We should see 5000 reads total, and then 17 split away for each of the
       # four other loci.  Rownames should match sample row IDs.
       cts_expected <- data.frame(Total = 5000 - 17,
-                                 Matching = 5000 - 17*3,
+                                 Matching = 5000 - 17 * 3,
                                  A   = as.integer(rep(17, 9)),
                                  B   = as.integer(rep(17, 9)),
                                  `1` = as.integer(rep(17, 9)),
                                  check.names = FALSE)
-      cts_expected$A[1:3]     <- as.integer(5000 - 17*3)
-      cts_expected$B[4:6]     <- as.integer(5000 - 17*3)
-      cts_expected$`1`[7:9]   <- as.integer(5000 - 17*3)
+      cts_expected$A[1:3]     <- as.integer(5000 - 17 * 3)
+      cts_expected$B[4:6]     <- as.integer(5000 - 17 * 3)
+      cts_expected$`1`[7:9]   <- as.integer(5000 - 17 * 3)
       rownames(cts_expected) <- paste(rep(1:3, times = 3),
                                       rep(c("A", "B", "1"), each = 3),
                                       sep = "-")
