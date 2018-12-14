@@ -15,5 +15,7 @@ load_genotypes(fp, ...)
 data frame of genotypes
 }
 \description{
-Load a comma-separated table of genotypes, one pair of alleles per row.
+Load a comma-separated table of genotypes, one pair of alleles per row.  This
+information is used to compare samples to genotypes of known individuals in
+\code{\link{summarize_dataset}}.
 }

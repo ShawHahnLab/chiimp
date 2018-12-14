@@ -21,6 +21,6 @@ save_histograms(results, dp, image.func = "png", width = 1600,
 \item{res}{integer resolution of image in PPI.}
 }
 \description{
-Take a full results list and save a histogram of each sample to a separate
-image file in a specified directory.
+Take a full results list and save a histogram (via \code{\link{histogram}})
+of each sample to a separate image file in a specified directory.
 }

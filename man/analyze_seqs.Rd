@@ -49,3 +49,18 @@ by each unique sequence compared to the total for that particular
 matching locus.
 }
 }
+\examples{
+# Starting from non-locus-specific sequences,
+# a locus attributes table, and requiring
+# three side-by-side motif repeats to register
+# as a motif match for a locus,
+raw_seq_vector <- c(test_data$seqs1$A, test_data$seqs1$B)
+locus_attrs <- test_data$locus_attrs
+num_adjacent_repeats <- 3
+# Convert the character vector of sequences
+# into a data frame with one row per
+# unique sequence.
+seq_data <- analyze_seqs(raw_seq_vector,
+                         locus_attrs,
+                         num_adjacent_repeats)
+}

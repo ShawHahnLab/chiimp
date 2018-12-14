@@ -1,25 +1,35 @@
 # simulated data for testing ----------------------------------------------
 
 
-# I'm shoving all this into a list to keep it separate from all the other
-# objects devtools::load_all() dumps into the namespace.  Users loading via
-# devtools otherwise end up with a bunch of extra objects that are only relevant
-# during testing.
+# I'm shoving all this into a list to keep it separate from the non-test-related
+# objects in the namespace, but still have it available to both the unit tests
+# and regular use.
+# Note that having an object stored directly in the package like this (and
+# forcing it to be the last file loaded when building) isn't ideal since it gets
+# created and stored at build time even though the code is mixed in with the
+# regular R functions.  A better way might be to explicitly build the test_data
+# list and store it in data/ as Hadley describes:
+# http://r-pkgs.had.co.nz/data.html
 
 #' Helper Data for Tests
 #'
 #' This list is a bundle of shared data and functions for running unit tests.
+#' @export
 test_data <- within(list(), {
-  txt.locus_attrs <- "Locus   LengthMin  LengthMax    LengthBuffer   Motif   Primer                  ReversePrimer
-A        131        179          20             TAGA    TATCACTGGTGTTAGTCCTCTG  CACAGTTGTGTGAGCCAGTC
-B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    TAGGAGCCTGTGGTCCTGTT
-1        232        270          20             TATC    ACAGTCAAGAATAACTGCCC    CTGTGGCTCAAAAGCTGAAT
-2        218        337          20             TCCA    TTGTCTCCCCAGTTGCTA      TCTGTCATAAACCGTCTGCA"
-  f.locus_attrs <- textConnection(txt.locus_attrs)
-  locus_attrs <- read.table(f.locus_attrs, header = T, stringsAsFactors = F)
+  # Careful!  When running via a package check we might be in temporary
+  # installed copy in /tmp or elsewhere, and probably won't have the "inst"
+  # directory anymore.  Alternatively when running with devtools::test() we
+  # will.
+  f.locus_attrs <- unique(system.file(c("inst/example_locus_attrs.csv",
+                                        "example_locus_attrs.csv"),
+                                      package = methods::getPackageName()))
+  txt.locus_attrs <- readChar(f.locus_attrs,
+                              nchars = file.info(f.locus_attrs)$size)
+  locus_attrs <- read.table(f.locus_attrs,
+                            header = TRUE,
+                            stringsAsFactors = FALSE,
+                            sep = ",")
   rownames(locus_attrs) <- locus_attrs$Locus
-  close(f.locus_attrs)
-  rm(f.locus_attrs)
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
                         "LengthMatch", "Ambiguous", "Stutter", "Artifact",
@@ -33,7 +43,7 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
   make.seq_junk <- function(N) {
     nucleotides <- c("A", "T", "C", "G")
     vapply(runif(N, min = 1, max = 20), function(L)
-      paste0(sample(nucleotides, L, replace = T), collapse = ""),
+      paste0(sample(nucleotides, L, replace = TRUE), collapse = ""),
       "character")
   }
 
@@ -83,7 +93,7 @@ B        194        235          20             TAGA    AGTCTCTCTTTCTCCTTGCA    
     if (cross_contam_ratio > 0) {
       others <- locus_attrs[-match(locus_name, rownames(locus_attrs)), ]
       for (i in 1:nrow(others)) {
-        idx <- seq(i, length(seqs), cross_contam_ratio*nrow(others))
+        idx <- seq(i, length(seqs), cross_contam_ratio * nrow(others))
         seqs[idx] <- simulate.seqs(locus_name = others$Locus[i],
                                    locus_attrs = locus_attrs,
                                    N = length(idx),

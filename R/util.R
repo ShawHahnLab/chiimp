@@ -34,8 +34,8 @@ make_entry_id <- function(data) {
   cols.idx <- cols.idx[!is.na(cols.idx)]
   cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
     !all(is.na(data[, x]))
-  }) )]
-  data.names <- data[, cols.idx, drop = F]
+  }))]
+  data.names <- data[, cols.idx, drop = FALSE]
   sapply(1:nrow(data.names), function(nr) {
     entries <- lapply(data.names[nr, !is.na(data.names[nr, ])], as.character)
     do.call(paste, as.list(c(entries, sep = "-")))
@@ -180,3 +180,25 @@ remove_shared_root_dir <- function(fps_full) {
 
 # Equivalent of /dev/null for the build platform.
 fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint
+
+#' Write Log Message
+#'
+#' Print a log message to the standard error stream.
+#'
+#' @param msg text to print.
+#' @param col2 extra text to show at right margin; defaults to current time.
+#' @param end ending to concatenate to message; defaults to newline character.
+logmsg <- function(msg, col2=as.character(Sys.time()), end="\n") {
+  if (!is.null(col2)) {
+    # right-justify col2, aim to fit total msg within 80 characters
+    pad <- max(1, 80 - nchar(msg) - nchar(col2))
+    msg <- paste0(msg, paste(rep(" ", pad),  collapse = ""), col2)
+  }
+  # stderr: file descriptor 2
+  cat(paste0(msg, end), file = 2)
+}
+
+# append an empty string to each the given files
+touch <- function(fps) {
+  lapply(fps, function(fp) cat("", file = fp, append = TRUE))
+}

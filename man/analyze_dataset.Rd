@@ -56,5 +56,6 @@ of processed samples.  The entries in the processed-samples list and the rows
 in the summary data frame will be sorted according to the ordering of loci in
 \code{locus_attrs} and by the sample attributes.  Processed files are stored
 separately (as there may be multiple samples per file) and named by input
-file path.
+file path.  An error is thrown if any locus entries in the given dataset are
+not found in the locus attributes data frame.
 }

@@ -25,7 +25,7 @@ setup_data_dir <- function(replicates, samples, loci, ord=c(1, 2, 3)) {
   # (hardcoded to match stems)
   pattern <- "(\\d+)-(\\d+)-([A-Za-z0-9]+)"
   fps <- file.path(dp, paste0(stems, ".fastq"))
-  lapply(fps, function(fp) cat("", file = fp))
+  touch(fps)
   return(list(dp = dp, fps = fps, pattern = pattern))
 }
 
@@ -92,7 +92,7 @@ with(test_data, {
 
   test_that("load_locus_attrs complains for repeated loci", {
     # It should throw a warning if any Locus names are repeated.
-    txt.wrong <- gsub("\nB ", "\nA ", txt.locus_attrs)
+    txt.wrong <- gsub("\nB,", "\nA,", txt.locus_attrs)
     fp <- write_locus_attrs(txt.wrong)
     expect_warning({
       locus_attrs_test <- load_locus_attrs(fp)
@@ -113,11 +113,38 @@ with(test_data, {
 
   test_that("load_dataset loads sample attributes", {
     dataset_known <- setup_dataset()
+    # Touch the input files so they at least exist
+    data.dir <- tempfile()
+    dir.create(data.dir)
+    setwd(data.dir)
+    touch(dataset_known$Filename)
+    # Write dataset CSV
     fp <- tempfile()
-    write.csv(dataset_known, file = fp, na = "", row.names = F)
-    dataset <- load_dataset(fp)
+    write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
+    expect_silent({
+      dataset <- load_dataset(fp)
+    })
     expect_identical(dataset, dataset_known)
   })
+
+  test_that("load_dataset warns of missing files", {
+    # Here we'll skip writing any actual data files, so load_dataset should
+    # complain.
+    dataset_known <- setup_dataset()
+    data.dir <- tempfile()
+    dir.create(data.dir)
+    setwd(data.dir)
+    fp <- tempfile()
+    write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
+    # expect_message and capture_messages both do NOT catch text send to stderr,
+    # though capture.output(..., type = "message") does.
+    msg <- capture.output({
+      dataset <- load_dataset(fp)
+    }, type = "message")
+    expect_true(length(grep("WARNING: Missing 60 of 60 data files", msg)) == 1)
+    expect_identical(dataset, dataset_known)
+  })
+
 
 # test save_dataset -------------------------------------------------------
 
@@ -125,7 +152,11 @@ with(test_data, {
   test_that("save_dataset saves sample attributes", {
     # We'll just make sure that saving and then re-loading provides what was
     # saved.  load_dataset is tested separately above.
+    data.dir <- tempfile()
+    dir.create(data.dir)
+    setwd(data.dir)
     dataset_known <- setup_dataset()
+    touch(dataset_known$Filename)
     fp <- tempfile()
     save_dataset(dataset_known, fp)
     dataset <- load_dataset(fp)
@@ -198,7 +229,7 @@ with(test_data, {
     samples <- 1:5
     loci <- sort(rownames(locus_attrs))
     data <- setup_data_dir(replicates, samples, loci)
-    cat("", file = paste0(data$fps[3], ".extra"))
+    touch(paste0(data$fps[3], ".extra"))
     expect_warning({
         dataset <- prepare_dataset(data$dp, data$pattern)
       },
@@ -211,8 +242,8 @@ with(test_data, {
     samples <- 1:5
     loci <- sort(rownames(locus_attrs))
     data <- setup_data_dir(replicates, samples, loci)
-    cat("", file = paste0(data$fps[3], ".2"))
-    cat("", file = paste0(data$fps[3], ".3"))
+    touch(paste0(data$fps[3], ".2"))
+    touch(paste0(data$fps[3], ".3"))
     dataset <- prepare_dataset(data$dp,
                                pattern = "()1-(\\d+)-([A-Za-z0-9]+)",
                                autorep = TRUE)
@@ -229,7 +260,24 @@ with(test_data, {
   })
 
   test_that("prepare_dataset works on nested directories", {
-    skip("test not yet implemented")
+    ## Create two separate sets of files in subdirectories
+    replicates <- 1:3
+    samples1 <- 1:3
+    samples2 <- 4:6
+    loci <- sort(rownames(locus_attrs))
+    data1 <- setup_data_dir(replicates, samples1, loci)
+    data2 <- setup_data_dir(replicates, samples2, loci)
+    # move both sets into a single parent directory
+    dp <- tempfile()
+    dir.create(dp)
+    file.copy(data1$dp, dp, recursive = TRUE)
+    file.copy(data2$dp, dp, recursive = TRUE)
+    # build dataset from parent directory
+    dataset <- prepare_dataset(dp, data1$pattern)
+    expect_equal(colnames(dataset),
+                 c("Filename", "Replicate", "Sample", "Locus"))
+    expect_equal(sort(dataset$Filename),
+                 sort(list.files(dp, recursive = TRUE, full.names = TRUE)))
   })
 
   test_that("prepare_dataset can separate multiplexed samples", {
@@ -257,6 +305,21 @@ with(test_data, {
     # Aside from the different filenames, does everything match up?
     dataset_known$Filename <- dataset$Filename
     expect_equal(dataset, dataset_known)
+  })
+
+  test_that("prepare_dataset handles missing data directory", {
+    dp <- tempfile()
+    expect_error({
+      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    }, paste("ERROR: directory path for data files does not exist:", dp))
+  })
+
+  test_that("prepare_dataset handles no-samples case", {
+    dp <- tempfile()
+    dir.create(dp)
+    expect_error({
+      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    }, paste("ERROR: no data files found:", dp))
   })
 
 
