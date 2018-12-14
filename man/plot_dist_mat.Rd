@@ -11,7 +11,7 @@ plot_dist_mat(dist_mat, num.alleles = max(dist_mat),
 \item{dist_mat}{distance matrix as produced by
 \code{\link{summarize_dataset}} via \code{\link{make_dist_mat}}.}
 
-\item{num.alleles}{the maximum number of matching/mis-matching alleles.  Used
+\item{num.alleles}{the maximum number of matching/mismatching alleles.  Used
 to determine color scaling.  Defaults to the highest observed distance in
 the matrix.}
 

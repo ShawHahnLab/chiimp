@@ -9,24 +9,26 @@
 #'
 #' @details
 #' Additional entries in the returned list:
-#'   * alignments: inter-allele alignments for each locus, from
+#'   * \code{alignments}: inter-allele alignments for each locus, from
 #'     \code{\link{align_alleles}}.
-#'   * dist_mat: inter-sample distance matrix, from \code{\link{make_dist_mat}}.
-#'   * dist_mat_known: if genotypes.known is given, this distance matrix of
-#'     sample-to-individual values will be present, from
-#'     \code{\link{make_dist_mat_known}}.
+#'   * \code{dist_mat}: inter-sample distance matrix, from
+#'   \code{\link{make_dist_mat}}.
+#'   * \code{dist_mat_known}: if genotypes.known is given, this distance matrix
+#'   of sample-to-individual values will be present, from
+#'   \code{\link{make_dist_mat_known}}.
 #'
 #' If genotypes.known is given *and* a Name column is present in
 #' \code{results$summary}, samples will be matched with the genotypes in
 #' genotypes.known and additional columns will be present in the summary data
 #' frame:
-#'   * CorrectAllele1Seq: One correct allele sequence for the individual.  The
-#'   order of this and \code{CorrectAllele2Seq} will be matched to
+#'   * \code{CorrectAllele1Seq}: One correct allele sequence for the individual.
+#'   The order of this and \code{CorrectAllele2Seq} will be matched to
 #'   \code{Allele1Seq} and \code{Allele2Seq} if possible.  See
 #'   \code{\link{match_known_genotypes}}.
-#'   * CorrectAllele2Seq: A second correct allele sequence, as above.
-#'   * GenotypeResult: Categorization for each entry as Correct, Incorrect,
-#'   Blank, or Dropped Allele.  See \code{\link{categorize_genotype_results}}.
+#'   * \code{CorrectAllele2Seq}: A second correct allele sequence, as above.
+#'   * \code{GenotypeResult}: Categorization for each entry as Correct,
+#'   Incorrect, Blank, or Dropped Allele.  See
+#'   \code{\link{categorize_genotype_results}}.
 #'
 #' @md
 #'
@@ -374,8 +376,8 @@ summarize_genotypes_known <- function(genotypes_known, tbl_genotypes=NULL) {
 #'
 #' Tabulate a single arbitrary attribute across loci, assuming repeats by two
 #' for the alleles.  This is used for color-coding summary heatmaps (see
-#' \code{\link{plot_heatmap}}) on top of the attribute values, like Homozgyous
-#' or ProminentSeqs.
+#' \code{\link{plot_heatmap}}) on top of the attribute values, like
+#' \code{Homozygous} or \code{ProminentSeqs}.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
 #'   \code{\link{analyze_dataset}}.

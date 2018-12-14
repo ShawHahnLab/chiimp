@@ -22,22 +22,24 @@ sample_summary_funcs <- c("summarize_sample",
 #' @details
 #' Entries in the returned list:
 #'  * For Allele1 and Allele2:
-#'    * Seq: sequence text for each allele.
-#'    * Count: integer count of occrrences of this exact sequence.
-#'    * Length: integer sequence length.
-#'  * Homozygous: If the sample appears homozygous (if so, the Allele2 entries
-#'  will be NA).
-#'  * Ambiguous: If a potential allele was ignored due to ambiguous bases in
-#'  sequence content (such as "N").
-#'  * Stutter: If a potential allele was ignored due to apparent PCR stutter.
-#'  * Artifact: If a potential allele was ignored due to apparent PCR artifact
-#'  (other than stutter).
-#'  * CountTotal: The total number of sequences in the original sample data.
-#'  * CountLocus: The number of sequences matching all criteria for the
+#'    * \code{Seq}: sequence text for each allele.
+#'    * \code{Count}: integer count of occurrences of this exact sequence.
+#'    * \code{Length}: integer sequence length.
+#'  * \code{Homozygous}: If the sample appears homozygous (if so, the Allele2
+#'  entries will be NA).
+#'  * \code{Ambiguous}: If a potential allele was ignored due to ambiguous bases
+#'  in sequence content (such as "N").
+#'  * \code{Stutter}: If a potential allele was ignored due to apparent PCR
+#'  stutter.
+#'  * \code{Artifact}: If a potential allele was ignored due to apparent PCR
+#'  artifact (other than stutter).
+#'  * \code{CountTotal}: The total number of sequences in the original sample
+#'  data.
+#'  * \code{CountLocus}: The number of sequences matching all criteria for the
 #'  specified locus in the original sample data.
-#'  * ProminentSeqs: The number of entries above the specified threshold after
-#'  all filtering.  This should be either one (for a homozygous sample) or two
-#'  (for a heterozygous sample) but conditions such as cross-sample
+#'  * \code{ProminentSeqs}: The number of entries above the specified threshold
+#'  after all filtering.  This should be either one (for a homozygous sample) or
+#'  two (for a heterozygous sample) but conditions such as cross-sample
 #'  contamination or excessive PCR stutter can lead to more than two.
 #' @md
 #'
@@ -88,9 +90,9 @@ summarize_sample <- function(sample_data, sample.attrs, counts.min) {
 }
 
 #' @describeIn summarize_sample Summarize a processed STR sample Using known
-#'   lengths.  If ExpectedLength1 and optionally ExpectedLength2 are given in
-#'   \code{sample.attrs}, the \code{counts.min} threshold is ignored.  See also
-#'   \code{\link{analyze_sample_guided}}.
+#'   lengths.  If \code{ExpectedLength1} and optionally \code{ExpectedLength2}
+#'   are given in \code{sample.attrs}, the \code{counts.min} threshold is
+#'   ignored.  See also \code{\link{analyze_sample_guided}}.
 #'
 #' @export
 summarize_sample_guided <- function(sample_data, sample.attrs, counts.min) {

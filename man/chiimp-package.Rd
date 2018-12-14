@@ -76,55 +76,56 @@ For defaults used in the configuration, see \code{\link{config.defaults}}.
 The workflow above outlines CHIIMP's behavior when called as a standalone
 program, where \code{\link{main}} loads a configuration file into a nested
 list of options and calls \code{\link{full_analysis}}.  The public functions
-linked above can also be used idependently; see the documentation and code
+linked above can also be used independently; see the documentation and code
 examples for the individual functions for more information.
 
 \strong{The Package structure of the source files, grouped by topic:}
 \itemize{
 \item Main Interface:
 \itemize{
-\item chiimp.R: Main entry point for command-line usage (\code{\link{main}})
-and R usage (\code{\link{full_analysis}}).
+\item \code{chiimp.R}: Main entry point for command-line usage
+(\code{\link{main}}) and R usage (\code{\link{full_analysis}}).
 }
 \item Data Analysis:
 \itemize{
-\item analyze_dataset.R: High-level interface to analyze all samples across a
-given dataset (\code{\link{analyze_dataset}}); used by
+\item \code{analyze_dataset.R}: High-level interface to analyze all samples
+across a given dataset (\code{\link{analyze_dataset}}); used by
 \code{\link{full_analysis}} to manage the main part of the processing.
-\item summarize_dataset.R: High-level interface to provide inter-sample and
-inter-locus analyses (\code{\link{summarize_dataset}}); used by
+\item \code{summarize_dataset.R}: High-level interface to provide inter-sample
+and inter-locus analyses (\code{\link{summarize_dataset}}); used by
 \code{\link{full_analysis}} to manage the second stage of the
 processing.
-\item analyze_seqs.R: Low-level interface to convert raw sequence input to a
-data frame of unique sequences (\code{\link{analyze_seqs}}); used by
-\code{\link{analyze_dataset}}.
-\item analyze_sample.R: Low-level interface to extract per-locus details from
-a data frame of unique sequences (\code{\link{analyze_sample}}); used by
-\code{\link{analyze_dataset}}.
-\item summarize_sample.R: Low-level interface to condense each sample data
-frame into a a concise list of consistent attributes, suitable for
+\item \code{analyze_seqs.R}: Low-level interface to convert raw sequence input
+to a data frame of unique sequences (\code{\link{analyze_seqs}}); used
+by \code{\link{analyze_dataset}}.
+\item \code{analyze_sample.R}: Low-level interface to extract per-locus
+details from a data frame of unique sequences
+(\code{\link{analyze_sample}}); used by \code{\link{analyze_dataset}}.
+\item \code{summarize_sample.R}: Low-level interface to condense each sample
+data frame into a a concise list of consistent attributes, suitable for
 binding together across samples for a dataset
 (\code{\link{summarize_sample}}); used by \code{\link{analyze_dataset}}.
-\item categorize.R: Low-level helper functions used by
+\item \code{categorize.R}: Low-level helper functions used by
 \code{\link{summarize_dataset}} for samples with known identity.
 }
 \item Plotting and reporting:
 \itemize{
-\item report.R: Various plotting and summarizing functions used when rendering
-a report in \code{\link{full_analysis}}.
-\item histogram.R: Sequence histogram plotting tools (\code{\link{histogram}})
-as used during \code{\link{full_analysis}}.
-\item markdown.R: Various helper functions for adding tables and plots to an R
-Markdown report as used in \code{\link{full_analysis}}.
+\item \code{report.R}: Various plotting and summarizing functions used when
+rendering a report in \code{\link{full_analysis}}.
+\item \code{histogram.R}: Sequence histogram plotting tools
+(\code{\link{histogram}}) as used during \code{\link{full_analysis}}.
+\item \code{markdown.R}: Various helper functions for adding tables and plots
+to an R Markdown report as used in \code{\link{full_analysis}}.
 }
 \item Utility Functions and Configuration:
 \itemize{
-\item configuration.R: The default configuration options
+\item \code{configuration.R}: The default configuration options
 (\code{\link{config.defaults}}) used by \code{\link{full_analysis}}.
-\item io.R: various helper input/output functions used loading and saving
-sequence data files, spreadsheets, and plots used in multiple parts of the
+\item \code{io.R}: various helper input/output functions used loading and
+saving sequence data files, spreadsheets, and plots used in multiple
+parts of the package.
+\item \code{util.R}: Various helper functions used in multiple parts of the
 package.
-\item util.R: Various helper functions used in multiple parts of the package.
 }
 }
 }

@@ -48,14 +48,14 @@ load_config <- function(fp) {
 #'
 #' @details
 #' Columns Required:
-#'   * Locus: Unique identifier for a given locus
-#'   * LengthMin: Minimum known allele sequence length for this locus
-#'   * LengthMax: Minimum known allele sequence length for this locus
-#'   * LengthBuffer: Additional sequence length below LengthMin and above
-#'     LengthMax to accept for a candidate allele
-#'   * Primer: The forward PCR primer sequence for a given locus, used when
-#'     matching sequences to loci
-#'   * ReversePrimer: The reverse PCR primer sequence
+#'   * \code{Locus}: Unique identifier for a given locus
+#'   * \code{LengthMin}: Minimum known allele sequence length for this locus
+#'   * \code{LengthMax}: Minimum known allele sequence length for this locus
+#'   * \code{LengthBuffer}: Additional sequence length below \code{LengthMin}
+#'     and above \code{LengthMax} to accept for a candidate allele
+#'   * \code{Primer}: The forward PCR primer sequence for a given locus, used
+#'   when matching sequences to loci
+#'   * \code{ReversePrimer}: The reverse PCR primer sequence
 #' @md
 #'
 #' @param fp.locus_attrs path to text file.
@@ -318,8 +318,8 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
 #' Load vector of sequences from FASTA/FASTQ file
 #'
 #' Load a vector of character sequences from the given path.  This is just a
-#' wrapper around dnar to choose the parser based on filename.  Only the
-#' sequences are returned, not IDs or quality scores.
+#' wrapper around \code{\link[dnar:read.fa]{dnar}} to choose the parser based on
+#' filename.  Only the sequences are returned, not IDs or quality scores.
 #'
 #' @param fp path to sequence file
 #'
@@ -399,9 +399,9 @@ save_allele_seqs <- function(results_summary, dp) {
 #' \code{\link{analyze_seqs}}) to a separate file in the specified directory
 #' path, in CSV format.  The directory structure will start at the first shared
 #' directory of the input file paths.
-#' For example, if the inputs were /data/run1/file.fastq and
-#' /data/run2/file.fastq there will be run1 and run2 directories inside the
-#' given `dp` directory.
+#' For example, if the inputs were \code{/data/run1/file.fastq} and
+#' \code{/data/run2/file.fastq} there will be run1 and run2 directories inside
+#' the given \code{dp} directory.
 #'
 #' @param results_file_data list of per-file data frames as produced by
 #'   \code{\link{analyze_dataset}}.
@@ -445,7 +445,7 @@ save_sample_data <- function(results_data, dp) {
 
 #' Save alignments to FASTA files
 #'
-#' Take a list of alignments, one per locus, and save each to a separate fasta
+#' Take a list of alignments, one per locus, and save each to a separate FASTA
 #' file in a specified directory.  If any of the per-locus alignment objects is
 #' NA it will be skipped.  These are produced by \code{\link{summarize_dataset}}
 #' via \code{\link{align_alleles}}.
