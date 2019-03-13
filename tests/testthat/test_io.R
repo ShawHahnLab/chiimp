@@ -352,9 +352,12 @@ with(test_data, {
                                ncores = 1)
     dp_out <- file.path(data.dir, "results", "processed_files")
     save_seqfile_data(results$files, dp_out)
-    fps_expected <- sort(paste0(names(results$files), ".csv"))
-    fps_observed <- sort(file.path(data.dir,
-                                   list.files(dp_out, recursive = TRUE)))
+    fps_expected <- sort(file.path(dp_out,
+                                   paste0(basename(names(results$files)),
+                                          ".csv")))
+    fps_observed <- sort(list.files(dp_out,
+                                    recursive = TRUE,
+                                    full.names = TRUE))
     expect_equal(fps_observed, fps_expected)
     unlink(x = data.dir, recursive = TRUE)
   })
@@ -376,9 +379,13 @@ with(test_data, {
                                ncores = 1)
     dp_out <- file.path(data.dir, "results", "processed_files")
     save_seqfile_data(results$files, dp_out)
-    fps_expected <- sort(paste0(names(results$files), ".csv"))
-    fps_observed <- sort(file.path(data.dir,
-                                   list.files(dp_out, recursive = TRUE)))
+    fps_expected <- sort(file.path(dp_out,
+                                   basename(dirname(names(results$files))),
+                                   paste0(basename(names(results$files)),
+                                          ".csv")))
+    fps_observed <- sort(list.files(dp_out,
+                                    recursive = TRUE,
+                                    full.names = TRUE))
     expect_equal(fps_observed, fps_expected)
     unlink(x = data.dir, recursive = TRUE)
   })
@@ -403,9 +410,17 @@ with(test_data, {
     names(results$files) <- gsub("/", "\\\\", names(results$files))
     save_seqfile_data(results$files, dp_out)
     names(results$files) <- gsub("\\\\", "/", names(results$files))
-    fps_expected <- sort(paste0(names(results$files), ".csv"))
-    fps_observed <- sort(file.path(data.dir,
-                                   list.files(dp_out, recursive = TRUE)))
+    fps_expected <- sort(file.path(dp_out,
+                                   basename(dirname(names(results$files))),
+                                   paste0(basename(names(results$files)),
+                                          ".csv")))
+    fps_observed <- sort(list.files(dp_out,
+                                    recursive = TRUE,
+                                    full.names = TRUE))
+    # Normalize any lingering \ or / inconsistencies, so this test should also
+    # pass on Windows itself.
+    fps_expected <- normalizePath(fps_expected)
+    fps_observed <- normalizePath(fps_observed)
     expect_equal(fps_observed, fps_expected)
     unlink(x = data.dir, recursive = TRUE)
   })
