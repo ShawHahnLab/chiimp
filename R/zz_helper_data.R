@@ -16,6 +16,11 @@
 #' This list is a bundle of shared data and functions for running unit tests.
 #' @export
 test_data <- within(list(), {
+  # This is a particularly awkward approach now that in the development branch
+  # for version 3.6.0 the random number generator has changed its behavior.
+  # The below is a stopgap measure but this should really be reorganized to not
+  # need to generate the test data at build-time.
+  RNGversion("3.5.3")
   # Careful!  When running via a package check we might be in temporary
   # installed copy in /tmp or elsewhere, and probably won't have the "inst"
   # directory anymore.  Alternatively when running with devtools::test() we
@@ -29,6 +34,7 @@ test_data <- within(list(), {
                             header = TRUE,
                             stringsAsFactors = FALSE,
                             sep = ",")
+  rm(f.locus_attrs)
   rownames(locus_attrs) <- locus_attrs$Locus
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
