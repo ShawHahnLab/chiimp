@@ -29,6 +29,7 @@ test_data <- within(list(), {
                             header = TRUE,
                             stringsAsFactors = FALSE,
                             sep = ",")
+  rm(f.locus_attrs)
   rownames(locus_attrs) <- locus_attrs$Locus
 
   sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
