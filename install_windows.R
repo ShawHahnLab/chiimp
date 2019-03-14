@@ -39,7 +39,7 @@ if (! haspkg("msa")) {
   cat("### Installing Bioconductor and MSA\n")
   cat("\n")
   source("https://bioconductor.org/biocLite.R")
-  biocLite("msa")
+  biocLite("msa", suppressUpdates = TRUE)
 }
 
 cat("\n")
