@@ -1,6 +1,11 @@
 # chiimp dev
 
+ * Fixed package checks and testing on latest R development releases ([#27]).
+ * Fixed test behavior on Windows and improved test organization ([#16]).
  * Added documentation corrections and improvements.
+
+[#27]: https://github.com/ShawHahnLab/chiimp/issues/27
+[#16]: https://github.com/ShawHahnLab/chiimp/issues/16
 
 # chiimp 0.2.2
 
