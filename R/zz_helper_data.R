@@ -159,8 +159,7 @@ test_data <- within(list(), {
     results <- analyze_dataset(dataset, locus_attrs, nrepeats = 3, ncores = 1,
                                analysis_opts = list(fraction.min = 0.05),
                                summary_opts = list(counts.min = 500))
-    lapply(dataset$Filename, file.remove)
-    file.remove(data.dir)
+    unlink(data.dir, recursive = TRUE)
     return(list(dataset = dataset, results = results))
   }
 
