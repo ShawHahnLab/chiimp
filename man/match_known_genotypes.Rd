@@ -21,8 +21,8 @@ data frame with two columns for the two correct alleles, and rows
 \description{
 Using the Name column of the given results summary data frame, pair each
 called genotype with the known alleles.  A data frame with two columns,
-CorrectAllele1Seq and CorrectAllele2Seq, is returned. If matching entries are
-found in Allele1Seq and/or Allele2Seq the order will be preserved, and at
-this point the two allele entries should match up directly for genotypes that
-were called correctly.
+\code{CorrectAllele1Seq} and \code{CorrectAllele2Seq}, is returned. If
+matching entries are found in \code{Allele1Seq} and/or \code{Allele2Seq} the
+order will be preserved, and at this point the two allele entries should
+match up directly for genotypes that were called correctly.
 }

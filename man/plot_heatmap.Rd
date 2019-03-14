@@ -25,8 +25,8 @@ lengths.}
 }
 \description{
 Given a cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}} and the name of a column (e.g., Stutter,
-Homozygous, ProminentSequences), plot a heatmap of the values for that
-attribute, with sample identifiers on rows and loci on columns.  The
+\code{\link{analyze_dataset}} and the name of a column (e.g., \code{Stutter},
+\code{Homozygous}, \code{ProminentSequences}), plot a heatmap of the values
+for that attribute, with sample identifiers on rows and loci on columns.  The
 attribute will be coerced to numeric.
 }

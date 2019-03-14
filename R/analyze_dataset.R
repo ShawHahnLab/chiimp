@@ -189,9 +189,9 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
 #' For the given results list (pair of summary data frame and list of per-sample
 #' data frames as produced by \code{\link{tidy_analyzed_dataset}}), add columns
 #' to all data frames defining names for recognized sequences.  For the summary
-#' data frame this will be Allele1Name and Allele2Name.  For each sample data
-#' frame this will be SeqName, defined for any sequences represented in the
-#' summary or in a given known alleles set.
+#' data frame this will be \code{Allele1Name} and \code{Allele2Name}.  For each
+#' sample data frame this will be \code{SeqName}, defined for any sequences
+#' represented in the summary or in a given known alleles set.
 #'
 #' @param results results list as produced by
 #'   \code{\link{tidy_analyzed_dataset}}.
@@ -202,10 +202,11 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
 #'   \code{\link{make_allele_name}}.
 #'
 #' @return list of results, with \code{summary} set to the single summary data
-#'   frame and \code{data} the per-sample data frames.  A "SeqName" column in
-#'   sample data frames and "Allele1Name" and "Allele2Name" columns in the
-#'   summary data frame will associate any sequence matching a known allele (for
-#'   either the given table or the current dataset) with a text name.
+#'   frame and \code{data} the per-sample data frames.  A \code{SeqName} column
+#'   in sample data frames and \code{Allele1Name} and \code{Allele2Name} columns
+#'   in the summary data frame will associate any sequence matching a known
+#'   allele (for either the given table or the current dataset) with a text
+#'   name.
 name_known_sequences <- function(results, known_alleles, name_args) {
   # Name all of the called alleles across samples
   results$summary <- name_alleles_in_table(results$summary, known_alleles,

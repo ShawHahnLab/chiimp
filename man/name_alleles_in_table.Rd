@@ -7,7 +7,7 @@
 name_alleles_in_table(data, known_alleles = NULL, name_args = list())
 }
 \arguments{
-\item{data}{data frame containing Allele1Seq and Allele2Seq colums such as
+\item{data}{data frame containing Allele1Seq and Allele2Seq columns such as
 the first list item produced by \code{\link{analyze_dataset}}.}
 
 \item{known_alleles}{data frame of custom allele names as defined for

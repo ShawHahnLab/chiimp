@@ -17,7 +17,7 @@ Save each per-file data frame produced by \code{\link{analyze_dataset}} (via
 \code{\link{analyze_seqs}}) to a separate file in the specified directory
 path, in CSV format.  The directory structure will start at the first shared
 directory of the input file paths.
-For example, if the inputs were /data/run1/file.fastq and
-/data/run2/file.fastq there will be run1 and run2 directories inside the
-given `dp` directory.
+For example, if the inputs were \code{/data/run1/file.fastq} and
+\code{/data/run2/file.fastq} there will be run1 and run2 directories inside
+the given \code{dp} directory.
 }

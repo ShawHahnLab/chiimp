@@ -4,10 +4,10 @@
 #'
 #' Using the Name column of the given results summary data frame, pair each
 #' called genotype with the known alleles.  A data frame with two columns,
-#' CorrectAllele1Seq and CorrectAllele2Seq, is returned. If matching entries are
-#' found in Allele1Seq and/or Allele2Seq the order will be preserved, and at
-#' this point the two allele entries should match up directly for genotypes that
-#' were called correctly.
+#' \code{CorrectAllele1Seq} and \code{CorrectAllele2Seq}, is returned. If
+#' matching entries are found in \code{Allele1Seq} and/or \code{Allele2Seq} the
+#' order will be preserved, and at this point the two allele entries should
+#' match up directly for genotypes that were called correctly.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
 #'   \code{\link{analyze_dataset}}.
@@ -41,10 +41,10 @@ match_known_genotypes <- function(results_summary, genotypes.known) {
 
 #' Categorize genotyping results
 #'
-#' For a given results summary data frame that has CorrectAllele1Seq and Correct
-#' Allele2Seq columns (such as produced by \code{\link{match_known_genotypes}})
-#' added, create a factor labeling every row of the input data frame by its
-#' genotyping outcome.
+#' For a given results summary data frame that has \code{CorrectAllele1Seq} and
+#' \code{CorrectAllele2Seq} columns (such as produced by
+#' \code{\link{match_known_genotypes}}) added, create a factor labeling every
+#' row of the input data frame by its genotyping outcome.
 #'
 #' @details
 #' Levels in the returned factor, in order:
@@ -56,8 +56,8 @@ match_known_genotypes <- function(results_summary, genotypes.known) {
 #' * Dropped Allele: One called allele is correct for a heterozygous individual,
 #'   but no second allele was called.
 #'
-#' Cases that should not occur, such as CorrectAllele1Seq and CorrectAllele2Seq
-#' both set to NA, map to NA in the returned factor.
+#' Cases that should not occur, such as \code{CorrectAllele1Seq} and
+#' \code{CorrectAllele2Seq} both set to NA, map to NA in the returned factor.
 #' @md
 #'
 #' @param results_summary cross-sample summary data frame as produced by
