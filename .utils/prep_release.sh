@@ -52,3 +52,8 @@ echo " * Update NEWS.md with all updates under a heading matching this version"
 echo " * Check README.md for link to this version"
 echo " * Make sure GUIDE.Rmd is up-to-date and rendered GUIDE.pdf is correct"
 echo
+echo "ALSO:"
+echo " * Draft release from tag on github including archive files with bundled"
+echo "   GUIDE.pdf"
+echo " * Merge release-### into master, dev, and gh-pages"
+echo
