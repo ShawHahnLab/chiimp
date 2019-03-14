@@ -1,6 +1,6 @@
 Package: chiimp
 Title: Computational, High-throughput Individual Identification through Microsatellite Profiling
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: person("Jesse", "Connell", email = "ancon@upenn.edu", role = c("aut", "cre"))
 Description: An R package to analyze microsatellites in high-throughput sequencing datasets.
 Depends: R (>= 3.2.3)

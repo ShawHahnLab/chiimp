@@ -1,4 +1,4 @@
-# chiimp dev
+# chiimp 0.2.3
 
  * Fixed package checks and testing on latest R development releases ([#27]).
  * Fixed test behavior on Windows and improved test organization ([#16]).
