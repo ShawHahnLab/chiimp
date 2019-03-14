@@ -320,16 +320,20 @@ with(test_data, {
   test_that("prepare_dataset handles missing data directory", {
     dp <- tempfile()
     expect_error({
-      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-    }, paste("ERROR: directory path for data files does not exist:", dp))
+        prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+      },
+      paste("ERROR: directory path for data files does not exist:", dp),
+      fixed = TRUE)
   })
 
   test_that("prepare_dataset handles no-samples case", {
     dp <- tempfile()
     dir.create(dp)
     expect_error({
-      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-    }, paste("ERROR: no data files found:", dp))
+        prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+      },
+      paste("ERROR: no data files found:", dp),
+      fixed = TRUE)
     unlink(x = dp, recursive = TRUE)
   })
 
