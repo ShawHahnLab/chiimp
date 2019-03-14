@@ -21,38 +21,25 @@ if (! any(file.access(.libPaths(), 2) == 0)) {
   .libPaths(dp)
 }
 
-cat("\n")
-cat("### Installing devtools\n")
-cat("\n")
-install.packages("devtools", repos = "https://cloud.r-project.org")
+if (! require("devtools", character.only = TRUE, quietly = TRUE)) {
+  cat("\n")
+  cat("### Installing devtools\n")
+  cat("\n")
+  install.packages("devtools", repos = "https://cloud.r-project.org")
+}
 
-cat("\n")
-cat("### Installing Bioconductor and MSA\n")
-cat("\n")
-source("https://bioconductor.org/biocLite.R")
-biocLite("msa")
-
-cat("\n")
-cat("### Installing dependencies\n")
-cat("\n")
-devtools::install_deps(path, dependencies = TRUE)
-
-cat("\n")
-cat("### Testing CHIIMP\n")
-cat("\n")
-status <- sum(as.data.frame(devtools::test(path))$failed)
-if (status == 1) {
+if (! suppressMessages(require("msa", character.only = TRUE, quietly = TRUE))) {
   cat("\n")
+  cat("### Installing Bioconductor and MSA\n")
   cat("\n")
-  cat("    Warning: Tests indicated failures.\n")
-  cat("\n")
-  cat("\n")
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("msa")
 }
 
 cat("\n")
 cat("### Installing CHIIMP\n")
 cat("\n")
-devtools::install(path)
+devtools::install(path, upgrade = "never")
 
 shortcut_path <- file.path(UPROF, "Desktop", "CHIIMP.lnk")
 chiimp_path <- system.file("bin", "chiimp.cmd", package = "chiimp")
