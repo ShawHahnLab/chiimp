@@ -322,7 +322,6 @@ with(test_data, {
     expect_error({
       prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
     }, paste("ERROR: directory path for data files does not exist:", dp))
-    unlink(x = dp, recursive = TRUE)
   })
 
   test_that("prepare_dataset handles no-samples case", {
