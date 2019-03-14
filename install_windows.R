@@ -21,14 +21,20 @@ if (! any(file.access(.libPaths(), 2) == 0)) {
   .libPaths(dp)
 }
 
-if (! require("devtools", character.only = TRUE, quietly = TRUE)) {
+haspkg <- function(pkgname) {
+  suppressMessages(suppressWarnings(
+    require(pkgname, character.only = TRUE, quietly = TRUE)
+  ))
+}
+
+if (! haspkg("devtools")) {
   cat("\n")
   cat("### Installing devtools\n")
   cat("\n")
   install.packages("devtools", repos = "https://cloud.r-project.org")
 }
 
-if (! suppressMessages(require("msa", character.only = TRUE, quietly = TRUE))) {
+if (! haspkg("msa")) {
   cat("\n")
   cat("### Installing Bioconductor and MSA\n")
   cat("\n")
