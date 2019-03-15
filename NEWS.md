@@ -1,3 +1,9 @@
+# chiimp dev
+
+ * Added support for demo scripts and integration testing in Mac OS ([#32]).
+
+[#32]: https://github.com/ShawHahnLab/chiimp/pull/32
+
 # chiimp 0.2.3
 
  * Fixed package checks and testing on latest R development releases ([#27]).
