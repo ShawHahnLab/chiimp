@@ -1,3 +1,7 @@
+# https://docs.travis-ci.com/user/multi-os/
+os:
+  - linux
+  - osx
 # https://docs.travis-ci.com/user/languages/r
 language: r
 bioc_packages: msa
