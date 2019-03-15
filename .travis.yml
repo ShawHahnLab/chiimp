@@ -9,6 +9,12 @@ r:
   - oldrel
   - release
   - devel
+# Mac OS R devel build URL is out of date, currently.
+# https://travis-ci.community/t/672
+matrix:
+  exclude:
+    - r: devel
+      os: osx
 cache: packages
 script:
   - R CMD build .
