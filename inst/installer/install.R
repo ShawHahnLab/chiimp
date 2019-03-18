@@ -81,10 +81,10 @@ setup_user_library_windows <- function() {
 get_user_library_windows <- function() {
   # This is the directory I see RStudio create automatically on first start,
   # and the command-line R also detects it.
-  # In Windows
   uprof <- Sys.getenv("USERPROFILE")
   ver <- paste(version$major, sub("\\..*", "", version$minor), sep = ".")
   dp <- file.path(uprof, "Documents", "R", "win-library", ver)
+  dp <- normalizePath(dp, mustWork = FALSE)
   return(dp)
 }
 
@@ -118,6 +118,7 @@ setup_icon_linux <- function() {
       paste("Exec", chiimp_path, sep = ":"),
       sep = "\n")
     icon_path <- file.path(desktop_path, "CHIIMP.desktop")
+    icon_path <- normalizePath(icon_path, mustWork = FALSE)
     cat(desktop_file, file = icon_path)
     system2("chmod", "+x", icon_path)
   }
@@ -132,6 +133,7 @@ setup_icon_osx <- function() {
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
     icon_path <- file.path(desktop_path, "CHIIMP")
+    icon_path <- normalizePath(icon_path, mustWork = FALSE)
     system2("ln", "-s", chiimp_path, icon_path)
   }
   return(icon_path)
@@ -144,6 +146,7 @@ setup_icon_windows <- function() {
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
     icon_path <- file.path(uprof, "Desktop", "CHIIMP.lnk")
+    icon_path <- normalizePath(icon_path, mustWork = FALSE)
     # https://stackoverflow.com/a/30029955/6073858
     args <- c(paste0("$s=(New-Object -COM WScript.Shell).CreateShortcut('",
                      icon_path,
