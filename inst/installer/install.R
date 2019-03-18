@@ -44,32 +44,20 @@ get_os <- function() {
 
 
 # Check if we have write access to any library paths.  If not, create the user
-# library.
-
+# library appropriate for the detected operating system.
 setup_user_library <- function() {
-  os <- get_os()
-  if (os == "windows") {
-    setup_user_library_windows()
-  } else if (os == "osx") {
-    setup_user_library_osx()
-  } else if (os == "linux") {
-    setup_user_library_linux()
-  } else {
-    warning("Operating system not recognized; skipping user library setup")
-  }
-}
-
-setup_user_library_linux <- function() {
-  # TODO implement as for Windows
-}
-
-setup_user_library_osx <- function() {
-  # TODO implement as for Windows
-}
-
-setup_user_library_windows <- function() {
   if (! any(file.access(.libPaths(), 2) == 0)) {
-    dp <- get_user_library_windows()
+    os <- get_os()
+    dp <- if (os == "windows") {
+      get_user_library_windows()
+    } else if (os == "osx") {
+      get_user_library_osx()
+    } else if (os == "linux") {
+      get_user_library_linux()
+    } else {
+      warning("Operating system not recognized; skipping user library setup")
+      return()
+    }
     dir.create(dp, recursive = TRUE)
     # On a second run through this will get picked up automatically,
     # but if we want it right now we have to add it to the list manually.
@@ -78,11 +66,27 @@ setup_user_library_windows <- function() {
   }
 }
 
+# Return the path to the user R library on Linux.
+get_user_library_linux <- function() {
+  dp <- file.path("~", "R", paste(R.version$platform, "library", sep = "-"))
+  dp <- normalizePath(dp, mustWork = FALSE)
+  return(dp)
+}
+
+# Return the path to the user R library on OS X.
+get_user_library_osx <- function() {
+  # TODO check this
+  dp <- file.path("~", "R", "Library")
+  dp <- normalizePath(dp, mustWork = FALSE)
+  return(dp)
+}
+
+# Return the path to the user R library on Windows.
 get_user_library_windows <- function() {
   # This is the directory I see RStudio create automatically on first start,
   # and the command-line R also detects it.
   uprof <- Sys.getenv("USERPROFILE")
-  ver <- paste(version$major, sub("\\..*", "", version$minor), sep = ".")
+  ver <- paste(R.version$major, sub("\\..*", "", version$minor), sep = ".")
   dp <- file.path(uprof, "Documents", "R", "win-library", ver)
   dp <- normalizePath(dp, mustWork = FALSE)
   return(dp)
@@ -92,6 +96,10 @@ get_user_library_windows <- function() {
 # Setup Desktop Icon ------------------------------------------------------
 
 
+# Create a Desktop icon appropriate for the detected operating system.
+#   Windows: A .lnk Shortcut to a .cmd wrapper script
+#   OS X: A symbolic link to a small .app wrapper application
+#   Linux: A .desktop INI file pointing to a .sh wrapper script
 setup_icon <- function() {
   os <- get_os()
   if (os == "windows") {
