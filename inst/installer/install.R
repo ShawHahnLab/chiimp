@@ -164,6 +164,8 @@ setup_icon_windows <- function() {
 
 install <- function(path_package = NULL) {
 
+  results <- list()
+
   if (is.null(path_package)) {
     path_installer <- get_script_path()
     if (is.null(path_installer)) {
@@ -172,7 +174,7 @@ install <- function(path_package = NULL) {
     path_package <- normalizePath(file.path(path_installer, "..", ".."))
   }
 
-  setup_user_library()
+  results$new_user_library <- setup_user_library()
 
   if (! haspkg("devtools")) {
     cat("\n")
@@ -193,7 +195,9 @@ install <- function(path_package = NULL) {
   cat("### Installing CHIIMP\n")
   cat("\n")
   devtools::install(path_package, upgrade = "never")
-  setup_icon()
+  results$icon <- setup_icon()
+
+  invisible(results)
 }
 
 # e.g., if __name__ == "__main__"
