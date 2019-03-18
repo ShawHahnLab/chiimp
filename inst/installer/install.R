@@ -43,53 +43,32 @@ get_os <- function() {
 # Setup R User Library ----------------------------------------------------
 
 
+# Sys.getenv("R_LIBS_USER") seems to work even if that variable was not set
+# going into R and even if the directory doesn't yet exist.
+#
+# Documentation is a bit vague but hints in this direction:
+#
+# ?.libPaths
+# "By default R_LIBS is unset, and R_LIBS_USER is set to directory
+# ‘R/R.version$platform-library/x.y’ of the home directory (or
+# ‘Library/R/x.y/library’ for CRAN macOS builds), for R x.y.z."
+#
+# The behavior I actually see is:
+#  Linux: ~/R/R.version$platform-library/x.y
+#  OSX: ~/Library/R/x.y/library
+#  Windows: %USERPROFILE%\Documents\R\win-library\x.y
+
 # Check if we have write access to any library paths.  If not, create the user
 # library appropriate for the detected operating system.
 setup_user_library <- function() {
   if (! any(file.access(.libPaths(), 2) == 0)) {
-    os <- get_os()
-    dp <- if (os == "windows") {
-      get_user_library_windows()
-    } else if (os == "osx") {
-      get_user_library_osx()
-    } else if (os == "linux") {
-      get_user_library_linux()
-    } else {
-      warning("Operating system not recognized; skipping user library setup")
-      return()
-    }
+    dp <- normalizePath(Sys.getenv("R_LIBS_USER"), mustWork = FALSE)
     dir.create(dp, recursive = TRUE)
     # On a second run through this will get picked up automatically,
     # but if we want it right now we have to add it to the list manually.
     .libPaths(dp)
     return(dp)
   }
-}
-
-# Return the path to the user R library on Linux.
-get_user_library_linux <- function() {
-  dp <- file.path("~", "R", paste(R.version$platform, "library", sep = "-"))
-  dp <- normalizePath(dp, mustWork = FALSE)
-  return(dp)
-}
-
-# Return the path to the user R library on OS X.
-get_user_library_osx <- function() {
-  # TODO check this
-  dp <- file.path("~", "R", "Library")
-  dp <- normalizePath(dp, mustWork = FALSE)
-  return(dp)
-}
-
-# Return the path to the user R library on Windows.
-get_user_library_windows <- function() {
-  # This is the directory I see RStudio create automatically on first start,
-  # and the command-line R also detects it.
-  uprof <- Sys.getenv("USERPROFILE")
-  ver <- paste(R.version$major, sub("\\..*", "", version$minor), sep = ".")
-  dp <- file.path(uprof, "Documents", "R", "win-library", ver)
-  dp <- normalizePath(dp, mustWork = FALSE)
-  return(dp)
 }
 
 
