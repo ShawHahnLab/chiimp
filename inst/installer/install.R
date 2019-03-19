@@ -1,5 +1,9 @@
 # Install CHIIMP package and desktop icon.
 
+# Should add a log file but R makes it tricky to safely capture stderr.  Maybe
+# just grab messages/warnings/errors specifically.
+# https://stackoverflow.com/questions/45036224/how-to-write-errors-and-warnings-to-a-log-file
+# https://stackoverflow.com/questions/19433848/handling-errors-before-warnings-in-trycatch
 
 # Functions ---------------------------------------------------------------
 
@@ -107,7 +111,9 @@ setup_icon_linux <- function() {
     icon_path <- file.path(desktop_path, "CHIIMP.desktop")
     icon_path <- normalizePath(icon_path, mustWork = FALSE)
     cat(desktop_file, file = icon_path)
-    system2("chmod", "+x", icon_path)
+    # TODO double-check if .desktop files actually need to be marked
+    # exectuable.  This may not be necessary.
+    system2("chmod", args = c("+x", icon_path))
   }
   return(icon_path)
 }
@@ -116,12 +122,12 @@ setup_icon_osx <- function() {
   chiimp_path <- system.file("bin", "chiimp.app", package = "chiimp")
   droplet_path <- file.path(chiimp_path, "Contents", "MacOS", "droplet.gz")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
-  system2("gunzip", droplet_path)
+  system2("gunzip", args = droplet_path)
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
     icon_path <- file.path(desktop_path, "CHIIMP")
     icon_path <- normalizePath(icon_path, mustWork = FALSE)
-    system2("ln", "-s", chiimp_path, icon_path)
+    system2("ln", args = c("-s", chiimp_path, icon_path))
   }
   return(icon_path)
 }
@@ -140,7 +146,7 @@ setup_icon_windows <- function() {
                      "');"),
               paste0("$s.TargetPath='", chiimp_path, "';"),
               "$s.Save();")
-    system2("powershell", args)
+    system2("powershell", args = args)
   }
   return(icon_path)
 }
