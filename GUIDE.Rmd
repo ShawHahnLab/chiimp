@@ -51,6 +51,10 @@ right-click (control+click) and select "Open" in the menu that appears.
 Apple has specific instructions [here](https://support.apple.com/kb/PH25088?locale=en_US)
 about these security setings.
 
+If a window appears recommending installation of the Mac OS command-line
+developer tools, go ahead and install them.  After that you'll probably need to
+re-run the CHIIMP installer again to finish the install.
+
 ### Linux
 
 On Linux, run the `install_linux.sh` shell script to automatically install the 
