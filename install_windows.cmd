@@ -16,5 +16,5 @@ REM  Path to chiimp source, relative to this script.
 set pkgdir=%~dp0
 
 REM  Run bulk of the install within R.
-"%rscript%" --vanilla "%pkgdir%\inst\installer\install.R"
+"%rscript%" --vanilla "%pkgdir%\tools\install.R"
 pause

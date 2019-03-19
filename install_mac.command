@@ -7,5 +7,5 @@
 
 rscript=$(which Rscript)
 pkgdir=$(dirname $BASH_SOURCE)
-"$rscript" --vanilla "$pkgdir/inst/installer/install.R"
+"$rscript" --vanilla "$pkgdir/tools/install.R"
 read -n 1 -s -p "Press any key to continue . . ."; echo # see "pause" in cmd.exe

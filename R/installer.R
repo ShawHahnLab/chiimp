@@ -1,25 +1,10 @@
-# Install CHIIMP package and desktop icon.
+# CHIIMP Installer Tools
+#
+# These functions help with CHIIMP installation, including a first-time user
+# library creation, devtools installation, and the Desktop icon.
 
-# Should add a log file but R makes it tricky to safely capture stderr.  Maybe
-# just grab messages/warnings/errors specifically.
-# https://stackoverflow.com/questions/45036224/how-to-write-errors-and-warnings-to-a-log-file
-# https://stackoverflow.com/questions/19433848/handling-errors-before-warnings-in-trycatch
+# Helper Functions --------------------------------------------------------
 
-# Functions ---------------------------------------------------------------
-
-
-# Find the path to the directory containing this script.
-get_script_path <- function() {
-  args <- commandArgs()
-  f <- gsub("^--file=", "", args[grep("^--file=", args)])
-  f <- normalizePath(f)
-  d <- dirname(f)
-  if (length(d)) {
-    return(d)
-  } else {
-    return(NULL)
-  }
-}
 
 # Check very quietly if a package is installed
 haspkg <- function(pkgname) {
@@ -158,16 +143,22 @@ setup_icon_windows <- function() {
 # Install -----------------------------------------------------------------
 
 
-install <- function(path_package = NULL) {
+# Should add a log file but R makes it tricky to safely capture stderr.  Maybe
+# just grab messages/warnings/errors specifically.
+# https://stackoverflow.com/questions/45036224/how-to-write-errors-and-warnings-to-a-log-file
+# https://stackoverflow.com/questions/19433848/handling-errors-before-warnings-in-trycatch
+
+install <- function(path_package) {
 
   results <- list()
 
-  if (is.null(path_package)) {
-    path_installer <- get_script_path()
-    if (is.null(path_installer)) {
-      stop("install must be run as script or given explicit package path")
-    }
-    path_package <- normalizePath(file.path(path_installer, "..", ".."))
+  # Conda's R has a longstanding problem (see all the issues on github across
+  # projects) where it sets TAR=/bin/gtar which may not exist.  Better to just
+  # let R figure it out from the PATH.
+  # https://github.com/r-lib/devtools/issues/379
+  if (! file.exists(Sys.getenv("TAR"))) {
+    Sys.setenv(TAR = Sys.which("tar")[[1]])
+    results$tar_path <- Sys.getenv("TAR")
   }
 
   results$new_user_library <- setup_user_library()
@@ -194,9 +185,4 @@ install <- function(path_package = NULL) {
   results$icon <- setup_icon()
 
   invisible(results)
-}
-
-# e.g., if __name__ == "__main__"
-if (! is.null(get_script_path())) {
- install()
 }
