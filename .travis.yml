@@ -21,3 +21,4 @@ script:
   - R CMD check *tar.gz
   - ./inst/bin/demo.sh
   - ./inst/bin/demo_empty.sh
+  - ./tools/travis_install_test.sh
