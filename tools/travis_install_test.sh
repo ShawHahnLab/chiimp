@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-set -e
 
 # This is a helper script for Travis testing.
 # Assumes working directory is the project directory.
+
+# make nonzero exit codes trigger failure
+set -e
+# print commands as they are executed
+set -x
 
 # (These scripts pause for input hence the pipe from the yes command.)
 if   [[ $TRAVIS_OS_NAME -eq "linux"   ]]; then
