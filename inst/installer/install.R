@@ -127,7 +127,10 @@ setup_icon_osx <- function() {
   if (dir.exists(desktop_path)) {
     icon_path <- file.path(desktop_path, "CHIIMP")
     icon_path <- normalizePath(icon_path, mustWork = FALSE)
-    system2("ln", args = c("-s", chiimp_path, icon_path))
+    # Create the symbolic link, replacing whatever link may have already been
+    # there.
+    # Also consider R's file.symlink().
+    system2("ln", args = c("-shf", chiimp_path, icon_path))
   }
   return(icon_path)
 }
