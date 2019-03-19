@@ -10,6 +10,7 @@ set -x
 
 # (These scripts pause for input hence the pipe from the yes command.)
 if   [[ $TRAVIS_OS_NAME -eq "linux"   ]]; then
+	mkdir -p ~/Desktop
 	yes | ./install_linux.sh
 	# Desktop icon should be a regular file
 	test -f ~/Desktop/CHIIMP.desktop
