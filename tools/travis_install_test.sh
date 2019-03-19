@@ -15,6 +15,7 @@ if   [[ $TRAVIS_OS_NAME == "linux"   ]]; then
 	# Desktop icon should be a regular file
 	test -f ~/Desktop/CHIIMP.desktop
 elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
+	mkdir -p ~/Desktop
 	yes | ./install_mac.command
 	# Desktop icon should be a symbolic link to an existent file
 	test -f ~/Desktop/CHIIMP
