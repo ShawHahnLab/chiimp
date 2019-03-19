@@ -95,7 +95,7 @@ setup_icon_linux <- function() {
       sep = "\n")
     icon_path <- file.path(desktop_path, "CHIIMP.desktop")
     icon_path <- normalizePath(icon_path, mustWork = FALSE)
-    cat(desktop_file, file = icon_path)
+    cat(desktop_file, file = icon_path, end = "\n")
     # TODO double-check if .desktop files actually need to be marked
     # exectuable.  This may not be necessary.
     system2("chmod", args = c("+x", icon_path))
