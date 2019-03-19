@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Set up an install on Linux from scratch.
+# Assumes working directory is project directory.
 #
 # You probably want "install_linux.sh" instead; this will pull in a lot of
 # dependencies into a self-contained Anaconda environment instead of using
@@ -28,7 +29,7 @@ fi
 # with:
 #     conda create --name chiimp --file spec-file.txt
 $CONDA/bin/conda env list | grep -q "$PKG" ||
-	$CONDA/bin/conda env create --file environment.yml
+	$CONDA/bin/conda env create --file tools/environment.yml
 
 source $CONDA/bin/activate "$PKG"
 
