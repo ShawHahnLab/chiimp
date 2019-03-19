@@ -17,6 +17,9 @@ if   [[ $TRAVIS_OS_NAME == "linux"   ]]; then
 elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	mkdir -p ~/Desktop
 	yes | ./install_mac.command
+	# Travis troubleshooting
+	ls -l ~
+	R -e 'print(file.path(system.file("bin", "chiimp.app", package = "chiimp"), "Contents", "MacOS", "droplet.gz"))'
 	# Desktop icon should be a symbolic link to an existent file
 	test -f ~/Desktop/CHIIMP
 	test -h ~/Desktop/CHIIMP
