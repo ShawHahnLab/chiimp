@@ -11,6 +11,7 @@ Imports:
   argparser (>= 0.4),
   dnaplotr (>= 0.1),
   dnar (>= 0.1),
+  devtools (>= 1.13.5),
   graphics (>= 3.2.3),
   grDevices (>= 3.2.3),
   kableExtra (>= 0.2.1.9000),
