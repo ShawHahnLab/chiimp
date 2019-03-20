@@ -82,7 +82,7 @@ setup_icon <- function() {
 }
 
 setup_icon_linux <- function() {
-  chiimp_path <- system.file("bin", "chiimp.sh", package = "chiimp")
+  chiimp_path <- system.file("exec", "chiimp.sh", package = "chiimp")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
@@ -104,7 +104,7 @@ setup_icon_linux <- function() {
 }
 
 setup_icon_osx <- function() {
-  chiimp_path <- system.file("bin", "chiimp.app", package = "chiimp")
+  chiimp_path <- system.file("exec", "chiimp.app", package = "chiimp")
   droplet_path <- file.path(chiimp_path, "Contents", "MacOS", "droplet.gz")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
   system2("gunzip", args = droplet_path)
@@ -121,7 +121,7 @@ setup_icon_osx <- function() {
 }
 
 setup_icon_windows <- function() {
-  chiimp_path <- system.file("bin", "chiimp.cmd", package = "chiimp")
+  chiimp_path <- system.file("exec", "chiimp.cmd", package = "chiimp")
   uprof <- Sys.getenv("USERPROFILE")
   desktop_path <- normalizePath(file.path(uprof, "Desktop"), mustWork = FALSE)
   icon_path <- NULL
