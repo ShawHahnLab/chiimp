@@ -4,7 +4,6 @@
 .utils
 install_linux.sh
 install_windows.cmd
-install_windows.R
 install_mac.command
 README.md
 GUIDE.Rmd
