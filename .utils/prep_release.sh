@@ -39,7 +39,7 @@ R --slave --vanilla -e "rmarkdown::render('GUIDE.Rmd', output_file = 'GUIDE.pdf'
 if [[ $VERSION != "" ]]; then
 	echo "$SEP Creating release archives"
 	pushd ..
-	zip -r chiimp-v${VERISON}.zip chiimp/*
+	zip -r chiimp-v${VERSION}.zip chiimp/*
 	tar czvf chiimp-v${VERSION}.tgz chiimp/*
 	popd
 fi
