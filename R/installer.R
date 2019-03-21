@@ -91,7 +91,7 @@ setup_icon_linux <- function() {
       "Type=Application",
       "Terminal=true",
       "Name=CHIIMP",
-      paste("Exec", chiimp_path, sep = ":"),
+      paste("Exec", chiimp_path, sep = "="),
       sep = "\n")
     icon_path <- file.path(desktop_path, "CHIIMP.desktop")
     icon_path <- normalizePath(icon_path, mustWork = FALSE)
