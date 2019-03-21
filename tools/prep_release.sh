@@ -10,11 +10,11 @@ SEP="==="
 chiimp_check='x<-devtools::check();quit(save="no",status=length(c(x$errors,x$warnings)))'
 
 echo "$SEP Running spell check"
-./tools/spellcheck.R
+./tools/check_spelling.R
 
 # Run lint script
 echo "$SEP Running lint check"
-./tools/lint.R
+./tools/check_lint.R
 
 if [[ $VERSION != "" ]]; then
 	# Update version in download link in README

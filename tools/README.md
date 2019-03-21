@@ -5,12 +5,16 @@ These aren't relevant within an installation or for regular users.
 
  * `chiimp.AppleScript`: Source code for the Desktop icon wrapper application
    on Mac OS.  See comments in the script for usage.
- * `environment.yml`: Conda environment definition file.
- * `install_linux_conda.sh`: Conda install wrapper.
+ * `conda_environment.yml`: Conda environment definition file.
+ * `conda_install.sh`: Conda install wrapper.
  * `install.R`: Small wrapper script to call installation code from within the
    package.
  * `travis_install_test.sh` Script to manage testing the various installers
    under Travis.
+ * `check_lint.R`: Checks for R code quality
+ * `check_spelling.R` Checks for spelling in documentation
+ * `check_spelling_wordlist.txt` Additional words for the spell checker
+ * `prep_release.sh` New version release preparation script
 
 ## Manual Testing Steps
 
