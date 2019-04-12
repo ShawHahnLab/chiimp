@@ -1,7 +1,9 @@
 # chiimp dev
 
+ * Reorganized installer and wrapper scripts ([#38]).
  * Added support for demo scripts and integration testing in Mac OS ([#32]).
 
+[#38]: https://github.com/ShawHahnLab/chiimp/pull/38
 [#32]: https://github.com/ShawHahnLab/chiimp/pull/32
 
 # chiimp 0.2.3
