@@ -10,11 +10,11 @@ SEP="==="
 chiimp_check='x<-devtools::check();quit(save="no",status=length(c(x$errors,x$warnings)))'
 
 echo "$SEP Running spell check"
-./.utils/spellcheck.R
+./tools/check_spelling.R
 
 # Run lint script
 echo "$SEP Running lint check"
-./.utils/lint.R
+./tools/check_lint.R
 
 if [[ $VERSION != "" ]]; then
 	# Update version in download link in README
@@ -39,7 +39,7 @@ R --slave --vanilla -e "rmarkdown::render('GUIDE.Rmd', output_file = 'GUIDE.pdf'
 if [[ $VERSION != "" ]]; then
 	echo "$SEP Creating release archives"
 	pushd ..
-	zip -r chiimp-v${VERISON}.zip chiimp/*
+	zip -r chiimp-v${VERSION}.zip chiimp/*
 	tar czvf chiimp-v${VERSION}.tgz chiimp/*
 	popd
 fi

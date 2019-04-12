@@ -13,9 +13,9 @@
 args <- commandArgs()
 f <- gsub("^--file=", "", args[grep("^--file=", args)])
 f <- normalizePath(f)
-path <- dirname(dirname(f))
-if (basename(path) == "inst") {
-  suppressWarnings(devtools::load_all(dirname(path), quiet = TRUE))
+pkgpath <- dirname(dirname(f))
+if ("inst" %in% list.files(pkgpath)) {
+  suppressWarnings(devtools::load_all(pkgpath, quiet = TRUE))
 }
 
 results <- chiimp::main()

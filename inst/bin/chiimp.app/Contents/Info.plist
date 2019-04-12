@@ -26,11 +26,11 @@
 	<key>CFBundleIconFile</key>
 	<string>droplet</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.apple.ScriptEditor.id.test</string>
+	<string>com.apple.ScriptEditor.id.chiimp</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Droplet with Settable Properties</string>
+	<string>chiimp</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -57,9 +57,9 @@
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>685</real>
+		<real>385</real>
 		<key>savedFrame</key>
-		<string>149 238 1443 936 0 0 2560 1417 </string>
+		<string>113 223 1211 636 0 0 1440 877 </string>
 		<key>selectedTab</key>
 		<string>description</string>
 	</dict>
