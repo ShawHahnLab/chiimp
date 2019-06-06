@@ -39,6 +39,44 @@ load_config <- function(fp) {
   yaml::yaml.load(text)
 }
 
+#' Load and save tables from CSV
+#'
+#' Load/save a comma-separated table from/to a CSV file.  (These are generic
+#' wrapper functions used by more specific loaders like
+#' \code{\link{load_locus_attrs}}.)
+#'
+#' @param fp path to text file.
+#' @param ... additional arguments passed to \code{\link[utils]{read.table}} or
+#'   \code{\link[utils]{write.table}}.
+#'
+#' @return data frame
+#' 
+#' @describeIn load_csv Load CSV
+#'
+#' @export
+load_csv <- function(fp, ...) {
+  data <- utils::read.table(fp,
+                            header = TRUE,
+                            sep = ",",
+                            stringsAsFactors = FALSE,
+                            ...)
+  rownames(data) <- make_rownames(data)
+  data
+}
+
+#' @describeIn load_csv Save CSV
+#' @param data data frame to save to CSV file
+#' @export
+save_csv <- function(data, fp, ...) {
+  utils::write.table(data,
+                     file = fp,
+                     sep = ",",
+                     na = "",
+                     row.names = FALSE,
+                     ...)
+  data
+}
+
 #' Load table of locus attributes
 #'
 #' Load a comma-separated table of locus attributes to use for analysis.  This
