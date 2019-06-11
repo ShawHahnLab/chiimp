@@ -5,13 +5,8 @@ r:
   - oldrel
   - release
   - devel
-  - bioc-devel
+  - bioc-release
 cache: packages
-before_install:
-  # Copied directly from the log of a working build to try to force the
-  # devtools install that should be happening automatically.
-  # https://api.travis-ci.org/v3/job/506519381/log.txt
-  - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
 script:
   - R CMD build .
   - R CMD check *tar.gz
