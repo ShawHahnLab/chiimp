@@ -10,6 +10,7 @@ r:
   - release
   - devel
   - bioc-release
+  - bioc-devel
 # Mac OS R devel build URL is out of date, currently.
 # https://travis-ci.community/t/672
 matrix:
