@@ -97,7 +97,7 @@ save_csv <- function(data, fp, ...) {
 #' @md
 #'
 #' @param fp.locus_attrs path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of locus attributes
 #'
@@ -107,11 +107,7 @@ save_csv <- function(data, fp, ...) {
 #' filename <- system.file("example_locus_attrs.csv", package = "chiimp")
 #' locus_attrs <- load_locus_attrs(filename)
 load_locus_attrs <- function(fp.locus_attrs, ...) {
-  data <- utils::read.table(fp.locus_attrs,
-                            header = TRUE,
-                            sep = ",",
-                            stringsAsFactors = FALSE,
-                            ...)
+  data <- load_csv(fp.locus_attrs, ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in locus_attrs table:",
@@ -130,17 +126,13 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 #' Load a comma-separated table of allele names for use in reporting.
 #'
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of allele names
 #'
 #' @export
 load_allele_names <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            stringsAsFactors = FALSE,
-                            ...)
+  data <- load_csv(fp, ...)
   col.missing <- is.na(match(allele_names_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in allele.names table:",
@@ -156,18 +148,13 @@ load_allele_names <- function(fp, ...) {
 #' \code{\link{summarize_dataset}}.
 #'
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of genotypes
 #'
 #' @export
 load_genotypes <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            colClasses = "character",
-                            na.strings = "",
-                            ...)
+  data <- load_csv(fp, colClasses = "character", na.strings = "", ...)
   col.missing <- is.na(match(genotypes_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in genotypes table:",
@@ -197,18 +184,13 @@ load_genotypes <- function(fp, ...) {
 #' @md
 #'
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of sample attributes for the dataset.
 #'
 #' @export
 load_dataset <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            colClasses = "character",
-                            na.strings = "",
-                            ...)
+  data <- load_csv(fp, colClasses = "character", na.strings = "", ...)
   col.missing <- is.na(match(dataset_cols, colnames(data)))
   files.missing <- ! file.exists(data$Filename)
   if (any(files.missing)) {
@@ -231,16 +213,11 @@ load_dataset <- function(fp, ...) {
 #' @param data data frame of sample attributes as produced by
 #'   \code{\link{prepare_dataset}} or \code{\link{load_dataset}}.
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{save_csv}}.
 #'
 #' @export
 save_dataset <- function(data, fp, ...) {
-  utils::write.table(data,
-                     file = fp,
-                     sep = ",",
-                     na = "",
-                     row.names = FALSE,
-                     ...)
+  save_csv(data, fp, ...)
 }
 
 #' Extract Sample Attributes from Filenames
@@ -387,7 +364,7 @@ load_seqs <- function(fp) {
 save_results_summary <- function(results_summary, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  utils::write.csv(results_summary, fp, na = "")
+  save_csv(results_summary, fp)
 }
 
 #' Save identified alleles to FASTA files
@@ -457,7 +434,7 @@ save_seqfile_data <- function(results_file_data, dp) {
       dir.create(dp_this, recursive = TRUE)
     }
     fp <- file.path(dp, paste0(fp_this, ".csv"))
-    utils::write.csv(results_file_data[[n]], fp, na = "", quote = FALSE)
+    save_csv(results_file_data[[n]], fp, quote = FALSE)
   }))
 }
 
@@ -477,7 +454,7 @@ save_sample_data <- function(results_data, dp) {
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
     fp <- file.path(dp, paste0(n, ".csv"))
-    utils::write.csv(results_data[[n]], fp, na = "", quote = FALSE)
+    save_csv(results_data[[n]], fp, quote = FALSE)
   }))
 }
 
@@ -594,5 +571,5 @@ save_histograms <- function(results, dp, image.func="png",
 save_dist_mat <- function(dist_mat, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  utils::write.csv(dist_mat, fp)
+  save_csv(dist_mat, fp)
 }

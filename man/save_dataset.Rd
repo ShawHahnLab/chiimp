@@ -12,7 +12,7 @@ save_dataset(data, fp, ...)
 
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link[utils]{read.table}}.}
+\item{...}{additional arguments passed to \code{\link{save_csv}}.}
 }
 \description{
 Save a comma-separated table of sample attributes.  (This is a convenience
