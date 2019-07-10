@@ -1,8 +1,11 @@
 # chiimp dev
 
+ * Added `load_csv` and `save_csv` functions to centralize loading and saving
+   tabular data ([#43]).
  * Reorganized installer and wrapper scripts ([#38]).
  * Added support for demo scripts and integration testing in Mac OS ([#32]).
 
+[#43]: https://github.com/ShawHahnLab/chiimp/pull/43
 [#38]: https://github.com/ShawHahnLab/chiimp/pull/38
 [#32]: https://github.com/ShawHahnLab/chiimp/pull/32
 
