@@ -7,11 +7,11 @@
 :: its own terminal window.
 
 if "%~1"=="" (
-	echo "To run CHIIMP, drag and drop a configuration file onto this icon."
-	echo
-	echo "For more information see the user guide bundled with the program or here:"
-	echo "https://shawhahnlab.github.io/chiimp/GUIDE.pdf"
-	echo
+	echo.To run CHIIMP, drag and drop a configuration file onto this icon.
+	echo.
+	echo.For more information see the user guide bundled with the program or here:
+	echo.https://shawhahnlab.github.io/chiimp/GUIDE.pdf
+	echo.
 ) else (
 	REM  This directory
 	set dir=%~dp0
