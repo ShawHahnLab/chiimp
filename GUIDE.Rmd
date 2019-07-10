@@ -34,8 +34,12 @@ package documentation.
 
 ## Installation
 
-Most dependencies are provided by installation of [R] and [RStudio].  Once these
-are installed, follow the specific instructions below for your operating system.
+Most dependencies are provided by installation of [R] and [RStudio].  Once
+these are installed, follow the specific instructions below for your operating
+system.  In all three cases CHIIMP performs an anlysis when a configuration
+file is dragged and dropped onto the desktop icon; there is no interactive
+interface via the icon, though the R package can be used interactively.  See
+the Usage section for more information.
 
 ### Windows
 
