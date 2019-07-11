@@ -1,5 +1,7 @@
 # chiimp dev
 
+ * Made read count ratio thresholds for PCR stutter and artifact sequence
+   flagging customizable ([#46]).
  * Added drag-and-drop usage message when desktop icon is opened directly
    ([#44]).
  * Added `load_csv` and `save_csv` functions to centralize loading and saving
@@ -7,6 +9,7 @@
  * Reorganized installer and wrapper scripts ([#38]).
  * Added support for demo scripts and integration testing in Mac OS ([#32]).
 
+[#46]: https://github.com/ShawHahnLab/chiimp/pull/46
 [#44]: https://github.com/ShawHahnLab/chiimp/pull/44
 [#43]: https://github.com/ShawHahnLab/chiimp/pull/43
 [#38]: https://github.com/ShawHahnLab/chiimp/pull/38
