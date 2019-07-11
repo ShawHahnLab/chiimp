@@ -4,8 +4,11 @@
 \alias{analyze_dataset}
 \title{Analyze all samples in a dataset}
 \usage{
-analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, analysis_opts,
-  summary_opts, analysis_function = analyze_sample,
+analyze_dataset(dataset, locus_attrs, nrepeats,
+  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
+  ncores = 0, analysis_opts, summary_opts,
+  analysis_function = analyze_sample,
   summary_function = summarize_sample, known_alleles = NULL,
   name_args = list())
 }
@@ -18,6 +21,13 @@ analyze_dataset(dataset, locus_attrs, nrepeats, ncores = 0, analysis_opts,
 
 \item{nrepeats}{number of repeats of each locus' motif to require for a
 match (see \code{\link{analyze_seqs}}).}
+
+\item{stutter.count.ratio_max}{highest ratio of read counts for second most
+frequent sequence to the most frequence where the second will be
+considered stutter (see \code{\link{analyze_seqs}}).}
+
+\item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
+non-stutter artifact sequences.}
 
 \item{ncores}{integer number of CPU cores to use in parallel for sample
 analysis.  Defaults to one less than half the number of detected cores with

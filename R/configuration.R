@@ -59,7 +59,11 @@ config.defaults <- list(
     name_args = list(hash_len = 6)
   ),
   ## Sample genotyping settings
-  seq_analysis = list(nrepeats = 3),
+  seq_analysis = list(
+    nrepeats = 3,
+    stutter.count.ratio_max = 1 / 3,
+    artifact.count.ratio_max = 1 / 3
+  ),
   sample_analysis_func = "analyze_sample",
   sample_analysis_opts = list(fraction.min = 0.05),
   sample_summary_func = "summarize_sample",

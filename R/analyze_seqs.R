@@ -36,6 +36,11 @@
 #' @param locus_attrs data frame of attributes for loci to look for.
 #' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match.
+#' @param stutter.count.ratio_max highest ratio of read counts for second most
+#'   frequent sequence to the most frequence where the second will be
+#'   considered stutter.
+#' @param artifact.count.ratio_max as for \code{stutter.count.ratio_max} but for
+#'   non-stutter artifact sequences.
 #'
 #' @return data frame of dereplicated sequences with added annotations.
 #'
@@ -55,7 +60,10 @@
 #' seq_data <- analyze_seqs(raw_seq_vector,
 #'                          locus_attrs,
 #'                          num_adjacent_repeats)
-analyze_seqs <- function(seqs, locus_attrs, nrepeats) {
+analyze_seqs <- function(
+  seqs, locus_attrs, nrepeats,
+  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max) {
   # Dereplicate sequences
   tbl <- table(seqs)
   count <- as.integer(tbl)
@@ -81,8 +89,8 @@ analyze_seqs <- function(seqs, locus_attrs, nrepeats) {
   # Label rows that contain unexpected characters in the sequence content.
   data$Ambiguous <- ! grepl("^[ACGT]*$", data$Seq, ignore.case = TRUE)
   # Label rows that look like PCR stutter or other artifacts of other rows.
-  data$Stutter <- find_stutter(data, locus_attrs)
-  data$Artifact <- find_artifact(data, locus_attrs)
+  data$Stutter <- find_stutter(data, locus_attrs, stutter.count.ratio_max)
+  data$Artifact <- find_artifact(data, locus_attrs, artifact.count.ratio_max)
   # Add columns for the proportion of counts out of the total and out of those
   # for the matching locus.  This way this information is preserved even in
   # subsets of the original sample data.
@@ -179,8 +187,9 @@ check_length <- function(sample.data, locus_attrs) {
 #'
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as a stutter band.
-find_stutter <- function(sample.data, locus_attrs,
-                         count.ratio_max = 1 / 3) {
+find_stutter <- function(
+  sample.data, locus_attrs,
+  count.ratio_max=config.defaults$seq_analysis$stutter.count.ratio_max) {
 
   stutter <- integer(nrow(sample.data)) * NA
 
@@ -228,8 +237,9 @@ find_stutter <- function(sample.data, locus_attrs,
 #'
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as an artifactual sequence.
-find_artifact <- function(sample.data, locus_attrs,
-                         count.ratio_max = 1 / 3) {
+find_artifact <- function(
+  sample.data, locus_attrs,
+  count.ratio_max=config.defaults$seq_analysis$artifact.count.ratio_max) {
 
   artifact <- integer(nrow(sample.data)) * NA
 
