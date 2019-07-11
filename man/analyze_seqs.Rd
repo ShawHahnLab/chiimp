@@ -4,7 +4,9 @@
 \alias{analyze_seqs}
 \title{Analyze a set of STR sequences}
 \usage{
-analyze_seqs(seqs, locus_attrs, nrepeats)
+analyze_seqs(seqs, locus_attrs, nrepeats,
+  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max)
 }
 \arguments{
 \item{seqs}{character vector containing sequences.}
@@ -13,6 +15,13 @@ analyze_seqs(seqs, locus_attrs, nrepeats)
 
 \item{nrepeats}{number of repeats of each locus' motif to require for a
 match.}
+
+\item{stutter.count.ratio_max}{highest ratio of read counts for second most
+frequent sequence to the most frequence where the second will be
+considered stutter.}
+
+\item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
+non-stutter artifact sequences.}
 }
 \value{
 data frame of dereplicated sequences with added annotations.
