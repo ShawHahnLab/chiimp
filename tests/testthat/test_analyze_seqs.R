@@ -134,7 +134,7 @@ with(test_data, {
   test_that("analyze_seqs works with varied threshold for stutter counts", {
     s <- seqs1$A
     s[nchar(s) %in% c(158, 54)] <- s[nchar(s) == 190][1]
-    seq_data <- analyze_seqs(s, locus_attrs, 3, stutter.count.ratio_max = 1/2)
+    seq_data <- analyze_seqs(s, locus_attrs, 3, stutter.count.ratio_max = 1 / 2)
     chunk <- subset(seq_data, !is.na(Stutter))
     expect_equal(chunk$Count, c(443, 2, 2, 2, 1, 1))
     expect_equal(chunk$Stutter, c(2, 2, 2, 2, 4, 4))

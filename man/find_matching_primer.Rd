@@ -4,17 +4,24 @@
 \alias{find_matching_primer}
 \title{Label STR sequence rows by locus}
 \usage{
-find_matching_primer(sample.data, locus_attrs)
+find_matching_primer(sample.data, locus_attrs, forward = TRUE,
+  reverse_primer_r1 = TRUE)
 }
 \arguments{
 \item{sample.data}{data frame of processed sequence data.}
 
 \item{locus_attrs}{data frame of attributes for loci to look for.}
+
+\item{forward}{use forward primers, or reverse?}
+
+\item{reverse_primer_r1}{Is each reverse primer given in its orientation on
+the forward read?  This is used to determine how the primers and reads
+should be reverse complemented before comparing.}
 }
 \value{
 factor of locus names corresponding the matched primer sequences.
 }
 \description{
 Return a factor giving the locus name matching each sample data entry's
-matching primer (first found).
+matching primer (first found) for either the forward or reverse primers.
 }

@@ -25,6 +25,8 @@
 #'   considered stutter (see \code{\link{analyze_seqs}}).
 #' @param artifact.count.ratio_max as for \code{stutter.count.ratio_max} but for
 #'   non-stutter artifact sequences.
+#' @param reverse_primer_r1 Is each reverse primer given in its orientation on
+#'   the forward read?  (See \code{\link{analyze_seqs}})
 #' @param ncores integer number of CPU cores to use in parallel for sample
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
@@ -53,8 +55,12 @@ analyze_dataset <- function(
   dataset,
   locus_attrs,
   nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
+  stutter.count.ratio_max = config.defaults$seq_analysis$
+    stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$
+    artifact.count.ratio_max,
+  reverse_primer_r1 = config.defaults$seq_analysis$
+    reverse_primer_r1,
   ncores = 0,
   analysis_opts,
   summary_opts,
@@ -72,10 +78,12 @@ analyze_dataset <- function(
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
   analyze.file <- function(fp, locus_attrs, nrepeats,
-                           stutter.count.ratio_max, artifact.count.ratio_max) {
+                           stutter.count.ratio_max, artifact.count.ratio_max,
+                           reverse_primer_r1) {
     seqs <- load_seqs(fp)
     analyze_seqs(seqs, locus_attrs, nrepeats,
-                 stutter.count.ratio_max, artifact.count.ratio_max)
+                 stutter.count.ratio_max, artifact.count.ratio_max,
+                 reverse_primer_r1)
   }
   analyze.entry <- function(entry, analysis_opts, summary_opts,
                             analysis_function, summary_function,
@@ -126,7 +134,8 @@ analyze_dataset <- function(
                                             locus_attrs = locus_attrs,
                                             nrepeats = nrepeats,
                                             stutter.count.ratio_max,
-                                            artifact.count.ratio_max)
+                                            artifact.count.ratio_max,
+                                            reverse_primer_r1)
       names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
                                         analysis_opts = analysis_opts,
@@ -144,7 +153,8 @@ analyze_dataset <- function(
                              locus_attrs = locus_attrs,
                              nrepeats = nrepeats,
                              stutter.count.ratio_max,
-                             artifact.count.ratio_max)
+                             artifact.count.ratio_max,
+                             reverse_primer_r1)
     names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
                          analysis_opts = analysis_opts,

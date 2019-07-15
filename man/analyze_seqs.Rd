@@ -6,7 +6,9 @@
 \usage{
 analyze_seqs(seqs, locus_attrs, nrepeats,
   stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max)
+  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
+  use_reverse_primers = config.defaults$seq_analysis$use_reverse_primers,
+  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1)
 }
 \arguments{
 \item{seqs}{character vector containing sequences.}
@@ -22,6 +24,10 @@ considered stutter.}
 
 \item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
 non-stutter artifact sequences.}
+
+\item{reverse_primer_r1}{Is each reverse primer given in its orientation on
+the forward read?  This is used to determine how the primers and reads
+should be reverse complemented before comparing.}
 }
 \value{
 data frame of dereplicated sequences with added annotations.
