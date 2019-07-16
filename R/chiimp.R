@@ -195,6 +195,8 @@ full_analysis <- function(config, dataset=NULL) {
                                stutter.count.ratio_max,
                              artifact.count.ratio_max = cfg$seq_analysis$
                                artifact.count.ratio_max,
+                             use_reverse_primers = cfg$seq_analysis$
+                               use_reverse_primers,
                              reverse_primer_r1 = cfg$seq_analysis$
                                reverse_primer_r1,
                              ncores = cfg$dataset_analysis$ncores,

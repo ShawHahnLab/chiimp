@@ -25,6 +25,8 @@
 #'   considered stutter (see \code{\link{analyze_seqs}}).
 #' @param artifact.count.ratio_max as for \code{stutter.count.ratio_max} but for
 #'   non-stutter artifact sequences.
+#' @param use_reverse_primers consider the ReversePrimer column from the locus
+#'   attributes for locus-matching?
 #' @param reverse_primer_r1 Is each reverse primer given in its orientation on
 #'   the forward read?  (See \code{\link{analyze_seqs}})
 #' @param ncores integer number of CPU cores to use in parallel for sample
@@ -59,6 +61,8 @@ analyze_dataset <- function(
     stutter.count.ratio_max,
   artifact.count.ratio_max = config.defaults$seq_analysis$
     artifact.count.ratio_max,
+  use_reverse_primers = config.defaults$seq_analysis$
+    use_reverse_primers,
   reverse_primer_r1 = config.defaults$seq_analysis$
     reverse_primer_r1,
   ncores = 0,
@@ -79,10 +83,12 @@ analyze_dataset <- function(
   }
   analyze.file <- function(fp, locus_attrs, nrepeats,
                            stutter.count.ratio_max, artifact.count.ratio_max,
+                           use_reverse_primers,
                            reverse_primer_r1) {
     seqs <- load_seqs(fp)
     analyze_seqs(seqs, locus_attrs, nrepeats,
                  stutter.count.ratio_max, artifact.count.ratio_max,
+                 use_reverse_primers,
                  reverse_primer_r1)
   }
   analyze.entry <- function(entry, analysis_opts, summary_opts,
@@ -135,6 +141,7 @@ analyze_dataset <- function(
                                             nrepeats = nrepeats,
                                             stutter.count.ratio_max,
                                             artifact.count.ratio_max,
+                                            use_reverse_primers,
                                             reverse_primer_r1)
       names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
@@ -154,6 +161,7 @@ analyze_dataset <- function(
                              nrepeats = nrepeats,
                              stutter.count.ratio_max,
                              artifact.count.ratio_max,
+                             use_reverse_primers,
                              reverse_primer_r1)
     names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
