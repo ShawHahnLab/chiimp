@@ -41,6 +41,11 @@
 #'   considered stutter.
 #' @param artifact.count.ratio_max as for \code{stutter.count.ratio_max} but for
 #'   non-stutter artifact sequences.
+#' @param use_reverse_primers consider the ReversePrimer column from the locus
+#'   attributes for locus-matching?
+#' @param reverse_primer_r1 Is each reverse primer given in its orientation on
+#'   the forward read?  This is used to determine how the primers and reads
+#'   should be reverse complemented before comparing.
 #'
 #' @return data frame of dereplicated sequences with added annotations.
 #'
@@ -62,8 +67,13 @@
 #'                          num_adjacent_repeats)
 analyze_seqs <- function(
   seqs, locus_attrs, nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max) {
+  stutter.count.ratio_max = config.defaults$seq_analysis$
+    stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$
+    artifact.count.ratio_max,
+  use_reverse_primers = config.defaults$seq_analysis$
+    use_reverse_primers,
+  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1) {
   # Dereplicate sequences
   tbl <- table(seqs)
   count <- as.integer(tbl)
@@ -79,7 +89,18 @@ analyze_seqs <- function(
   rownames(data) <- NULL
   # Label rows with the apparent locus by checking primer sequences.  Note that
   # this uses the first matching locus for each row.
-  data$MatchingLocus <- find_matching_primer(data, locus_attrs)
+
+  # In the next major release we can add these into the returned data frame, but
+  # for now they can stay internal for compatibility.
+  MatchingPrimerForward <- find_matching_primer(data, locus_attrs)
+  MatchingPrimerReverse <- find_matching_primer(data, locus_attrs, FALSE,
+                                                reverse_primer_r1)
+  data$MatchingLocus <- MatchingPrimerForward
+  if (use_reverse_primers) {
+    data$MatchingLocus[
+      ! (MatchingPrimerForward == MatchingPrimerReverse) %in% TRUE] <- NA
+  }
+
   # Label rows where the sequence content matches the matching locus" repeat
   # motif.
   data$MotifMatch <- check_motif(data, locus_attrs, nrepeats)
@@ -107,24 +128,46 @@ analyze_seqs <- function(
 #' Label STR sequence rows by locus
 #'
 #' Return a factor giving the locus name matching each sample data entry's
-#' matching primer (first found).
+#' matching primer (first found) for either the forward or reverse primers.
 #'
 #' @param sample.data data frame of processed sequence data.
 #' @param locus_attrs data frame of attributes for loci to look for.
+#' @param forward use forward primers, or reverse?
+#' @param reverse_primer_r1 Is each reverse primer given in its orientation on
+#'   the forward read?  This is used to determine how the primers and reads
+#'   should be reverse complemented before comparing.
 #'
 #' @return factor of locus names corresponding the matched primer sequences.
-find_matching_primer <- function(sample.data, locus_attrs) {
+find_matching_primer <- function(sample.data, locus_attrs,
+                                 forward=TRUE, reverse_primer_r1=TRUE) {
+  seqs <- sample.data$Seq
+  if (forward) {
+    primercol <- "Primer"
+  } else {
+    primercol <- "ReversePrimer"
+    seqs <- as.character(
+      Biostrings::reverse(Biostrings::DNAStringSet(sample.data$Seq)))
+  }
   # Separately check each primer.  Is there a slicker way to do this all at
   # once?
   matches <- do.call(cbind, lapply(rownames(locus_attrs), function(locus_name) {
-    primer <- as.character(locus_attrs[locus_name, "Primer"])
-    result <- grepl(primer, substr(sample.data$Seq, 1, nchar(primer) + 10))
+    primer <- as.character(locus_attrs[locus_name, primercol])
+    if (! forward) {
+      primer <- as.character(
+        if (reverse_primer_r1) {
+            Biostrings::reverse(primer)
+        } else {
+            Biostrings::complement(Biostrings::DNAString(primer))
+        }
+      )
+    }
+    result <- grepl(primer, substr(seqs, 1, nchar(primer) + 10))
     c(locus_name)[as.numeric((! result) + 1)]
   }))
   # Collapse that set down to just the first match for each entry.
   first.matches <- apply(matches, 1, function(m) m[match(TRUE, !is.na(m))])
   # Store that as a factor and use the standard locus name levels.
-  factor(first.matches, levels = rownames(locus_attrs))
+  factor(first.matches, levels = unique(locus_attrs$Locus))
 }
 
 #' Check sequences for STR repeats

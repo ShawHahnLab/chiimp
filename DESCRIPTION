@@ -9,6 +9,7 @@ Encoding: UTF-8
 LazyData: true
 Imports:
   argparser (>= 0.4),
+  Biostrings (>= 2.38.4),
   dnaplotr (>= 0.1),
   dnar (>= 0.1),
   devtools (>= 1.13.5),
