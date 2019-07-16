@@ -13,7 +13,6 @@ These aren't relevant within an installation or for regular users.
    under Travis.
  * `check_lint.R`: Checks for R code quality
  * `check_spelling.R` Checks for spelling in documentation
- * `check_spelling_wordlist.txt` Additional words for the spell checker
  * `prep_release.sh` New version release preparation script
 
 ## Manual Testing Steps

@@ -37,7 +37,7 @@
 #' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match.
 #' @param stutter.count.ratio_max highest ratio of read counts for second most
-#'   frequent sequence to the most frequence where the second will be
+#'   frequent sequence to the most frequent where the second will be
 #'   considered stutter.
 #' @param artifact.count.ratio_max as for \code{stutter.count.ratio_max} but for
 #'   non-stutter artifact sequences.

@@ -19,7 +19,7 @@ analyze_seqs(seqs, locus_attrs, nrepeats,
 match.}
 
 \item{stutter.count.ratio_max}{highest ratio of read counts for second most
-frequent sequence to the most frequence where the second will be
+frequent sequence to the most frequent where the second will be
 considered stutter.}
 
 \item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
