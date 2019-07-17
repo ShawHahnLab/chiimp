@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# On MacOS, compile the AppleScript for the desktop icon into an application.
+if [[ $(uname -s) == Darwin ]]; then
+	osacompile -o exec/chiimp.app tools/chiimp.AppleScript
+fi
