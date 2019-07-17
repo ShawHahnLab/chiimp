@@ -104,7 +104,7 @@ setup_icon_linux <- function() {
 }
 
 setup_icon_osx <- function() {
-  chiimp_path <- system.file("exec", "chiimp.app", package = "chiimp")
+  chiimp_path <- system.file("chiimp.app", package = "chiimp")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
