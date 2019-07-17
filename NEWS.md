@@ -1,5 +1,6 @@
 # chiimp dev
 
+ * Improved icon setup on Mac OS ([#48]).
  * Added support for use of reverse primers in locus-matching ([#47]).
  * Made read count ratio thresholds for PCR stutter and artifact sequence
    flagging customizable ([#46]).
@@ -10,6 +11,7 @@
  * Reorganized installer and wrapper scripts ([#38]).
  * Added support for demo scripts and integration testing in Mac OS ([#32]).
 
+[#48]: https://github.com/ShawHahnLab/chiimp/pull/48
 [#47]: https://github.com/ShawHahnLab/chiimp/pull/47
 [#46]: https://github.com/ShawHahnLab/chiimp/pull/46
 [#44]: https://github.com/ShawHahnLab/chiimp/pull/44
