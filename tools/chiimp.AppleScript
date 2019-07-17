@@ -1,5 +1,9 @@
 -- This AppleScript needs to be compiled into a Mac OS .app directory in order for drag-and-drop to work.
 --
+-- On the command line: osacompile -o chiimp.app chiimp.AppleScript
+--
+-- Interactively:
+--
 -- 1) Open in Script Editor
 -- 2) File > Export...
 --    * File Format: Application

@@ -104,10 +104,8 @@ setup_icon_linux <- function() {
 }
 
 setup_icon_osx <- function() {
-  chiimp_path <- system.file("bin", "chiimp.app", package = "chiimp")
-  droplet_path <- file.path(chiimp_path, "Contents", "MacOS", "droplet.gz")
+  chiimp_path <- system.file("chiimp.app", package = "chiimp")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
-  system2("gunzip", args = droplet_path)
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
     icon_path <- file.path(desktop_path, "CHIIMP")
