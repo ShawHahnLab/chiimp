@@ -5,6 +5,8 @@
 # A base R install is assumed to already be present, but all dependencies
 # should be installed automatically here.
 
+set -e
+
 rscript=$(which Rscript)
 pkgdir=$(dirname $BASH_SOURCE)
 cd "$pkgdir"
