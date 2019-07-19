@@ -3,7 +3,7 @@
 set -e
 
 # On MacOS, compile the AppleScript for the desktop icon into an application.
-if [[ $(uname -s) == Darwin ]]; then
+if test $(uname -s) = Darwin; then
 	# I tried exec/chiimp.app, but R CMD install seems to skip directories
 	# when copying (which chimp.app actually is)
 	osacompile -o inst/chiimp.app tools/chiimp.AppleScript
