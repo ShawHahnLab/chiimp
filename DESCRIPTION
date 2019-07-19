@@ -8,6 +8,7 @@ License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Language: en-US
+biocViews:
 Imports:
   argparser (>= 0.4),
   Biostrings (>= 2.38.4),

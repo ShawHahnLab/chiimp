@@ -168,14 +168,6 @@ install <- function(path_package) {
     install.packages("devtools", repos = "https://cloud.r-project.org")
   }
 
-  if (! haspkg("msa")) {
-    cat("\n")
-    cat("### Installing Bioconductor and MSA\n")
-    cat("\n")
-    source("https://bioconductor.org/biocLite.R")
-    biocLite("msa", suppressUpdates = TRUE)
-  }
-
   cat("\n")
   cat("### Installing CHIIMP\n")
   cat("\n")
