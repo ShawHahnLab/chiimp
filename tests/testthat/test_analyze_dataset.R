@@ -28,8 +28,7 @@ with(test_data, {
                                summary_opts = list(counts.min = 500),
                                nrepeats = 3,
                                ncores = 1)
-    lapply(dataset$Filename, file.remove)
-    file.remove(data.dir)
+    unlink(x = data.dir, recursive = TRUE)
     # Check the overall structure
     expect_equal(sapply(results, class),
                  c(summary = "data.frame",
@@ -47,8 +46,7 @@ with(test_data, {
                                summary_opts = list(counts.min = 500),
                                nrepeats = 3,
                                ncores = 1)
-    lapply(dataset$Filename, file.remove)
-    file.remove(data.dir)
+    unlink(x = data.dir, recursive = TRUE)
     # Check the summary data frame
     with(results$summary, {
       # First update ordering of dataset's rows.  The existing order should be
@@ -123,8 +121,7 @@ with(test_data, {
                                nrepeats = 3,
                                ncores = 1,
                                known_alleles = known_alleles)
-    lapply(dataset$Filename, file.remove)
-    file.remove(data.dir)
+    unlink(x = data.dir, recursive = TRUE)
 
     # Check that the resulting allele names match all the expected values
     with(results$summary, {
@@ -182,6 +179,7 @@ with(test_data, {
                                  nrepeats = 3,
                                  ncores = 1)
     }, "ERROR: Locus names in dataset not in attributes table: a, b")
+    unlink(x = data.dir, recursive = TRUE)
   })
 
   test_that("analyze_dataset warns of empty input files", {
@@ -202,6 +200,7 @@ with(test_data, {
     }, type = "message")
     msg_exp <- "WARNING: Zero reads for 1 of 12 data files"
     expect_true(length(grep(msg_exp, msg)) == 1)
+    unlink(x = data.dir, recursive = TRUE)
   })
 
 })

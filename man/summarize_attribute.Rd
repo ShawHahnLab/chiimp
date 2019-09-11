@@ -21,6 +21,6 @@ data frame of attribute across samples and loci.
 \description{
 Tabulate a single arbitrary attribute across loci, assuming repeats by two
 for the alleles.  This is used for color-coding summary heatmaps (see
-\code{\link{plot_heatmap}}) on top of the attribute values, like Homozgyous
-or ProminentSeqs.
+\code{\link{plot_heatmap}}) on top of the attribute values, like
+\code{Homozygous} or \code{ProminentSeqs}.
 }

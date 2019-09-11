@@ -8,18 +8,18 @@
 #' itself to see all of the build-time defaults.
 #'
 #' Notable Options:
-#'   * dataset_opts:
-#'     * dp: directory path to input sequence files
-#'     * pattern: regular expression for the input filename pattern
-#'     * ord: order of fields Replicate, Sample, and Locus in in the input
-#'     filename pattern.  For example, if Locus is the first field followed by
-#'     Replicate and Sample, set \code{ord=c(3, 1, 2)}.
-#'   * output:
-#'     * dp: directory path for saving output data
-#'   * fp_dataset: file path to table of sample attributes to use, rather than
-#'     detecting via dataset_opts
-#'   * fp_locus_attrs: file path to locus attributes CSV file
-#'   * fp_genotypes_known: file path to known genotypes CSV file
+#'   * \code{dataset_opts}:
+#'     * \code{dp}: directory path to input sequence files
+#'     * \code{pattern}: regular expression for the input filename pattern
+#'     * \code{ord}: order of fields Replicate, Sample, and Locus in in the
+#'     input filename pattern.  For example, if Locus is the first field
+#'     followed by Replicate and Sample, set \code{ord=c(3, 1, 2)}.
+#'   * \code{output}:
+#'     * \code{dp}: directory path for saving output data
+#'   * \code{fp_dataset}: file path to table of sample attributes to use, rather
+#'     than detecting via dataset_opts
+#'   * \code{fp_locus_attrs}: file path to locus attributes CSV file
+#'   * \code{fp_genotypes_known}: file path to known genotypes CSV file
 #' @md
 #'
 #' @export
@@ -59,7 +59,13 @@ config.defaults <- list(
     name_args = list(hash_len = 6)
   ),
   ## Sample genotyping settings
-  seq_analysis = list(nrepeats = 3),
+  seq_analysis = list(
+    nrepeats = 3,
+    stutter.count.ratio_max = 1 / 3,
+    artifact.count.ratio_max = 1 / 3,
+    use_reverse_primers = FALSE,
+    reverse_primer_r1 = TRUE
+  ),
   sample_analysis_func = "analyze_sample",
   sample_analysis_opts = list(fraction.min = 0.05),
   sample_summary_func = "summarize_sample",

@@ -18,5 +18,13 @@ set rdir=%rpath%\..\
 REM  TODO: detect RStudio instead of presuming the path
 set RSTUDIO_PANDOC=C:\Program Files\RStudio\bin\pandoc
 
-"%rdir%\RScript" "%dir%\chiimp" %*
+if "%~1"=="" (
+	echo.To run CHIIMP, drag and drop a configuration file onto this icon.
+	echo.
+	echo.For more information see the user guide bundled with the program or here:
+	echo.https://shawhahnlab.github.io/chiimp/GUIDE.pdf
+	echo.
+) else (
+	"%rdir%\RScript" "%dir%\chiimp" %*
+)
 pause

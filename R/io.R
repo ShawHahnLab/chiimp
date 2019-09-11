@@ -39,6 +39,44 @@ load_config <- function(fp) {
   yaml::yaml.load(text)
 }
 
+#' Load and save tables from CSV
+#'
+#' Load/save a comma-separated table from/to a CSV file.  (These are generic
+#' wrapper functions used by more specific loaders like
+#' \code{\link{load_locus_attrs}}.)
+#'
+#' @param fp path to text file.
+#' @param ... additional arguments passed to \code{\link[utils]{read.table}} or
+#'   \code{\link[utils]{write.table}}.
+#'
+#' @return data frame
+#' 
+#' @describeIn load_csv Load CSV
+#'
+#' @export
+load_csv <- function(fp, ...) {
+  data <- utils::read.table(fp,
+                            header = TRUE,
+                            sep = ",",
+                            stringsAsFactors = FALSE,
+                            ...)
+  rownames(data) <- make_rownames(data)
+  data
+}
+
+#' @describeIn load_csv Save CSV
+#' @param data data frame to save to CSV file
+#' @export
+save_csv <- function(data, fp, ...) {
+  utils::write.table(data,
+                     file = fp,
+                     sep = ",",
+                     na = "",
+                     row.names = FALSE,
+                     ...)
+  data
+}
+
 #' Load table of locus attributes
 #'
 #' Load a comma-separated table of locus attributes to use for analysis.  This
@@ -48,18 +86,18 @@ load_config <- function(fp) {
 #'
 #' @details
 #' Columns Required:
-#'   * Locus: Unique identifier for a given locus
-#'   * LengthMin: Minimum known allele sequence length for this locus
-#'   * LengthMax: Minimum known allele sequence length for this locus
-#'   * LengthBuffer: Additional sequence length below LengthMin and above
-#'     LengthMax to accept for a candidate allele
-#'   * Primer: The forward PCR primer sequence for a given locus, used when
-#'     matching sequences to loci
-#'   * ReversePrimer: The reverse PCR primer sequence
+#'   * \code{Locus}: Unique identifier for a given locus
+#'   * \code{LengthMin}: Minimum known allele sequence length for this locus
+#'   * \code{LengthMax}: Minimum known allele sequence length for this locus
+#'   * \code{LengthBuffer}: Additional sequence length below \code{LengthMin}
+#'     and above \code{LengthMax} to accept for a candidate allele
+#'   * \code{Primer}: The forward PCR primer sequence for a given locus, used
+#'   when matching sequences to loci
+#'   * \code{ReversePrimer}: The reverse PCR primer sequence
 #' @md
 #'
 #' @param fp.locus_attrs path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of locus attributes
 #'
@@ -69,11 +107,7 @@ load_config <- function(fp) {
 #' filename <- system.file("example_locus_attrs.csv", package = "chiimp")
 #' locus_attrs <- load_locus_attrs(filename)
 load_locus_attrs <- function(fp.locus_attrs, ...) {
-  data <- utils::read.table(fp.locus_attrs,
-                            header = TRUE,
-                            sep = ",",
-                            stringsAsFactors = FALSE,
-                            ...)
+  data <- load_csv(fp.locus_attrs, ...)
   col.missing <- is.na(match(locus_attrs_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in locus_attrs table:",
@@ -92,17 +126,13 @@ load_locus_attrs <- function(fp.locus_attrs, ...) {
 #' Load a comma-separated table of allele names for use in reporting.
 #'
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of allele names
 #'
 #' @export
 load_allele_names <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            stringsAsFactors = FALSE,
-                            ...)
+  data <- load_csv(fp, ...)
   col.missing <- is.na(match(allele_names_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in allele.names table:",
@@ -118,18 +148,13 @@ load_allele_names <- function(fp, ...) {
 #' \code{\link{summarize_dataset}}.
 #'
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of genotypes
 #'
 #' @export
 load_genotypes <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            colClasses = "character",
-                            na.strings = "",
-                            ...)
+  data <- load_csv(fp, colClasses = "character", na.strings = "", ...)
   col.missing <- is.na(match(genotypes_cols, colnames(data)))
   if (any(col.missing)) {
     warning(paste("Missing columns in genotypes table:",
@@ -159,18 +184,13 @@ load_genotypes <- function(fp, ...) {
 #' @md
 #'
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{load_csv}}.
 #'
 #' @return data frame of sample attributes for the dataset.
 #'
 #' @export
 load_dataset <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            colClasses = "character",
-                            na.strings = "",
-                            ...)
+  data <- load_csv(fp, colClasses = "character", na.strings = "", ...)
   col.missing <- is.na(match(dataset_cols, colnames(data)))
   files.missing <- ! file.exists(data$Filename)
   if (any(files.missing)) {
@@ -193,16 +213,11 @@ load_dataset <- function(fp, ...) {
 #' @param data data frame of sample attributes as produced by
 #'   \code{\link{prepare_dataset}} or \code{\link{load_dataset}}.
 #' @param fp path to text file.
-#' @param ... additional arguments passed to \code{\link[utils]{read.table}}.
+#' @param ... additional arguments passed to \code{\link{save_csv}}.
 #'
 #' @export
 save_dataset <- function(data, fp, ...) {
-  utils::write.table(data,
-                     file = fp,
-                     sep = ",",
-                     na = "",
-                     row.names = FALSE,
-                     ...)
+  save_csv(data, fp, ...)
 }
 
 #' Extract Sample Attributes from Filenames
@@ -318,8 +333,8 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
 #' Load vector of sequences from FASTA/FASTQ file
 #'
 #' Load a vector of character sequences from the given path.  This is just a
-#' wrapper around dnar to choose the parser based on filename.  Only the
-#' sequences are returned, not IDs or quality scores.
+#' wrapper around \code{\link[dnar:read.fa]{dnar}} to choose the parser based on
+#' filename.  Only the sequences are returned, not IDs or quality scores.
 #'
 #' @param fp path to sequence file
 #'
@@ -349,7 +364,7 @@ load_seqs <- function(fp) {
 save_results_summary <- function(results_summary, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  utils::write.csv(results_summary, fp, na = "")
+  save_csv(results_summary, fp)
 }
 
 #' Save identified alleles to FASTA files
@@ -399,9 +414,9 @@ save_allele_seqs <- function(results_summary, dp) {
 #' \code{\link{analyze_seqs}}) to a separate file in the specified directory
 #' path, in CSV format.  The directory structure will start at the first shared
 #' directory of the input file paths.
-#' For example, if the inputs were /data/run1/file.fastq and
-#' /data/run2/file.fastq there will be run1 and run2 directories inside the
-#' given `dp` directory.
+#' For example, if the inputs were \code{/data/run1/file.fastq} and
+#' \code{/data/run2/file.fastq} there will be run1 and run2 directories inside
+#' the given \code{dp} directory.
 #'
 #' @param results_file_data list of per-file data frames as produced by
 #'   \code{\link{analyze_dataset}}.
@@ -419,7 +434,7 @@ save_seqfile_data <- function(results_file_data, dp) {
       dir.create(dp_this, recursive = TRUE)
     }
     fp <- file.path(dp, paste0(fp_this, ".csv"))
-    utils::write.csv(results_file_data[[n]], fp, na = "", quote = FALSE)
+    save_csv(results_file_data[[n]], fp, quote = FALSE)
   }))
 }
 
@@ -439,13 +454,13 @@ save_sample_data <- function(results_data, dp) {
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
     fp <- file.path(dp, paste0(n, ".csv"))
-    utils::write.csv(results_data[[n]], fp, na = "", quote = FALSE)
+    save_csv(results_data[[n]], fp, quote = FALSE)
   }))
 }
 
 #' Save alignments to FASTA files
 #'
-#' Take a list of alignments, one per locus, and save each to a separate fasta
+#' Take a list of alignments, one per locus, and save each to a separate FASTA
 #' file in a specified directory.  If any of the per-locus alignment objects is
 #' NA it will be skipped.  These are produced by \code{\link{summarize_dataset}}
 #' via \code{\link{align_alleles}}.
@@ -556,5 +571,5 @@ save_histograms <- function(results, dp, image.func="png",
 save_dist_mat <- function(dist_mat, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
-  utils::write.csv(dist_mat, fp)
+  save_csv(dist_mat, fp)
 }

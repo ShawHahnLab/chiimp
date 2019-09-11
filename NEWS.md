@@ -1,3 +1,33 @@
+# chiimp 0.3.0
+
+ * Improved icon setup on Mac OS ([#48]).
+ * Added support for use of reverse primers in locus-matching ([#47]).
+ * Made read count ratio thresholds for PCR stutter and artifact sequence
+   flagging customizable ([#46]).
+ * Added drag-and-drop usage message when desktop icon is opened directly
+   ([#44]).
+ * Added `load_csv` and `save_csv` functions to centralize loading and saving
+   tabular data ([#43]).
+ * Reorganized installer and wrapper scripts ([#38]).
+ * Added support for demo scripts and integration testing in Mac OS ([#32]).
+
+[#48]: https://github.com/ShawHahnLab/chiimp/pull/48
+[#47]: https://github.com/ShawHahnLab/chiimp/pull/47
+[#46]: https://github.com/ShawHahnLab/chiimp/pull/46
+[#44]: https://github.com/ShawHahnLab/chiimp/pull/44
+[#43]: https://github.com/ShawHahnLab/chiimp/pull/43
+[#38]: https://github.com/ShawHahnLab/chiimp/pull/38
+[#32]: https://github.com/ShawHahnLab/chiimp/pull/32
+
+# chiimp 0.2.3
+
+ * Fixed package checks and testing on latest R development releases ([#27]).
+ * Fixed test behavior on Windows and improved test organization ([#16]).
+ * Added documentation corrections and improvements.
+
+[#27]: https://github.com/ShawHahnLab/chiimp/issues/27
+[#16]: https://github.com/ShawHahnLab/chiimp/issues/16
+
 # chiimp 0.2.2
 
  * Fixed heatmap plotting via updated `plot_heatmap` for cases with blank

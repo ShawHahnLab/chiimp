@@ -38,23 +38,25 @@ Entries in the returned list:
 \itemize{
 \item For Allele1 and Allele2:
 \itemize{
-\item Seq: sequence text for each allele.
-\item Count: integer count of occrrences of this exact sequence.
-\item Length: integer sequence length.
+\item \code{Seq}: sequence text for each allele.
+\item \code{Count}: integer count of occurrences of this exact sequence.
+\item \code{Length}: integer sequence length.
 }
-\item Homozygous: If the sample appears homozygous (if so, the Allele2 entries
-will be NA).
-\item Ambiguous: If a potential allele was ignored due to ambiguous bases in
-sequence content (such as "N").
-\item Stutter: If a potential allele was ignored due to apparent PCR stutter.
-\item Artifact: If a potential allele was ignored due to apparent PCR artifact
-(other than stutter).
-\item CountTotal: The total number of sequences in the original sample data.
-\item CountLocus: The number of sequences matching all criteria for the
+\item \code{Homozygous}: If the sample appears homozygous (if so, the Allele2
+entries will be NA).
+\item \code{Ambiguous}: If a potential allele was ignored due to ambiguous bases
+in sequence content (such as "N").
+\item \code{Stutter}: If a potential allele was ignored due to apparent PCR
+stutter.
+\item \code{Artifact}: If a potential allele was ignored due to apparent PCR
+artifact (other than stutter).
+\item \code{CountTotal}: The total number of sequences in the original sample
+data.
+\item \code{CountLocus}: The number of sequences matching all criteria for the
 specified locus in the original sample data.
-\item ProminentSeqs: The number of entries above the specified threshold after
-all filtering.  This should be either one (for a homozygous sample) or two
-(for a heterozygous sample) but conditions such as cross-sample
+\item \code{ProminentSeqs}: The number of entries above the specified threshold
+after all filtering.  This should be either one (for a homozygous sample) or
+two (for a heterozygous sample) but conditions such as cross-sample
 contamination or excessive PCR stutter can lead to more than two.
 }
 }
@@ -63,8 +65,8 @@ contamination or excessive PCR stutter can lead to more than two.
 \item \code{summarize_sample}: Default version of sample summary.
 
 \item \code{summarize_sample_guided}: Summarize a processed STR sample Using known
-lengths.  If ExpectedLength1 and optionally ExpectedLength2 are given in
-\code{sample.attrs}, the \code{counts.min} threshold is ignored.  See also
-\code{\link{analyze_sample_guided}}.
+lengths.  If \code{ExpectedLength1} and optionally \code{ExpectedLength2}
+are given in \code{sample.attrs}, the \code{counts.min} threshold is
+ignored.  See also \code{\link{analyze_sample_guided}}.
 }}
 

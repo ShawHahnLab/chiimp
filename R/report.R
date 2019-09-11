@@ -23,7 +23,7 @@ normalize_alleles <- function(data) {
 #' Allele pairs are shown in a standardized order with homozygous entries shown
 #' twice.
 #'
-#' @param data data frame containing Allele1Name and Allele2Name colums such as
+#' @param data data frame containing Allele1Name and Allele2Name columns such as
 #'   the first list item produced by \code{\link{analyze_dataset}}.  If allele
 #'   names are not yet present call \code{\link{name_alleles_in_table}}.
 #' @param extra_cols names or index values of additional columns from input data
@@ -126,7 +126,7 @@ report_genotypes <- function(results,
 #' @param na.replicates text to replace NA entries with for the Replicates
 #'     column.
 #'
-#' @return data frame showing summary of sample genotypes with interleved
+#' @return data frame showing summary of sample genotypes with interleaved
 #'   genotypes for similar known individuals.
 #'
 #' @export
@@ -268,7 +268,7 @@ make.dist_scale <- function(n) {
 #'
 #' @param dist_mat distance matrix as produced by
 #'   \code{\link{summarize_dataset}} via \code{\link{make_dist_mat}}.
-#' @param num.alleles the maximum number of matching/mis-matching alleles.  Used
+#' @param num.alleles the maximum number of matching/mismatching alleles.  Used
 #'   to determine color scaling.  Defaults to the highest observed distance in
 #'   the matrix.
 #' @param dist.display_thresh distance value at or below which distances will be
@@ -319,9 +319,9 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 #' Render heatmap of STR attribute across samples and loci
 #'
 #' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}} and the name of a column (e.g., Stutter,
-#' Homozygous, ProminentSequences), plot a heatmap of the values for that
-#' attribute, with sample identifiers on rows and loci on columns.  The
+#' \code{\link{analyze_dataset}} and the name of a column (e.g., \code{Stutter},
+#' \code{Homozygous}, \code{ProminentSequences}), plot a heatmap of the values
+#' for that attribute, with sample identifiers on rows and loci on columns.  The
 #' attribute will be coerced to numeric.
 #'
 #' @param results combined results list

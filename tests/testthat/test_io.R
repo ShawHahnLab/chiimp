@@ -57,6 +57,36 @@ setup_dataset <- function(reps=1:3, samps=1:5,
 with(test_data, {
 
 
+# test load_csv/save_csv --------------------------------------------------
+
+
+# We'll use the same locus_attrs as below for these tests.
+
+  test_that("load_csv parses CSV files", {
+    fp <- write_locus_attrs(txt.locus_attrs)
+    locus_attrs_test <- load_csv(fp)
+    file.remove(fp)
+    expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
+    expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
+    expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
+    expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
+    expect_true(all(locus_attrs == locus_attrs_test))
+  })
+
+
+  test_that("save_csv saves CSV files", {
+    fp <- tempfile()
+    save_csv(locus_attrs, fp)
+    locus_attrs_test <- load_locus_attrs(fp)
+    file.remove(fp)
+    expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
+    expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
+    expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
+    expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
+    expect_true(all(locus_attrs == locus_attrs_test))
+  })
+
+
 # test load_locus_attrs ---------------------------------------------------
 
 
@@ -119,11 +149,12 @@ with(test_data, {
     setwd(data.dir)
     touch(dataset_known$Filename)
     # Write dataset CSV
-    fp <- tempfile()
+    fp <- tempfile(tmpdir = data.dir)
     write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
     expect_silent({
       dataset <- load_dataset(fp)
     })
+    unlink(x = data.dir, recursive = TRUE)
     expect_identical(dataset, dataset_known)
   })
 
@@ -134,13 +165,14 @@ with(test_data, {
     data.dir <- tempfile()
     dir.create(data.dir)
     setwd(data.dir)
-    fp <- tempfile()
+    fp <- tempfile(tmpdir = data.dir)
     write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
     # expect_message and capture_messages both do NOT catch text send to stderr,
     # though capture.output(..., type = "message") does.
     msg <- capture.output({
       dataset <- load_dataset(fp)
     }, type = "message")
+    unlink(x = data.dir, recursive = TRUE)
     expect_true(length(grep("WARNING: Missing 60 of 60 data files", msg)) == 1)
     expect_identical(dataset, dataset_known)
   })
@@ -157,9 +189,10 @@ with(test_data, {
     setwd(data.dir)
     dataset_known <- setup_dataset()
     touch(dataset_known$Filename)
-    fp <- tempfile()
+    fp <- tempfile(tmpdir = data.dir)
     save_dataset(dataset_known, fp)
     dataset <- load_dataset(fp)
+    unlink(x = data.dir, recursive = TRUE)
     expect_identical(dataset, dataset_known)
   })
 
@@ -174,6 +207,7 @@ with(test_data, {
     # by default the field ordering is assumed to be replicate, sample, locus
     data <- setup_data_dir(replicates, samples, loci)
     dataset <- prepare_dataset(data$dp, data$pattern)
+    unlink(x = data$dp, recursive = TRUE)
     expect_equal(colnames(dataset),
                  c("Filename", "Replicate", "Sample", "Locus"))
     expect_equal(sort(dataset$Filename), sort(data$fps))
@@ -199,6 +233,7 @@ with(test_data, {
     ord <- c(3, 1, 2)
     data <- setup_data_dir(replicates, samples, loci, ord)
     dataset <- prepare_dataset(data$dp, "([A-Za-z0-9]+)-(\\d+)-(\\d+)", ord)
+    unlink(x = data$dp, recursive = TRUE)
     expect_equal(colnames(dataset),
                  c("Filename", "Locus", "Replicate", "Sample"))
     expect_equal(sort(dataset$Filename), sort(data$fps))
@@ -220,6 +255,7 @@ with(test_data, {
     # warning.
     data <- setup_data_dir(replicates, samples, loci)
     expect_warning(dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)"))
+    unlink(x = data$dp, recursive = TRUE)
   })
 
   test_that("prepare_dataset warns of repeated identifier rows", {
@@ -234,6 +270,7 @@ with(test_data, {
         dataset <- prepare_dataset(data$dp, data$pattern)
       },
       "Some replicate/sample/locus combinations match multiple files")
+    unlink(x = data$dp, recursive = TRUE)
   })
 
   test_that("prepare_dataset can autolabel replicates", {
@@ -247,6 +284,7 @@ with(test_data, {
     dataset <- prepare_dataset(data$dp,
                                pattern = "()1-(\\d+)-([A-Za-z0-9]+)",
                                autorep = TRUE)
+    unlink(x = data$dp, recursive = TRUE)
     extras <- paste0(data$fps[3], c(".2", ".3"))
     expect_equal(sort(dataset$Filename), sort(c(data$fps, extras)))
     expect_equal(as.character(dataset$Locus),
@@ -278,6 +316,7 @@ with(test_data, {
                  c("Filename", "Replicate", "Sample", "Locus"))
     expect_equal(sort(dataset$Filename),
                  sort(list.files(dp, recursive = TRUE, full.names = TRUE)))
+    unlink(x = c(data1, data2, dp), recursive = TRUE)
   })
 
   test_that("prepare_dataset can separate multiplexed samples", {
@@ -302,6 +341,7 @@ with(test_data, {
     dataset_known$Replicate <- as.integer(dataset_known$Replicate)
     # Read dataset from disk using the mapping of locus names
     dataset <- prepare_dataset(data$dp, data$pattern, locusmap = locusmap)
+    unlink(x = data$dp, recursive = TRUE)
     # Aside from the different filenames, does everything match up?
     dataset_known$Filename <- dataset$Filename
     expect_equal(dataset, dataset_known)
@@ -310,16 +350,21 @@ with(test_data, {
   test_that("prepare_dataset handles missing data directory", {
     dp <- tempfile()
     expect_error({
-      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-    }, paste("ERROR: directory path for data files does not exist:", dp))
+        prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+      },
+      paste("ERROR: directory path for data files does not exist:", dp),
+      fixed = TRUE)
   })
 
   test_that("prepare_dataset handles no-samples case", {
     dp <- tempfile()
     dir.create(dp)
     expect_error({
-      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-    }, paste("ERROR: no data files found:", dp))
+        prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+      },
+      paste("ERROR: no data files found:", dp),
+      fixed = TRUE)
+    unlink(x = dp, recursive = TRUE)
   })
 
 
@@ -340,10 +385,14 @@ with(test_data, {
                                ncores = 1)
     dp_out <- file.path(data.dir, "results", "processed_files")
     save_seqfile_data(results$files, dp_out)
-    fps_expected <- sort(paste0(names(results$files), ".csv"))
-    fps_observed <- sort(file.path(data.dir,
-                                   list.files(dp_out, recursive = TRUE)))
+    fps_expected <- sort(file.path(dp_out,
+                                   paste0(basename(names(results$files)),
+                                          ".csv")))
+    fps_observed <- sort(list.files(dp_out,
+                                    recursive = TRUE,
+                                    full.names = TRUE))
     expect_equal(fps_observed, fps_expected)
+    unlink(x = data.dir, recursive = TRUE)
   })
 
   test_that("save_seqfile_data works with directory trees", {
@@ -363,10 +412,15 @@ with(test_data, {
                                ncores = 1)
     dp_out <- file.path(data.dir, "results", "processed_files")
     save_seqfile_data(results$files, dp_out)
-    fps_expected <- sort(paste0(names(results$files), ".csv"))
-    fps_observed <- sort(file.path(data.dir,
-                                   list.files(dp_out, recursive = TRUE)))
+    fps_expected <- sort(file.path(dp_out,
+                                   basename(dirname(names(results$files))),
+                                   paste0(basename(names(results$files)),
+                                          ".csv")))
+    fps_observed <- sort(list.files(dp_out,
+                                    recursive = TRUE,
+                                    full.names = TRUE))
     expect_equal(fps_observed, fps_expected)
+    unlink(x = data.dir, recursive = TRUE)
   })
 
   test_that("save_seqfile_data works with Windows-style paths", {
@@ -389,10 +443,19 @@ with(test_data, {
     names(results$files) <- gsub("/", "\\\\", names(results$files))
     save_seqfile_data(results$files, dp_out)
     names(results$files) <- gsub("\\\\", "/", names(results$files))
-    fps_expected <- sort(paste0(names(results$files), ".csv"))
-    fps_observed <- sort(file.path(data.dir,
-                                   list.files(dp_out, recursive = TRUE)))
+    fps_expected <- sort(file.path(dp_out,
+                                   basename(dirname(names(results$files))),
+                                   paste0(basename(names(results$files)),
+                                          ".csv")))
+    fps_observed <- sort(list.files(dp_out,
+                                    recursive = TRUE,
+                                    full.names = TRUE))
+    # Normalize any lingering \ or / inconsistencies, so this test should also
+    # pass on Windows itself.
+    fps_expected <- normalizePath(fps_expected)
+    fps_observed <- normalizePath(fps_observed)
     expect_equal(fps_observed, fps_expected)
+    unlink(x = data.dir, recursive = TRUE)
   })
 
 })

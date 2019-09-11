@@ -4,7 +4,11 @@
 \alias{analyze_seqs}
 \title{Analyze a set of STR sequences}
 \usage{
-analyze_seqs(seqs, locus_attrs, nrepeats)
+analyze_seqs(seqs, locus_attrs, nrepeats,
+  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
+  use_reverse_primers = config.defaults$seq_analysis$use_reverse_primers,
+  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1)
 }
 \arguments{
 \item{seqs}{character vector containing sequences.}
@@ -13,6 +17,20 @@ analyze_seqs(seqs, locus_attrs, nrepeats)
 
 \item{nrepeats}{number of repeats of each locus' motif to require for a
 match.}
+
+\item{stutter.count.ratio_max}{highest ratio of read counts for second most
+frequent sequence to the most frequent where the second will be
+considered stutter.}
+
+\item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
+non-stutter artifact sequences.}
+
+\item{use_reverse_primers}{consider the ReversePrimer column from the locus
+attributes for locus-matching?}
+
+\item{reverse_primer_r1}{Is each reverse primer given in its orientation on
+the forward read?  This is used to determine how the primers and reads
+should be reverse complemented before comparing.}
 }
 \value{
 data frame of dereplicated sequences with added annotations.
@@ -26,27 +44,27 @@ all loci are treated equally.
 \details{
 Columns in the returned data frame:
 \itemize{
-\item Seq: sequence text for each unique sequence
-\item Count: integer count of occurrences of this exact sequence
-\item Length: integer sequence length
-\item MatchingLocus: factor for the name of the locus matching each sequence,
-by checking the primer
-\item MotifMatch: logical: are there are least \code{nrepeats} perfect
+\item \code{Seq}: sequence text for each unique sequence
+\item \code{Count}: integer count of occurrences of this exact sequence
+\item \code{Length}: integer sequence length
+\item \code{MatchingLocus}: factor for the name of the locus matching each
+sequence, by checking the primer
+\item \code{MotifMatch}: logical: are there are least \code{nrepeats} perfect
 adjacent repeats of the STR motif for the matching locus?
-\item LengthMatch: logical: is the sequence length within the expected range
-for the matching locus?
-\item Ambiguous: logical: are there unexpected characters in the sequence
+\item \code{LengthMatch}: logical: is the sequence length within the expected
+range for the matching locus?
+\item \code{Ambiguous}: logical: are there unexpected characters in the sequence
 content?
-\item Stutter: integer: for any sequence that looks like potential PCR stutter,
-the index of the row that may be the source of the stutter band.
-\item Artifact: integer: for any sequence that looks like potential PCR artifact
-(other than stutter), the index of the row that may be the source of the
-stutter band.
-\item FractionOfTotal: numeric fraction of the number of sequences
+\item \code{Stutter}: integer: for any sequence that looks like potential PCR
+stutter, the index of the row that may be the source of the stutter band.
+\item \code{Artifact}: integer: for any sequence that looks like potential PCR
+artifact (other than stutter), the index of the row that may be the source
+of the stutter band.
+\item \code{FractionOfTotal}: numeric fraction of the number of sequences
 represented by each unique sequence compared to the total.
-\item FractionOfLocus: numeric fraction of the number of sequences represented
-by each unique sequence compared to the total for that particular
-matching locus.
+\item \code{FractionOfLocus}: numeric fraction of the number of sequences
+represented by each unique sequence compared to the total for that
+particular matching locus.
 }
 }
 \examples{

@@ -7,7 +7,7 @@
 tabulate_allele_names(data, extra_cols = NULL)
 }
 \arguments{
-\item{data}{data frame containing Allele1Name and Allele2Name colums such as
+\item{data}{data frame containing Allele1Name and Allele2Name columns such as
 the first list item produced by \code{\link{analyze_dataset}}.  If allele
 names are not yet present call \code{\link{name_alleles_in_table}}.}
 

@@ -9,7 +9,7 @@ load_dataset(fp, ...)
 \arguments{
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link[utils]{read.table}}.}
+\item{...}{additional arguments passed to \code{\link{load_csv}}.}
 }
 \value{
 data frame of sample attributes for the dataset.

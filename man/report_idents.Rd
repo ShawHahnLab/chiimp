@@ -16,7 +16,7 @@ report_idents(results, closest, na.replicates = "")
 column.}
 }
 \value{
-data frame showing summary of sample genotypes with interleved
+data frame showing summary of sample genotypes with interleaved
   genotypes for similar known individuals.
 }
 \description{
