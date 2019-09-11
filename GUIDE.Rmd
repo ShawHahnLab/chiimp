@@ -4,7 +4,7 @@
 
 title: "CHIIMP User Guide"
 author: "Jesse Connell"
-date: "2018/11/07"
+date: "2019/07/10"
 output:
   pdf_document:
     toc: true

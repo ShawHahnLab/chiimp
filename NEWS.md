@@ -1,4 +1,4 @@
-# chiimp dev
+# chiimp 0.3.0
 
  * Improved icon setup on Mac OS ([#48]).
  * Added support for use of reverse primers in locus-matching ([#47]).
