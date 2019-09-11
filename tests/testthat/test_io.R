@@ -57,6 +57,36 @@ setup_dataset <- function(reps=1:3, samps=1:5,
 with(test_data, {
 
 
+# test load_csv/save_csv --------------------------------------------------
+
+
+# We'll use the same locus_attrs as below for these tests.
+
+  test_that("load_csv parses CSV files", {
+    fp <- write_locus_attrs(txt.locus_attrs)
+    locus_attrs_test <- load_csv(fp)
+    file.remove(fp)
+    expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
+    expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
+    expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
+    expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
+    expect_true(all(locus_attrs == locus_attrs_test))
+  })
+
+
+  test_that("save_csv saves CSV files", {
+    fp <- tempfile()
+    save_csv(locus_attrs, fp)
+    locus_attrs_test <- load_locus_attrs(fp)
+    file.remove(fp)
+    expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
+    expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
+    expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
+    expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
+    expect_true(all(locus_attrs == locus_attrs_test))
+  })
+
+
 # test load_locus_attrs ---------------------------------------------------
 
 

@@ -20,6 +20,15 @@
 #'   \code{\link{load_locus_attrs}}.
 #' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match (see \code{\link{analyze_seqs}}).
+#' @param stutter.count.ratio_max highest ratio of read counts for second most
+#'   frequent sequence to the most frequent where the second will be
+#'   considered stutter (see \code{\link{analyze_seqs}}).
+#' @param artifact.count.ratio_max as for \code{stutter.count.ratio_max} but for
+#'   non-stutter artifact sequences.
+#' @param use_reverse_primers consider the ReversePrimer column from the locus
+#'   attributes for locus-matching?
+#' @param reverse_primer_r1 Is each reverse primer given in its orientation on
+#'   the forward read?  (See \code{\link{analyze_seqs}})
 #' @param ncores integer number of CPU cores to use in parallel for sample
 #'   analysis.  Defaults to one less than half the number of detected cores with
 #'   a minimum of 1.  If 1, the function will run without using the
@@ -44,16 +53,25 @@
 #'   per-sample data frames.
 #'
 #' @export
-analyze_dataset <- function(dataset,
-                            locus_attrs,
-                            nrepeats,
-                            ncores = 0,
-                            analysis_opts,
-                            summary_opts,
-                            analysis_function=analyze_sample,
-                            summary_function=summarize_sample,
-                            known_alleles=NULL,
-                            name_args=list()) {
+analyze_dataset <- function(
+  dataset,
+  locus_attrs,
+  nrepeats,
+  stutter.count.ratio_max = config.defaults$seq_analysis$
+    stutter.count.ratio_max,
+  artifact.count.ratio_max = config.defaults$seq_analysis$
+    artifact.count.ratio_max,
+  use_reverse_primers = config.defaults$seq_analysis$
+    use_reverse_primers,
+  reverse_primer_r1 = config.defaults$seq_analysis$
+    reverse_primer_r1,
+  ncores = 0,
+  analysis_opts,
+  summary_opts,
+  analysis_function=analyze_sample,
+  summary_function=summarize_sample,
+  known_alleles=NULL,
+  name_args=list()) {
   if (! all(dataset$Locus %in% locus_attrs$Locus)) {
     rogue_loci <- unique(dataset$Locus[! dataset$Locus %in% locus_attrs$Locus])
     msg <- paste("ERROR: Locus names in dataset not in attributes table:",
@@ -63,9 +81,15 @@ analyze_dataset <- function(dataset,
   if (ncores == 0) {
     ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
-  analyze.file <- function(fp, locus_attrs, nrepeats) {
+  analyze.file <- function(fp, locus_attrs, nrepeats,
+                           stutter.count.ratio_max, artifact.count.ratio_max,
+                           use_reverse_primers,
+                           reverse_primer_r1) {
     seqs <- load_seqs(fp)
-    analyze_seqs(seqs, locus_attrs, nrepeats)
+    analyze_seqs(seqs, locus_attrs, nrepeats,
+                 stutter.count.ratio_max, artifact.count.ratio_max,
+                 use_reverse_primers,
+                 reverse_primer_r1)
   }
   analyze.entry <- function(entry, analysis_opts, summary_opts,
                             analysis_function, summary_function,
@@ -114,7 +138,11 @@ analyze_dataset <- function(dataset,
       fps <- unique(dataset$Filename)
       analyzed_files <- parallel::parLapply(cluster, fps, analyze.file,
                                             locus_attrs = locus_attrs,
-                                            nrepeats = nrepeats)
+                                            nrepeats = nrepeats,
+                                            stutter.count.ratio_max,
+                                            artifact.count.ratio_max,
+                                            use_reverse_primers,
+                                            reverse_primer_r1)
       names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
                                         analysis_opts = analysis_opts,
@@ -130,7 +158,11 @@ analyze_dataset <- function(dataset,
     fps <- unique(dataset$Filename)
     analyzed_files <- lapply(fps, analyze.file,
                              locus_attrs = locus_attrs,
-                             nrepeats = nrepeats)
+                             nrepeats = nrepeats,
+                             stutter.count.ratio_max,
+                             artifact.count.ratio_max,
+                             use_reverse_primers,
+                             reverse_primer_r1)
     names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
                          analysis_opts = analysis_opts,

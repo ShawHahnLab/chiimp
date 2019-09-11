@@ -1,14 +1,29 @@
+# https://docs.travis-ci.com/user/multi-os/
+os:
+  - linux
+  - osx
 # https://docs.travis-ci.com/user/languages/r
 language: r
-bioc_packages: msa
 r:
   - oldrel
   - release
   - devel
   - bioc-release
+  - bioc-devel
+# Mac OS R devel build URL is out of date, currently.
+# https://travis-ci.community/t/672
+matrix:
+  exclude:
+    - r: devel
+      os: osx
 cache: packages
 script:
   - R CMD build .
   - R CMD check *tar.gz
-  - ./inst/bin/demo.sh
-  - ./inst/bin/demo_empty.sh
+  - ./exec/demo.sh
+  - ./exec/demo_empty.sh
+  - ./tools/travis_install_test.sh
+# Don't cache the installed chiimp R package itself.  We want to start without
+# it installed for each test.
+before_cache:
+  - rm -rf $HOME/R/Library/chiimp

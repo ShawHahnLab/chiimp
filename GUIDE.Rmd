@@ -4,7 +4,7 @@
 
 title: "CHIIMP User Guide"
 author: "Jesse Connell"
-date: "2018/11/07"
+date: "2019/07/10"
 output:
   pdf_document:
     toc: true
@@ -34,8 +34,12 @@ package documentation.
 
 ## Installation
 
-Most dependencies are provided by installation of [R] and [RStudio].  Once these
-are installed, follow the specific instructions below for your operating system.
+Most dependencies are provided by installation of [R] and [RStudio].  Once
+these are installed, follow the specific instructions below for your operating
+system.  In all three cases CHIIMP performs an anlysis when a configuration
+file is dragged and dropped onto the desktop icon; there is no interactive
+interface via the icon, though the R package can be used interactively.  See
+the Usage section for more information.
 
 ### Windows
 
@@ -50,6 +54,10 @@ the install script won't open because of a security warning, you can
 right-click (control+click) and select "Open" in the menu that appears.
 Apple has specific instructions [here](https://support.apple.com/kb/PH25088?locale=en_US)
 about these security setings.
+
+If a window appears recommending installation of the Mac OS command-line
+developer tools, go ahead and install them.  After that you'll probably need to
+re-run the CHIIMP installer again to finish the install.
 
 ### Linux
 

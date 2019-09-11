@@ -191,6 +191,14 @@ full_analysis <- function(config, dataset=NULL) {
     allele.names <- load_allele_names(cfg$fp_allele_names)
   results <- analyze_dataset(dataset, locus_attrs,
                              nrepeats = cfg$seq_analysis$nrepeats,
+                             stutter.count.ratio_max = cfg$seq_analysis$
+                               stutter.count.ratio_max,
+                             artifact.count.ratio_max = cfg$seq_analysis$
+                               artifact.count.ratio_max,
+                             use_reverse_primers = cfg$seq_analysis$
+                               use_reverse_primers,
+                             reverse_primer_r1 = cfg$seq_analysis$
+                               reverse_primer_r1,
                              ncores = cfg$dataset_analysis$ncores,
                              analysis_opts = cfg$sample_analysis_opts,
                              summary_opts = cfg$sample_summary_opts,
