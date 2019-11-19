@@ -16,7 +16,9 @@ r:
 # out so I'm not sure what the deal is with that one.  (2019-11-20)
 matrix:
   exclude:
-    - r: [devel, bioc-devel]
+    - r: devel
+      os: osx
+    - r: bioc-devel
       os: osx
 cache: packages
 script:
