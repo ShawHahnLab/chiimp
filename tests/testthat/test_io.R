@@ -73,6 +73,23 @@ with(test_data, {
     expect_true(all(locus_attrs == locus_attrs_test))
   })
 
+  test_that("load_csv parses CSV files with unknown columns", {
+    # For cases where our CSV file has none of the recognized column names, it
+    # should still work but just give us generic rownames and a
+    # warning.
+    fp <- tempfile()
+    data_expected <- data.frame(
+      Vec1 = c("A", "D"),
+      Vec2 = c("B", "E"),
+      Vec3 = c("C", "F"),
+      stringsAsFactors = FALSE,
+      row.names = c("entry1", "entry2"))
+    cat("Vec1,Vec2,Vec3\nA,B,C\nD,E,F\n", file = fp)
+    expect_warning(data <- load_csv(fp), "no recognized columns for entry id")
+    file.remove(fp)
+    expect_equal(data, data_expected)
+  })
+
 
   test_that("save_csv saves CSV files", {
     fp <- tempfile()
@@ -84,6 +101,21 @@ with(test_data, {
     expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
     expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
     expect_true(all(locus_attrs == locus_attrs_test))
+  })
+
+  test_that("save_csv saves CSV files with unknown columns", {
+    # save_csv shouldn't care about the columns but we'll make sure here.
+    fp <- tempfile()
+    data_expected <- data.frame(
+      Vec1 = c("A", "D"),
+      Vec2 = c("B", "E"),
+      Vec3 = c("C", "F"),
+      stringsAsFactors = FALSE)
+    save_csv(data_expected, fp)
+    expect_warning(data <- load_csv(fp))
+    file.remove(fp)
+    rownames(data_expected) <- c("entry1", "entry2")
+    expect_equal(data, data_expected)
   })
 
 
