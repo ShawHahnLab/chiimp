@@ -38,6 +38,7 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	# Simulate drag-and-drop onto the icon, and specify that it should exit
 	# automatically when finished so Travis can continue
 	CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
+	cat /tmp/chiimp_${USER}_$(date +%Y%m%d%H%M).txt
 	# Check that the results are there
 	test -e str-results/summary.csv
 elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
