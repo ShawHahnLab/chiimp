@@ -3,7 +3,9 @@
 # Mac OS wrapper to the CHIIMP command-line script.
 #
 # This script will wait for a keypress before exiting since it presumably
-# opened its own terminal window.
+# opened its own terminal window and Terminal may or may not be configured to
+# auto-close windows when commands finish.  If CHIIMP_AUTOCLOSE is set to yes,
+# this is skipped.
 
 # This directory
 dir=$(dirname $BASH_SOURCE)
@@ -24,5 +26,7 @@ else
 	cd "$cfg_dir"
 	Rscript "$rel/$dir/chiimp" $*
 fi
-read -p "Press any key to continue... " -n1 -s
-echo
+if [[ "$CHIIMP_AUTOCLOSE" != "yes" ]]; then
+	read -p "Press any key to continue... " -n1 -s
+	echo
+fi
