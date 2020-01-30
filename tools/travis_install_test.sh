@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # This is a helper script for Travis testing.
 # Assumes working directory is the project directory.
 
@@ -38,6 +37,7 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	# Simulate drag-and-drop onto the icon, and specify that it should exit
 	# automatically when finished so Travis can continue
 	CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
+	# Check that the results are there
 	# TODO why do we need to do this?  open -W should wait for the command to complete.
 	timeout=60
 	while [[ $timeout -gt 0 ]]; do
@@ -47,7 +47,6 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 		sleep 5
 	done
 	# In case we timed out run one final check (and fail)
-	# Check that the results are there
 	test -e str-results/summary.csv
 elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
 	# (If and when enabled in the Travis config.)

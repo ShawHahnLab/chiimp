@@ -24,8 +24,7 @@ else
 		rel=$(pwd)
 	fi
 	cd "$cfg_dir"
-	logpath=/tmp/chiimp_${USER}_$(date +%Y%m%d%H%M).txt
-	Rscript "$rel/$dir/chiimp" $* |& tee $logpath
+	Rscript "$rel/$dir/chiimp" "$@"
 fi
 if [[ "$CHIIMP_AUTOCLOSE" != "yes" ]]; then
 	read -p "Press any key to continue... " -n1 -s
