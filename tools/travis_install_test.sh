@@ -36,17 +36,18 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	cd "$scratch"
 	# Simulate drag-and-drop onto the icon, and specify that it should exit
 	# automatically when finished so Travis can continue
-	CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
-	# Check that the results are there
-	# TODO why do we need to do this?  open -W should wait for the command to complete.
+	# TODO why do we need to call it multiple times?  It's not just the
+	# output that's not there at first, we actually need to try the open
+	# command a couple of times in some cases.
 	timeout=60
 	while [[ $timeout -gt 0 ]]; do
+		CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
 		test -e str-results/summary.csv && break || true
 		echo "waiting for str-results/summary.csv... (${timeout}s)"
 		timeout=$((timeout - 5))
 		sleep 5
 	done
-	# In case we timed out run one final check (and fail)
+	# In case we timed out, run one final check (and fail, if we did time out)
 	test -e str-results/summary.csv
 elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
 	# (If and when enabled in the Travis config.)
