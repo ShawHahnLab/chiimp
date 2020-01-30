@@ -39,6 +39,15 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	# automatically when finished so Travis can continue
 	CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
 	cat /tmp/chiimp_${USER}_$(date +%Y%m%d%H%M).txt
+	# TODO why do we need to do this?  open -W should wait for the command to complete.
+	timeout=60
+	while [[ $timeout -gt 0 ]]; do
+		test -e str-results/summary.csv && break || true
+		echo "waiting for str-results/summary.csv... (${timeout}s)"
+		timeout=$((timeout - 5))
+		sleep 5
+	done
+	# In case we timed out run one final check (and fail)
 	# Check that the results are there
 	test -e str-results/summary.csv
 elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
