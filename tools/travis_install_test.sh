@@ -38,7 +38,6 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	# Simulate drag-and-drop onto the icon, and specify that it should exit
 	# automatically when finished so Travis can continue
 	CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
-	cat /tmp/chiimp_${USER}_$(date +%Y%m%d%H%M).txt
 	# TODO why do we need to do this?  open -W should wait for the command to complete.
 	timeout=60
 	while [[ $timeout -gt 0 ]]; do
