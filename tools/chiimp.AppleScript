@@ -37,7 +37,7 @@ on process_item(this_item)
 	-- CHIIMP_AUTOCLOSE (this isn't automatically exported to the Terminal
 	-- call but it works to just build it into the string here.)
 	set UnixPath to quoted form of POSIX path of ((path to me as text) & "::")
-	set runCmd to UnixPath & "/exec/chiimp.command " & quoted form of quoted form of POSIX path of this_item
+	set runCmd to UnixPath & "/exec/chiimp.command " & quoted form of POSIX path of this_item
 	set runCmd to "CHIIMP_AUTOCLOSE=" & chiimp_autoclose & " " & runCmd & "; exit"
 	-- Send the command string to the Terminal app, and wait for it to
 	-- complete.
