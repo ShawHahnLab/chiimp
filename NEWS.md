@@ -1,3 +1,7 @@
+# chiimp 0.3.1
+
+ * Fixed icon setup on Mac OS ([#56]).
+
 # chiimp 0.3.0
 
  * Improved icon setup on Mac OS ([#48]).
