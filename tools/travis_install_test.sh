@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # This is a helper script for Travis testing.
 # Assumes working directory is the project directory.
 
@@ -23,11 +22,33 @@ elif [[ $TRAVIS_OS_NAME == "osx"     ]]; then
 	# Desktop icon should be a symbolic link to an existent directory
 	test -d ~/Desktop/CHIIMP
 	test -h ~/Desktop/CHIIMP
-	# TODO we may be able to test the drag-and-drop behavior with a command like this:
-	# open -W -a ~/Desktop/CHIIMP .../config.yml
-	# Currently the .app exits and leaves the Terminal window open, though,
-	# so -W doesn't work as expected.  Changing the AppleScript .app export
-	# options might resolve this.
+	# Desktop icon should run chiimp.command when a config file is dragged
+	# onto it
+	# First, set up inputs in a temp location.
+	# TODO This is largely a repeat of what's in demo.sh
+	cd "$(dirname $BASH_SOURCE)"
+	dir=$(pwd -P)
+	inst="../inst"
+	scratch=$(mktemp -d)
+	R --vanilla -q -e "devtools::load_all('..', quiet=T); test_data\$write_seqs(test_data\$seqs, '$scratch/str-dataset', 'Replicate1-Sample%s-%s.fasta')" > /dev/null
+	cp "$dir/$inst/example_locus_attrs.csv" "$scratch/locus_attrs.csv"
+	cp "$dir/$inst/example_config.yml" "$scratch/config.yml"
+	cd "$scratch"
+	# Simulate drag-and-drop onto the icon, and specify that it should exit
+	# automatically when finished so Travis can continue
+	# TODO why do we need to call it multiple times?  It's not just the
+	# output that's not there at first, we actually need to try the open
+	# command a couple of times in some cases.
+	timeout=60
+	while [[ $timeout -gt 0 ]]; do
+		CHIIMP_AUTOCLOSE=yes open -W -a ~/Desktop/CHIIMP config.yml
+		test -e str-results/summary.csv && break || true
+		echo "waiting for str-results/summary.csv... (${timeout}s)"
+		timeout=$((timeout - 5))
+		sleep 5
+	done
+	# In case we timed out, run one final check (and fail, if we did time out)
+	test -e str-results/summary.csv
 elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
 	# (If and when enabled in the Travis config.)
 	yes | ./install_windows.cmd

@@ -3,6 +3,8 @@
 set -e
 
 # On MacOS, compile the AppleScript for the desktop icon into an application.
+# In the installed package chiimp.app will be at the top level of the package
+# directory.
 if test $(uname -s) = Darwin; then
 	# I tried exec/chiimp.app, but R CMD install seems to skip directories
 	# when copying (which chimp.app actually is)
