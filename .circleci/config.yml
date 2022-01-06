@@ -23,3 +23,9 @@ jobs:
       - run:
           name: Check package
           command: R CMD check *tar.gz
+      - store_artifacts:
+          name: "Store Artifacts: check log"
+          path: chiimp.Rcheck/00check.out
+      - store_artifacts:
+          name: "Store Artifacts: install log"
+          path: chiimp.Rcheck/00install.out
