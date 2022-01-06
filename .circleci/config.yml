@@ -26,11 +26,19 @@ jobs:
           command: R CMD build .
       - run:
           name: Check package
-          # getting TeX font errors otherwise, when it tries to run Rd2pdf.
-          command: R CMD check --no-manual *tar.gz
+          command: R CMD check *tar.gz
       - store_artifacts:
           name: "Store Artifacts: 00check.log"
           path: chiimp.Rcheck/00check.log
       - store_artifacts:
           name: "Store Artifacts: 00install.out"
           path: chiimp.Rcheck/00install.out
+      - run:
+          name: "Run demo script"
+          command: bash exec/demo.sh
+      - run:
+          name: "Run demo script - empty case"
+          command: bash exec/demo_empty.sh
+      - run:
+          name: "Run install test script"
+          command: bash tools/circleci_install_test.sh
