@@ -8,6 +8,10 @@ jobs:
       - image: rocker/verse:4.1.2
     steps:
       - checkout
+      - run:
+          # https://tex.stackexchange.com/a/177073
+          name: Try installing more TeX fonts
+          command: apt-get install texlive-fonts-recommends --no-install-recommends
       - restore_cache:
           keys:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
