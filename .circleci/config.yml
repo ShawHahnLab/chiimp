@@ -8,10 +8,6 @@ jobs:
       - image: rocker/verse:4.1.2
     steps:
       - checkout
-      - run:
-          # https://tex.stackexchange.com/a/177073
-          name: Try installing more TeX fonts
-          command: apt-get install texlive-fonts-recommended
       - restore_cache:
           keys:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
@@ -26,11 +22,9 @@ jobs:
           name: Build package
           command: R CMD build .
       - run:
-          name: Try Rd2pdf manually
-          command: R CMD Rd2pdf man
-      - run:
           name: Check package
-          command: R CMD check *tar.gz
+          # getting TeX font errors otherwise, when it tries to run Rd2pdf.
+          command: R CMD check --no-manual *tar.gz
       - store_artifacts:
           name: "Store Artifacts: 00check.log"
           path: chiimp.Rcheck/00check.log
