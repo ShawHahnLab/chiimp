@@ -1,0 +1,49 @@
+# https://blog.jdblischak.com/posts/circleci-for-r-1/
+# https://blog.jdblischak.com/posts/circleci-for-r-2/
+#
+# Can't get the full package check working with rocker becuase of latex/pdf
+# issues.  This looks like the problem:
+#
+# https://gitlab.irstea.fr/in-wop/airGRiwrm/-/issues/53
+#
+# ...but if I switch to rocker/tidyverse it's then missing pdflatex, and if I
+# stick with rocker/verse, it still can't find the font.  For now I'm just
+# skipping that part of the package check with --no-manual.
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: rocker/verse:4.1.2
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
+      - run:
+          name: Install package dependencies
+          command: R -e "devtools::install_deps(dep = TRUE)"
+      - save_cache:
+          key: cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
+          paths:
+            - "/usr/local/lib/R/site-library"
+      - run:
+          name: Build package
+          command: R CMD build .
+      - run:
+          name: Check package
+          command: R CMD check --no-manual *tar.gz
+      - store_artifacts:
+          name: "Store Artifacts: 00check.log"
+          path: chiimp.Rcheck/00check.log
+      - store_artifacts:
+          name: "Store Artifacts: 00install.out"
+          path: chiimp.Rcheck/00install.out
+      - run:
+          name: "Run demo script"
+          command: bash exec/demo.sh
+      - run:
+          name: "Run demo script - empty case"
+          command: bash exec/demo_empty.sh
+      - run:
+          name: "Run install test script"
+          command: bash tools/circleci_install_test.sh

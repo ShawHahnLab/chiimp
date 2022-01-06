@@ -2,7 +2,8 @@
 # https://conda.io/docs/user-guide/tasks/manage-environments.html
 name: chiimp
 channels:
-- defaults
+  - conda-forge
+  - defaults
 dependencies:
   - r
   - r-devtools
@@ -15,3 +16,8 @@ dependencies:
   - r-stringr
   - r-testthat
   - r-yaml
+  # for devtools
+  - gcc
+  - r-systemfonts
+  - r-svglite
+  - r-kableExtra
