@@ -25,8 +25,8 @@ jobs:
           name: Check package
           command: R CMD check *tar.gz
       - store_artifacts:
-          name: "Store Artifacts: check log"
-          path: chiimp.Rcheck/00check.out
+          name: "Store Artifacts: 00check.log"
+          path: chiimp.Rcheck/00check.log
       - store_artifacts:
-          name: "Store Artifacts: install log"
+          name: "Store Artifacts: 00install.out"
           path: chiimp.Rcheck/00install.out
