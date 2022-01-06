@@ -11,7 +11,7 @@ jobs:
       - run:
           # https://tex.stackexchange.com/a/177073
           name: Try installing more TeX fonts
-          command: apt-get install texlive-fonts-recommends --no-install-recommends
+          command: apt-get install texlive-fonts-recommended
       - restore_cache:
           keys:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
