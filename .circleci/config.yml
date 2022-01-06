@@ -7,9 +7,16 @@ jobs:
       - image: rocker/verse:4.1.2
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
       - run:
           name: Install package dependencies
           command: R -e "devtools::install_deps(dep = TRUE)"
+      - save_cache:
+          key: cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
+          paths:
+            - "/usr/local/lib/R/site-library"
       - run:
           name: Build package
           command: R CMD build .
