@@ -5,7 +5,7 @@ version: 2.1
 jobs:
   build:
     docker: 
-      - image: rocker/tidyverse:4.1.2
+      - image: rocker/verse:4.1.2
     steps:
       - checkout
       - restore_cache:
