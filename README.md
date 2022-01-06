@@ -1,7 +1,7 @@
 # CHIIMP
 Computational, High-throughput Individual Identification through Microsatellite Profiling
 
-[![Travis Build Status](https://travis-ci.org/ShawHahnLab/chiimp.svg?branch=master)](https://travis-ci.org/ShawHahnLab/chiimp)
+[![CircleCI Build Status](https://circleci.com/gh/ShawHahnLab/chiimp/tree/master.svg?style=svg)](https://circleci.com/gh/ShawHahnLab/chiimp/tree/master)
 
 An R package and standalone program to analyze microsatellites in
 high-throughput sequencing datasets.
