@@ -8,6 +8,9 @@ jobs:
       - image: rocker/tidyverse:4.1.2
     steps:
       - checkout
+      - run:
+          name: Install texlive-latex-base for pdflatex
+          command: apt-get install texlive-latex-base
       - restore_cache:
           keys:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
