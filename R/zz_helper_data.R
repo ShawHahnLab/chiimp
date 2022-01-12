@@ -20,7 +20,19 @@ test_data <- within(list(), {
   # for version 3.6.0 the random number generator has changed its behavior.
   # The below is a stopgap measure but this should really be reorganized to not
   # need to generate the test data at build-time.
-  RNGversion("3.5.3")
+  # From ?RNGkind:
+  # > sample.kind can be "Rounding" or "Rejection", or partial matches to these.
+  # > The former was the default in versions prior to 3.6.0: it made sample
+  # > noticeably non-uniform on large populations, and should only be used for
+  # > reproduction of old results. See PR#17494 for a discussion."
+  # I'll temporarily disable warnings here so that R doesn't warn about the
+  # Rounding option's behavior.
+  rng_orig <- RNGkind()
+  warn_orig <- options()$warn
+  options(warn=-1)
+  RNGkind("Mersenne-Twister", "Inversion", "Rounding")
+  options(warn=warn_orig)
+  rm(warn_orig)
   # Careful!  When running via a package check we might be in temporary
   # installed copy in /tmp or elsewhere, and probably won't have the "inst"
   # directory anymore.  Alternatively when running with devtools::test() we
@@ -173,4 +185,7 @@ test_data <- within(list(), {
   kg2 <- cbind(Name = "ID001", kg2)
   genotypes_known <- rbind(kg2, kg1)
 
+  # reset the RNG behavior
+  do.call(RNGkind, as.list(rng_orig))
+  rm(rng_orig)
 })
