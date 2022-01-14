@@ -25,14 +25,17 @@ test_data <- within(list(), {
   # > The former was the default in versions prior to 3.6.0: it made sample
   # > noticeably non-uniform on large populations, and should only be used for
   # > reproduction of old results. See PR#17494 for a discussion."
-  # I'll temporarily disable warnings here so that R doesn't warn about the
-  # Rounding option's behavior.
+  # Older R doesn't have have a third argument to RNGkind, so, only run this
+  # if needed.  I'll temporarily disable warnings here so that R doesn't warn
+  # about the Rounding option's behavior.
   rng_orig <- RNGkind()
-  warn_orig <- options()$warn
-  options(warn=-1)
-  RNGkind("Mersenne-Twister", "Inversion", "Rounding")
-  options(warn=warn_orig)
-  rm(warn_orig)
+  if (length(rng_orig) > 2) {
+    warn_orig <- options()$warn
+    options(warn=-1)
+    RNGkind("Mersenne-Twister", "Inversion", "Rounding")
+    options(warn=warn_orig)
+    rm(warn_orig)
+  }
   # Careful!  When running via a package check we might be in temporary
   # installed copy in /tmp or elsewhere, and probably won't have the "inst"
   # directory anymore.  Alternatively when running with devtools::test() we
