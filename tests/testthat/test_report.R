@@ -20,6 +20,43 @@ with(test_data, {
     })
   })
 
+
+# test plot_dist_mat ------------------------------------------------------
+
+  test_that("plot_dist_mat plots heatmap of distance matrix", {
+    with(results_summary_data, {
+      dist_mat <- make_dist_mat(test_data$results_summary_data$results$summary)
+      fp_img <- tempfile()
+      png(fp_img)
+      plot_data <- plot_dist_mat(dist_mat)
+      dev.off()
+      unlink(x = fp_img)
+      # check a few basic things on the pheatmap object
+      expect_equal(class(plot_data), "pheatmap")
+      expect_equal(
+        plot_data$gtable$layout$name,
+        c("col_tree", "matrix", "col_names", "row_names", "legend"))
+    })
+  })
+
+  test_that("plot_dist_mat can take pheatmap arguments", {
+    with(results_summary_data, {
+      dist_mat <- make_dist_mat(test_data$results_summary_data$results$summary)
+      fp_img <- tempfile()
+      png(fp_img)
+      annotations <- data.frame(
+        Attribute=LETTERS[seq_along(rownames(dist_mat))])
+      rownames(annotations) <- rownames(dist_mat)
+      plot_data <- plot_dist_mat(dist_mat, annotation_col = annotations)
+      dev.off()
+      unlink(x = fp_img)
+      # we should still get a pheatmap object back, but this time with the
+      # annotation info built into the plot data
+      expect_equal(class(plot_data), "pheatmap")
+      expect_true("col_annotation" %in% plot_data$gtable$layout$name)
+    })
+  })
+
 # test tabulate_allele_names ----------------------------------------------
 
   test_that("tabulate_allele_names produces expected data frame", {
