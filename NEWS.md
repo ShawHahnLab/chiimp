@@ -1,6 +1,14 @@
+# chiimp dev
+
+ * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
+
+[#62]: https://github.com/ShawHahnLab/chiimp/pull/62
+
 # chiimp 0.3.1
 
  * Fixed icon setup on Mac OS ([#56]).
+
+[#56]: https://github.com/ShawHahnLab/chiimp/pull/56
 
 # chiimp 0.3.0
 
