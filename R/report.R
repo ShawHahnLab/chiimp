@@ -302,15 +302,15 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
                fontsize = fontsize)
   if (nrow(dist_mat) == ncol(dist_mat)) {
     args <- c(args,
-              clustering_distance_rows = stats::as.dist(dist_mat),
-              clustering_distance_cols = stats::as.dist(dist_mat))
+              list(clustering_distance_rows = stats::as.dist(dist_mat)),
+              list(clustering_distance_cols = stats::as.dist(dist_mat)))
   } else {
     args <- c(args,
               cluster_cols = FALSE,
               cluster_rows = FALSE)
   }
 
-  do.call(pheatmap::pheatmap, c(args, ...))
+  do.call(pheatmap::pheatmap, c(args, list(...)))
 }
 
 
