@@ -118,6 +118,20 @@ with(test_data, {
     expect_equal(data, data_expected)
   })
 
+  test_that("save_csv makes parent dirs when saving", {
+    # the parent directories here don't yet exist, so for this to work,
+    # save_csv will need to create them
+    fp <- file.path(tempfile(), basename(tempfile()))
+    save_csv(locus_attrs, fp)
+    locus_attrs_test <- load_locus_attrs(fp)
+    file.remove(fp)
+    expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
+    expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
+    expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
+    expect_equal(c("A", "B", "1", "2"), rownames(locus_attrs_test))
+    expect_true(all(locus_attrs == locus_attrs_test))
+  })
+
 
 # test load_locus_attrs ---------------------------------------------------
 
