@@ -9,7 +9,12 @@ cd "$(dirname $BASH_SOURCE)"
 dir=$(pwd -P)
 inst="../inst"
 [ -d "$inst" ] || inst=".."
-scratch=$(mktemp -d)
+scratch=$1
+if [[ "$scratch" == "" ]]; then
+	scratch=$(mktemp -d)
+else
+	mkdir -p "$scratch"
+fi
 mkdir -p "$scratch/str-dataset"
 for samp in {1..3}; do
 	for locus in A B 1 2; do
