@@ -68,6 +68,7 @@ load_csv <- function(fp, ...) {
 #' @param data data frame to save to CSV file
 #' @export
 save_csv <- function(data, fp, ...) {
+  mkparents(fp)
   utils::write.table(data,
                      file = fp,
                      sep = ",",
@@ -572,4 +573,14 @@ save_dist_mat <- function(dist_mat, fp) {
   if (!dir.exists(dirname(fp)))
     dir.create(dirname(fp), recursive = TRUE)
   save_csv(dist_mat, fp)
+}
+
+
+# Helpers -----------------------------------------------------------------
+
+
+# Create all parent directories as needed
+mkparents <- function(fp) {
+    if (!dir.exists(dirname(fp)))
+          dir.create(dirname(fp), recursive = TRUE)
 }
