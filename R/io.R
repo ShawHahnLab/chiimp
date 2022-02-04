@@ -363,8 +363,6 @@ load_seqs <- function(fp) {
 #'
 #' @export
 save_results_summary <- function(results_summary, fp) {
-  if (!dir.exists(dirname(fp)))
-    dir.create(dirname(fp), recursive = TRUE)
   save_csv(results_summary, fp)
 }
 
@@ -428,12 +426,6 @@ save_seqfile_data <- function(results_file_data, dp) {
   fps_rel <- remove_shared_root_dir(names(results_file_data))
   invisible(lapply(names(results_file_data), function(n) {
     fp_this <- fps_rel[n]
-    dp_this <- ifelse(dirname(fp_this) != ".",
-                      file.path(dp, dirname(fp_this)),
-                      dp)
-    if (! dir.exists(dp_this)) {
-      dir.create(dp_this, recursive = TRUE)
-    }
     fp <- file.path(dp, paste0(fp_this, ".csv"))
     save_csv(results_file_data[[n]], fp, quote = FALSE)
   }))
@@ -451,8 +443,6 @@ save_seqfile_data <- function(results_file_data, dp) {
 #'
 #' @export
 save_sample_data <- function(results_data, dp) {
-  if (!dir.exists(dp))
-    dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results_data), function(n) {
     fp <- file.path(dp, paste0(n, ".csv"))
     save_csv(results_data[[n]], fp, quote = FALSE)
@@ -570,8 +560,6 @@ save_histograms <- function(results, dp, image.func="png",
 #'
 #' @export
 save_dist_mat <- function(dist_mat, fp) {
-  if (!dir.exists(dirname(fp)))
-    dir.create(dirname(fp), recursive = TRUE)
   save_csv(dist_mat, fp)
 }
 
@@ -581,6 +569,6 @@ save_dist_mat <- function(dist_mat, fp) {
 
 # Create all parent directories as needed
 mkparents <- function(fp) {
-    if (!dir.exists(dirname(fp)))
-          dir.create(dirname(fp), recursive = TRUE)
+  if (!dir.exists(dirname(fp)))
+    dir.create(dirname(fp), recursive = TRUE)
 }
