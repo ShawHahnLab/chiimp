@@ -1,7 +1,10 @@
 # chiimp dev
 
+ * Made `save_csv` automatically create any parent directories as needed
+   ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#63]: https://github.com/ShawHahnLab/chiimp/pull/63
 [#62]: https://github.com/ShawHahnLab/chiimp/pull/62
 
 # chiimp 0.3.1
