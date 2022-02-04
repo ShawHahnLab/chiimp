@@ -40,10 +40,22 @@ jobs:
           path: chiimp.Rcheck/00install.out
       - run:
           name: "Run demo script"
-          command: bash exec/demo.sh
+          command: bash exec/demo.sh $PWD/demo-files
+      - store_artifacts:
+          name: "Store Artifacts: demo: report"
+          path: demo-files/str-results/report.html
+      - store_artifacts:
+          name: "Store Artifacts: demo: summary"
+          path: demo-files/str-results/summary.csv
       - run:
           name: "Run demo script - empty case"
-          command: bash exec/demo_empty.sh
+          command: bash exec/demo_empty.sh $PWD/demo-empty-files
+      - store_artifacts:
+          name: "Store Artifacts: empty demo: report"
+          path: demo-empty-files/str-results/report.html
+      - store_artifacts:
+          name: "Store Artifacts: empty demo: summary"
+          path: demo-empty-files/str-results/summary.csv
       - run:
           name: "Run install test script"
           command: bash tools/circleci_install_test.sh
