@@ -12,8 +12,11 @@
 version: 2.1
 jobs:
   build:
+    parameters:
+      rversion:
+        type: string
     docker:
-      - image: rocker/verse:4.1.2
+      - image: rocker/verse:<<parameters.rversion>>
     steps:
       - checkout
       - restore_cache:
@@ -59,3 +62,12 @@ jobs:
       - run:
           name: "Run install test script"
           command: bash tools/circleci_install_test.sh
+
+workflows:
+  version: 2
+  build_all:
+    jobs:
+      - build:
+          matrix:
+            parameters:
+              rversion: ["3.6.3", "4.1.2"]

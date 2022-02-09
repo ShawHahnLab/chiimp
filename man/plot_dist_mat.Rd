@@ -4,8 +4,12 @@
 \alias{plot_dist_mat}
 \title{Plot Distance Matrix}
 \usage{
-plot_dist_mat(dist_mat, num.alleles = max(dist_mat),
-  dist.display_thresh = round(num.alleles * 2/3), ...)
+plot_dist_mat(
+  dist_mat,
+  num.alleles = max(dist_mat),
+  dist.display_thresh = round(num.alleles * 2/3),
+  ...
+)
 }
 \arguments{
 \item{dist_mat}{distance matrix as produced by

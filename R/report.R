@@ -21,7 +21,8 @@ normalize_alleles <- function(data) {
 #' Wide table of allele names vs loci
 #'
 #' Allele pairs are shown in a standardized order with homozygous entries shown
-#' twice.
+#' twice.  NA allele names in the input are converted to empty strings while NA
+#' is given for missing sample/locus combinations.
 #'
 #' @param data data frame containing Allele1Name and Allele2Name columns such as
 #'   the first list item produced by \code{\link{analyze_dataset}}.  If allele
@@ -32,7 +33,9 @@ normalize_alleles <- function(data) {
 #'
 #' @return wide format data frame with sample entries on rows and loci on
 #'   columns.  An ID column will label sample entries by whichever columns were
-#'   provided in the input (see \code{\link{make_entry_id}}).
+#'   provided in the input (see \code{\link{make_entry_id}}).  Empty strings are
+#'   given for NA allele names, while NA is given for any implicitly missing
+#'   locus/sample combinations.
 #'
 #' @export
 tabulate_allele_names <- function(data, extra_cols=NULL) {
@@ -78,6 +81,7 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #' @param results list of results data as produced by \code{analyze_dataset}.
 #' @param na.replicates text to replace NA entries with for the Replicates
 #'     column.
+#' @param na.alleles text to replace NA entries with for the allele names
 #' @param closest list of closest matches as produced by
 #'   \code{\link{find_closest_matches}}.
 #'
@@ -85,6 +89,7 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #' @export
 report_genotypes <- function(results,
                              na.replicates="",
+                             na.alleles="",
                              closest=NULL) {
   tbl <- tabulate_allele_names(data = results$summary,
                                extra_cols = c("Sample", "Replicate"))
@@ -109,7 +114,7 @@ report_genotypes <- function(results,
   else
     tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
   # Blank out any remaining NA values
-  tbl[is.na(tbl)] <- ""
+  tbl[is.na(tbl)] <- na.alleles
 
   tbl
 }

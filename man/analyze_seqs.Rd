@@ -4,11 +4,15 @@
 \alias{analyze_seqs}
 \title{Analyze a set of STR sequences}
 \usage{
-analyze_seqs(seqs, locus_attrs, nrepeats,
+analyze_seqs(
+  seqs,
+  locus_attrs,
+  nrepeats,
   stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
   artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
   use_reverse_primers = config.defaults$seq_analysis$use_reverse_primers,
-  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1)
+  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1
+)
 }
 \arguments{
 \item{seqs}{character vector containing sequences.}

@@ -4,8 +4,12 @@
 \alias{find_matching_primer}
 \title{Label STR sequence rows by locus}
 \usage{
-find_matching_primer(sample.data, locus_attrs, forward = TRUE,
-  reverse_primer_r1 = TRUE)
+find_matching_primer(
+  sample.data,
+  locus_attrs,
+  forward = TRUE,
+  reverse_primer_r1 = TRUE
+)
 }
 \arguments{
 \item{sample.data}{data frame of processed sequence data.}

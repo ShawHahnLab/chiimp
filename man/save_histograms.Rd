@@ -4,8 +4,14 @@
 \alias{save_histograms}
 \title{Save sequence histogram visualizations to image files}
 \usage{
-save_histograms(results, dp, image.func = "png", width = 1600,
-  height = 1200, res = 150)
+save_histograms(
+  results,
+  dp,
+  image.func = "png",
+  width = 1600,
+  height = 1200,
+  res = 150
+)
 }
 \arguments{
 \item{results}{list of results as created by \code{\link{analyze_dataset}}.}
