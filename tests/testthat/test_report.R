@@ -202,4 +202,50 @@ with(test_data, {
     })
   })
 
+
+# test report_genotypes ---------------------------------------------------
+
+  test_that("report_genotypes produces expected data frame", {
+    # Largely just a wrapper around tabulate_allele_names, but with a few
+    # additional features like NA handling for specific kinds of columns
+    tbl_known <- data.frame(
+      Sample = as.character(1:3), stringsAsFactors = FALSE)
+    tbl_known$`A_1` <- c("162-c6933c", "162-c6933c", "182-d679e1")
+    tbl_known$`A_2` <- c("194-fc013a", "178-d84dc0", "182-d679e1")
+    tbl_known$`B_1` <- c("216-c0f11a", "236-321c79", "220-fb9a92")
+    tbl_known$`B_2` <- c("252-27c5bf", "240-2a344f", "236-321c79")
+    tbl_known$`1_1` <- c("260-9a01fc", "256-c18a06", "276-ea279a")
+    tbl_known$`1_2` <- c("280-74dd46", "284-2b3fab", "280-74dd46")
+    tbl_known$`2_1` <- c("250-5dacee", "266-2aa675", "238-6cc8ff")
+    tbl_known$`2_2` <- c("318-35b7b6", "266-2aa675", "342-2e88c0")
+    results <- results_summary_data$results
+    tbl <- report_genotypes(results)
+    expect_equivalent(tbl, tbl_known)
+    # Missing combinations in the input should give blanks in the table, and by
+    # default so should missing results
+    # (Sample 3 Locus A not given; Sample 2 Locus A blank results)
+    results$summary[
+      11, c("Allele1Seq", "Allele2Seq", "Allele1Name", "Alelel2Name")] <- NA
+    results$summary <- results$summary[-12, ]
+    tbl <- report_genotypes(results)
+    tbl_known[2:3, 8:9] <- ""
+    expect_equivalent(tbl, tbl_known)
+    # Blanks are the default for NA here but we can specify something else
+    tbl <- report_genotypes(results, na.alleles = "X")
+    expect_identical(tbl[, 8], c("250-5dacee", "", "X"))
+    expect_identical(tbl[, 9], c("318-35b7b6", "", "X"))
+  })
+
+  test_that("report_genotypes handles replicates including NA", {
+    results <- results_summary_data$results
+    # Explicitly label Sample 1 with a replicate, which will make that column
+    # show up in the output
+    results$summary$Replicate[results$summary$Sample == 1] <- 1
+    tbl <- report_genotypes(results)
+    expect_identical(tbl$Replicate, c("1", "", ""))
+    # Blanks are the default for NA here but we can specify something else
+    tbl <- report_genotypes(results, na.replicates = "X")
+    expect_identical(tbl$Replicate, c("1", "X", "X"))
+  })
+
 })
