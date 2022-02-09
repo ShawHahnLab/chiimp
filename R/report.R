@@ -21,7 +21,8 @@ normalize_alleles <- function(data) {
 #' Wide table of allele names vs loci
 #'
 #' Allele pairs are shown in a standardized order with homozygous entries shown
-#' twice.
+#' twice.  NA allele names in the input are converted to empty strings while NA
+#' is given for missing sample/locus combinations.
 #'
 #' @param data data frame containing Allele1Name and Allele2Name columns such as
 #'   the first list item produced by \code{\link{analyze_dataset}}.  If allele
@@ -32,7 +33,9 @@ normalize_alleles <- function(data) {
 #'
 #' @return wide format data frame with sample entries on rows and loci on
 #'   columns.  An ID column will label sample entries by whichever columns were
-#'   provided in the input (see \code{\link{make_entry_id}}).
+#'   provided in the input (see \code{\link{make_entry_id}}).  Empty strings are
+#'   given for NA allele names, while NA is given for any implicitly missing
+#'   locus/sample combinations.
 #'
 #' @export
 tabulate_allele_names <- function(data, extra_cols=NULL) {
