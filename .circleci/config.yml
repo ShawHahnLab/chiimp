@@ -12,6 +12,9 @@
 version: 2.1
 jobs:
   build:
+    parameters:
+      rversion:
+        type: string
     docker:
       - image: rocker/verse:<<parameters.rversion>>
     steps:
