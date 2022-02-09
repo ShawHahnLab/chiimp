@@ -4,8 +4,14 @@
 \alias{save_alignment_images}
 \title{Save alignment visualizations to image files}
 \usage{
-save_alignment_images(alignments, dp, image.func = "png", width = 1600,
-  height = 1200, res = 150)
+save_alignment_images(
+  alignments,
+  dp,
+  image.func = "png",
+  width = 1600,
+  height = 1200,
+  res = 150
+)
 }
 \arguments{
 \item{alignments}{list of MSA alignment objects, such as created by

@@ -4,7 +4,9 @@
 \name{sample_summary_funcs}
 \alias{sample_summary_funcs}
 \title{Versions of summarize_sample}
-\format{An object of class \code{character} of length 2.}
+\format{
+An object of class \code{character} of length 2.
+}
 \usage{
 sample_summary_funcs
 }

@@ -4,8 +4,11 @@
 \alias{make_dist_mat_known}
 \title{Make distance matrix for samples to known genotypes}
 \usage{
-make_dist_mat_known(results_summary, genotypes.known,
-  dist.func = calc_genotype_distance)
+make_dist_mat_known(
+  results_summary,
+  genotypes.known,
+  dist.func = calc_genotype_distance
+)
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by

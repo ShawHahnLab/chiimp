@@ -4,8 +4,11 @@
 \alias{find_artifact}
 \title{Check for non-stutter PCR artifacts between sequences}
 \usage{
-find_artifact(sample.data, locus_attrs,
-  count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max)
+find_artifact(
+  sample.data,
+  locus_attrs,
+  count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max
+)
 }
 \arguments{
 \item{sample.data}{data frame of processed sample data.}

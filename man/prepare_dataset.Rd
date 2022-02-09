@@ -4,8 +4,13 @@
 \alias{prepare_dataset}
 \title{Extract Sample Attributes from Filenames}
 \usage{
-prepare_dataset(dp, pattern, ord = c(1, 2, 3), autorep = FALSE,
-  locusmap = NULL)
+prepare_dataset(
+  dp,
+  pattern,
+  ord = c(1, 2, 3),
+  autorep = FALSE,
+  locusmap = NULL
+)
 }
 \arguments{
 \item{dp}{directory path to search for matching data files.}
