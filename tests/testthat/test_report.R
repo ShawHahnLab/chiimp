@@ -225,7 +225,7 @@ with(test_data, {
     # default so should missing results
     # (Sample 3 Locus A not given; Sample 2 Locus A blank results)
     results$summary[
-      11, c("Allele1Seq", "Allele2Seq", "Allele1Name", "Alelel2Name")] <- NA
+      11, c("Allele1Seq", "Allele2Seq", "Allele1Name", "Allele2Name")] <- NA
     results$summary <- results$summary[-12, ]
     tbl <- report_genotypes(results)
     tbl_known[2:3, 8:9] <- ""
