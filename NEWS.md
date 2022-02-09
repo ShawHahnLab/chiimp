@@ -1,9 +1,12 @@
 # chiimp dev
 
+ * Added option for custom text in genotype summary tables for untested
+   locus/sample combinations ([#64])
  * Made `save_csv` automatically create any parent directories as needed
    ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#64]: https://github.com/ShawHahnLab/chiimp/pull/64
 [#63]: https://github.com/ShawHahnLab/chiimp/pull/63
 [#62]: https://github.com/ShawHahnLab/chiimp/pull/62
 
