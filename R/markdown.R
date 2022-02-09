@@ -49,11 +49,13 @@ kable_genotypes <- function(data, group_samples=FALSE) {
 # Write markdown tables to standard output for report_genotypes()
 rmd_kable_genotypes <- function(results,
                                 na.replicates="",
+                                na.alleles="",
                                 locus_chunks=NULL,
                                 group_samples=FALSE,
                                 closest=NULL) {
   tbl <- report_genotypes(results = results,
                    na.replicates = na.replicates,
+                   na.alleles = na.alleles,
                    closest = closest)
   if (!is.null(locus_chunks)) {
     chunk_up(data = tbl,
