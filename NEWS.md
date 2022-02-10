@@ -1,11 +1,14 @@
 # chiimp dev
 
+ * Fixed spurious warnings during histogram plotting due to missing data
+   ([#66])
  * Added option for custom text in genotype summary tables for untested
    locus/sample combinations ([#64])
  * Made `save_csv` automatically create any parent directories as needed
    ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#66]: https://github.com/ShawHahnLab/chiimp/pull/66
 [#64]: https://github.com/ShawHahnLab/chiimp/pull/64
 [#63]: https://github.com/ShawHahnLab/chiimp/pull/63
 [#62]: https://github.com/ShawHahnLab/chiimp/pull/62

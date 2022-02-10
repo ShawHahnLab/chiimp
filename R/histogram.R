@@ -96,7 +96,7 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
 #'
 #' Render prepared histogram data to the display device.
 #'
-#' @param bars data frames of counts-vs-lengths as prepared by
+#' @param bars list of data frames of counts-vs-lengths as prepared by
 #' \code{\link{str_hist_setup}}.
 #' @param main title of the plot.
 #' @param xlim numeric range for x-axis.
@@ -120,15 +120,17 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
   lwd <- max(1, get_px_width()) # at least one pixel
 
   for (nm in names(bars)) {
-    graphics::points(bars[[nm]]$Length,
-                     bars[[nm]]$Count,
-                     type = "h",
-                     col = categories[nm, "col"],
-                     lend = 1,
-                     lwd = lwd)
+    if (nrow(bars[[nm]]) > 0) {
+      graphics::points(bars[[nm]]$Length,
+                       bars[[nm]]$Count,
+                       type = "h",
+                       col = categories[nm, "col"],
+                       lend = 1,
+                       lwd = lwd)
+    }
   }
 
-  if (! is.null(bars$filt)) {
+  if (! is.null(bars$filt) && nrow(bars$filt) > 0) {
     # Draw threshold
     cutoff <- (cutoff_fraction * sum(bars$filt$Count))[1]
     if (! is.na(cutoff)) {
