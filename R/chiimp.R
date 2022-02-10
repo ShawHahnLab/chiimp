@@ -337,8 +337,6 @@ save_data <- function(results, config) {
 #'
 #' @return list of \code{--metadata} argument strings
 format_pandoc_args <- function(metadata) {
-  metadata <- paste(names(metadata),
-                    lapply(metadata,
-                           function(s) paste0("\"", s, "\"")), sep = ":")
+  metadata <- paste(names(metadata), metadata, sep = ":")
   paste("--metadata=", metadata, sep = "")
 }
