@@ -62,7 +62,8 @@ with(test_data, {
     data_summary <- results_summary_data$results$summary["3-2", ]
     seq_data <- results_summary_data$results$files[[data_summary$Filename]][0, ]
     png(fp_devnull)
-    output <- histogram(seq_data = seq_data)
+    expect_silent(
+      output <- histogram(seq_data = seq_data))
     dev.off()
     output_expected <- within(list(), {
       orig <- data.frame(Length = as.integer(NA), Count = as.integer(NA))[0, ]
@@ -77,9 +78,10 @@ with(test_data, {
     seq_data <- results_summary_data$results$files[[data_summary$Filename]]
     sample_data <- results_summary_data$results$samples[["3-2"]][0, ]
     png(fp_devnull)
-    output <- histogram(seq_data = seq_data,
-                       sample_data = sample_data,
-                       cutoff_fraction = 0.05)
+    expect_silent(
+      output <- histogram(seq_data = seq_data,
+                          sample_data = sample_data,
+                          cutoff_fraction = 0.05))
     dev.off()
     # With sample_data data empty but still provided we should still have the
     # same structure of output, just with zero-row data frames in most of the
