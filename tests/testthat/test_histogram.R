@@ -9,10 +9,11 @@ with(test_data, {
     data_summary <- results_summary_data$results$summary["3-2", ]
     seq_data <- results_summary_data$results$files[[data_summary$Filename]]
     sample_data <- results_summary_data$results$samples[["3-2"]]
+    png(fp_devnull)
     output <- histogram(seq_data = seq_data,
                        sample_data = sample_data,
-                       cutoff_fraction = 0.05,
-                       render = FALSE)
+                       cutoff_fraction = 0.05)
+    dev.off()
     # The return value of histogram() should be a list of data frames organized
     # by category.
     output_expected <- within(list(), {
@@ -43,8 +44,9 @@ with(test_data, {
   test_that("histogram plots histogram with just seq_data provided", {
     data_summary <- results_summary_data$results$summary["3-2", ]
     seq_data <- results_summary_data$results$files[[data_summary$Filename]]
-    output <- histogram(seq_data = seq_data,
-                       render = FALSE)
+    png(fp_devnull)
+    output <- histogram(seq_data = seq_data)
+    dev.off()
     output_expected <- within(list(), {
       orig <- data.frame(Length = as.integer(c(40, 41, 43, 46, 47, 48, 50, 162,
                                                166, 220, 224, 232, 234, 236,
@@ -59,8 +61,9 @@ with(test_data, {
   test_that("histogram works with empty seq_data", {
     data_summary <- results_summary_data$results$summary["3-2", ]
     seq_data <- results_summary_data$results$files[[data_summary$Filename]][0, ]
-    output <- histogram(seq_data = seq_data,
-                       render = FALSE)
+    png(fp_devnull)
+    output <- histogram(seq_data = seq_data)
+    dev.off()
     output_expected <- within(list(), {
       orig <- data.frame(Length = as.integer(NA), Count = as.integer(NA))[0, ]
     })
@@ -73,10 +76,11 @@ with(test_data, {
     data_summary <- results_summary_data$results$summary["3-2", ]
     seq_data <- results_summary_data$results$files[[data_summary$Filename]]
     sample_data <- results_summary_data$results$samples[["3-2"]][0, ]
+    png(fp_devnull)
     output <- histogram(seq_data = seq_data,
                        sample_data = sample_data,
-                       cutoff_fraction = 0.05,
-                       render = FALSE)
+                       cutoff_fraction = 0.05)
+    dev.off()
     # With sample_data data empty but still provided we should still have the
     # same structure of output, just with zero-row data frames in most of the
     # list entries.
