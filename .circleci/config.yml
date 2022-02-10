@@ -30,6 +30,13 @@ jobs:
           paths:
             - "/usr/local/lib/R/site-library"
       - run:
+          name: Check versions
+          command: |
+            which R
+            R --quiet -e 'installed.packages()[, "Version"]'
+            which pandoc
+            pandoc --version
+      - run:
           name: Build package
           command: R CMD build .
       - run:
