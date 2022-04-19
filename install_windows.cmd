@@ -17,5 +17,5 @@ set pkgdir=%~dp0
 
 REM  Run bulk of the install within R.
 cd %pkgdir%
-"%rscript%" --vanilla "%pkgdir%\tools\install.R"
+"%rscript%" --no-save --no-restore "%pkgdir%\tools\install.R"
 pause
