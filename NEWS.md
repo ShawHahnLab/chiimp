@@ -1,5 +1,6 @@
 # chiimp dev
 
+ * Made installer obey site-wide R configuration if present ([#72])
  * Fixed superfluous quotes in report HTML file when rendered with newer pandoc
    ([#69])
  * Fixed spurious warnings during histogram plotting due to missing data
@@ -10,6 +11,7 @@
    ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#72]: https://github.com/ShawHahnLab/chiimp/pull/72
 [#69]: https://github.com/ShawHahnLab/chiimp/pull/69
 [#66]: https://github.com/ShawHahnLab/chiimp/pull/66
 [#64]: https://github.com/ShawHahnLab/chiimp/pull/64
