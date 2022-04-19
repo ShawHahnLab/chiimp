@@ -50,7 +50,7 @@ load_config <- function(fp) {
 #'   \code{\link[utils]{write.table}}.
 #'
 #' @return data frame
-#' 
+#'
 #' @describeIn load_csv Load CSV
 #'
 #' @export
@@ -60,7 +60,9 @@ load_csv <- function(fp, ...) {
                             sep = ",",
                             stringsAsFactors = FALSE,
                             ...)
-  rownames(data) <- make_rownames(data)
+  if (! "row.names" %in% names(list(...))) {
+    rownames(data) <- make_rownames(data)
+  }
   data
 }
 

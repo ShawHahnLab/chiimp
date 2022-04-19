@@ -90,6 +90,22 @@ with(test_data, {
     expect_equal(data, data_expected)
   })
 
+  test_that("load_csv uses row names given", {
+    # If we give a row.names argument it should pass that on to read.table and
+    # shouldn't automatically generate row names
+    fp <- tempfile()
+    data_expected <- data.frame(
+      Vec1 = c("A", "D"),
+      Vec2 = c("B", "E"),
+      Vec3 = c("C", "F"),
+      stringsAsFactors = FALSE,
+      row.names = NULL)
+    cat("Vec1,Vec2,Vec3\nA,B,C\nD,E,F\n", file = fp)
+    data <- load_csv(fp, row.names = NULL)
+    file.remove(fp)
+    expect_equal(data, data_expected)
+  })
+
 
   test_that("save_csv saves CSV files", {
     fp <- tempfile()

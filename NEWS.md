@@ -1,5 +1,6 @@
 # chiimp dev
 
+ * Made `load_csv` use custom row names if given ([#74])
  * Made installer obey site-wide R configuration if present ([#72])
  * Fixed superfluous quotes in report HTML file when rendered with newer pandoc
    ([#69])
@@ -11,6 +12,7 @@
    ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#74]: https://github.com/ShawHahnLab/chiimp/pull/74
 [#72]: https://github.com/ShawHahnLab/chiimp/pull/72
 [#69]: https://github.com/ShawHahnLab/chiimp/pull/69
 [#66]: https://github.com/ShawHahnLab/chiimp/pull/66
