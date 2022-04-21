@@ -49,6 +49,9 @@ jobs:
           name: "Store Artifacts: 00install.out"
           path: chiimp.Rcheck/00install.out
       - run:
+          name: "Run find_pandoc script"
+          command: Rscript exec/find_pandoc.R
+      - run:
           name: "Run demo script"
           command: bash exec/demo.sh $PWD/demo-files
       - store_artifacts:
