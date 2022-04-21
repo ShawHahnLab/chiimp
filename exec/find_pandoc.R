@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
-# Figure out the path to the pandoc executable.  In order of priority:
+# Figure out the path to the pandoc executable's parent directory.  In order of
+# priority:
 #
 #  1. Anything set in RSTUDIO_PANDOC env variable
 #  2. Anything found in installed copies of RStudio
@@ -28,10 +29,10 @@ find_pandoc <- function() {
     c("pandoc", "pandoc.exe"))
   execs <- execs[file.exists(execs)]
 
-  # Find files (no dirs) that are named exactly "pandoc", and get the full path
-  # to the parent dir of any found
+  # Find files (no dirs) that are named exactly "pandoc" or "pandoc.exe", and
+  # get the full path to the parent dir of any found
   pandoc_dirs_available <- c(
-    dirname(list.files(search_paths, recursive = TRUE, full.names = TRUE, pattern = "^pandoc(?:\\.exe)$")),
+    dirname(list.files(search_paths, recursive = TRUE, full.names = TRUE, pattern = "^(pandoc|pandoc\\.exe)$")),
     dirname(execs))
 
   # Let rmarkdown package decide which pandoc to use, if that feature is
@@ -41,7 +42,7 @@ find_pandoc <- function() {
   pandoc_dir <- if ("find_pandoc" %in% getNamespaceExports("rmarkdown")) {
     rmarkdown::find_pandoc(dir = pandoc_dirs_available)$dir
   } else {
-    file.path(pandoc_dirs_available[1], "pandoc")
+    pandoc_dirs_available[1]
   }
   return(pandoc_dir)
 }
