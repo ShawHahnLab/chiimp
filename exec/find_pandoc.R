@@ -23,13 +23,15 @@ find_pandoc <- function() {
     list.files("/Applications", pattern = "^RStudio.*.app", full.names = TRUE),
     "/usr/lib/rstudio")
 
-  execs <- file.path(strsplit(Sys.getenv("PATH"), ":")[[1]], "pandoc")
+  execs <- file.path(
+    strsplit(Sys.getenv("PATH"), .Platform$path.sep)[[1]],
+    c("pandoc", "pandoc.exe"))
   execs <- execs[file.exists(execs)]
 
   # Find files (no dirs) that are named exactly "pandoc", and get the full path
   # to the parent dir of any found
   pandoc_dirs_available <- c(
-    dirname(list.files(search_paths, recursive = TRUE, full.names = TRUE, pattern = "^pandoc$")),
+    dirname(list.files(search_paths, recursive = TRUE, full.names = TRUE, pattern = "^pandoc(?:\\.exe)$")),
     dirname(execs))
 
   # Let rmarkdown package decide which pandoc to use, if that feature is
