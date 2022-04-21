@@ -15,8 +15,7 @@ set rpath=%rpath: "%1"=%
 set rpath=%rpath:"=%
 set rdir=%rpath%\..\
 
-REM  TODO: detect RStudio instead of presuming the path
-set RSTUDIO_PANDOC=C:\Program Files\RStudio\bin\pandoc
+for /f "tokens=* usebackq" %%x in (`%rdir%\Rscript %dir%\find_pandoc.R`) do set RSTUDIO_PANDOC=%%x
 
 if "%~1"=="" (
 	echo.To run CHIIMP, drag and drop a configuration file onto this icon.
