@@ -47,4 +47,4 @@ find_pandoc <- function() {
   return(pandoc_dir)
 }
 
-cat(find_pandoc(), end = "\n")
+cat(find_pandoc(), "\n", sep = "")

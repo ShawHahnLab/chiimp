@@ -24,10 +24,6 @@ REM  Also note that spaces are OK in the Rscript path but not the path to the
 REM  script; for some reason that makes space-handling for the whole command
 REM  fail.
 for /f "tokens=* usebackq" %%x in (`"%rdir%\Rscript" %dir%\find_pandoc.R`) do set RSTUDIO_PANDOC=%%x
-REM  Removing the trailing space on the end of the variable I can't figure out
-REM  how to avoid
-REM  https://stackoverflow.com/a/29504225
-set RSTUDIO_PANDOC=%RSTUDIO_PANDOC:~0,-1%
 
 if "%~1"=="" (
 	echo.To run CHIIMP, drag and drop a configuration file onto this icon.
