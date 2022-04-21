@@ -46,4 +46,6 @@ find_pandoc <- function() {
   return(pandoc_dir)
 }
 
-cat(find_pandoc(), end = "\n")
+# Leaving off a newline for windows because chiimp.cmd mangles that to a space
+# and then keeps it on the end of the file path.
+cat(find_pandoc(), end = if (.Platform$OS.type == "windows") "" else "\n")
