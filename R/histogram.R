@@ -135,10 +135,10 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
     cutoff <- (cutoff_fraction * sum(bars$filt$Count))[1]
     if (! is.na(cutoff)) {
       categories["threshold", "Render"] <- TRUE
-      xlim_view <- par("usr")[1:2]
+      xlim_view <- graphics::par("usr")[1:2]
       xlim_view[1] <- floor(xlim_view[1])
       xlim_view[2] <- ceiling(xlim_view[2])
-      points(xlim_view[1]:xlim_view[2],
+      graphics::points(xlim_view[1]:xlim_view[2],
              rep(cutoff, diff(xlim_view) + 1), pch = ".")
     }
     # Draw domain of sample data
@@ -194,9 +194,9 @@ str_hist_setup_legend <- function(bars) {
 #' device?
 get_px_width <- function() {
   # https://stackoverflow.com/questions/17213293/how-to-get-r-plot-window-size
-  px_width_fig <- dev.size("px")[1] # width of whole figure in pixels
-  px_width_plt <- diff(par("plt")[1:2] * px_width_fig) # just the plot region
-  width_plt <- diff(par("usr")[1:2]) # width of plot region in plot units
+  px_width_fig <- grDevices::dev.size("px")[1] # width of whole figure in pixels
+  px_width_plt <- diff(graphics::par("plt")[1:2] * px_width_fig) # just the plot region
+  width_plt <- diff(graphics::par("usr")[1:2]) # width of plot region in plot units
   step_width <- px_width_plt / width_plt # pixels per plot unit increment
   step_width
 }

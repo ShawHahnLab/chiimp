@@ -45,7 +45,7 @@ with(test_data, {
       fp_img <- tempfile()
       png(fp_img)
       annotations <- data.frame(
-        Attribute=LETTERS[seq_along(rownames(dist_mat))])
+        Attribute = LETTERS[seq_along(rownames(dist_mat))])
       rownames(annotations) <- rownames(dist_mat)
       plot_data <- plot_dist_mat(dist_mat, annotation_col = annotations)
       dev.off()

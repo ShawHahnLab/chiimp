@@ -31,9 +31,9 @@ test_data <- within(list(), {
   rng_orig <- RNGkind()
   if (length(rng_orig) > 2) {
     warn_orig <- options()$warn
-    options(warn=-1)
+    options(warn = -1)
     RNGkind("Mersenne-Twister", "Inversion", "Rounding")
-    options(warn=warn_orig)
+    options(warn = warn_orig)
     rm(warn_orig)
   }
   # Careful!  When running via a package check we might be in temporary

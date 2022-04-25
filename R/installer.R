@@ -165,7 +165,7 @@ install <- function(path_package) {
     cat("\n")
     cat("### Installing devtools\n")
     cat("\n")
-    install.packages("devtools", repos = "https://cloud.r-project.org")
+    utils::install.packages("devtools", repos = "https://cloud.r-project.org")
   }
 
   cat("\n")
