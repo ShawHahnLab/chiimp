@@ -22,6 +22,7 @@ Given a list of configuration options, run all aspects of a microsatellite
 analysis, and save the corresponding output files.
 }
 \examples{
+\dontrun{
 # Set up a temporary copy of the CHIIMP test data
 example_dir <- tempfile()
 dir.create(example_dir)
@@ -36,5 +37,6 @@ file.copy(locus_attrs_path, "locus_attrs.csv")
 config_path <- system.file("example_config.yml", package = "chiimp")
 config <- load_config(config_path)
 results <- full_analysis(config)
+}
 
 }
