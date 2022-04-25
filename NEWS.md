@@ -1,4 +1,4 @@
-# chiimp dev
+# chiimp 0.4.0
 
  * Fixed pandoc error with newer RStudio versions (>= 2022.02) by finding
    pandoc automatically ([#75])
