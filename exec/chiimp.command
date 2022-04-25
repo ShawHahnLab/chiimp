@@ -18,11 +18,10 @@ if [[ $# -eq 0 ]]; then
 	echo "https://shawhahnlab.github.io/chiimp/GUIDE.pdf"
 	echo
 else
-	which pandoc > /dev/null || export RSTUDIO_PANDOC=/Applications/RStudio.app/Contents/MacOS/pandoc/
-
 	if [[ ! "$dir" =~ ^/ ]]; then
 		rel=$(pwd)
 	fi
+	export RSTUDIO_PANDOC=$(Rscript "$rel/$dir/find_pandoc.R")
 	cd "$cfg_dir"
 	Rscript "$rel/$dir/chiimp" "$@"
 fi

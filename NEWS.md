@@ -1,5 +1,7 @@
 # chiimp dev
 
+ * Fixed pandoc error with newer RStudio versions (>= 2022.02) by finding
+   pandoc automatically ([#75])
  * Made `load_csv` use custom row names if given ([#74])
  * Made installer obey site-wide R configuration if present ([#72])
  * Fixed superfluous quotes in report HTML file when rendered with newer pandoc
@@ -12,6 +14,7 @@
    ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#75]: https://github.com/ShawHahnLab/chiimp/pull/75
 [#74]: https://github.com/ShawHahnLab/chiimp/pull/74
 [#72]: https://github.com/ShawHahnLab/chiimp/pull/72
 [#69]: https://github.com/ShawHahnLab/chiimp/pull/69
