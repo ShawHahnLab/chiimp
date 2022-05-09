@@ -32,7 +32,7 @@ echo "$SEP Running devtools::check()"
 R --slave --vanilla -e "$chiimp_check"
 
 echo "$SEP Rendering user guide"
-R --slave --vanilla -e "rmarkdown::render('GUIDE.Rmd', output_file = 'GUIDE.pdf', quiet = TRUE)"
+./tools/render_guide.sh
 
 # Create bundled ZIP and TGZ versions without hidden top level files (such as
 # the git and travis stuff) and with the GUIDE.pdf.
