@@ -276,6 +276,19 @@ with(test_data, {
     expect_equal(tbl$Replicate, c("1", "1", ""))
     tbl <- report_genotypes(results, na.alleles = "X")
     expect_equal(tbl$Replicate, c("1", "1", ""))
+    # That's somewhat a special case, though, since Replicate has some
+    # NA-handling logic of its own.  How about the identity columns, if present?
+    # (Faking the output from find_closest_matches here: nobody has a close
+    # match except for sample 3, which matches Bob perfectly)
+    closest <- lapply(rownames(tbl), function(entryname) numeric())
+    names(closest) <- rownames(tbl)
+    closest[["3"]] <- c(Bob = 0)
+    tbl <- report_genotypes(results, closest = closest)
+    expect_equal(tbl[["Distance"]], c("", "", "0"))
+    expect_equal(tbl[["Name"]], c("", "", "Bob"))
+    tbl <- report_genotypes(results, closest = closest, na.alleles = "X")
+    expect_equal(tbl[["Distance"]], c("", "", "0"))
+    expect_equal(tbl[["Name"]], c("", "", "Bob"))
   })
 
 })
