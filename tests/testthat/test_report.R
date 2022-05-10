@@ -206,6 +206,7 @@ with(test_data, {
 # test report_genotypes ---------------------------------------------------
 
   test_that("report_genotypes produces expected data frame", {
+    # Basic test
     # Largely just a wrapper around tabulate_allele_names, but with a few
     # additional features like NA handling for specific kinds of columns
     tbl_known <- data.frame(
@@ -237,6 +238,7 @@ with(test_data, {
   })
 
   test_that("report_genotypes handles replicates including NA", {
+    # Test for na.replicates argument
     results <- results_summary_data$results
     # Explicitly label Sample 1 with a replicate, which will make that column
     # show up in the output
@@ -246,6 +248,34 @@ with(test_data, {
     # Blanks are the default for NA here but we can specify something else
     tbl <- report_genotypes(results, na.replicates = "X")
     expect_identical(tbl$Replicate, c("1", "X", "X"))
+  })
+
+  test_that("report_genotypes uses text for absent sample/locus combos", {
+    # Test for na.alleles argument
+    # remove one tested combo from the results
+    results <- results_summary_data$results
+    results$summary <- subset(results$summary, ! (Sample == 3 & Locus == 2))
+    results$files <- results$files[results$summary$Filename]
+    results$samples <- results$samples[rownames(results$summary)]
+    # by default, an empty string is shown for missing info, indistinguishable
+    # from blank results.  Locus 1 should be unaffected, but we should see a
+    # blank for sample 3 in Locus 2's first column.
+    tbl <- report_genotypes(results)
+    expect_equal(tbl[["1_2"]], c("280-74dd46", "284-2b3fab", "280-74dd46"))
+    expect_equal(tbl[["2_1"]], c("250-5dacee", "266-2aa675", ""))
+    # If we give an na.alleles argument we should be able to get different
+    # placeholder text there.
+    tbl <- report_genotypes(results, na.alleles = "X")
+    expect_equal(tbl[["1_2"]], c("280-74dd46", "284-2b3fab", "280-74dd46"))
+    expect_equal(tbl[["2_1"]], c("250-5dacee", "266-2aa675", "X"))
+    # That placeholder text should only be applied to allele columns,
+    # not elsewhere like Replicate or known ID info columns
+    results$summary$Replicate <- rep(1, nrow(results$summary))
+    results$summary$Replicate[results$summary$Sample == 3] <- NA
+    tbl <- report_genotypes(results)
+    expect_equal(tbl$Replicate, c("1", "1", ""))
+    tbl <- report_genotypes(results, na.alleles = "X")
+    expect_equal(tbl$Replicate, c("1", "1", ""))
   })
 
 })
