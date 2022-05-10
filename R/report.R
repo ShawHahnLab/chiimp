@@ -76,7 +76,9 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #' Report the genotypes present in a processed dataset in a concise data frame.
 #' This will arrange the allele names into a wide-format table with unique
 #' samples on rows and loci on columns, do some automatic cleanup on the
-#' columns, and show closest-matching individuals per entry, if given.
+#' columns, and show closest-matching individuals per entry, if given.  All NA
+#' entries are replaced with blank strings or optionally (for NA Replicates or
+#' untested sample/locus combinations) other custom placeholder text.
 #'
 #' @param results list of results data as produced by \code{analyze_dataset}.
 #' @param na.replicates text to replace NA entries with for the Replicates
@@ -108,13 +110,29 @@ report_genotypes <- function(results,
     tbl <- cbind(tbl, idents)
   }
 
-  # If we have no replicates drop that column
+  # If we have no replicates drop that column.  Otherwise put placeholder text
+  # for any NA replicate entries.
   if (all(is.na(tbl$Replicate)))
     tbl <- tbl[, -2]
   else
     tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
+
+  # Put placeholder text for any untested sample/locus combinations
+  # (This is a clumsy way of handling different columns differently, and is
+  # probably a hint that more logic handled in the long-format data frames would
+  # be better, but this can be a stopgap before some reorganization at some
+  # point.)
+  locus_cols <- do.call(
+    paste0,
+    expand.grid(unique(results$summary$Locus), c("_1", "_2")))
+  for (colnm in colnames(tbl)) {
+      if (colnm %in% locus_cols) {
+        tbl[[colnm]][is.na(tbl[[colnm]])] <- na.alleles
+      }
+  }
+
   # Blank out any remaining NA values
-  tbl[is.na(tbl)] <- na.alleles
+  tbl[is.na(tbl)] <- ""
 
   tbl
 }
