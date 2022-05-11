@@ -102,6 +102,71 @@ with(test_data, {
     })
   })
 
+  test_that("tabulate_allele_names sorts rows using extra cols given", {
+    # By default tabulate_allele_names sorts in whatever order is given, but
+    # there are some edge cases for certain combinations.  The optional
+    # extra_cols argument can help enforce a particular output ordering.
+
+    # We'll make the the data have sample 1 replicate 1, sample 2 replicate 1,
+    # and then sample 1 replicate 2.
+    results_summary <- with(results_summary_data, {
+      results$summary$Replicate <- "1"
+      results$summary$Replicate[results$summary$Sample == "3"] <- "2"
+      results$summary$Sample <- rep(c("1", "2", "1"), 4)
+      results$summary
+    })
+    tbl_known <- data.frame(
+      ID = c("1-1", "2-1", "1-2"),
+      Sample = c("1", "2", "1"),
+      Replicate = c("1", "1", "2"),
+      stringsAsFactors = FALSE)
+    tbl_known$`A_1` <- c("162-c6933c", "162-c6933c", "182-d679e1")
+    tbl_known$`A_2` <- c("194-fc013a", "178-d84dc0", "182-d679e1")
+    tbl_known$`B_1` <- c("216-c0f11a", "236-321c79", "220-fb9a92")
+    tbl_known$`B_2` <- c("252-27c5bf", "240-2a344f", "236-321c79")
+    tbl_known$`1_1` <- c("260-9a01fc", "256-c18a06", "276-ea279a")
+    tbl_known$`1_2` <- c("280-74dd46", "284-2b3fab", "280-74dd46")
+    tbl_known$`2_1` <- c("250-5dacee", "266-2aa675", "238-6cc8ff")
+    tbl_known$`2_2` <- c("318-35b7b6", "266-2aa675", "342-2e88c0")
+
+    # Generally, order going in -> order going out, so this leaves sample 1
+    # split to either side of sample 2's row.
+    tbl <- tabulate_allele_names(results_summary)
+    expect_equivalent(tbl, subset(tbl_known, select = -c(Sample, Replicate)))
+    # but with extra_cols we can sort while tabulating
+    tbl <- tabulate_allele_names(
+      results_summary,
+      extra_cols = c("Sample", "Replicate"))
+    expect_equivalent(tbl, tbl_known[order_entries(tbl_known), ])
+    # If we start with sorted input, we can generally expect sorted output
+    tbl <- tabulate_allele_names(
+      results_summary[order_entries(results_summary), ])
+    expect_equivalent(
+      tbl,
+      subset(
+        tbl_known[order_entries(tbl_known), ],
+        select = -c(Sample, Replicate)))
+
+    # Partial grid of samples/loci also works, though this is where an edge case
+    # comes up about sorting with/without a Locus column included (with, for the
+    # input; without, for the output)
+    results_summary <- subset(
+      results_summary,
+      paste(Sample, Replicate, Locus) %in% c(
+        "1 1 A", "1 1 B", "2 1 A", "2 1 B", "1 2 B"))
+    tbl_known <- tbl_known[
+      , c("ID", "Sample", "Replicate", "A_1", "A_2", "B_1", "B_2")]
+    tbl_known[3, 4:5] <- NA
+    # As before, we get equivalent output sorting as input, generally
+    tbl <- tabulate_allele_names(results_summary)
+    expect_equivalent(tbl, subset(tbl_known, select = -c(Sample, Replicate)))
+    # But, with an incomplete grid of samples/loci, sorting doesn't work like
+    # above and we still get the same output.
+    tbl <- tabulate_allele_names(
+      results_summary[order_entries(results_summary), ])
+    expect_equivalent(tbl, subset(tbl_known, select = -c(Sample, Replicate)))
+  })
+
 
 # test plot_heatmap -------------------------------------------------------
 
