@@ -68,6 +68,10 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
                        c(1, 2),
                        sep = "_")
   colnames(tbl) <- c("ID", extra_cols, allele_cols)
+  # If extra columns were given, re-order output rows using those
+  if (! is.null(extra_cols)) {
+    tbl <- tbl[order_entries(tbl[, extra_cols]), ]
+  }
   tbl
 }
 

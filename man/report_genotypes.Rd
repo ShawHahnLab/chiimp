@@ -24,5 +24,7 @@ data frame showing summary of genotypes.
 Report the genotypes present in a processed dataset in a concise data frame.
 This will arrange the allele names into a wide-format table with unique
 samples on rows and loci on columns, do some automatic cleanup on the
-columns, and show closest-matching individuals per entry, if given.
+columns, and show closest-matching individuals per entry, if given.  All NA
+entries are replaced with blank strings or optionally (for NA Replicates or
+untested sample/locus combinations) other custom placeholder text.
 }
