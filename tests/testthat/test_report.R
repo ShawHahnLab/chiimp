@@ -165,6 +165,15 @@ with(test_data, {
     tbl <- tabulate_allele_names(
       results_summary[order_entries(results_summary), ])
     expect_equivalent(tbl, subset(tbl_known, select = -c(Sample, Replicate)))
+    # Giving extra columns enforces output sorting as expected
+    tbl <- tabulate_allele_names(
+      results_summary,
+      extra_cols = c("Sample", "Replicate"))
+    expect_equivalent(tbl, tbl_known[order_entries(tbl_known), ])
+    tbl <- tabulate_allele_names(
+      results_summary[order_entries(results_summary), ],
+      extra_cols = c("Sample", "Replicate"))
+    expect_equivalent(tbl, tbl_known[order_entries(tbl_known), ])
   })
 
 
