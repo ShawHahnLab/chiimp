@@ -39,6 +39,14 @@ normalize_alleles <- function(data) {
 #'
 #' @export
 tabulate_allele_names <- function(data, extra_cols=NULL) {
+  if (length(extra_cols)) {
+    badcols <- extra_cols[! extra_cols %in% colnames(data)]
+    if (length(badcols)) {
+      stop(
+        paste("undefined extra columns in tabulate_allele_names: ",
+              badcols, collapse = " "))
+    }
+  }
   # Order and replicate (for homozygous) the allele names
   nms <- normalize_alleles(data[, c("Allele1Name", "Allele2Name")])
   # Create unique (aside from Locus) identifiers for each entry
@@ -69,8 +77,8 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
                        sep = "_")
   colnames(tbl) <- c("ID", extra_cols, allele_cols)
   # If extra columns were given, re-order output rows using those
-  if (! is.null(extra_cols)) {
-    tbl <- tbl[order_entries(tbl[, extra_cols]), ]
+  if (length(extra_cols)) {
+    tbl <- tbl[order_entries(tbl[, extra_cols, drop = FALSE]), ]
   }
   tbl
 }

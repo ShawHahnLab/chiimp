@@ -95,10 +95,25 @@ with(test_data, {
                             Replicate = integer(3) * NA,
                             stringsAsFactors = FALSE)
     with(results_summary_data, {
+      # The basic case: sample and replicate columns
       tbl <- tabulate_allele_names(results$summary,
                                    extra_cols = c("Sample", "Replicate"))
-      tbl <- tbl[, 1:3]
-      expect_equivalent(tbl, tbl_known)
+      expect_true(all(c("Sample", "Replicate") %in% colnames(tbl)))
+      expect_equivalent(tbl[, 1:3], tbl_known)
+      # What about just one column name?  (We'd better be using drop=FALSE!)
+      tbl <- tabulate_allele_names(results$summary,
+                                   extra_cols = "Sample")
+      expect_true("Sample" %in% colnames(tbl))
+      expect_false("Replicate" %in% colnames(tbl))
+      expect_equivalent(tbl[, 1:2], tbl_known[, 1:2])
+      # Unknown column name
+      expect_error({
+        tabulate_allele_names(results$summary,
+                              extra_cols = "DoesNotExist")
+      }, "undefined extra columns")
+      # Empty column name vector -> same as not given
+      tbl <- tabulate_allele_names(results$summary, extra_cols = character())
+      expect_true(all(! c("Sample", "Replicate") %in% colnames(tbl)))
     })
   })
 
