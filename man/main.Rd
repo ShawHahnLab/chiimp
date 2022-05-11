@@ -20,6 +20,7 @@ arguments, load the configuration data (see \code{\link{load_config}}), and
 run \code{\link{full_analysis}}.
 }
 \examples{
+\dontrun{
 # Set up a temporary copy of the CHIIMP test data
 example_dir <- tempfile()
 dir.create(example_dir)
@@ -33,5 +34,6 @@ file.copy(locus_attrs_path, "locus_attrs.csv")
 # Run the example analysis
 config_path <- system.file("example_config.yml", package = "chiimp")
 results <- main(config_path)
+}
 
 }

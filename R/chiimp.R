@@ -131,6 +131,7 @@
 #'   "config."
 #'
 #' @examples
+#' \dontrun{
 #' # Set up a temporary copy of the CHIIMP test data
 #' example_dir <- tempfile()
 #' dir.create(example_dir)
@@ -145,6 +146,7 @@
 #' config_path <- system.file("example_config.yml", package = "chiimp")
 #' config <- load_config(config_path)
 #' results <- full_analysis(config)
+#' }
 #'
 #' @export
 full_analysis <- function(config, dataset=NULL) {
@@ -241,6 +243,7 @@ full_analysis <- function(config, dataset=NULL) {
 #'   "config."
 #'
 #' @examples
+#' \dontrun{
 #' # Set up a temporary copy of the CHIIMP test data
 #' example_dir <- tempfile()
 #' dir.create(example_dir)
@@ -254,6 +257,7 @@ full_analysis <- function(config, dataset=NULL) {
 #' # Run the example analysis
 #' config_path <- system.file("example_config.yml", package = "chiimp")
 #' results <- main(config_path)
+#' }
 #'
 #' @export
 main <- function(args=NULL) {

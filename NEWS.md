@@ -1,5 +1,6 @@
-# chiimp dev
+# chiimp 0.4.0
 
+ * Fixed genotype summary table row ordering for certain edge cases ([#81])
  * Fixed pandoc error with newer RStudio versions (>= 2022.02) by finding
    pandoc automatically ([#75])
  * Made `load_csv` use custom row names if given ([#74])
@@ -14,6 +15,7 @@
    ([#63])
  * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
 
+[#81]: https://github.com/ShawHahnLab/chiimp/pull/81
 [#75]: https://github.com/ShawHahnLab/chiimp/pull/75
 [#74]: https://github.com/ShawHahnLab/chiimp/pull/74
 [#72]: https://github.com/ShawHahnLab/chiimp/pull/72
