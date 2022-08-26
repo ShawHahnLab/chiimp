@@ -3,33 +3,33 @@ Title: Computational, High-throughput Individual Identification through Microsat
 Version: 0.4.0
 Authors@R: person("Jesse", "Connell", email = "ancon@upenn.edu", role = c("aut", "cre"))
 Description: An R package to analyze microsatellites in high-throughput sequencing datasets.
-Depends: R (>= 3.2.3)
+Depends: R (>= 3.6)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Language: en-US
 biocViews:
 Imports:
-  argparser (>= 0.4),
-  Biostrings (>= 2.38.4),
+  graphics (>= 3.6),
+  grDevices (>= 3.6),
+  methods (>= 3.6),
+  parallel (>= 3.6),
+  stats (>= 3.6),
+  utils (>= 3.6),
+  argparser (>= 0.6),
   dnaplotr (>= 0.1),
   dnar (>= 0.1),
-  devtools (>= 1.13.5),
-  graphics (>= 3.2.3),
-  grDevices (>= 3.2.3),
-  kableExtra (>= 0.2.1.9000),
-  knitr (>= 1.16),
-  methods (>= 3.2.3),
-  msa (>= 1.2.1),
-  openssl (>= 0.9.6),
-  parallel (>= 3.2.3),
-  pheatmap (>= 1.0.8),
-  rmarkdown (>= 1.6),
-  stats (>= 3.2.3),
-  stringr (>= 1.2.0),
-  utils (>= 3.2.3),
-  viridis (>= 0.4.0),
-  yaml (>= 2.1.14)
+  devtools (>= 2.3),
+  Biostrings (>= 2.54),
+  kableExtra (>= 1.1),
+  knitr (>= 1.28),
+  msa (>= 1.18),
+  openssl (>= 1.4),
+  pheatmap (>= 1.0),
+  rmarkdown (>= 2.1),
+  stringr (>= 1.4),
+  viridis (>= 0.5),
+  yaml (>= 2.2)
 Remotes:
   github::sherrillmix/dnar,
   github::sherrillmix/dnaplotr
