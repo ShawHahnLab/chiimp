@@ -14,7 +14,7 @@
    locus/sample combinations ([#64])
  * Made `save_csv` automatically create any parent directories as needed
    ([#63])
- * Fixed handling of extra pheatmap arguments in `plot_dist_mat` ([#62])
+ * Fixed handling of extra `pheatmap` arguments in `plot_dist_mat` ([#62])
 
 [#85]: https://github.com/ShawHahnLab/chiimp/pull/85
 [#81]: https://github.com/ShawHahnLab/chiimp/pull/81
