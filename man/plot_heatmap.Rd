@@ -4,8 +4,14 @@
 \alias{plot_heatmap}
 \title{Render heatmap of STR attribute across samples and loci}
 \usage{
-plot_heatmap(results, attribute, label.by = c("Allele1Length",
-  "Allele2Length"), color = c("white", "pink"), breaks = NA, ...)
+plot_heatmap(
+  results,
+  attribute,
+  label.by = c("Allele1Length", "Allele2Length"),
+  color = c("white", "pink"),
+  breaks = NA,
+  ...
+)
 }
 \arguments{
 \item{results}{combined results list}

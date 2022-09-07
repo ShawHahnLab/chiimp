@@ -29,17 +29,22 @@ full_locus_match <- function(sample_data, locus_name) {
 #'
 #' @return character vector of entry identifiers
 make_entry_id <- function(data) {
-  cols.names <- c("Dataset", "Sample", "Name", "Replicate", "Locus")
-  cols.idx <- match(cols.names, colnames(data))
-  cols.idx <- cols.idx[!is.na(cols.idx)]
-  cols.idx <- cols.idx[unlist(lapply(cols.idx, function(x) {
-    !all(is.na(data[, x]))
-  }))]
-  data.names <- data[, cols.idx, drop = FALSE]
-  sapply(1:nrow(data.names), function(nr) {
-    entries <- lapply(data.names[nr, !is.na(data.names[nr, ])], as.character)
-    do.call(paste, as.list(c(entries, sep = "-")))
-  })
+  cols_names <- c("Dataset", "Sample", "Name", "Replicate", "Locus")
+  cols_idx <- match(cols_names, colnames(data))
+  cols_idx <- cols_idx[! is.na(cols_idx)]
+  if (length(cols_idx)) {
+    cols_idx <- cols_idx[unlist(lapply(cols_idx, function(x) {
+      ! all(is.na(data[, x]))
+    }))]
+    data_names <- data[, cols_idx, drop = FALSE]
+    sapply(1:nrow(data_names), function(nr) {
+      entries <- lapply(data_names[nr, ! is.na(data_names[nr, ])], as.character)
+      do.call(paste, as.list(c(entries, sep = "-")))
+    })
+  } else {
+    warning("no recognized columns for entry id")
+    paste0("entry", 1:nrow(data))
+  }
 }
 
 #' Create Row Names for STR Data

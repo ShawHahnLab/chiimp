@@ -85,6 +85,10 @@ config.defaults <- list(
   report.group_samples = FALSE,
   # Text to use for NA entries in Replicates column of tables (i.e. Pooled)
   report.na.replicates = "",
+  # Text to use for NA allele enries in tables (when the Sample+Locus
+  # combination was not present at all, as opposed to when a genotype could not
+  # be determined)
+  report.na.alleles = "",
   # Parameters controlling how identifications are reported: dist_range is how
   # closeby (to the closest case) the next-nearest individuals must be to be
   # listed as similar to a sample, and dist_max is the maximum distance for a

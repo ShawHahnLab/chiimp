@@ -21,7 +21,8 @@ normalize_alleles <- function(data) {
 #' Wide table of allele names vs loci
 #'
 #' Allele pairs are shown in a standardized order with homozygous entries shown
-#' twice.
+#' twice.  NA allele names in the input are converted to empty strings while NA
+#' is given for missing sample/locus combinations.
 #'
 #' @param data data frame containing Allele1Name and Allele2Name columns such as
 #'   the first list item produced by \code{\link{analyze_dataset}}.  If allele
@@ -32,10 +33,20 @@ normalize_alleles <- function(data) {
 #'
 #' @return wide format data frame with sample entries on rows and loci on
 #'   columns.  An ID column will label sample entries by whichever columns were
-#'   provided in the input (see \code{\link{make_entry_id}}).
+#'   provided in the input (see \code{\link{make_entry_id}}).  Empty strings are
+#'   given for NA allele names, while NA is given for any implicitly missing
+#'   locus/sample combinations.
 #'
 #' @export
 tabulate_allele_names <- function(data, extra_cols=NULL) {
+  if (length(extra_cols)) {
+    badcols <- extra_cols[! extra_cols %in% colnames(data)]
+    if (length(badcols)) {
+      stop(
+        paste("undefined extra columns in tabulate_allele_names: ",
+              badcols, collapse = " "))
+    }
+  }
   # Order and replicate (for homozygous) the allele names
   nms <- normalize_alleles(data[, c("Allele1Name", "Allele2Name")])
   # Create unique (aside from Locus) identifiers for each entry
@@ -65,6 +76,10 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
                        c(1, 2),
                        sep = "_")
   colnames(tbl) <- c("ID", extra_cols, allele_cols)
+  # If extra columns were given, re-order output rows using those
+  if (length(extra_cols)) {
+    tbl <- tbl[order_entries(tbl[, extra_cols, drop = FALSE]), ]
+  }
   tbl
 }
 
@@ -73,11 +88,14 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #' Report the genotypes present in a processed dataset in a concise data frame.
 #' This will arrange the allele names into a wide-format table with unique
 #' samples on rows and loci on columns, do some automatic cleanup on the
-#' columns, and show closest-matching individuals per entry, if given.
+#' columns, and show closest-matching individuals per entry, if given.  All NA
+#' entries are replaced with blank strings or optionally (for NA Replicates or
+#' untested sample/locus combinations) other custom placeholder text.
 #'
 #' @param results list of results data as produced by \code{analyze_dataset}.
 #' @param na.replicates text to replace NA entries with for the Replicates
 #'     column.
+#' @param na.alleles text to replace NA entries with for the allele names
 #' @param closest list of closest matches as produced by
 #'   \code{\link{find_closest_matches}}.
 #'
@@ -85,6 +103,7 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #' @export
 report_genotypes <- function(results,
                              na.replicates="",
+                             na.alleles="",
                              closest=NULL) {
   tbl <- tabulate_allele_names(data = results$summary,
                                extra_cols = c("Sample", "Replicate"))
@@ -103,11 +122,27 @@ report_genotypes <- function(results,
     tbl <- cbind(tbl, idents)
   }
 
-  # If we have no replicates drop that column
+  # If we have no replicates drop that column.  Otherwise put placeholder text
+  # for any NA replicate entries.
   if (all(is.na(tbl$Replicate)))
     tbl <- tbl[, -2]
   else
     tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
+
+  # Put placeholder text for any untested sample/locus combinations
+  # (This is a clumsy way of handling different columns differently, and is
+  # probably a hint that more logic handled in the long-format data frames would
+  # be better, but this can be a stopgap before some reorganization at some
+  # point.)
+  locus_cols <- do.call(
+    paste0,
+    expand.grid(unique(results$summary$Locus), c("_1", "_2")))
+  for (colnm in colnames(tbl)) {
+      if (colnm %in% locus_cols) {
+        tbl[[colnm]][is.na(tbl[[colnm]])] <- na.alleles
+      }
+  }
+
   # Blank out any remaining NA values
   tbl[is.na(tbl)] <- ""
 
@@ -302,15 +337,15 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
                fontsize = fontsize)
   if (nrow(dist_mat) == ncol(dist_mat)) {
     args <- c(args,
-              clustering_distance_rows = stats::as.dist(dist_mat),
-              clustering_distance_cols = stats::as.dist(dist_mat))
+              list(clustering_distance_rows = stats::as.dist(dist_mat)),
+              list(clustering_distance_cols = stats::as.dist(dist_mat)))
   } else {
     args <- c(args,
               cluster_cols = FALSE,
               cluster_rows = FALSE)
   }
 
-  do.call(pheatmap::pheatmap, c(args, ...))
+  do.call(pheatmap::pheatmap, c(args, list(...)))
 }
 
 

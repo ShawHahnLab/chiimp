@@ -10,5 +10,5 @@ set -e
 rscript=$(which Rscript)
 pkgdir=$(readlink -f $(dirname $BASH_SOURCE))
 cd "$pkgdir"
-"$rscript" --vanilla "$pkgdir/tools/install.R"
+"$rscript" --no-save --no-restore "$pkgdir/tools/install.R"
 read -n 1 -s -p "Press any key to continue . . ."; echo # see "pause" in cmd.exe

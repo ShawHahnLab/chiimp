@@ -86,18 +86,20 @@ setup_icon_linux <- function() {
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
+    # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
     desktop_file <- paste(
       "[Desktop Entry]",
       "Type=Application",
       "Terminal=true",
       "Name=CHIIMP",
-      paste("Exec", chiimp_path, sep = "="),
+      paste0('Exec="', chiimp_path, '" "%f"'),
       sep = "\n")
     icon_path <- file.path(desktop_path, "CHIIMP.desktop")
     icon_path <- normalizePath(icon_path, mustWork = FALSE)
     cat(desktop_file, file = icon_path, end = "\n")
-    # TODO double-check if .desktop files actually need to be marked
-    # exectuable.  This may not be necessary.
+    # If the .desktop file is not marked executable I get a security warning
+    # under XFCE (and possibly with other desktop environments) though I don't
+    # see anything about this in the freedesktop.org specs.
     system2("chmod", args = c("+x", icon_path))
   }
   return(icon_path)
@@ -165,7 +167,7 @@ install <- function(path_package) {
     cat("\n")
     cat("### Installing devtools\n")
     cat("\n")
-    install.packages("devtools", repos = "https://cloud.r-project.org")
+    utils::install.packages("devtools", repos = "https://cloud.r-project.org")
   }
 
   cat("\n")

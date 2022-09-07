@@ -96,7 +96,7 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
 #'
 #' Render prepared histogram data to the display device.
 #'
-#' @param bars data frames of counts-vs-lengths as prepared by
+#' @param bars list of data frames of counts-vs-lengths as prepared by
 #' \code{\link{str_hist_setup}}.
 #' @param main title of the plot.
 #' @param xlim numeric range for x-axis.
@@ -120,23 +120,25 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
   lwd <- max(1, get_px_width()) # at least one pixel
 
   for (nm in names(bars)) {
-    graphics::points(bars[[nm]]$Length,
-                     bars[[nm]]$Count,
-                     type = "h",
-                     col = categories[nm, "col"],
-                     lend = 1,
-                     lwd = lwd)
+    if (nrow(bars[[nm]]) > 0) {
+      graphics::points(bars[[nm]]$Length,
+                       bars[[nm]]$Count,
+                       type = "h",
+                       col = categories[nm, "col"],
+                       lend = 1,
+                       lwd = lwd)
+    }
   }
 
-  if (! is.null(bars$filt)) {
+  if (! is.null(bars$filt) && nrow(bars$filt) > 0) {
     # Draw threshold
     cutoff <- (cutoff_fraction * sum(bars$filt$Count))[1]
     if (! is.na(cutoff)) {
       categories["threshold", "Render"] <- TRUE
-      xlim_view <- par("usr")[1:2]
+      xlim_view <- graphics::par("usr")[1:2]
       xlim_view[1] <- floor(xlim_view[1])
       xlim_view[2] <- ceiling(xlim_view[2])
-      points(xlim_view[1]:xlim_view[2],
+      graphics::points(xlim_view[1]:xlim_view[2],
              rep(cutoff, diff(xlim_view) + 1), pch = ".")
     }
     # Draw domain of sample data
@@ -192,9 +194,9 @@ str_hist_setup_legend <- function(bars) {
 #' device?
 get_px_width <- function() {
   # https://stackoverflow.com/questions/17213293/how-to-get-r-plot-window-size
-  px_width_fig <- dev.size("px")[1] # width of whole figure in pixels
-  px_width_plt <- diff(par("plt")[1:2] * px_width_fig) # just the plot region
-  width_plt <- diff(par("usr")[1:2]) # width of plot region in plot units
+  px_width_fig <- grDevices::dev.size("px")[1] # width of whole figure in pixels
+  px_width_plt <- diff(graphics::par("plt")[1:2] * px_width_fig) # just the plot region
+  width_plt <- diff(graphics::par("usr")[1:2]) # width of plot region in plot units
   step_width <- px_width_plt / width_plt # pixels per plot unit increment
   step_width
 }

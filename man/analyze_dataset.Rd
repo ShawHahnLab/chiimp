@@ -4,15 +4,22 @@
 \alias{analyze_dataset}
 \title{Analyze all samples in a dataset}
 \usage{
-analyze_dataset(dataset, locus_attrs, nrepeats,
+analyze_dataset(
+  dataset,
+  locus_attrs,
+  nrepeats,
   stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
   artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
   use_reverse_primers = config.defaults$seq_analysis$use_reverse_primers,
   reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1,
-  ncores = 0, analysis_opts, summary_opts,
+  ncores = 0,
+  analysis_opts,
+  summary_opts,
   analysis_function = analyze_sample,
-  summary_function = summarize_sample, known_alleles = NULL,
-  name_args = list())
+  summary_function = summarize_sample,
+  known_alleles = NULL,
+  name_args = list()
+)
 }
 \arguments{
 \item{dataset}{data frame of sample details as produced by
