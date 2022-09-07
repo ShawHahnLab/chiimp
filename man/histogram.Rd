@@ -4,10 +4,14 @@
 \alias{histogram}
 \title{Plot histogram of STR sequences}
 \usage{
-histogram(seq_data, sample_data = NULL,
+histogram(
+  seq_data,
+  sample_data = NULL,
   main = "Number of Reads by Sequence Length",
-  xlim = range(seq_data$Length), cutoff_fraction = NULL,
-  render = TRUE)
+  xlim = range(seq_data$Length),
+  cutoff_fraction = NULL,
+  render = TRUE
+)
 }
 \arguments{
 \item{seq_data}{data frame of dereplicated sequences as created by

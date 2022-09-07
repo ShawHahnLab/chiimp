@@ -7,7 +7,7 @@
 str_hist_render(bars, main, xlim, cutoff_fraction)
 }
 \arguments{
-\item{bars}{data frames of counts-vs-lengths as prepared by
+\item{bars}{list of data frames of counts-vs-lengths as prepared by
 \code{\link{str_hist_setup}}.}
 
 \item{main}{title of the plot.}

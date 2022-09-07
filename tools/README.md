@@ -12,7 +12,9 @@ These aren't relevant within an installation or for regular users.
  * `travis_install_test.sh` Script to manage testing the various installers
    under Travis.
  * `check_lint.R`: Checks for R code quality
- * `check_spelling.R` Checks for spelling in documentation
+ * `check_spelling.R` Checks for spelling in documentation.  Add extra words to
+   `inst/WORDLIST`.  Note that it's clever about code encapsulated in backticks
+   and won't flag it.
  * `prep_release.sh` New version release preparation script
 
 ## Manual Testing Steps

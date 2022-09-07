@@ -1,6 +1,37 @@
+# chiimp 0.4.0
+
+ * Fixed desktop icon drag-and-drop for recent Linux distributions ([#85])
+ * Fixed genotype summary table row ordering for certain edge cases ([#81])
+ * Fixed pandoc error with newer RStudio versions (>= 2022.02) by finding
+   pandoc automatically ([#75])
+ * Made `load_csv` use custom row names if given ([#74])
+ * Made installer obey site-wide R configuration if present ([#72])
+ * Fixed superfluous quotes in report HTML file when rendered with newer pandoc
+   ([#69])
+ * Fixed spurious warnings during histogram plotting due to missing data
+   ([#66])
+ * Added option for custom text in genotype summary tables for untested
+   locus/sample combinations ([#64])
+ * Made `save_csv` automatically create any parent directories as needed
+   ([#63])
+ * Fixed handling of extra `pheatmap` arguments in `plot_dist_mat` ([#62])
+
+[#85]: https://github.com/ShawHahnLab/chiimp/pull/85
+[#81]: https://github.com/ShawHahnLab/chiimp/pull/81
+[#75]: https://github.com/ShawHahnLab/chiimp/pull/75
+[#74]: https://github.com/ShawHahnLab/chiimp/pull/74
+[#72]: https://github.com/ShawHahnLab/chiimp/pull/72
+[#69]: https://github.com/ShawHahnLab/chiimp/pull/69
+[#66]: https://github.com/ShawHahnLab/chiimp/pull/66
+[#64]: https://github.com/ShawHahnLab/chiimp/pull/64
+[#63]: https://github.com/ShawHahnLab/chiimp/pull/63
+[#62]: https://github.com/ShawHahnLab/chiimp/pull/62
+
 # chiimp 0.3.1
 
  * Fixed icon setup on Mac OS ([#56]).
+
+[#56]: https://github.com/ShawHahnLab/chiimp/pull/56
 
 # chiimp 0.3.0
 

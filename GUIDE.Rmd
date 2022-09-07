@@ -4,11 +4,13 @@
 
 title: "CHIIMP User Guide"
 author: "Jesse Connell"
-date: "2019/07/10"
+date: "2022/04/25"
 output:
   pdf_document:
     toc: true
     toc_depth: 3
+urlcolor: blue
+linkcolor: blue
 ---
 
 ```{r setup, include=FALSE}
@@ -34,12 +36,12 @@ package documentation.
 
 ## Installation
 
-Most dependencies are provided by installation of [R] and [RStudio].  Once
-these are installed, follow the specific instructions below for your operating
-system.  In all three cases CHIIMP performs an anlysis when a configuration
-file is dragged and dropped onto the desktop icon; there is no interactive
-interface via the icon, though the R package can be used interactively.  See
-the Usage section for more information.
+First install [R] and [RStudio], which will supply most software dependencies
+for CHIIMP.  Once these are installed, follow the specific instructions below
+for your operating system.  In all three cases CHIIMP performs an analysis when
+a configuration file is dragged and dropped onto the desktop icon; there is no
+interactive interface via the icon, though the R package can be used
+interactively.  See the Usage section for more information.
 
 ### Windows
 
@@ -48,12 +50,12 @@ the package and R dependencies, and create a desktop shortcut.
 
 ### Mac OS
 
-On Mac OS, double-click the `install_mac.command` shell script to automatically
-install the package along with R dependencies and create a desktop alias.  If
-the install script won't open because of a security warning, you can
-right-click (control+click) and select "Open" in the menu that appears.
-Apple has specific instructions [here](https://support.apple.com/kb/PH25088?locale=en_US)
-about these security setings.
+On Mac OS, right-click (control+click) the `install_mac.command` shell script,
+select "Open," and also click "Open" in the window that appears to confirm that
+really do want to open it.  (Apple has specific instructions about these
+security precautions [here](https://support.apple.com/kb/PH25088?locale=en_US).)
+This will automatically install the package along with R dependencies and
+create a desktop alias.
 
 If a window appears recommending installation of the Mac OS command-line
 developer tools, go ahead and install them.  After that you'll probably need to
@@ -61,9 +63,12 @@ re-run the CHIIMP installer again to finish the install.
 
 ### Linux
 
-On Linux, run the `install_linux.sh` shell script to automatically install the 
-package along with R dependencies.  An icon for the program is created at 
-`$HOME/Desktop/CHIIMP`.
+On Linux, run the `install_linux.sh` shell script to automatically install the
+package along with R dependencies.  An icon for the program is created at
+`$HOME/Desktop/CHIIMP.desktop`.  Specific usage of the desktop icon will depend
+on the desktop environment in use.  (The `CHIIMP.desktop` text file references
+the installed chiimp executable, and supplies the config file as a command-line
+argument when dragged and dropped onto the icon.)
 
 ## Input Data Organization
 
@@ -94,24 +99,24 @@ primer sequence is one of the filtering criteria during analysis.)
 The description of the samples to be analyzed can be provided in a spreadsheet,
 or automatically loaded from the data file names.  An example spreadsheet:
 
-| Filename      | Replicate   | Sample | Locus |
-| -------------:| -----------:| ------:| -----:|
-| 100-1-A.fastq |     1       | 100    | A     |
-| 100-2-A.fastq |     2       | 100    | A     |
-| 100-1-B.fastq |     1       | 100    | B     |
-| 100-2-B.fastq |     2       | 100    | B     |
-| 100-1-1.fastq |     1       | 100    | 1     |
-| 100-2-1.fastq |     2       | 100    | 1     |
-| 100-1-2.fastq |     1       | 100    | 2     |
-| 100-2-2.fastq |     2       | 100    | 2     |
-| 101-1-A.fastq |     1       | 101    | A     |
-| 101-2-A.fastq |     2       | 101    | A     |
-| 101-1-B.fastq |     1       | 101    | B     |
-| 101-2-B.fastq |     2       | 101    | B     |
-| 101-1-1.fastq |     1       | 101    | 1     |
-| 101-2-1.fastq |     2       | 101    | 1     |
-| 101-1-2.fastq |     1       | 101    | 2     |
-| 101-2-2.fastq |     2       | 101    | 2     |
+| `Filename`         | `Replicate` | `Sample` | `Locus` |
+|:------------------:|:-----------:|:--------:|:-------:|
+| `100-1-A.fastq.gz` |    `1`      |   `100`  |    `A`  |
+| `100-2-A.fastq.gz` |    `2`      |   `100`  |    `A`  |
+| `100-1-B.fastq.gz` |    `1`      |   `100`  |    `B`  |
+| `100-2-B.fastq.gz` |    `2`      |   `100`  |    `B`  |
+| `100-1-1.fastq.gz` |    `1`      |   `100`  |    `1`  |
+| `100-2-1.fastq.gz` |    `2`      |   `100`  |    `1`  |
+| `100-1-2.fastq.gz` |    `1`      |   `100`  |    `2`  |
+| `100-2-2.fastq.gz` |    `2`      |   `100`  |    `2`  |
+| `101-1-A.fastq.gz` |    `1`      |   `101`  |    `A`  |
+| `101-2-A.fastq.gz` |    `2`      |   `101`  |    `A`  |
+| `101-1-B.fastq.gz` |    `1`      |   `101`  |    `B`  |
+| `101-2-B.fastq.gz` |    `2`      |   `101`  |    `B`  |
+| `101-1-1.fastq.gz` |    `1`      |   `101`  |    `1`  |
+| `101-2-1.fastq.gz` |    `2`      |   `101`  |    `1`  |
+| `101-1-2.fastq.gz` |    `1`      |   `101`  |    `2`  |
+| `101-2-2.fastq.gz` |    `2`      |   `101`  |    `2`  |
 
 These columns are required for each entry:
  
@@ -136,13 +141,12 @@ Usage section for more information.
 The description of the loci should be given in a spreadsheet with loci on rows
 and attributes on columns.  For example:
 
-```{r, echo=FALSE}
-# Show the example locus attributes table
-locus_attrs <- load_locus_attrs("inst/example_locus_attrs.csv")
-locus_attrs$Primer <- paste0(substr(locus_attrs$Primer, 1, 12), "...")
-locus_attrs$ReversePrimer <- paste0(substr(locus_attrs$ReversePrimer, 1, 12), "...")
-knitr::kable(locus_attrs, row.names = FALSE)
-```
+| `Locus` | `LengthMin` | `LengthMax` | `LengthBuffer` | `Motif` |    `Primer`       |  `ReversePrimer` |
+|:-------:| -----------:| -----------:| --------------:|:-------:|:-----------------:|:----------------:|
+|   `A`   |       `131` |      `179`  |          `20`  |  `TAGA` | `TATCACTGGTGT...` | `CACAGTTGTGTG...`|
+|   `B`   |       `194` |      `235`  |          `20`  |  `TAGA` | `AGTCTCTCTTTC...` | `TAGGAGCCTGTG...`|
+|   `1`   |       `232` |      `270`  |          `20`  |  `TATC` | `ACAGTCAAGAAT...` | `CTGTGGCTCAAA...`|
+|   `2`   |       `218` |      `337`  |          `20`  |  `TCCA` | `TTGTCTCCCCAG...` | `TCTGTCATAAAC...`|
 
 These columns are required:
  
@@ -157,7 +161,8 @@ These columns are required:
  * Primer: The forward PCR primer used in preparing the sequencing library. 
  This is used as one of the checks for candidate allele sequences.
  * ReversePrimer: The reverse PCR primer used in preparing the sequencing
- library.  This is not currently used.
+ library.  This is not currently used unless `use_reverse_primers` is enabled
+ in the configuration.
 
 ### Known Individuals (Optional)
 
@@ -165,16 +170,16 @@ If a spreadsheet of genotypes for known individuals is supplied, the analysis
 can attempt to match samples with the known genotypes automatically.  For
 example:
 
-| Name          | Locus       | Allele1Seq     | Allele2Seq     |
-|:-------------:|:-----------:|:--------------:|:--------------:|
-| CH001         |     A       | ATTATCACTGG... | ATTATCACTGG... |
-| CH001         |     B       | TCAGTCTCTCT... |                |
-| CH001         |     1       | AGACAGTCAAG... | AGACAGTCAAG... |
-| CH001         |     2       | CTTTGTCTCCC... | CTTTGTCTCCC... |
-| CH002         |     A       | ATTATCACTGG... | ATTATCACTGG... |
-| CH002         |     B       | TCAGTCTCTCT... | TCAGTCTCTCT... |
-| CH002         |     1       | AGACAGTCAAG... |                |
-| CH002         |     2       | CTTTGTCTCCC... | CTTTGTCTCCC... |
+|   `Name`  | `Locus` |   `Allele1Seq`   |   `Allele2Seq`   |
+|:---------:|:-------:|:----------------:|:----------------:|
+|  `CH001`  |   `A`   | `ATTATCACTGG...` | `ATTATCACTGG...` |
+|  `CH001`  |   `B`   | `TCAGTCTCTCT...` |                  |
+|  `CH001`  |   `1`   | `AGACAGTCAAG...` | `AGACAGTCAAG...` |
+|  `CH001`  |   `2`   | `CTTTGTCTCCC...` | `CTTTGTCTCCC...` |
+|  `CH002`  |   `A`   | `ATTATCACTGG...` | `ATTATCACTGG...` |
+|  `CH002`  |   `B`   | `TCAGTCTCTCT...` | `TCAGTCTCTCT...` |
+|  `CH002`  |   `1`   | `AGACAGTCAAG...` |                  |
+|  `CH002`  |   `2`   | `CTTTGTCTCCC...` | `CTTTGTCTCCC...` |
 
 The order of the alleles given is not important, and homozygous individuals may 
 have Allele2Seq either left blank or set to a copy of Allele1Seq.  The sequences
@@ -186,14 +191,14 @@ used for the PCR primers described above.
 If a spreadsheet of allele names and sequences is supplied, the analysis 
 will use those names in summary tables in the output report.  For example:
 
-| Locus |  Name       | Seq            |
-|:-----:|:-----------:|:--------------:|
-| A     | 200-a       | ATTATCACTGG... |
-| A     | 180-a       | ATTATCACTGG... |
-| A     | 180-b       | ATTATCACTGG... |
-| B     | 300-a       | ATTATCACTGG... |
-| B     | 305-a       | ATTATCACTGG... |
-| B     | 290-a       | ATTATCACTGG... |
+| `Locus` |   `Name`    |      `Seq`       |
+|:-------:|:-----------:|:----------------:|
+|   `A`   |   `200-a`   | `ATTATCACTGG...` |
+|   `A`   |   `180-a`   | `ATTATCACTGG...` |
+|   `A`   |   `180-b`   | `ATTATCACTGG...` |
+|   `B`   |   `300-a`   | `ATTATCACTGG...` |
+|   `B`   |   `305-a`   | `ATTATCACTGG...` |
+|   `B`   |   `290-a`   | `ATTATCACTGG...` |
 
 The software will automatically create short allele names for any identified 
 allele not listed in the allele spreadsheet (or for all alleles if no 

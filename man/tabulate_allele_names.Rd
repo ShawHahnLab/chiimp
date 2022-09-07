@@ -18,9 +18,12 @@ loci for a given entry.}
 \value{
 wide format data frame with sample entries on rows and loci on
   columns.  An ID column will label sample entries by whichever columns were
-  provided in the input (see \code{\link{make_entry_id}}).
+  provided in the input (see \code{\link{make_entry_id}}).  Empty strings are
+  given for NA allele names, while NA is given for any implicitly missing
+  locus/sample combinations.
 }
 \description{
 Allele pairs are shown in a standardized order with homozygous entries shown
-twice.
+twice.  NA allele names in the input are converted to empty strings while NA
+is given for missing sample/locus combinations.
 }

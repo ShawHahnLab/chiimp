@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis.yml$
+.circleci
 .utils
 install_linux.sh
 install_windows.cmd

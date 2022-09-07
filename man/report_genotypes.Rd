@@ -4,13 +4,15 @@
 \alias{report_genotypes}
 \title{Create genotype summary table}
 \usage{
-report_genotypes(results, na.replicates = "", closest = NULL)
+report_genotypes(results, na.replicates = "", na.alleles = "", closest = NULL)
 }
 \arguments{
 \item{results}{list of results data as produced by \code{analyze_dataset}.}
 
 \item{na.replicates}{text to replace NA entries with for the Replicates
 column.}
+
+\item{na.alleles}{text to replace NA entries with for the allele names}
 
 \item{closest}{list of closest matches as produced by
 \code{\link{find_closest_matches}}.}
@@ -22,5 +24,7 @@ data frame showing summary of genotypes.
 Report the genotypes present in a processed dataset in a concise data frame.
 This will arrange the allele names into a wide-format table with unique
 samples on rows and loci on columns, do some automatic cleanup on the
-columns, and show closest-matching individuals per entry, if given.
+columns, and show closest-matching individuals per entry, if given.  All NA
+entries are replaced with blank strings or optionally (for NA Replicates or
+untested sample/locus combinations) other custom placeholder text.
 }

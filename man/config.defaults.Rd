@@ -4,7 +4,9 @@
 \name{config.defaults}
 \alias{config.defaults}
 \title{Default microsatellite configuration}
-\format{An object of class \code{list} of length 23.}
+\format{
+An object of class \code{list} of length 24.
+}
 \usage{
 config.defaults
 }

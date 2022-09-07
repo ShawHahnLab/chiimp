@@ -1,0 +1,83 @@
+# https://blog.jdblischak.com/posts/circleci-for-r-1/
+# https://blog.jdblischak.com/posts/circleci-for-r-2/
+#
+# Can't get the full package check working with rocker becuase of latex/pdf
+# issues.  This looks like the problem:
+#
+# https://gitlab.irstea.fr/in-wop/airGRiwrm/-/issues/53
+#
+# ...but if I switch to rocker/tidyverse it's then missing pdflatex, and if I
+# stick with rocker/verse, it still can't find the font.  For now I'm just
+# skipping that part of the package check with --no-manual.
+version: 2.1
+jobs:
+  build:
+    parameters:
+      rversion:
+        type: string
+    docker:
+      - image: rocker/verse:<<parameters.rversion>>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
+      - run:
+          name: Install package dependencies
+          command: R -e "devtools::install_deps(dep = TRUE)"
+      - save_cache:
+          key: cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
+          paths:
+            - "/usr/local/lib/R/site-library"
+      - run:
+          name: Check versions
+          command: |
+            which R
+            R --quiet -e 'installed.packages()[, "Version"]'
+            which pandoc
+            pandoc --version
+      - run:
+          name: Build package
+          command: R CMD build .
+      - run:
+          name: Check package
+          command: R CMD check --no-manual *tar.gz
+      - store_artifacts:
+          name: "Store Artifacts: 00check.log"
+          path: chiimp.Rcheck/00check.log
+      - store_artifacts:
+          name: "Store Artifacts: 00install.out"
+          path: chiimp.Rcheck/00install.out
+      - run:
+          name: "Run find_pandoc script"
+          command: Rscript exec/find_pandoc.R
+      - run:
+          name: "Run demo script"
+          command: bash exec/demo.sh $PWD/demo-files
+      - store_artifacts:
+          name: "Store Artifacts: demo: report"
+          path: demo-files/str-results/report.html
+      - store_artifacts:
+          name: "Store Artifacts: demo: summary"
+          path: demo-files/str-results/summary.csv
+      - run:
+          name: "Run demo script - empty case"
+          command: bash exec/demo_empty.sh $PWD/demo-empty-files
+      - store_artifacts:
+          name: "Store Artifacts: empty demo: report"
+          path: demo-empty-files/str-results/report.html
+      - store_artifacts:
+          name: "Store Artifacts: empty demo: summary"
+          path: demo-empty-files/str-results/summary.csv
+      - run:
+          name: "Run install test script"
+          command: bash tools/circleci_install_test.sh
+
+workflows:
+  version: 2
+  build_all:
+    jobs:
+      - build:
+          matrix:
+            parameters:
+              rversion: ["3.6.3", "4.2.1"]

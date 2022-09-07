@@ -4,7 +4,9 @@
 \name{sample_analysis_funcs}
 \alias{sample_analysis_funcs}
 \title{Versions of analyze_sample}
-\format{An object of class \code{character} of length 3.}
+\format{
+An object of class \code{character} of length 3.
+}
 \usage{
 sample_analysis_funcs
 }

@@ -4,8 +4,7 @@
 \alias{summarize_genotypes}
 \title{Create Summary Genotype Table}
 \usage{
-summarize_genotypes(results_summary, vars = c("Allele1Seq",
-  "Allele2Seq"))
+summarize_genotypes(results_summary, vars = c("Allele1Seq", "Allele2Seq"))
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
