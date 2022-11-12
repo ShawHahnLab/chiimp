@@ -262,6 +262,20 @@ with(test_data, {
     expect_identical(dataset, dataset_known)
   })
 
+  test_that("load_dataset warns of duplicated sample/replicate/locus combos", {
+    dataset_path <- normalizePath(test_path("data", "io", "dataset_dups.csv"))
+    dataset_known <- readRDS(test_path("data", "io", "dataset_dups.rds"))
+    within_tmpdir({
+      touch(as.character(read.csv(dataset_path)$Filename))
+      expect_warning(
+        dataset <- load_dataset(dataset_path),
+        paste(
+          "Duplicated sample/replicate/locus entries for",
+          "1/1/1, 1/1/2, 1/1/A, 1/1/B"))
+    })
+    expect_identical(dataset, dataset_known)
+  })
+
 
 # test save_dataset -------------------------------------------------------
 
