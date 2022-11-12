@@ -1,3 +1,10 @@
+# chiimp dev
+
+ * Made `load_config` warn about any unrecognized configuration file entries
+   ([#88])
+
+[#88]: https://github.com/ShawHahnLab/chiimp/pull/88
+
 # chiimp 0.4.0
 
  * Fixed desktop icon drag-and-drop for recent Linux distributions ([#85])
