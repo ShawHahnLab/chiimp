@@ -57,6 +57,22 @@ setup_dataset <- function(reps=1:3, samps=1:5,
 with(test_data, {
 
 
+
+# test load_config --------------------------------------------------------
+
+
+  test_that("load_config loads config YAML files", {
+    # this would have been the right way to handle test data all along:
+    # https://r-pkgs.org/testing-design.html#storing-test-data
+    config_path <- test_path("data", "io", "config.yml")
+    config <- load_config(config_path)
+    expect_equal(
+      config,
+      list(fp_dataset = "samples.csv", output = list(fp_rds = "results.rds"))
+    )
+  })
+
+
 # test load_csv/save_csv --------------------------------------------------
 
 
