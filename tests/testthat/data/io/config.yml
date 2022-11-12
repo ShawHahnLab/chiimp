@@ -1,0 +1,3 @@
+fp_dataset: "samples.csv"
+output:
+  fp_rds: "results.rds"
