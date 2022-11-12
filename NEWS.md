@@ -1,10 +1,13 @@
 # chiimp dev
 
+ * Made warnings encountered in the chiimp script display as they occur, rather
+   than at the end ([#91])
  * Made `load_dataset` warn about repeated Sample+Replicate+Locus entries
    across rows ([#90])
  * Made `load_config` warn about any unrecognized configuration file entries
    ([#88])
 
+[#91]: https://github.com/ShawHahnLab/chiimp/pull/91
 [#90]: https://github.com/ShawHahnLab/chiimp/pull/90
 [#88]: https://github.com/ShawHahnLab/chiimp/pull/88
 
