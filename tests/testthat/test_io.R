@@ -62,8 +62,6 @@ with(test_data, {
 
 
   test_that("load_config loads config YAML files", {
-    # this would have been the right way to handle test data all along:
-    # https://r-pkgs.org/testing-design.html#storing-test-data
     config_path <- test_path("data", "io", "config.yml")
     config <- load_config(config_path)
     expect_equal(
@@ -240,37 +238,26 @@ with(test_data, {
 
 
   test_that("load_dataset loads sample attributes", {
-    dataset_known <- setup_dataset()
-    # Touch the input files so they at least exist
-    data.dir <- tempfile()
-    dir.create(data.dir)
-    setwd(data.dir)
-    touch(dataset_known$Filename)
-    # Write dataset CSV
-    fp <- tempfile(tmpdir = data.dir)
-    write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
-    expect_silent({
-      dataset <- load_dataset(fp)
+    dataset_path <- normalizePath(test_path("data", "io", "dataset.csv"))
+    dataset_known <- readRDS(test_path("data", "io", "dataset.rds"))
+    within_tmpdir({
+      # Touch the input files so they at least exist
+      touch(read.csv(dataset_path)$Filename)
+      expect_silent(dataset <- load_dataset(dataset_path))
     })
-    unlink(x = data.dir, recursive = TRUE)
     expect_identical(dataset, dataset_known)
   })
 
   test_that("load_dataset warns of missing files", {
     # Here we'll skip writing any actual data files, so load_dataset should
     # complain.
-    dataset_known <- setup_dataset()
-    data.dir <- tempfile()
-    dir.create(data.dir)
-    setwd(data.dir)
-    fp <- tempfile(tmpdir = data.dir)
-    write.csv(dataset_known, file = fp, na = "", row.names = FALSE)
+    dataset_path <- normalizePath(test_path("data", "io", "dataset.csv"))
+    dataset_known <- readRDS(test_path("data", "io", "dataset.rds"))
     # expect_message and capture_messages both do NOT catch text send to stderr,
     # though capture.output(..., type = "message") does.
     msg <- capture.output({
-      dataset <- load_dataset(fp)
+      dataset <- load_dataset(dataset_path)
     }, type = "message")
-    unlink(x = data.dir, recursive = TRUE)
     expect_true(length(grep("WARNING: Missing 60 of 60 data files", msg)) == 1)
     expect_identical(dataset, dataset_known)
   })
@@ -282,16 +269,14 @@ with(test_data, {
   test_that("save_dataset saves sample attributes", {
     # We'll just make sure that saving and then re-loading provides what was
     # saved.  load_dataset is tested separately above.
-    data.dir <- tempfile()
-    dir.create(data.dir)
-    setwd(data.dir)
-    dataset_known <- setup_dataset()
-    touch(dataset_known$Filename)
-    fp <- tempfile(tmpdir = data.dir)
-    save_dataset(dataset_known, fp)
-    dataset <- load_dataset(fp)
-    unlink(x = data.dir, recursive = TRUE)
-    expect_identical(dataset, dataset_known)
+    within_tmpdir({
+      dataset_known <- setup_dataset()
+      touch(dataset_known$Filename)
+      fp <- tempfile(tmpdir = ".")
+      save_dataset(dataset_known, fp)
+      dataset <- load_dataset(fp)
+      expect_identical(dataset, dataset_known)
+    })
   })
 
 # test prepare_dataset ----------------------------------------------------
