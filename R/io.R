@@ -67,7 +67,7 @@ load_config_get_unknown_entries <- function(config) {
     }
     obj
   }
-  remaining <- modifyList(config, blank(config.defaults))
+  remaining <- utils::modifyList(config, blank(config.defaults))
   trim <- function(obj) {
     for (nm in names(obj)) {
       obj[[nm]] <- trim(obj[[nm]])
