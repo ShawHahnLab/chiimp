@@ -18,13 +18,16 @@ dataset_cols <- c("Filename", "Replicate", "Sample", "Locus")
 #' Load configuration file
 #'
 #' Load a YAML-formatted text file of configuration options for microsatellite
-#' analysis.  This is currently just a wrapper around
-#' \code{\link[yaml]{yaml.load}}.  The \code{\link{main}} function loads
-#' configuration options with this for use by \code{\link{full_analysis}}.
+#' analysis.  The \code{\link{main}} function loads configuration options with
+#' this for use by \code{\link{full_analysis}}.
+#'
+#' Whatever entries are present in the file will be returned, but names that
+#' don't match known names (see \code{\link{config.defaults}}) will be reported
+#' in a warning.
 #'
 #' @param fp path to configuration file.
 #'
-#' @return list of configuration options
+#' @return nested list of configuration options
 #'
 #' @export
 #'
@@ -36,7 +39,52 @@ load_config <- function(fp) {
   if (is.na(fp))
     return(list())
   text <- readChar(fp, file.info(fp)$size)
-  yaml::yaml.load(text)
+  config <- yaml::yaml.load(text)
+  unknown_entries <- load_config_get_unknown_entries(config)
+  if (length(unknown_entries)) {
+    unknown_txt <- load_config_flatten_keys(unknown_entries)
+    warning(paste0(
+      "unrecognized config file entries:\n",
+      paste(gsub("^", "  ", unknown_txt), collapse = "\n")))
+  }
+  config
+}
+
+load_config_get_unknown_entries <- function(config) {
+  # make an everything-is-null nested list from a template (which can be used
+  # with the default config to get only those that are *not* mentioned in the
+  # default)
+  blank <- function(obj) {
+    for (nm in names(obj)) {
+      if (is.list(obj[[nm]])) {
+        obj[[nm]] <- blank(obj[[nm]])
+      } else {
+        obj[[nm]] <- NULL
+        entry <- list(NULL)
+        names(entry) <- nm
+        obj <- c(obj, entry)
+      }
+    }
+    obj
+  }
+  remaining <- modifyList(config, blank(config.defaults))
+  trim <- function(obj) {
+    for (nm in names(obj)) {
+      obj[[nm]] <- trim(obj[[nm]])
+    }
+    obj <- obj[sapply(obj, length) > 0]
+    obj
+  }
+  trim(remaining)
+}
+
+# take a nested list like list(x=list(y=5)) and return "x:y"
+load_config_flatten_keys <- function(config) {
+  unname(sapply(names(config), function(nm) {
+    result <- load_config_flatten_keys(config[[nm]])
+    result <- paste0(nm, ":", result)
+    sub(":$", "", result)
+  }))
 }
 
 #' Load and save tables from CSV
