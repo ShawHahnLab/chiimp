@@ -202,8 +202,3 @@ logmsg <- function(msg, col2=as.character(Sys.time()), end="\n") {
   # stderr: file descriptor 2
   cat(paste0(msg, end), file = 2)
 }
-
-# append an empty string to each the given files
-touch <- function(fps) {
-  lapply(fps, function(fp) cat("", file = fp, append = TRUE))
-}

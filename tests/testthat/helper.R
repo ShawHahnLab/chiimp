@@ -10,3 +10,8 @@ within_tmpdir <- function(expr) {
     setwd(here)
   })
 }
+
+# append an empty string to each the given files
+touch <- function(fps) {
+  lapply(fps, function(fp) cat("", file = fp, append = TRUE))
+}
