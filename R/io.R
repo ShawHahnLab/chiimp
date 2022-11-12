@@ -252,6 +252,14 @@ load_dataset <- function(fp, ...) {
     warning(paste("Missing columns in dataset table:",
                   dataset_cols[col.missing]))
   }
+  # check for duplicated Sample+Replicate+Locus entries
+  cts <- table(with(data, paste(Sample, Replicate, Locus, sep = "/")))
+  dups <- names(cts[cts > 1])
+  if (length(dups) > 0) {
+    warning(paste(
+      "Duplicated sample/replicate/locus entries for",
+      paste(dups, collapse = ", ")))
+  }
   rownames(data) <- make_rownames(data)
   data
 }
