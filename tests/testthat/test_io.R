@@ -242,7 +242,7 @@ with(test_data, {
     dataset_known <- readRDS(test_path("data", "io", "dataset.rds"))
     within_tmpdir({
       # Touch the input files so they at least exist
-      touch(read.csv(dataset_path)$Filename)
+      touch(as.character(read.csv(dataset_path)$Filename))
       expect_silent(dataset <- load_dataset(dataset_path))
     })
     expect_identical(dataset, dataset_known)
