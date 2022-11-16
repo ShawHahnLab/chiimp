@@ -1,166 +1,126 @@
 context("Test sequence set analysis")
 
-with(test_data, {
-
 
 # test analyze_seqs -------------------------------------------------------
 
 
-  test_that("analyze_seqs tabulates sequences", {
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    expect_equal(nrow(seq_data), 24)
-    chunk <- seq_data[1:2, ]
-    expect_equal(chunk[1, "Length"], 162)
-    expect_equal(chunk[2, "Length"], 194)
-    with(chunk, {
-      expect_equal(droplevels(MatchingLocus), factor(c("A", "A")))
-      expect_equal(MotifMatch, c(TRUE, TRUE))
-      expect_equal(LengthMatch, c(TRUE, TRUE))
-      expect_equal(Ambiguous, c(FALSE, FALSE))
-      expect_equal(Stutter, as.integer(c(NA, NA)))
-      expect_equal(Artifact, as.integer(c(NA, NA)))
-    })
-  })
+test_that("analyze_seqs tabulates sequences", {
+  seqs <- readRDS(test_path("data", "analyze_seqs", "seqs.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(
+    test_path("data", "analyze_seqs", "seq_data.rds"))
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
+})
 
-  test_that("analyze_seqs handles completely emtpy input vector", {
-    seq_data <- analyze_seqs(c(), locus_attrs, 3)
-    expect_equal(nrow(seq_data), 0)
-    expect_equal(colnames(seq_data), sample.data.cols)
-  })
+test_that("analyze_seqs handles completely emtpy input vector", {
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_empty.rds"))
+  seq_data <- analyze_seqs(c(), locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
+})
 
-  test_that("analyze_seqs handles empty sequences", {
-    seqs <- seqs1$A
-    seqs[1:100] <- "" # empty out a segment of the vector
-    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
-    # Looking specifically at the entry for zero length
-    chunk <- subset(seq_data, Length == 0)
-    # There should be one row, accounting for all 100 original blank entries
-    expect_equal(nrow(chunk), 1)
-    expect_equal(chunk$Seq, "")
-    expect_equal(chunk$Count, 100)
-    # There should be nothing in the other columns
-    expect_equal(droplevels(chunk$MatchingLocus), factor(NA, levels = c()))
-    expect_equal(chunk$MotifMatch, FALSE)
-    expect_equal(chunk$LengthMatch, NA)
-    expect_equal(chunk$Ambiguous, FALSE)
-    expect_equal(chunk$Stutter, as.integer(NA))
-    expect_equal(chunk$Artifact, as.integer(NA))
-  })
+test_that("analyze_seqs handles empty sequences", {
+  # As in seqs.rds but with the first hundred sequences set to empty strings
+  seqs <- readRDS(test_path("data", "analyze_seqs", "seqs_stubs.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_stubs.rds"))
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
+})
 
-  test_that("analyze_seqs can use reverse primers", {
-    # As is, everything still works if we enable the use of reverse primers from
-    # the locus attributes table.
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3,
-                             use_reverse_primers = TRUE)
-    expect_equal(
-      table(seq_data$MatchingLocus),
-      table(factor(c(rep("A", 14), "B", "B", rep(c("1", "2"), 4)),
-                     levels = c("A", "B", "1", "2"))))
-    # Now, try with a reverse primer that won't match up.
-    locus_attrs_mod <- locus_attrs
-    locus_attrs_mod["A", "ReversePrimer"] <- locus_attrs["B", "ReversePrimer"]
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs_mod, 3,
-                             use_reverse_primers = TRUE)
-    # No more locus A matched since we replaced the reverse primer with B's but
-    # the forward primer still matches A's.
-    expect_equal(
-      table(seq_data$MatchingLocus),
-      table(factor(rep(c("1", "2"), 4), levels = c("A", "B", "1", "2"))))
-  })
+test_that("analyze_seqs can use reverse primers", {
+  seqs <- readRDS(test_path("data", "analyze_seqs", "seqs.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_rev_primers.rds"))
+  # As is, everything still works if we enable the use of reverse primers from
+  # the locus attributes table.
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3, use_reverse_primers = TRUE)
+  expect_equal(seq_data, seq_data_expected)
+  # Now, try with a reverse primer that won't match up.  Here A's reverse
+  # primer is replaced with B's.
+  locus_attrs_mod <- readRDS(
+    test_path("data", "analyze_seqs", "locus_attrs_rev_primer_mod.rds"))
+  seq_data_expected_mod <- readRDS(
+    test_path("data", "analyze_seqs", "seq_data_rev_primers_mod.rds"))
+  # No more locus A matched since we replaced the reverse primer with B's in
+  # the locus attributes but the forward primer observed still matches A's.
+  seq_data <- analyze_seqs(seqs, locus_attrs_mod, 3, use_reverse_primers = TRUE)
+  expect_equal(seq_data, seq_data_expected_mod)
+})
 
-  test_that("analyze_seqs can use reverse primers and auto-revcmp", {
-    # If we supply the reverse primers in their orientation on R2, it should
-    # still work as expected so long as we specify reverse_primer_r1 = FALSE.
-    primers <- as.character(
-      Biostrings::reverseComplement(
-        Biostrings::DNAStringSet(locus_attrs[, "ReversePrimer"])))
-    locus_attrs_mod <- locus_attrs
-    locus_attrs_mod[, "ReversePrimer"] <- primers
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs_mod, 3,
-                             use_reverse_primers = TRUE,
-                             reverse_primer_r1 = FALSE)
-    expect_equal(
-      table(seq_data$MatchingLocus),
-      table(factor(c(rep("A", 14), "B", "B", rep(c("1", "2"), 4)),
-                   levels = c("A", "B", "1", "2"))))
-  })
+test_that("analyze_seqs can use reverse primers and auto-revcmp", {
+  seqs <- readRDS(test_path("data", "analyze_seqs", "seqs.rds"))
+  # If we supply the reverse primers in their orientation on R2 (reverse
+  # complement of what's there in the other examples), it should still work as
+  # expected so long as we specify reverse_primer_r1 = FALSE.
+  locus_attrs <- readRDS(
+    test_path("data", "analyze_seqs", "locus_attrs_rev_primer_revcmp.rds"))
+  seq_data_expected <- readRDS(
+    test_path("data", "analyze_seqs", "seq_data_rev_primers.rds"))
+  seq_data <- analyze_seqs(
+    seqs, locus_attrs_mod, 3,
+    use_reverse_primers = TRUE,
+    reverse_primer_r1 = FALSE)
+  expect_equal(seq_data, seq_data_expected)
+})
 
-  test_that("analyze_seqs checks for motif repeats", {
-    seqs <- seqs1$A
-    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
-    chunk <- subset(seq_data, !MotifMatch)
-    with(chunk, {
-      expect_equal(sum(Count), 483)
-      expect_equal(range(Length), c(45, 57))
-      expect_equal(droplevels(unique(MatchingLocus)), factor("A"))
-      expect_true(all(is.na(Stutter)))
-      expect_true(all(is.na(Artifact)))
-    })
-  })
+test_that("analyze_seqs does not mark high-count entries as stutter", {
+  # In this version I've  replaced a few high-count entries with one that was
+  # considered stutter in the above test.  Now none of those top sequences
+  # should be considered stutter.
+  seqs <- readRDS(test_path(
+    "data", "analyze_seqs", "seqs_stutter_filter_check.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_stutter_filter_check.rds"))
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
+})
 
-  test_that("analyze_seqs checks for length", {
-    seqs <- seqs1$A
-    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
-    chunk <- subset(seq_data, !LengthMatch)
-    with(chunk, {
-    expect_equal(sum(Count), 483)
-    expect_equal(range(Length), c(45, 57))
-    expect_equal(droplevels(unique(MatchingLocus)), factor("A"))
-    expect_true(all(!(MotifMatch)))
-    expect_true(all(is.na(Stutter)))
-    expect_true(all(is.na(Artifact)))
-    })
-  })
+test_that("analyze_seqs works with varied threshold for stutter counts", {
+  # Here I've removed seqs at 158 nt and 54 nt and put those counts into the
+  # 190 nt seq instead, making that more abundant compared to 194 (ratio of
+  # 0.34).  With the default ratio setting of 1/3 it would no longer be
+  # considered stutter.
+  seqs <- readRDS(test_path(
+    "data", "analyze_seqs", "seqs_stutter_threshold_check.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_stutter_threshold_orig.rds"))
+  seq_data_expected_mod <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_stutter_threshold_mod.rds"))
+  # With default settings the 190 nt seq is no longer considered stutter.
+  # With a higher ratio_max value it still is
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
+  seq_data_mod <- analyze_seqs(
+    seqs, locus_attrs, 3, stutter.count.ratio_max = 1 / 2)
+  expect_equal(seq_data_mod, seq_data_expected_mod)
+})
 
-  test_that("analyze_seqs marks stutter entries", {
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    chunk <- subset(seq_data, !is.na(Stutter))
-    expect_equal(chunk$Count, c(279, 114, 2, 2, 2))
-    expect_equal(chunk$Stutter, c(1, 2, 2, 2, 2))
-  })
+test_that("analyze_seqs marks artifact entries", {
+  # Here I took the first stutter entry in the other cases and made it a
+  # different-by-one-nt version of the most abundant sequence
+  seqs <- readRDS(test_path("data", "analyze_seqs", "seqs_artifact.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_artifact.rds"))
+  # The third entry should be marked an artifact of the first
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
+})
 
-  test_that("analyze_seqs does not mark high-count entries as stutter", {
-    # replace a few high-count entries with one that was considered stutter
-    # in the above test.  Now none of those top sequences should be considered
-    # stutter.
-    s <- seqs1$A
-    s[nchar(s) %in% c(158, 54)] <- s[nchar(s) == 190][1]
-    seq_data <- analyze_seqs(s, locus_attrs, 3)
-    chunk <- subset(seq_data, !is.na(Stutter))
-    expect_equal(chunk$Count, c(2, 2, 2))
-    expect_equal(chunk$Stutter, c(2, 2, 2))
-  })
-
-  test_that("analyze_seqs works with varied threshold for stutter counts", {
-    s <- seqs1$A
-    s[nchar(s) %in% c(158, 54)] <- s[nchar(s) == 190][1]
-    seq_data <- analyze_seqs(s, locus_attrs, 3, stutter.count.ratio_max = 1 / 2)
-    chunk <- subset(seq_data, !is.na(Stutter))
-    expect_equal(chunk$Count, c(443, 2, 2, 2, 1, 1))
-    expect_equal(chunk$Stutter, c(2, 2, 2, 2, 4, 4))
-  })
-
-  test_that("analyze_seqs marks artifact entries", {
-    s <- seqs1$A
-    # Take that first stutter and make it an artifact instead
-    highest <- names(sort(table(s), decreasing = TRUE)[1])
-    stutter <- names(sort(table(s), decreasing = TRUE)[3])
-    idx <- s == stutter
-    s[idx] <- highest
-    substr(s[idx], nchar(stutter), nchar(stutter)) <- "R"
-    # Check that the third entry is marked an artifact of the first
-    seq_data <- analyze_seqs(s, locus_attrs, 3)
-    expect_equal(seq_data$Artifact, c(NA, NA, 1)[1:24])
-  })
-
-  test_that("analyze_seqs marks ambiguous entries", {
-    # sequences that contain non-ACTG characters should be marked TRUE in the
-    # Ambiguous column (interpreting those as "N" or similar).
-    s <- seqs1$A
-    s[s == s[1]] <- sub("AGCCAGTC", "AGCCANTC", s[1])
-    seq_data <- analyze_seqs(s, locus_attrs, 3)
-    expect_equal(seq_data$Ambiguous,
-                 c(TRUE, rep(FALSE, nrow(seq_data) - 1)))
-  })
-
+test_that("analyze_seqs marks ambiguous entries", {
+  # sequences that contain non-ACTG characters should be marked TRUE in the
+  # Ambiguous column (interpreting those as "N" or similar).
+  # Here I substituted an N at a specific position for one sequence's entries
+  seqs <- readRDS(test_path("data", "analyze_seqs", "seqs_ambig.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
+  seq_data_expected <- readRDS(test_path(
+    "data", "analyze_seqs", "seq_data_ambig.rds"))
+  seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+  expect_equal(seq_data, seq_data_expected)
 })
