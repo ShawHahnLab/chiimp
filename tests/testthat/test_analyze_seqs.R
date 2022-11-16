@@ -57,7 +57,7 @@ test_that("analyze_seqs can use reverse primers and auto-revcmp", {
   # If we supply the reverse primers in their orientation on R2 (reverse
   # complement of what's there in the other examples), it should still work as
   # expected so long as we specify reverse_primer_r1 = FALSE.
-  locus_attrs <- readRDS(
+  locus_attrs_mod <- readRDS(
     test_path("data", "analyze_seqs", "locus_attrs_rev_primer_revcmp.rds"))
   seq_data_expected <- readRDS(
     test_path("data", "analyze_seqs", "seq_data_rev_primers.rds"))
@@ -74,6 +74,7 @@ test_that("analyze_seqs does not mark high-count entries as stutter", {
   # should be considered stutter.
   seqs <- readRDS(test_path(
     "data", "analyze_seqs", "seqs_stutter_filter_check.rds"))
+  locus_attrs <- readRDS(test_path("data", "analyze_seqs", "locus_attrs.rds"))
   seq_data_expected <- readRDS(test_path(
     "data", "analyze_seqs", "seq_data_stutter_filter_check.rds"))
   seq_data <- analyze_seqs(seqs, locus_attrs, 3)
