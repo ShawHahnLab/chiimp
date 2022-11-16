@@ -1,8 +1,99 @@
-context("Test sample summarization")
+testrds <- function(fname) readRDS(test_path("data", "summarize_sample", fname))
+
+
+# test summarize_sample ---------------------------------------------------
+
+test_that("summarize_sample summarizes sample attributes", {
+  sample_data <- testrds("sample_data.rds")
+  sample_summary_expected <- testrds("sample_summary.rds")
+  sample_summary <- summarize_sample(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+test_that("summarize_sample handles completely empty sample data", {
+  sample_data <- testrds("sample_data_empty.rds")
+  sample_summary_expected <- testrds("sample_summary_empty.rds")
+  sample_summary <- summarize_sample(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  # A zero-row data frame in should work here, just producing a list with a
+  # bunch of 0/NA/FALSE entries.
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+test_that("summarize_sample handles empty sequences in input sample data", {
+  sample_data <- testrds("sample_data_stubs.rds")
+  sample_summary_expected <- testrds("sample_summary_stubs.rds")
+  sample_summary <- summarize_sample(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  # Nothing should change in the output, except that we zeroed out 90 reads
+  # that would otherwise get counted (the rest were already set to off-target
+  # junk during setup).
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+
+test_that("summarize_sample marks stutter removal", {
+  # (different sample here than above)
+  sample_data <- testrds("sample_data_stutter.rds")
+  sample_summary_expected <- testrds("sample_summary_stutter.rds")
+  sample_summary <- summarize_sample(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  # Here an entry that could have been called as an allele was rejected as
+  # presumed stutter, so the Stutter value in the summary list should now be
+  # TRUE.
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+test_that("summarize_sample marks removal of multiple artifact types", {
+  # There are separate columns in the output for ambiguous/stutter/artifact
+  # sequences and each one can independently be TRUE if a sequence was skipped
+  # due to that particular aspect.  (Previously only the first would be
+  # marked, and it was incorrectly assumed that a secondary sequence was
+  # always the one that may have been filtered.)
+  # In this version half of the "correct" reads are split off with an
+  # ambiguous sequence.  This also leaves some existing stutter reads in
+  # place.
+  sample_data <- testrds("sample_data_multi_artifact.rds")
+  sample_summary_expected <- testrds("sample_summary_multi_artifact.rds")
+  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+test_that("summarize_sample handles multiple stutter sequences", {
+  # If multiple candidate allele sequences are marked as potential stutter,
+  # they should all be skipped, not just the first.
+  # In this version there are two high-abundance stutter sequences, and both
+  # should be recognized as stutter.
+  sample_data <- testrds("sample_data_multi_stutter.rds")
+  sample_summary_expected <- testrds("sample_summary_multi_stutter.rds")
+  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+
+test_that("summarize_sample handles ambiguous sequences", {
+  # If sequences contain unexpected characters these should be interpreted as
+  # ambiguous and filtered.
+  # In this version the second-highest-count sequence is modified to include an
+  # ambiguous base near the end.
+  sample_data <- testrds("sample_data_ambig.rds")
+  sample_summary_expected <- testrds("sample_summary_ambig.rds")
+  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
+
+test_that("summarize_sample rejects low-count samples", {
+  # Here we check that the filtered-counts-thresholding is applied, by checking
+  # a case where the counts to a low number.  This should still report some
+  # stats but should leave out the allele1/allele2 information
+  sample_data <- testrds("sample_data_low.rds")
+  sample_summary_expected <- testrds("sample_summary_low.rds")
+  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
 
 with(test_data, {
-
-# util --------------------------------------------------------------------
 
   check.seqs1A_summary <- function(data,
                                    count.locus=4466,
@@ -16,13 +107,13 @@ with(test_data, {
       lengths <- c(Allele1Length, Allele2Length)[ord]
       expect_equal(alleles[1],
                    gsub("[\n ]*", "",
-                       "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
+                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
                         ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
                         TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACACAG
                         TTGTGTGAGCCAGTC"))
       expect_equal(alleles[2],
                    gsub("[\n ]*", "",
-                       "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
+                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
                         ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
                         TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
                         AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
@@ -39,7 +130,7 @@ with(test_data, {
       expect_equal(ProminentSeqs, 2)
     })
   }
-
+  
   expect_empty <- function(sample_summary) {
     with(sample_summary, {
       expect_equal(Allele1Seq,    as.character(NA))
@@ -57,167 +148,6 @@ with(test_data, {
       expect_equal(ProminentSeqs, 0)
     })
   }
-
-# test summarize_sample ---------------------------------------------------
-
-  test_that("summarize_sample summarizes sample attributes", {
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"),
-                                  fraction.min = 0.05)
-    sample_summary <- summarize_sample(sample_data, list(Locus = "A"),
-                                       counts.min = 500)
-    check.seqs1A_summary(sample_summary)
-  })
-
-  test_that("summarize_sample handles completely empty sample data", {
-    seq_data <- analyze_seqs(c(), locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample(sample_data,  list(Locus = "A"),
-                                       counts.min = 500)
-    expect_equal(names(sample_summary), sample.summary.cols)
-    expect_empty(sample_summary)
-  })
-
-  test_that("summarize_sample handles empty sequences in input sample data", {
-    seqs <- seqs1$A
-    seqs[1:100] <- "" # empty out a segment of the vector
-    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample(sample_data,  list(Locus = "A"),
-                                       counts.min = 500)
-    # Nothing should change in the output, except that we zeroed out 90 reads
-    # that would otherwise get counted (the rest were already set to off-target
-    # junk during setup).
-    check.seqs1A_summary(sample_summary,
-                         count.locus = 4378,
-                         allele1.count = 2727,
-                         allele2.count = 1269)
-  })
-
-  test_that("summarize_sample marks stutter removal", {
-    seq_data <- analyze_seqs(seqs3$A, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample(sample_data,  list(Locus = "A"),
-                                       counts.min = 500)
-    with(sample_summary, {
-      expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
-                                      "TAGATAGATAGATAGATAGATAGATAGATA",
-                                      "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGATAGATAGATAGATAGATAGATAGATA",
-                                      "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, 3415)
-      expect_equal(Allele1Length, 182)
-      expect_equal(Allele2Seq, as.character(NA))
-      expect_equal(Allele2Count, as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous, TRUE)
-      expect_equal(Ambiguous, FALSE)
-      expect_equal(Stutter, TRUE)
-      expect_equal(Artifact, FALSE)
-      expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, 4466)
-      expect_equal(ProminentSeqs, 1)
-    })
-  })
-
-  test_that("summarize_sample marks removal of multiple artifact types", {
-    # There are separate columns in the output for ambiguous/stutter/artifact
-    # sequences and each one can independently be TRUE if a sequence was skipped
-    # due to that particular aspect.  (Previously only the first would be
-    # marked, and it was incorrectly assumed that a secondary sequence was
-    # always the one that may have been filtered.)
-    # First take an example sample and split half of the "correct" reads with an
-    # ambiguous sequence.  This also leaves some existing stutter reads in
-    # place.
-    s <- seqs2$`2`
-    idx <- (which(s == s[1]))[c(TRUE, FALSE)] # every other matching index
-    s[idx] <- gsub(".$", "N", s[idx]) # replace last character with N
-    seq_data <- analyze_seqs(s, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data,  list(Locus = "2"), 0.05)
-    sample_summary <- summarize_sample(sample_data, counts.min = 500)
-    with(sample_summary, {
-      expect_equal(Homozygous, TRUE)
-      expect_equal(Ambiguous, TRUE)
-      expect_equal(Stutter, TRUE)
-      expect_equal(Artifact, FALSE)
-      expect_equal(ProminentSeqs, 1)
-    })
-  })
-
-  test_that("summarize_sample handles multiple stutter sequences", {
-    # If multiple candidate allele sequences are marked as potential stutter,
-    # they should all be skipped, not just the first.
-    seq_data <- analyze_seqs(seqs3$A, locus_attrs, 3)
-    # Replace the third entry with a different stutter sequence.  Munge the
-    # counts around to still total correctly.
-    tot <- sum(seq_data$Count)
-    seq_data[3, ] <- seq_data[2, ]
-    seq_data[3, "Seq"] <- sub("TAGA", "TACA", seq_data[3, "Seq"])
-    seq_data[3, "Count"] <- 410
-    seq_data[3, "FractionOfTotal"] <- 410 / tot
-    seq_data[3, "FractionOfLocus"] <- 410 / tot
-    seq_data[4:12, "Count"] <- 10
-    seq_data[4:12, "FractionOfTotal"] <- 10 / tot
-    seq_data[4:12, "FractionOfLocus"] <- 10 / tot
-    sample_data <- analyze_sample(seq_data,  list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample(sample_data,  list(Locus = "A"),
-                                       counts.min = 500)
-    with(sample_summary, {
-      expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
-                                      "TAGATAGATAGATAGATAGATAGATAGATA",
-                                      "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGATAGATAGATAGATAGATAGATAGATA",
-                                      "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, 3415)
-      expect_equal(Allele1Length, 182)
-      expect_equal(Allele2Seq, as.character(NA))
-      expect_equal(Allele2Count, as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous, TRUE)
-      expect_equal(Ambiguous, FALSE)
-      expect_equal(Stutter, TRUE)
-      expect_equal(Artifact, FALSE)
-      expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, 4876)
-      expect_equal(ProminentSeqs, 1)
-    })
-  })
-
-  test_that("summarize_sample handles ambiguous sequences", {
-    # If sequences contain unexpected characters these should be interpreted as
-    # ambiguous and filtered.
-    # Replace the second-highest-count sequence to include an ambiguous base
-    # near the end.
-    idx <- nchar(seqs3$A) == 178
-    seqs3$A[idx] <- sub("AGCCAGTC$",
-                        "AGCCNAGTC",
-                        seqs3$A[idx])
-    seq_data <- analyze_seqs(seqs3$A, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample(sample_data, counts.min = 500)
-    with(sample_summary, {
-      expect_equal(Allele1Seq, paste0("TATCACTGGTGTTAGTCCTCTGTAGATAGA",
-                                      "TAGATAGATAGATAGATAGATAGATAGATA",
-                                      "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGATAGATAGATAGATAGATAGATAGATA",
-                                      "GATAGATAGATAGATAGATAGATAGATAGA",
-                                      "TAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele1Count, 3415)
-      expect_equal(Allele1Length, 182)
-      expect_equal(Allele2Seq, as.character(NA))
-      expect_equal(Allele2Count, as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous, TRUE)
-      expect_equal(Ambiguous, TRUE)
-      expect_equal(Stutter, FALSE)
-      expect_equal(Artifact, FALSE)
-      expect_equal(CountTotal, 5000)
-      expect_equal(CountLocus, 4466)
-      expect_equal(ProminentSeqs, 1)
-    })
-  })
 
   test_that("summarize_sample counts prominent sequences", {
     seq_data_1B          <- analyze_seqs(seqs1$B, locus_attrs, 3)
@@ -254,32 +184,6 @@ with(test_data, {
     expect_equal(sample_summary_2B$Stutter,    FALSE)
     expect_equal(sample_summary_3B$Stutter,    FALSE)
     expect_equal(sample_summary_empty$Stutter, FALSE)
-  })
-
-  test_that("summarize_sample rejects low-count samples", {
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    # Here we check that the filtered-counts-thresholding is applied, by forcing
-    # the counts to a low number.  This should still report some stats but
-    # should leave out the allele1/allele2 information.
-    seq_data$Count <- round(seq_data$Count / 100)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample(sample_data, list(Locus = "A"),
-                                       counts.min = 500)
-    with(sample_summary, {
-      expect_equal(Allele1Seq, as.character(NA))
-      expect_equal(Allele1Count, as.integer(NA))
-      expect_equal(Allele1Length, as.integer(NA))
-      expect_equal(Allele2Seq, as.character(NA))
-      expect_equal(Allele2Count, as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous, FALSE)
-      expect_equal(Ambiguous, FALSE)
-      expect_equal(Stutter, FALSE)
-      expect_equal(Artifact, FALSE)
-      expect_equal(CountTotal, 50)
-      expect_equal(CountLocus, 45)
-      expect_equal(ProminentSeqs, 2)
-    })
   })
 
   test_that("summarize_sample works with vector for sample attrs", {
@@ -320,7 +224,6 @@ with(test_data, {
     sample_summary <- summarize_sample_guided(sample_data,  list(Locus = "A"),
                                        counts.min = 500)
     expect_equal(names(sample_summary), sample.summary.cols)
-    expect_empty(sample_summary)
   })
 
   test_that("summarize_sample_guided uses expected_lengths", {
