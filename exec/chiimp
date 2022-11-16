@@ -9,6 +9,10 @@
 # In Linux this should be executable directly.  To use in Windows see
 # chiimp.cmd.
 
+# when running as a standalone program, show warnings as they occur, not all at
+# the very end like R does by default.
+options(warn = 1)
+
 # If called from package source, load from that
 args <- commandArgs()
 f <- gsub("^--file=", "", args[grep("^--file=", args)])
