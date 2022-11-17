@@ -121,6 +121,12 @@ test_that("summarize_sample works with vector for sample attrs", {
 
 with(test_data, {
 
+  sample.summary.cols <- c("Allele1Seq", "Allele1Count",
+                           "Allele1Length", "Allele2Seq",
+                           "Allele2Count", "Allele2Length",
+                           "Homozygous", "Ambiguous", "Stutter", "Artifact",
+                           "CountTotal", "CountLocus", "ProminentSeqs")
+
   test_that("summarize_sample warns of missing locus name", {
     # summarize_sample() should be able to tell if an invalid (as per the
     # earlier processing) locus name is given, because it won't be in the levels

@@ -225,7 +225,7 @@ test_that("save_seqfile_data saves per-file information", {
   locus_attrs <- testrds("locus_attrs.rds")
   seqs <- testrds("seqs.rds")
   within_tmpdir({
-    test_data$write_seqs(seqs, "data")
+    write_seqs(seqs, "data")
     dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
     results <- analyze_dataset(
       dataset, locus_attrs,
@@ -249,8 +249,8 @@ test_that("save_seqfile_data works with directory trees", {
   locus_attrs <- testrds("locus_attrs.rds")
   seqs <- testrds("seqs.rds")
   within_tmpdir({
-    test_data$write_seqs(seqs, file.path("data", "set1"))
-    test_data$write_seqs(seqs, file.path("data", "set2"))
+    write_seqs(seqs, file.path("data", "set1"))
+    write_seqs(seqs, file.path("data", "set2"))
     dataset <- prepare_dataset(
       "data", pattern = "()(\\d+)-([A-Za-z0-9]+).fasta", autorep = TRUE)
     results <- analyze_dataset(
@@ -277,8 +277,8 @@ test_that("save_seqfile_data works with Windows-style paths", {
   locus_attrs <- testrds("locus_attrs.rds")
   seqs <- testrds("seqs.rds")
   within_tmpdir({
-    test_data$write_seqs(seqs, file.path("data", "set1"))
-    test_data$write_seqs(seqs, file.path("data", "set2"))
+    write_seqs(seqs, file.path("data", "set1"))
+    write_seqs(seqs, file.path("data", "set2"))
     dataset <- prepare_dataset(
       "data", pattern = "()(\\d+)-([A-Za-z0-9]+).fasta", autorep = TRUE)
     results <- analyze_dataset(
@@ -328,7 +328,7 @@ setup_data_dir <- function(replicates, samples, loci, ord = c(1, 2, 3)) {
 
 # simple example dataset data frame
 setup_dataset <- function(reps = 1:3, samps = 1:5,
-                          loci = sort(rownames(test_data$locus_attrs))) {
+                          loci = c(1, 2, "A", "B")) {
   ids <- as.character(outer(reps,
                             outer(samps,
                                   loci,
@@ -351,173 +351,179 @@ setup_dataset <- function(reps = 1:3, samps = 1:5,
   dataset
 }
 
-with(test_data, {
 
-  test_that("prepare_dataset parses file paths", {
-    ## Basic test of prepare_dataset
-    replicates <- 1:3
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    # by default the field ordering is assumed to be replicate, sample, locus
-    data <- setup_data_dir(replicates, samples, loci)
+test_that("prepare_dataset parses file paths", {
+  ## Basic test of prepare_dataset
+  replicates <- 1:3
+  samples <- 1:5
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  # by default the field ordering is assumed to be replicate, sample, locus
+  data <- setup_data_dir(replicates, samples, loci)
+  dataset <- prepare_dataset(data$dp, data$pattern)
+  unlink(x = data$dp, recursive = TRUE)
+  expect_equal(colnames(dataset),
+               c("Filename", "Replicate", "Sample", "Locus"))
+  expect_equal(sort(dataset$Filename), sort(data$fps))
+  # The row ordering will vary loci slowest (largest chunks), then samples,
+  # then replicates.
+  # Loci first, repeated across samples and replicates
+  expect_equal(as.character(dataset$Locus),
+               rep(loci, each = 15))
+  # Samples, repeated across replicates and then cycled across loci
+  expect_equal(as.character(dataset$Sample),
+               as.character(rep(rep(samples, each = 3), 4)))
+  # Replicates, cycled across samples and loci
+  expect_equal(dataset$Replicate,
+               rep(replicates, 20))
+})
+
+test_that("prepare_dataset handles different field ordering", {
+  replicates <- 1:3
+  samples <- 1:5
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  # order: 1=replicate, 2=sample, 3=locus
+  # --> Locus, Replicate, Sample
+  ord <- c(3, 1, 2)
+  data <- setup_data_dir(replicates, samples, loci, ord)
+  dataset <- prepare_dataset(data$dp, "([A-Za-z0-9]+)-(\\d+)-(\\d+)", ord)
+  unlink(x = data$dp, recursive = TRUE)
+  expect_equal(colnames(dataset),
+               c("Filename", "Locus", "Replicate", "Sample"))
+  expect_equal(sort(dataset$Filename), sort(data$fps))
+  # These should be the same as for the previous test; the ordering of rows
+  # shouldn't change.
+  expect_equal(as.character(dataset$Locus),
+               rep(loci, each = 15))
+  expect_equal(as.character(dataset$Sample),
+               as.character(rep(rep(samples, each = 3), 4)))
+  expect_equal(dataset$Replicate,
+               rep(replicates, 20))
+})
+
+test_that("prepare_dataset handles broken patterns", {
+  replicates <- 1:3
+  samples <- 1:5
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  # Whoops, we left out the loci field in the pattern.  We should get a
+  # warning.
+  data <- setup_data_dir(replicates, samples, loci)
+  expect_warning(dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)"))
+  unlink(x = data$dp, recursive = TRUE)
+})
+
+test_that("prepare_dataset warns of repeated identifier rows", {
+  # It should throw a warning if there are multiple rows for any
+  # Replicate/Sample/Locus combination.
+  replicates <- 1:3
+  samples <- 1:5
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  data <- setup_data_dir(replicates, samples, loci)
+  touch(paste0(data$fps[3], ".extra"))
+  expect_warning({
     dataset <- prepare_dataset(data$dp, data$pattern)
-    unlink(x = data$dp, recursive = TRUE)
-    expect_equal(colnames(dataset),
-                 c("Filename", "Replicate", "Sample", "Locus"))
-    expect_equal(sort(dataset$Filename), sort(data$fps))
-    # The row ordering will vary loci slowest (largest chunks), then samples,
-    # then replicates.
-    # Loci first, repeated across samples and replicates
-    expect_equal(as.character(dataset$Locus),
-                 rep(loci, each = 15))
-    # Samples, repeated across replicates and then cycled across loci
-    expect_equal(as.character(dataset$Sample),
-                 as.character(rep(rep(samples, each = 3), 4)))
-    # Replicates, cycled across samples and loci
-    expect_equal(dataset$Replicate,
-                 rep(replicates, 20))
-  })
+  },
+  "Some replicate/sample/locus combinations match multiple files")
+  unlink(x = data$dp, recursive = TRUE)
+})
 
-  test_that("prepare_dataset handles different field ordering", {
-    replicates <- 1:3
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    # order: 1=replicate, 2=sample, 3=locus
-    # --> Locus, Replicate, Sample
-    ord <- c(3, 1, 2)
-    data <- setup_data_dir(replicates, samples, loci, ord)
-    dataset <- prepare_dataset(data$dp, "([A-Za-z0-9]+)-(\\d+)-(\\d+)", ord)
-    unlink(x = data$dp, recursive = TRUE)
-    expect_equal(colnames(dataset),
-                 c("Filename", "Locus", "Replicate", "Sample"))
-    expect_equal(sort(dataset$Filename), sort(data$fps))
-    # These should be the same as for the previous test; the ordering of rows
-    # shouldn't change.
-    expect_equal(as.character(dataset$Locus),
-                 rep(loci, each = 15))
-    expect_equal(as.character(dataset$Sample),
-                 as.character(rep(rep(samples, each = 3), 4)))
-    expect_equal(dataset$Replicate,
-                 rep(replicates, 20))
-  })
+test_that("prepare_dataset can autolabel replicates", {
+  # With autorep=TRUE it should automatically number replicates.
+  replicates <- 1
+  samples <- 1:5
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  data <- setup_data_dir(replicates, samples, loci)
+  touch(paste0(data$fps[3], ".2"))
+  touch(paste0(data$fps[3], ".3"))
+  dataset <- prepare_dataset(data$dp,
+                             pattern = "()1-(\\d+)-([A-Za-z0-9]+)",
+                             autorep = TRUE)
+  unlink(x = data$dp, recursive = TRUE)
+  extras <- paste0(data$fps[3], c(".2", ".3"))
+  expect_equal(sort(dataset$Filename), sort(c(data$fps, extras)))
+  expect_equal(as.character(dataset$Locus),
+               c(loci[1], loci[1], rep(loci, each = 5)))
+  s <- as.character(rep(samples, 4))
+  s <- c(s[1:3], s[3], s[3], s[4:length(s)])
+  expect_equal(as.character(dataset$Sample), s)
+  r <- rep(1, nrow(dataset))
+  r[4:5] <- 2:3
+  expect_equal(dataset$Replicate, r)
+})
 
-  test_that("prepare_dataset handles broken patterns", {
-    replicates <- 1:3
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    # Whoops, we left out the loci field in the pattern.  We should get a
-    # warning.
-    data <- setup_data_dir(replicates, samples, loci)
-    expect_warning(dataset <- prepare_dataset(data$dp, "(\\d+)-(\\d+)"))
-    unlink(x = data$dp, recursive = TRUE)
-  })
+test_that("prepare_dataset works on nested directories", {
+  ## Create two separate sets of files in subdirectories
+  replicates <- 1:3
+  samples1 <- 1:3
+  samples2 <- 4:6
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  data1 <- setup_data_dir(replicates, samples1, loci)
+  data2 <- setup_data_dir(replicates, samples2, loci)
+  # move both sets into a single parent directory
+  dp <- tempfile()
+  dir.create(dp)
+  file.copy(data1$dp, dp, recursive = TRUE)
+  file.copy(data2$dp, dp, recursive = TRUE)
+  # build dataset from parent directory
+  dataset <- prepare_dataset(dp, data1$pattern)
+  expect_equal(colnames(dataset),
+               c("Filename", "Replicate", "Sample", "Locus"))
+  expect_equal(sort(dataset$Filename),
+               sort(list.files(dp, recursive = TRUE, full.names = TRUE)))
+  unlink(x = c(data1, data2, dp), recursive = TRUE)
+})
 
-  test_that("prepare_dataset warns of repeated identifier rows", {
-    # It should throw a warning if there are multiple rows for any
-    # Replicate/Sample/Locus combination.
-    replicates <- 1:3
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    data <- setup_data_dir(replicates, samples, loci)
-    touch(paste0(data$fps[3], ".extra"))
-    expect_warning({
-        dataset <- prepare_dataset(data$dp, data$pattern)
-      },
-      "Some replicate/sample/locus combinations match multiple files")
-    unlink(x = data$dp, recursive = TRUE)
-  })
 
-  test_that("prepare_dataset can autolabel replicates", {
-    # With autorep=TRUE it should automatically number replicates.
-    replicates <- 1
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    data <- setup_data_dir(replicates, samples, loci)
-    touch(paste0(data$fps[3], ".2"))
-    touch(paste0(data$fps[3], ".3"))
-    dataset <- prepare_dataset(data$dp,
-                               pattern = "()1-(\\d+)-([A-Za-z0-9]+)",
-                               autorep = TRUE)
-    unlink(x = data$dp, recursive = TRUE)
-    extras <- paste0(data$fps[3], c(".2", ".3"))
-    expect_equal(sort(dataset$Filename), sort(c(data$fps, extras)))
-    expect_equal(as.character(dataset$Locus),
-                 c(loci[1], loci[1], rep(loci, each = 5)))
-    s <- as.character(rep(samples, 4))
-    s <- c(s[1:3], s[3], s[3], s[4:length(s)])
-    expect_equal(as.character(dataset$Sample), s)
-    r <- rep(1, nrow(dataset))
-    r[4:5] <- 2:3
-    expect_equal(dataset$Replicate, r)
-  })
+test_that("prepare_dataset can separate multiplexed samples", {
+  replicates <- 1
+  samples <- 1:5
+  locus_attrs <- testrds("locus_attrs.rds")
+  loci <- sort(rownames(locus_attrs))
+  # Set up locus name placeholders for multiplexed samples, lumping loci
+  # together two at a time (assumes even number)
+  locusmap <- sapply(1:2, function(i) {
+      loci[seq(i, length(loci), 2)]
+    },
+    simplify = FALSE)
+  names(locusmap) <- sapply(locusmap, paste, collapse = "")
+  # Write data using multiplex version of locus names
+  data <- setup_data_dir(replicates, samples, names(locusmap))
+  # Create the full dataset table we expect to see
+  dataset_known <- setup_dataset(reps = replicates,
+                                 samp = samples,
+                                 loci = loci)
+  # prepare_dataset gives integers for replicate.  Should reconcile that up
+  # with load_dataset and setup_dataset.
+  dataset_known$Replicate <- as.integer(dataset_known$Replicate)
+  # Read dataset from disk using the mapping of locus names
+  dataset <- prepare_dataset(data$dp, data$pattern, locusmap = locusmap)
+  unlink(x = data$dp, recursive = TRUE)
+  # Aside from the different filenames, does everything match up?
+  dataset_known$Filename <- dataset$Filename
+  expect_equal(dataset, dataset_known)
+})
 
-  test_that("prepare_dataset works on nested directories", {
-    ## Create two separate sets of files in subdirectories
-    replicates <- 1:3
-    samples1 <- 1:3
-    samples2 <- 4:6
-    loci <- sort(rownames(locus_attrs))
-    data1 <- setup_data_dir(replicates, samples1, loci)
-    data2 <- setup_data_dir(replicates, samples2, loci)
-    # move both sets into a single parent directory
-    dp <- tempfile()
-    dir.create(dp)
-    file.copy(data1$dp, dp, recursive = TRUE)
-    file.copy(data2$dp, dp, recursive = TRUE)
-    # build dataset from parent directory
-    dataset <- prepare_dataset(dp, data1$pattern)
-    expect_equal(colnames(dataset),
-                 c("Filename", "Replicate", "Sample", "Locus"))
-    expect_equal(sort(dataset$Filename),
-                 sort(list.files(dp, recursive = TRUE, full.names = TRUE)))
-    unlink(x = c(data1, data2, dp), recursive = TRUE)
-  })
+test_that("prepare_dataset handles missing data directory", {
+  dp <- tempfile()
+  expect_error({
+      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    },
+    paste("ERROR: directory path for data files does not exist:", dp),
+    fixed = TRUE)
+})
 
-  test_that("prepare_dataset can separate multiplexed samples", {
-    replicates <- 1
-    samples <- 1:5
-    loci <- sort(rownames(locus_attrs))
-    # Set up locus name placeholders for multiplexed samples, lumping loci
-    # together two at a time (assumes even number)
-    locusmap <- sapply(1:2, function(i) {
-        loci[seq(i, length(loci), 2)]
-      },
-      simplify = FALSE)
-    names(locusmap) <- sapply(locusmap, paste, collapse = "")
-    # Write data using multiplex version of locus names
-    data <- setup_data_dir(replicates, samples, names(locusmap))
-    # Create the full dataset table we expect to see
-    dataset_known <- setup_dataset(reps = replicates,
-                                   samp = samples,
-                                   loci = loci)
-    # prepare_dataset gives integers for replicate.  Should reconcile that up
-    # with load_dataset and setup_dataset.
-    dataset_known$Replicate <- as.integer(dataset_known$Replicate)
-    # Read dataset from disk using the mapping of locus names
-    dataset <- prepare_dataset(data$dp, data$pattern, locusmap = locusmap)
-    unlink(x = data$dp, recursive = TRUE)
-    # Aside from the different filenames, does everything match up?
-    dataset_known$Filename <- dataset$Filename
-    expect_equal(dataset, dataset_known)
-  })
-
-  test_that("prepare_dataset handles missing data directory", {
-    dp <- tempfile()
-    expect_error({
-        prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-      },
-      paste("ERROR: directory path for data files does not exist:", dp),
-      fixed = TRUE)
-  })
-
-  test_that("prepare_dataset handles no-samples case", {
-    dp <- tempfile()
-    dir.create(dp)
-    expect_error({
-        prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
-      },
-      paste("ERROR: no data files found:", dp),
-      fixed = TRUE)
-    unlink(x = dp, recursive = TRUE)
-  })
+test_that("prepare_dataset handles no-samples case", {
+  dp <- tempfile()
+  dir.create(dp)
+  expect_error({
+      prepare_dataset(dp, "(\\d+)-(\\d+)-([A-Za-z0-9]+)")
+    },
+    paste("ERROR: no data files found:", dp),
+    fixed = TRUE)
+  unlink(x = dp, recursive = TRUE)
 })
