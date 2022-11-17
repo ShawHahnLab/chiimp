@@ -1,11 +1,12 @@
-context("Test input/output functions")
+testpth <- function(fname) normalizePath(test_path("data", "io", fname))
+testrds <- function(fname) readRDS(test_path("data", "io", fname))
 
 
 # test load_config --------------------------------------------------------
 
 
 test_that("load_config loads config YAML files", {
-  config_path <- test_path("data", "io", "config.yml")
+  config_path <- testpth("config.yml")
   config <- load_config(config_path)
   expect_equal(
     config,
@@ -14,7 +15,7 @@ test_that("load_config loads config YAML files", {
 })
 
 test_that("load_config handles unexpected entries", {
-  config_path <- test_path("data", "io", "config_unrecognized_key.yml")
+  config_path <- testpth("config_unrecognized_key.yml")
   # it should warn about whatever config entries are unknown, but still load and
   # return whatever's there
   expect_warning(
@@ -40,8 +41,8 @@ test_that("load_config handles unexpected entries", {
 # We'll use the same locus_attrs as below for these tests.
 
 test_that("load_csv parses CSV files", {
-  locus_attrs_test <- load_csv(test_path("data", "io", "locus_attrs.csv"))
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
+  locus_attrs_test <- load_csv(testpth("locus_attrs.csv"))
+  locus_attrs <- testrds("locus_attrs.rds")
   expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
   expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
   expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
@@ -52,9 +53,9 @@ test_that("load_csv parses CSV files", {
 test_that("load_csv parses CSV files with unknown columns", {
   # For cases where our CSV file has none of the recognized column names, it
   # should still work but just give us generic rownames and a warning.
-  data_expected <- readRDS(test_path("data", "io", "misc.csv.rds"))
+  data_expected <- testrds("misc.csv.rds")
   expect_warning(
-    data <- load_csv(test_path("data", "io", "misc.csv")),
+    data <- load_csv(testpth("misc.csv")),
     "no recognized columns for entry id")
   expect_equal(data, data_expected)
 })
@@ -62,14 +63,14 @@ test_that("load_csv parses CSV files with unknown columns", {
 test_that("load_csv uses row names given", {
   # If we give a row.names argument it should pass that on to read.table and
   # shouldn't automatically generate row names
-  data_expected <- readRDS(test_path("data", "io", "misc.csv.rds"))
+  data_expected <- testrds("misc.csv.rds")
   rownames(data_expected) <- NULL
-  data <- load_csv(test_path("data", "io", "misc.csv"), row.names = NULL)
+  data <- load_csv(testpth("misc.csv"), row.names = NULL)
   expect_equal(data, data_expected)
 })
 
 test_that("save_csv saves CSV files", {
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
+  locus_attrs <- testrds("locus_attrs.rds")
   within_tmpdir({
     fp <- tempfile(tmpdir = ".")
     save_csv(locus_attrs, fp)
@@ -84,7 +85,7 @@ test_that("save_csv saves CSV files", {
 
 test_that("save_csv saves CSV files with unknown columns", {
   # save_csv shouldn't care about the columns but we'll make sure here.
-  data_expected <- readRDS(test_path("data", "io", "misc.csv.rds"))
+  data_expected <- testrds("misc.csv.rds")
   rownames(data_expected) <- c("entry1", "entry2")
   within_tmpdir({
     fp <- tempfile(tmpdir = ".")
@@ -97,7 +98,7 @@ test_that("save_csv saves CSV files with unknown columns", {
 test_that("save_csv makes parent dirs when saving", {
   # the parent directories here don't yet exist, so for this to work, save_csv
   # will need to create them
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
+  locus_attrs <- testrds("locus_attrs.rds")
   within_tmpdir({
     fp <- file.path(tempfile(tmpdir = "."), basename(tempfile()))
     save_csv(locus_attrs, fp)
@@ -117,8 +118,8 @@ test_that("save_csv makes parent dirs when saving", {
 test_that("load_locus_attrs parses locus details", {
   # Write the raw text to a temp file, read it back in, and verify that the data
   # structure matches the predefined one.
-  locus_attrs_test <- load_csv(test_path("data", "io", "locus_attrs.csv"))
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
+  locus_attrs_test <- load_csv(testpth("locus_attrs.csv"))
+  locus_attrs <- testrds("locus_attrs.rds")
   expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
   expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
   expect_equal(locus_attrs_cols, colnames(locus_attrs_test))
@@ -129,10 +130,9 @@ test_that("load_locus_attrs parses locus details", {
 test_that("load_locus_attrs handles missing column names", {
   # It should throw a warning if one of the expected columns is missing, and
   # then proceed.  The other columns should still match up.
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
+  locus_attrs <- testrds("locus_attrs.rds")
   expect_warning({
-    locus_attrs_test <- load_locus_attrs(
-      test_path("data", "io", "locus_attrs_wrongcol.csv"))
+    locus_attrs_test <- load_locus_attrs(testpth("locus_attrs_wrongcol.csv"))
   })
   expect_equal(nrow(locus_attrs_test), nrow(locus_attrs))
   expect_equal(ncol(locus_attrs_test), ncol(locus_attrs))
@@ -143,10 +143,9 @@ test_that("load_locus_attrs handles missing column names", {
 
 test_that("load_locus_attrs complains for repeated loci", {
   # It should throw a warning if any Locus names are repeated.
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs_dups.rds"))
+  locus_attrs <- testrds("locus_attrs_dups.rds")
   expect_warning({
-    locus_attrs_test <- load_locus_attrs(
-      test_path("data", "io", "locus_attrs_dups.csv"))
+    locus_attrs_test <- load_locus_attrs(testpth("locus_attrs_dups.csv"))
   })
   # The data frame will still be constructed, but the second A row will have the
   # row name "A.1".
@@ -162,8 +161,8 @@ test_that("load_locus_attrs complains for repeated loci", {
 
 
 test_that("load_dataset loads sample attributes", {
-  dataset_path <- normalizePath(test_path("data", "io", "dataset.csv"))
-  dataset_known <- readRDS(test_path("data", "io", "dataset.rds"))
+  dataset_path <- testpth("dataset.csv")
+  dataset_known <- testrds("dataset.rds")
   within_tmpdir({
     # Touch the input files so they at least exist
     touch(as.character(read.csv(dataset_path)$Filename))
@@ -175,8 +174,8 @@ test_that("load_dataset loads sample attributes", {
 test_that("load_dataset warns of missing files", {
   # Here we'll skip writing any actual data files, so load_dataset should
   # complain.
-  dataset_path <- normalizePath(test_path("data", "io", "dataset.csv"))
-  dataset_known <- readRDS(test_path("data", "io", "dataset.rds"))
+  dataset_path <- testpth("dataset.csv")
+  dataset_known <- testrds("dataset.rds")
   # expect_message and capture_messages both do NOT catch text send to stderr,
   # though capture.output(..., type = "message") does.
   msg <- capture.output(dataset <- load_dataset(dataset_path), type = "message")
@@ -185,8 +184,8 @@ test_that("load_dataset warns of missing files", {
 })
 
 test_that("load_dataset warns of duplicated sample/replicate/locus combos", {
-  dataset_path <- normalizePath(test_path("data", "io", "dataset_dups.csv"))
-  dataset_known <- readRDS(test_path("data", "io", "dataset_dups.rds"))
+  dataset_path <- testpth("dataset_dups.csv")
+  dataset_known <- testrds("dataset_dups.rds")
   within_tmpdir({
     touch(as.character(read.csv(dataset_path)$Filename))
     expect_warning(
@@ -205,7 +204,7 @@ test_that("load_dataset warns of duplicated sample/replicate/locus combos", {
 test_that("save_dataset saves sample attributes", {
   # We'll just make sure that saving and then re-loading provides what was
   # saved.  load_dataset is tested separately above.
-  dataset_known <- readRDS(test_path("data", "io", "dataset.rds"))
+  dataset_known <- testrds("dataset.rds")
   within_tmpdir({
     touch(dataset_known$Filename)
     fp <- tempfile(tmpdir = ".")
@@ -223,8 +222,8 @@ test_that("save_seqfile_data saves per-file information", {
   # Just make sure the expected files are created based on the existing
   # filenames.  The names should be the existing names with an added csv
   # extension with a flat directory structure.
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
-  seqs <- readRDS(test_path("data", "io", "seqs.rds"))
+  locus_attrs <- testrds("locus_attrs.rds")
+  seqs <- testrds("seqs.rds")
   within_tmpdir({
     test_data$write_seqs(seqs, "data")
     dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
@@ -247,8 +246,8 @@ test_that("save_seqfile_data saves per-file information", {
 
 test_that("save_seqfile_data works with directory trees", {
   # In this case we should get two sub-directories in the output.
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
-  seqs <- readRDS(test_path("data", "io", "seqs.rds"))
+  locus_attrs <- testrds("locus_attrs.rds")
+  seqs <- testrds("seqs.rds")
   within_tmpdir({
     test_data$write_seqs(seqs, file.path("data", "set1"))
     test_data$write_seqs(seqs, file.path("data", "set2"))
@@ -275,8 +274,8 @@ test_that("save_seqfile_data works with directory trees", {
 test_that("save_seqfile_data works with Windows-style paths", {
   # This should behave the same as the above test despite the backslashes
   # substituted in for path separators.
-  locus_attrs <- readRDS(test_path("data", "io", "locus_attrs.rds"))
-  seqs <- readRDS(test_path("data", "io", "seqs.rds"))
+  locus_attrs <- testrds("locus_attrs.rds")
+  seqs <- testrds("seqs.rds")
   within_tmpdir({
     test_data$write_seqs(seqs, file.path("data", "set1"))
     test_data$write_seqs(seqs, file.path("data", "set2"))
