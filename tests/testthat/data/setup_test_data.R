@@ -177,6 +177,9 @@ make_test_data <- function() {
                                  analysis_opts = list(fraction.min = 0.05),
                                  summary_opts = list(counts.min = 500))
       unlink(data.dir, recursive = TRUE)
+      nms <- basename(results$summary$Filename)
+      names(results$files) <- nms
+      results$summary$Filename <- nms
       return(list(dataset = dataset, results = results))
     }
     
@@ -415,6 +418,117 @@ setup_test_data_categorize <- function(
 # summarize_sample --------------------------------------------------------
 
 
+setup_test_data_summarize_sample <- function(
+  dirpath="tests/testthat/data/summarize_sample") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  # summarize_sample
+  seq_data <- with(
+    test_data_for_setup, analyze_seqs(seqs$`1`$A, locus_attrs, 3))
+  sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  sample_summary <- summarize_sample(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  mktestrds(sample_data)
+  mktestrds(sample_summary)
+  # summarize_sample (empty)
+  seq_data_empty <- analyze_seqs(c(), test_data_for_setup$locus_attrs, 3)
+  sample_data_empty <- analyze_sample(seq_data_empty, list(Locus = "A"), 0.05)
+  sample_summary_empty <- summarize_sample(
+    sample_data_empty, list(Locus = "A"), counts.min = 500)
+  mktestrds(sample_data_empty)
+  mktestrds(sample_summary_empty)
+  # summarize_sample (stubs)
+  sample_data_stubs <- with(test_data_for_setup, {
+    seqs <- test_data_for_setup$seqs$`1`$A
+    seqs[1:100] <- ""
+    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+    analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  })
+  sample_summary_stubs <- summarize_sample(
+    sample_data_stubs, list(Locus = "A"), counts.min = 500)
+  mktestrds(sample_data_stubs)
+  mktestrds(sample_summary_stubs)
+  # summarize_sample (stutter)
+  sample_data_stutter <- with(test_data_for_setup, {
+    seqs <- test_data_for_setup$seqs$`3`$A
+    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+    analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  })
+  sample_summary_stutter <- summarize_sample(
+    sample_data_stutter, list(Locus = "A"), counts.min = 500)
+  mktestrds(sample_data_stutter)
+  mktestrds(sample_summary_stutter)
+  # summarize_sample (multi artifact)
+  sample_data_multi_artifact <- with(test_data_for_setup, {
+    seqs <- test_data_for_setup$seqs$`2`$`2`
+    idx <- (which(seqs == seqs[1]))[c(TRUE, FALSE)] # every other matching index
+    seqs[idx] <- gsub(".$", "N", seqs[idx]) # replace last character with N
+    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+    analyze_sample(seq_data, list(Locus = "2"), 0.05)
+  })
+  sample_summary_multi_artifact <- summarize_sample(
+    sample_data_multi_artifact, counts.min = 500)
+  mktestrds(sample_data_multi_artifact)
+  mktestrds(sample_summary_multi_artifact)
+  # summarize_sample (multi stutter)
+  sample_data_multi_stutter <- with(test_data_for_setup, {
+    # Replace the third entry with a different stutter sequence.  Munge the
+    # counts around to still total correctly.
+    seq_data <- analyze_seqs(seqs$`3`$A, locus_attrs, 3)
+    tot <- sum(seq_data$Count)
+    seq_data[3, ] <- seq_data[2, ]
+    seq_data[3, "Seq"] <- sub("TAGA", "TACA", seq_data[3, "Seq"])
+    seq_data[3, "Count"] <- 410
+    seq_data[3, "FractionOfTotal"] <- 410 / tot
+    seq_data[3, "FractionOfLocus"] <- 410 / tot
+    seq_data[4:12, "Count"] <- 10
+    seq_data[4:12, "FractionOfTotal"] <- 10 / tot
+    seq_data[4:12, "FractionOfLocus"] <- 10 / tot
+    analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  })
+  sample_summary_multi_stutter <- summarize_sample(
+    sample_data_multi_stutter, counts.min = 500)
+  mktestrds(sample_data_multi_stutter)
+  mktestrds(sample_summary_multi_stutter)
+  # summarize_sample (ambig)
+  sample_data_ambig <- with(test_data_for_setup, {
+    # Replace the second-highest-count sequence to include an ambiguous base
+    # near the end.
+    seqs <- seqs$`3`$A
+    idx <- nchar(seqs) == 178
+    seqs[idx] <- sub("AGCCAGTC$", "AGCCNAGTC", seqs[idx])
+    seq_data <- analyze_seqs(seqs, locus_attrs, 3)
+    analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  })
+  sample_summary_ambig <- summarize_sample(sample_data_ambig, counts.min = 500)
+  mktestrds(sample_data_ambig)
+  mktestrds(sample_summary_ambig)
+  # summarize_sample (low)
+  sample_data_low <- with(test_data_for_setup, {
+    # Replace the second-highest-count sequence to include an ambiguous base
+    # near the end.
+    seq_data <- analyze_seqs(seqs$`1`$A, locus_attrs, 3)
+    seq_data$Count <- round(seq_data$Count / 100)
+    analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  })
+  sample_summary_low <- summarize_sample(sample_data_low, counts.min = 500)
+  mktestrds(sample_data_low)
+  mktestrds(sample_summary_low)
+  # summarize_sample (prominent seqs)
+  sample_datas_b <- lapply(1:3, function(samp) {
+    with(test_data_for_setup, {
+    seq_data <- analyze_seqs(seqs[[samp]]$B, locus_attrs, 3)
+    sample_data <- analyze_sample(seq_data, list(Locus = "B"), 0.05)
+    })
+  })
+  sample_summaries_b <- lapply(
+    sample_datas_b, summarize_sample, list(Locus = "B"), counts.min = 500)
+  mktestrds(sample_datas_b)
+  mktestrds(sample_summaries_b)
+
+}
+
 # all ---------------------------------------------------------------------
 
 
@@ -422,3 +536,4 @@ setup_test_data_io()
 setup_test_data_analyze_seqs()
 setup_test_data_analyze_sample()
 setup_test_data_categorize()
+setup_test_data_summarize_sample()
