@@ -1,8 +1,20 @@
 # Use this to generate the files under tests/testthat/data/
-
+# Run from top level of repo with the package loaded
 
 # common ------------------------------------------------------------------
 
+
+# given obj or parent$obj in a setup function below, save it to
+# <dirpath>/obj.rds
+mktestrds <- function(obj, objname=NULL) {
+  dirpath <- get("dirpath", env=sys.frame(-1))
+  if (is.null(objname)) {
+    objname <- sub(".*\\$", "", deparse(substitute(obj)))
+  }
+  path <- file.path(dirpath, paste0(objname, ".rds"))
+  message(paste("saving", path))
+  saveRDS(obj, path)
+}
 
 # This was split away from R/zz_helper_data.R.
 
@@ -105,7 +117,7 @@ make_test_data <- function() {
       options(warn = warn_orig)
       rm(warn_orig)
     }
-    
+
     # setting the set to an arbitrary value so the below is all arbitrary but
     # still deterministic.
     set.seed(0)
@@ -338,10 +350,66 @@ setup_test_data_analyze_seqs <- function(
   saveRDS(seq_data_ambig, file.path(dirpath, "seq_data_ambig.rds"))
 }
 
+
 # analyze_sample ----------------------------------------------------------
 
 
+setup_test_data_analyze_sample <- function(
+  dirpath="tests/testthat/data/analyze_sample") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  # analyze_sample
+  seq_data <- with(
+    test_data_for_setup, analyze_seqs(seqs$`1`$A, locus_attrs, 3))
+  sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  saveRDS(seq_data, file.path(dirpath, "seq_data.rds"))
+  saveRDS(sample_data, file.path(dirpath, "sample_data.rds"))
+}
+
+
 # categorize --------------------------------------------------------------
+
+
+setup_test_data_categorize <- function(
+  dirpath="tests/testthat/data/categorize") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  # match_known_genotypes
+  # Names for the first two samples but leaving the third unidentified
+  results_summary <- test_data_for_setup$results_summary_data$results$summary
+  results_summary$Name <- c("ID002", "ID001")[
+    as.integer(results_summary$Sample)]
+  mktestrds(results_summary)
+  mktestrds(test_data_for_setup$genotypes_known)
+  genotypes_matched <- with(test_data_for_setup, match_known_genotypes(
+    results_summary, genotypes_known))
+  mktestrds(genotypes_matched, "match_known_genotypes")
+  # categorize_genotype_results
+  results_summary_matched <- cbind(results_summary, genotypes_matched)
+  mktestrds(results_summary_matched)
+  categories <- categorize_genotype_results(results_summary_matched)
+  mktestrds(categories)
+  # categorize_genotype_results (drop)
+  # drop an allele for each of two samples
+  results_summary_matched_drop <- within(results_summary_matched, {
+    Allele1Seq[2] <- NA
+    Allele2Seq[1] <- NA
+  })
+  categories_drop <- categorize_genotype_results(results_summary_matched_drop)
+  mktestrds(results_summary_matched_drop)
+  mktestrds(categories_drop)
+  # categorize_genotype_results (blanks)
+  results_summary_matched_blanks <- within(results_summary_matched, {
+    Allele1Seq[c(1, 3)] <- NA
+    Allele2Seq[1] <- NA
+  })
+  categories_blanks <- categorize_genotype_results(
+    results_summary_matched_blanks)
+  mktestrds(results_summary_matched_blanks)
+  mktestrds(categories_blanks)
+}
 
 
 # summarize_sample --------------------------------------------------------
@@ -352,3 +420,5 @@ setup_test_data_analyze_seqs <- function(
 
 setup_test_data_io()
 setup_test_data_analyze_seqs()
+setup_test_data_analyze_sample()
+setup_test_data_categorize()
