@@ -74,7 +74,7 @@ test_that("categorize_genotype_results categorizes results", {
 })
 
 test_that("categorize_genotype_results identifies dropped alleles", {
-  # This example is missing one allele each for the first two entries, the first
+  # This example is missing one allele each for the first two entries: the first
   # allele for the first and the second allele for the second.
   results_summary <- testrds("results_summary_matched_drop.rds")
   categories_expected <- testrds("categories_drop.rds")
@@ -87,8 +87,8 @@ test_that("categorize_genotype_results identifies blanks", {
   # This example is missing a whole allele pair for the first and third entries.
   # The third has no know individual to match to, so that result should still
   # stay NA, though.
-  results_summary <- testrds("results_summary_matched_drop.rds")
-  categories_expected <- testrds("categories_drop.rds")
+  results_summary <- testrds("results_summary_matched_blanks.rds")
+  categories_expected <- testrds("categories_blanks.rds")
   categories <- categorize_genotype_results(results_summary)
   # Here we should see one Blank in the vector
   expect_equal(categories, categories_expected)
