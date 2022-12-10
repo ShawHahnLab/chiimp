@@ -5,6 +5,18 @@
 
 DIRPATH = "tests/testthat/data/"
 
+# from tests/testthat/helper.R
+within_tmpdir <- function(expr) {
+  here <- getwd()
+  data.dir <- tempfile()
+  dir.create(data.dir)
+  setwd(data.dir)
+  tryCatch(eval(expr), finally = {
+    unlink(x = data.dir, recursive = TRUE)
+    setwd(here)
+  })
+}
+
 # given obj or parent$obj in a setup function below, save it to
 # <dirpath>/obj.rds
 mktestrds <- function(obj, objname=NULL, dirpath=NULL) {
@@ -170,16 +182,14 @@ make_test_data <- function() {
     }
 
     prepare_for_summary <- function() {
-      data.dir <- tempfile()
-      write_seqs(seqs, data.dir)
-      dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
-      results <- analyze_dataset(dataset, locus_attrs, nrepeats = 3, ncores = 1,
-                                 analysis_opts = list(fraction.min = 0.05),
-                                 summary_opts = list(counts.min = 500))
-      unlink(data.dir, recursive = TRUE)
-      nms <- basename(results$summary$Filename)
-      names(results$files) <- nms
-      results$summary$Filename <- nms
+      within_tmpdir({
+        write_seqs(seqs, "data")
+        dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
+        results <- analyze_dataset(
+          dataset, locus_attrs, nrepeats = 3, ncores = 1,
+          analysis_opts = list(fraction.min = 0.05),
+          summary_opts = list(counts.min = 500))
+      })
       return(list(dataset = dataset, results = results))
     }
     
@@ -540,7 +550,7 @@ setup_test_data_histogram <- function(
   }
   # histogram
   results <- test_data_for_setup$results_summary_data$results
-  seq_data <- results$files[["3-2.fasta"]]
+  seq_data <- results$files[["data/3-2.fasta"]]
   sample_data <- results$samples[["3-2"]]
   png(fp_devnull)
   output <- histogram(
@@ -563,6 +573,53 @@ setup_test_data_histogram <- function(
 }
 
 
+# analyze_dataset ---------------------------------------------------------
+
+
+setup_test_data_analyze_dataset <- function(
+  dirpath="tests/testthat/data/analyze_dataset") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  # analyze_dataset
+  mktestrds(test_data_for_setup$seqs)
+  mktestrds(test_data_for_setup$results_summary_data$dataset)
+  mktestrds(test_data_for_setup$locus_attrs)
+  mktestrds(test_data_for_setup$results_summary_data$results)
+  # analyze_dataset (names known alleles)
+  known_alleles <- data.frame(
+    Locus = c("1", "1", "A"),
+    Seq = c(paste0(
+      "ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+      "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+      "TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+      "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+      "TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCCTGTGGCTCA",
+      "AAAGCTGAAT"), paste0(
+      "ACAGTCAAGAATAACTGCCCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+      "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+      "TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA",
+      "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC",
+      "TATCTATCTATCTATCTATCTATCCTGTGGCTCAAAAGCTGAAT"), paste0(
+      "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAGATAGA",
+      "TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATA",
+      "GATAGATAGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC")),
+    Name = c("280-a", "260-X", "different_name_format"))
+  within_tmpdir({
+    results_known_alleles <- with(test_data_for_setup, {
+      write_seqs(seqs, "data")
+      dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
+      analyze_dataset(
+        dataset, locus_attrs, nrepeats = 3, ncores = 1,
+        analysis_opts = list(fraction.min = 0.05),
+        summary_opts = list(counts.min = 500), known_alleles = known_alleles)
+    })
+  })
+  mktestrds(known_alleles)
+  mktestrds(results_known_alleles)
+}
+
+
 # all ---------------------------------------------------------------------
 
 
@@ -572,3 +629,4 @@ setup_test_data_analyze_sample()
 setup_test_data_categorize()
 setup_test_data_summarize_sample()
 setup_test_data_histogram()
+setup_test_data_analyze_dataset()
