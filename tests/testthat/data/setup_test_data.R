@@ -529,6 +529,40 @@ setup_test_data_summarize_sample <- function(
 
 }
 
+
+# histogram ---------------------------------------------------------------
+
+
+setup_test_data_histogram <- function(
+  dirpath="tests/testthat/data/histogram") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  # histogram
+  results <- test_data_for_setup$results_summary_data$results
+  seq_data <- results$files[["3-2.fasta"]]
+  sample_data <- results$samples[["3-2"]]
+  png(fp_devnull)
+  output <- histogram(
+    seq_data = seq_data, sample_data = sample_data, cutoff_fraction = 0.05)
+  dev.off()
+  mktestrds(seq_data)
+  mktestrds(sample_data)
+  mktestrds(output)
+  # histogram (seq_data only)
+  png(fp_devnull)
+  output_seq_data_only <- histogram(seq_data = seq_data)
+  dev.off()
+  mktestrds(output_seq_data_only)
+  # histogram (empty sample data)
+  png(fp_devnull)
+  output_empty_sample_data <- histogram(
+    seq_data = seq_data, sample_data = sample_data[0, ], cutoff_fraction = 0.05)
+  dev.off()
+  mktestrds(output_empty_sample_data)
+}
+
+
 # all ---------------------------------------------------------------------
 
 
@@ -537,3 +571,4 @@ setup_test_data_analyze_seqs()
 setup_test_data_analyze_sample()
 setup_test_data_categorize()
 setup_test_data_summarize_sample()
+setup_test_data_histogram()
