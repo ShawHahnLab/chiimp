@@ -119,194 +119,136 @@ test_that("summarize_sample works with vector for sample attrs", {
 # test summarize_sample_guided --------------------------------------------
 
 
-with(test_data, {
+sample.summary.cols <- c("Allele1Seq", "Allele1Count",
+                         "Allele1Length", "Allele2Seq",
+                         "Allele2Count", "Allele2Length",
+                         "Homozygous", "Ambiguous", "Stutter", "Artifact",
+                         "CountTotal", "CountLocus", "ProminentSeqs")
 
-  sample.summary.cols <- c("Allele1Seq", "Allele1Count",
-                           "Allele1Length", "Allele2Seq",
-                           "Allele2Count", "Allele2Length",
-                           "Homozygous", "Ambiguous", "Stutter", "Artifact",
-                           "CountTotal", "CountLocus", "ProminentSeqs")
+test_that("summarize_sample warns of missing locus name", {
+  # summarize_sample() should be able to tell if an invalid (as per the
+  # earlier processing) locus name is given, because it won't be in the levels
+  # of the MatchingLocus factor of the data frame from analyze_seqs().  I
+  # think this would only come about when locus names given by
+  # prepare.dataset() don't match what's in locus_attrs.
+  skip("test not yet implemented")
+})
 
-  test_that("summarize_sample warns of missing locus name", {
-    # summarize_sample() should be able to tell if an invalid (as per the
-    # earlier processing) locus name is given, because it won't be in the levels
-    # of the MatchingLocus factor of the data frame from analyze_seqs().  I
-    # think this would only come about when locus names given by
-    # prepare.dataset() don't match what's in locus_attrs.
-    skip("test not yet implemented")
+check_seqs1a_summary <- function(data,
+                                 count_locus = 4466,
+                                 allele1_count = 2783,
+                                 allele2_count = 1290,
+                                 ord = 1:2) {
+  expect_equal(names(data), sample.summary.cols)
+  with(data, {
+    alleles <- c(Allele1Seq, Allele2Seq)[ord]
+    counts  <- c(Allele1Count, Allele2Count)[ord]
+    lengths <- c(Allele1Length, Allele2Length)[ord]
+    expect_equal(alleles[1],
+                 gsub("[\n ]*", "",
+                      "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
+                      ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
+                      TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACACAG
+                      TTGTGTGAGCCAGTC"))
+    expect_equal(alleles[2],
+                 gsub("[\n ]*", "",
+                      "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
+                      ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
+                      TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
+                      AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
+    expect_equal(counts[1],     allele1_count)
+    expect_equal(lengths[1],    162)
+    expect_equal(counts[2],     allele2_count)
+    expect_equal(lengths[2],    194)
+    expect_equal(Homozygous,    FALSE)
+    expect_equal(Ambiguous,     FALSE)
+    expect_equal(Stutter,       FALSE)
+    expect_equal(Artifact,      FALSE)
+    expect_equal(CountTotal,    5000)
+    expect_equal(CountLocus,    count_locus)
+    expect_equal(ProminentSeqs, 2)
   })
+}
 
-  check_seqs1a_summary <- function(data,
-                                   count_locus = 4466,
-                                   allele1_count = 2783,
-                                   allele2_count = 1290,
-                                   ord = 1:2) {
-    expect_equal(names(data), sample.summary.cols)
-    with(data, {
-      alleles <- c(Allele1Seq, Allele2Seq)[ord]
-      counts  <- c(Allele1Count, Allele2Count)[ord]
-      lengths <- c(Allele1Length, Allele2Length)[ord]
-      expect_equal(alleles[1],
-                   gsub("[\n ]*", "",
-                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
-                        ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
-                        TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACACAG
-                        TTGTGTGAGCCAGTC"))
-      expect_equal(alleles[2],
-                   gsub("[\n ]*", "",
-                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
-                        ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
-                        TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
-                        AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(counts[1],     allele1_count)
-      expect_equal(lengths[1],    162)
-      expect_equal(counts[2],     allele2_count)
-      expect_equal(lengths[2],    194)
-      expect_equal(Homozygous,    FALSE)
-      expect_equal(Ambiguous,     FALSE)
-      expect_equal(Stutter,       FALSE)
-      expect_equal(Artifact,      FALSE)
-      expect_equal(CountTotal,    5000)
-      expect_equal(CountLocus,    count_locus)
-      expect_equal(ProminentSeqs, 2)
-    })
-  }
+test_that("summarize_sample_guided summarizes sample attributes", {
+  # This should have the same behavior as summarize_sample above.
+  sample_data <- testrds("sample_data_guided.rds")
+  sample_summary_expected <- testrds("sample_summary_guided.rds")
+  sample_summary <- summarize_sample_guided(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
 
-  # So do the summarize_ functions take lists or vectors for sample.attrs?  Make
-  # that explicit and consistent!
+test_that("summarize_sample_guided handles completely empty sample data", {
+  # This should have the same behavior as summarize_sample above.
+  sample_data <- testrds("sample_data_empty.rds")
+  sample_summary_empty_expected <- testrds(
+    "sample_summary_empty.rds")
+  sample_summary <- summarize_sample_guided(
+    sample_data, list(Locus = "A"), counts.min = 500)
+  expect_equal(sample_summary, sample_summary_empty_expected)
+})
 
-  test_that("summarize_sample_guided summarizes sample attributes", {
-    # This should have the same behavior as summarize_sample above.
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, list(Locus = "A"),
-                                      counts.min = 500)
-    check_seqs1a_summary(sample_summary)
-  })
+test_that("summarize_sample_guided uses expected_lengths", {
+  # This should give allele sequences matching the given expected_lengths,
+  # including order.
+  # Flipping the order of alleles here to check that aspect
+  sample_data <- testrds("sample_data_guided_flip.rds")
+  sample_summary_expected <- testrds("sample_summary_guided_flip.rds")
+  sample_attrs <- list(
+    Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162)
+  sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
+                                            counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
+})
 
-  test_that("summarize_sample_guided handles completely empty sample data", {
-    # This should have the same behavior as summarize_sample above.
-    seq_data <- analyze_seqs(c(), locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, list(Locus = "A"), 0.05)
-    sample_summary <- summarize_sample_guided(sample_data,  list(Locus = "A"),
-                                       counts.min = 500)
-    expect_equal(names(sample_summary), sample.summary.cols)
-  })
+test_that("summarize_sample_guided ignores counts.min for expected lengths", {
+  # This should give allele sequences matching the given expected_lengths,
+  # including order, despite the counts.min value.
+  # Flip the order of alleles here to check that aspect
+  sample_data <- testrds("sample_data_guided_flip.rds")
+  sample_summary_expected <- testrds("sample_summary_guided_flip.rds")
+  sample_attrs <- list(
+    Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162)
+  sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
+                                            counts.min = 5000)
+  expect_equal(sample_summary, sample_summary_expected)
+})
 
-  test_that("summarize_sample_guided uses expected_lengths", {
-    # This should give allele sequences matching the given expected_lengths,
-    # including order.
-    # Flip the order of alleles here to check that aspect
-    sample_attrs <- list(Locus = "A",
-                         ExpectedLength1 = 194,
-                         ExpectedLength2 = 162)
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                              counts.min = 500)
-    check_seqs1a_summary(sample_summary, ord = 2:1)
-  })
+test_that("summarize_sample_guided ignores counts.min for one exp. length", {
+  # This should give allele sequences matching the given expected_lengths,
+  # including order, despite the counts.min value.
+  sample_data <- testrds("sample_data_guided_one_len.rds")
+  sample_summary_expected <- testrds("sample_summary_guided_one_len.rds")
+  sample_attrs <- list(
+    Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 194)
+  sample_summary <- summarize_sample_guided(
+    sample_data, sample_attrs, counts.min = 5000)
+  # There should be one and only one called allele.
+  expect_equal(sample_summary, sample_summary_expected)
+})
 
-  test_that("summarize_sample_guided ignores counts.min for expected lengths", {
-    # This should give allele sequences matching the given expected_lengths,
-    # including order, despite the counts.min value.
-    # Flip the order of alleles here to check that aspect
-    sample_attrs <- list(Locus = "A",
-                         ExpectedLength1 = 194,
-                         ExpectedLength2 = 162)
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                              counts.min = 5000)
-    check_seqs1a_summary(sample_summary, ord = 2:1)
-  })
+test_that("summarize_sample_guided uses counts.min if no expected lengths", {
+  # This should not report alleles if total filtered read count is below
+  # counts.min threshold.
+  sample_attrs <- list(Locus = "A", ExpectedLength1 = NA, ExpectedLength2 = NA)
+  sample_data <- testrds("sample_data_guided_no_lens.rds")
+  sample_summary_expected <- testrds("sample_summary_guided_no_lens.rds")
+  sample_summary <- summarize_sample_guided(
+    sample_data, sample_attrs, counts.min = 5000)
+  expect_equal(sample_summary, sample_summary_expected)
+})
 
-  test_that("summarize_sample_guided ignores counts.min for one exp. length", {
-    # This should give allele sequences matching the given expected_lengths,
-    # including order, despite the counts.min value.
-    sample_attrs <- list(Locus = "A",
-                         ExpectedLength1 = 194,
-                         ExpectedLength2 = 194)
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                              counts.min = 5000)
-    # Check for one and only one called allele.
-    with(sample_summary, {
-      expect_equal(Allele1Seq,
-                   gsub("[\n ]*", "",
-                        "TATCACTGGTGTTAGTCCTCTGTAGATAGATAGATAGATAGATAGATAG
-                        ATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA
-                        TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT
-                        AGATAGATAGATAGATAGATAGATAGACACAGTTGTGTGAGCCAGTC"))
-      expect_equal(Allele2Seq,    as.character(NA))
-      expect_equal(Allele1Count,  1290)
-      expect_equal(Allele1Length, 194)
-      expect_equal(Allele2Count,  as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous,    TRUE)
-      expect_equal(Ambiguous,     FALSE)
-      expect_equal(Stutter,       FALSE)
-      expect_equal(Artifact,      FALSE)
-      expect_equal(CountTotal,    5000)
-      expect_equal(CountLocus,    4466)
-      expect_equal(ProminentSeqs, 1)
-    })
-
-  })
-
-  test_that("summarize_sample_guided uses counts.min if no expected lengths", {
-    # This should not report alleles if total filtered read count is below
-    # counts.min threshold.
-    sample_attrs <- list(Locus = "A",
-                         ExpectedLength1 = NA,
-                         ExpectedLength2 = NA)
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                              counts.min = 5000)
-    with(sample_summary, {
-      expect_equal(Allele1Seq,    as.character(NA))
-      expect_equal(Allele1Count,  as.integer(NA))
-      expect_equal(Allele1Length, as.integer(NA))
-      expect_equal(Allele2Seq,    as.character(NA))
-      expect_equal(Allele2Count,  as.integer(NA))
-      expect_equal(Allele2Length, as.integer(NA))
-      expect_equal(Homozygous,    FALSE)
-      expect_equal(Ambiguous,     FALSE)
-      expect_equal(Stutter,       FALSE)
-      expect_equal(Artifact,      FALSE)
-      expect_equal(CountTotal,    5000)
-      expect_equal(CountLocus,    4466)
-      expect_equal(ProminentSeqs, 2)
-    })
-  })
-
-  test_that("summarize_sample_guided works with vector for sample attrs", {
-    # It's "supposed" to be a list, but when used with functions like apply with
-    # a data frame it gets munged into a vector.  So let's make sure that works
-    # too.
-    # Flip the order of alleles here to check that aspect too
-    sample_attrs <- unlist(list(Locus = "A",
-                                ExpectedLength1 = 194,
-                                ExpectedLength2 = 162))
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                              counts.min = 500)
-    check_seqs1a_summary(sample_summary, ord = 2:1)
-  })
-
-  test_that("summarize_sample_guided works with blank expected_lengths", {
-    # This should have the same behavior as summarize_sample above.
-    sample_attrs <- list(Locus = "A",
-                         ExpectedLength1 = NA,
-                         ExpectedLength2 = NA)
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
-    sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                              counts.min = 500)
-    check_seqs1a_summary(sample_summary)
-  })
-
+test_that("summarize_sample_guided works with vector for sample attrs", {
+  # It's "supposed" to be a list, but when used with functions like apply with
+  # a data frame it gets munged into a vector.  So let's make sure that works
+  # too.
+  # Flip the order of alleles here to check that aspect too
+  sample_attrs <- unlist(list(
+    Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162))
+  sample_data <- testrds("sample_data_guided_flip.rds")
+  sample_summary_expected <- testrds("sample_summary_guided_flip.rds")
+  sample_summary <- summarize_sample_guided(
+    sample_data, sample_attrs, counts.min = 500)
+  expect_equal(sample_summary, sample_summary_expected)
 })

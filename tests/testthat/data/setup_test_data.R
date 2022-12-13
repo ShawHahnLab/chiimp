@@ -536,7 +536,46 @@ setup_test_data_summarize_sample <- function(
     sample_datas_b, summarize_sample, list(Locus = "B"), counts.min = 500)
   mktestrds(sample_datas_b)
   mktestrds(sample_summaries_b)
-
+  # summarize_sample_guided
+  sample_data_guided <- analyze_sample_guided(seq_data, list(Locus = "A"), 0.05)
+  sample_summary_guided <- summarize_sample_guided(
+    sample_data_guided, list(Locus = "A"), counts.min = 500)
+  mktestrds(sample_data_guided)
+  mktestrds(sample_summary_guided)
+  # summarize_sample_guided (empty)
+  sample_data_guided_empty <- analyze_sample_guided(seq_data_empty, list(Locus = "A"), 0.05)
+  mktestrds(sample_data_guided_empty)
+  sample_summary_guided_empty <- summarize_sample_guided(
+    sample_data_guided_empty, list(Locus = "A"), counts.min = 500)
+  mktestrds(sample_data_guided_empty)
+  mktestrds(sample_summary_guided_empty)
+  # summarize_sample_guided (expected lengths)
+  sample_attrs <- list(
+    Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162)
+  sample_data_guided_flip <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
+  sample_summary_guided_flip <- summarize_sample_guided(
+    sample_data_guided_flip, sample_attrs, counts.min = 500)
+  mktestrds(sample_data_guided_flip)
+  mktestrds(sample_summary_guided_flip)
+  # summarize_sample_guided (one length)
+  sample_attrs <- list(
+    Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 194)
+  sample_data_guided_one_len <- analyze_sample_guided(
+    seq_data, sample_attrs, 0.05)
+  sample_summary_guided_one_len <- summarize_sample_guided(
+    sample_data_guided_one_len, sample_attrs, counts.min = 5000)
+  mktestrds(sample_data_guided_one_len)
+  mktestrds(sample_summary_guided_one_len)
+  # summarize_sample_guided (no lengths)
+  sample_attrs <- list(
+    Locus = "A", ExpectedLength1 = NA, ExpectedLength2 = NA)
+  sample_data_guided_no_lens <- analyze_sample_guided(
+    seq_data, sample_attrs, 0.05)
+  sample_summary_guided_no_lens <- summarize_sample_guided(
+    sample_data_guided_no_lens, sample_attrs, counts.min = 5000)
+  mktestrds(sample_data_guided_no_lens)
+  mktestrds(sample_summary_guided_no_lens)
+  
 }
 
 
@@ -647,6 +686,43 @@ setup_test_data_report <- function(
 }
 
 
+# summarize_dataset -------------------------------------------------------
+
+
+setup_test_data_summarize_dataset <- function(
+  dirpath="tests/testthat/data/summarize_dataset") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  # summarize_dataset
+  results <- test_data_for_setup$results_summary_data$results
+  results_mod <- summarize_dataset(results)
+  mktestrds(results)
+  mktestrds(results_mod)
+  mktestrds(test_data_for_setup$genotypes_known)
+  # summarize_dataset (known genotypes)
+  results_known <- results
+  results_known$summary$Name <- c("ID002", "ID001")[
+    as.integer(results$summary$Sample)]
+  results_known_mod <- summarize_dataset(
+    results_known, genotypes.known = test_data_for_setup$genotypes_known)
+  mktestrds(results_known)
+  mktestrds(results_known_mod)
+  # make_dist_mat
+  dist_mat <- make_dist_mat(results$summary)
+  mktestrds(dist_mat)
+  # align_alleles
+  alignments <- align_alleles(results$summary)
+  mktestrds(alignments)
+  # align_alleles (derep=FALSE)
+  alignments_no_derep <- align_alleles(results$summary, derep = FALSE)
+  mktestrds(alignments_no_derep)
+  # tally_cts_per_locus
+  cts_per_locus <- tally_cts_per_locus(results)
+  mktestrds(cts_per_locus)
+}
+
+
 # all ---------------------------------------------------------------------
 
 
@@ -658,3 +734,4 @@ setup_test_data_summarize_sample()
 setup_test_data_histogram()
 setup_test_data_analyze_dataset()
 setup_test_data_report()
+setup_test_data_summarize_dataset()
