@@ -1,19 +1,16 @@
 # simulated data for testing ----------------------------------------------
 
 
-# I'm shoving all this into a list to keep it separate from the non-test-related
-# objects in the namespace, but still have it available to both the unit tests
-# and regular use.
 # Note that having an object stored directly in the package like this (and
 # forcing it to be the last file loaded when building) isn't ideal since it gets
 # created and stored at build time even though the code is mixed in with the
-# regular R functions.  A better way might be to explicitly build the test_data
+# regular R functions.  A better way would be to explicitly build the test_data
 # list and store it in data/ as Hadley describes:
 # http://r-pkgs.had.co.nz/data.html
 
-#' Helper Data for Tests
+#' Helper Data for Examples
 #'
-#' This list is a bundle of shared data and functions for running unit tests.
+#' This list is a bundle of shared data and functions for CHIIMP examples.
 #' @export
 test_data <- within(list(), {
   # This is a particularly awkward approach now that in the development branch
