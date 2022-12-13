@@ -620,6 +620,33 @@ setup_test_data_analyze_dataset <- function(
 }
 
 
+
+# report ------------------------------------------------------------------
+
+
+setup_test_data_report <- function(
+  dirpath="tests/testthat/data/report") {
+  if (! dir.exists(dirpath)) {
+    dir.create(dirpath, recursive = TRUE)
+  }
+  results_summary <- test_data_for_setup$results_summary_data$results$summary
+  mktestrds(results_summary)
+  # plot_alignment
+  alignments <- align_alleles(results_summary)
+  mktestrds(alignments)
+  # plot_dist_mat
+  dist_mat <- make_dist_mat(results_summary)
+  mktestrds(dist_mat)
+  # tabulate_allele_names
+  allele_summary <- tabulate_allele_names(results_summary)
+  mktestrds(allele_summary)
+  # plot_cts_per_locus
+  results <- test_data_for_setup$results_summary_data$results
+  results <- summarize_dataset(results)
+  mktestrds(results)
+}
+
+
 # all ---------------------------------------------------------------------
 
 
@@ -630,3 +657,4 @@ setup_test_data_categorize()
 setup_test_data_summarize_sample()
 setup_test_data_histogram()
 setup_test_data_analyze_dataset()
+setup_test_data_report()
