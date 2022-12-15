@@ -195,8 +195,8 @@ str_hist_setup_legend <- function(bars) {
 get_px_width <- function() {
   # https://stackoverflow.com/questions/17213293/how-to-get-r-plot-window-size
   px_width_fig <- grDevices::dev.size("px")[1] # width of whole figure in pixels
-  px_width_plt <- diff(graphics::par("plt")[1:2] * px_width_fig) # just the plot region
-  width_plt <- diff(graphics::par("usr")[1:2]) # width of plot region in plot units
+  px_width_plt <- diff(graphics::par("plt")[1:2] * px_width_fig) # plt region
+  width_plt <- diff(graphics::par("usr")[1:2]) # plot region (in plot units)
   step_width <- px_width_plt / width_plt # pixels per plot unit increment
   step_width
 }

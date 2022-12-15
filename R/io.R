@@ -40,7 +40,7 @@ load_config <- function(fp) {
     return(list())
   text <- readChar(fp, file.info(fp)$size)
   config <- yaml::yaml.load(text)
-  unknown_entries <- load_config_get_unknown_entries(config)
+  unknown_entries <- config_get_unknown_entries(config)
   if (length(unknown_entries)) {
     unknown_txt <- load_config_flatten_keys(unknown_entries)
     warning(paste0(
@@ -50,7 +50,7 @@ load_config <- function(fp) {
   config
 }
 
-load_config_get_unknown_entries <- function(config) {
+config_get_unknown_entries <- function(config) {
   # make an everything-is-null nested list from a template (which can be used
   # with the default config to get only those that are *not* mentioned in the
   # default)

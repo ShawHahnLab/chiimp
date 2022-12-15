@@ -17,7 +17,7 @@ touch <- function(fps) {
 }
 
 # seq_sets is per-sample list of per-locus sequences
-write_seqs <- function(seq_sets, outdir, fmt="%s-%s.fasta") {
+write_seqs <- function(seq_sets, outdir, fmt = "%s-%s.fasta") {
   if (! dir.exists(outdir))
     dir.create(outdir, recursive = TRUE)
   for (sn in names(seq_sets)) {

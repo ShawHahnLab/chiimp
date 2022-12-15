@@ -44,7 +44,7 @@ test_that("analyze_dataset names known alleles", {
       known_alleles = known_alleles)
   })
   expect_equal(results, results_expected)
-  
+
   # Check that the resulting allele names match all the expected values
   with(results$summary, {
     expect_equal(Allele1Name, c("different_name_format",
@@ -86,7 +86,6 @@ test_that("analyze_dataset handles missing loci", {
   # If there are locus names in dataset$Locus that are not present in the
   # rownames of locus_attrs, it should throw an error.
   dataset <- testrds("dataset.rds")
-  #seqs <- testrds("seqs.rds")
   locus_attrs <- testrds("locus_attrs.rds")
   # the names are case-sensitive!
   dataset$Locus[dataset$Locus == "A"] <- "a"

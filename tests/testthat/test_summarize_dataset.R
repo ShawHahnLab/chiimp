@@ -1,4 +1,4 @@
-testrds <- function(fname) readRDS(test_path("data", "summarize_dataset", fname))
+testrds <- function(fn) readRDS(test_path("data", "summarize_dataset", fn))
 
 
 # test_summarize_dataset --------------------------------------------------

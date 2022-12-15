@@ -3,7 +3,7 @@
 
 # common ------------------------------------------------------------------
 
-DIRPATH = "tests/testthat/data/"
+DIRPATH <- "tests/testthat/data/"
 
 # from tests/testthat/helper.R
 within_tmpdir <- function(expr) {
@@ -19,7 +19,7 @@ within_tmpdir <- function(expr) {
 
 # given obj or parent$obj in a setup function below, save it to
 # <dirpath>/obj.rds
-mktestrds <- function(obj, objname=NULL, dirpath=NULL) {
+mktestrds <- function(obj, objname = NULL, dirpath = NULL) {
   path <- mktestfile(obj, objname, dirpath, ".rds")
   message(paste("saving", path))
   saveRDS(obj, path)
@@ -27,17 +27,17 @@ mktestrds <- function(obj, objname=NULL, dirpath=NULL) {
 
 # given obj or parent$obj in a setup function below, save it to
 # <dirpath>/obj.csv
-mktestcsv <- function(obj, objname=NULL, dirpath=NULL) {
+mktestcsv <- function(obj, objname = NULL, dirpath = NULL) {
   path <- mktestfile(obj, objname, dirpath, ".csv")
   message(paste("saving", path))
   write.csv(obj, path, row.names = FALSE, quote = FALSE)
 }
 
 # don't look at this, it's horrible
-mktestfile <- function(obj, objname=NULL, dirpath=NULL, ext="") {
+mktestfile <- function(obj, objname = NULL, dirpath = NULL, ext = "") {
   if (is.null(dirpath)) {
     funcname <- as.character(sys.call(-2))
-    dirpath <- sub("^setup_test_data_", DIRPATH, funcname)
+    dirpath <- sub("^setup_for_", DIRPATH, funcname)
   }
   if (is.null(objname)) {
     objname <- deparse(substitute(obj, sys.frame(-1)))
@@ -50,13 +50,14 @@ mktestfile <- function(obj, objname=NULL, dirpath=NULL, ext="") {
 
 make.seq_junk <- function(N) {
   nucleotides <- c("A", "T", "C", "G")
-  vapply(runif(N, min = 1, max = 20), function(L)
-    paste0(sample(nucleotides, L, replace = TRUE), collapse = ""),
+  vapply(runif(N, min = 1, max = 20), function(L) {
+    paste0(sample(nucleotides, L, replace = TRUE), collapse = "")
+    },
     "character")
 }
 
-simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
-                          off_target_ratio=10, cross_contam_ratio=100) {
+simulate.seqs <- function(locus_name, locus_attrs, homozygous = NULL, N = 5000,
+                          off_target_ratio = 10, cross_contam_ratio = 100) {
   attrs <- locus_attrs[locus_name, ]
   L.min <- attrs$LengthMin - nchar(attrs$Primer)
   L.max <- attrs$LengthMax - nchar(attrs$Primer)
@@ -69,8 +70,9 @@ simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
         L <- as.integer(runif(2, min = L.min, max = L.max))
     }
   }
-  make.reps <- function(motif, len)
+  make.reps <- function(motif, len) {
     paste(rep(motif, floor(len / nchar(motif))), collapse = "")
+  }
   repeats1 <- make.reps(attrs$Motif, L[1])
   repeats2 <- make.reps(attrs$Motif, L[2])
   seq.correct.1 <- paste0(attrs$Primer, repeats1, attrs$ReversePrimer)
@@ -100,7 +102,7 @@ simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
   ## Mix in other loci
   if (cross_contam_ratio > 0) {
     others <- locus_attrs[-match(locus_name, rownames(locus_attrs)), ]
-    for (i in 1:nrow(others)) {
+    for (i in seq_len(nrow(others))) {
       idx <- seq(i, length(seqs), cross_contam_ratio * nrow(others))
       seqs[idx] <- simulate.seqs(locus_name = others$Locus[i],
                                  locus_attrs = locus_attrs,
@@ -110,7 +112,7 @@ simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
     }
   }
   ## TODO munge up the reads a bit
-  
+
   ## Shuffle vector
   seqs <- sample(seqs)
   return(seqs)
@@ -127,15 +129,16 @@ simulate.set <- function(locus_attrs) {
 make_test_data <- function() {
   within(list(), {
     locus_attrs <- load_locus_attrs("inst/example_locus_attrs.csv")
-    # This is a particularly awkward approach now that in the development branch
-    # for version 3.6.0 the random number generator has changed its behavior.
-    # The below is a stopgap measure but this should really be reorganized to not
-    # need to generate the test data at build-time.
+    # This is a particularly awkward approach now that in the development
+    # branch for version 3.6.0 the random number generator has changed its
+    # behavior.  The below is a stopgap measure but this should really be
+    # reorganized to not need to generate the test data at build-time.
     # From ?RNGkind:
-    # > sample.kind can be "Rounding" or "Rejection", or partial matches to these.
-    # > The former was the default in versions prior to 3.6.0: it made sample
-    # > noticeably non-uniform on large populations, and should only be used for
-    # > reproduction of old results. See PR#17494 for a discussion."
+    # > sample.kind can be "Rounding" or "Rejection", or partial matches to
+    # > these. The former was the default in versions prior to 3.6.0: it
+    # > made sample noticeably non-uniform on large populations, and should
+    # > only be used for reproduction of old results. See PR#17494 for a
+    # > discussion."
     # Older R doesn't have have a third argument to RNGkind, so, only run this
     # if needed.  I'll temporarily disable warnings here so that R doesn't warn
     # about the Rounding option's behavior.
@@ -161,11 +164,9 @@ make_test_data <- function() {
     rm(seqs1)
     rm(seqs2)
     rm(seqs3)
-    
+
     # TODO support replicates
-    write_seqs <- function(seq_sets,
-                           outdir,
-                           fmt="%s-%s.fasta") {
+    write_seqs <- function(seq_sets, outdir, fmt = "%s-%s.fasta") {
       if (! dir.exists(outdir))
         dir.create(outdir, recursive = TRUE)
       for (sn in names(seq_sets)) {
@@ -192,9 +193,9 @@ make_test_data <- function() {
       })
       return(list(dataset = dataset, results = results))
     }
-    
+
     results_summary_data <- prepare_for_summary()
-    
+
     kg1 <- subset(results_summary_data$results$summary,
                   Sample == 1)[, c("Locus", "Allele1Seq", "Allele2Seq")]
     kg1 <- cbind(Name = "ID002", kg1)
@@ -204,7 +205,7 @@ make_test_data <- function() {
     genotypes_known <- rbind(kg2, kg1)
     rm(kg1)
     rm(kg2)
-    
+
     # reset the RNG behavior
     do.call(RNGkind, as.list(rng_orig))
     rm(rng_orig)
@@ -217,7 +218,7 @@ test_data_for_setup <- make_test_data()
 # io ----------------------------------------------------------------------
 
 
-setup_test_data_io <- function() {
+setup_for_io <- function() {
   dirpath <- file.path(DIRPATH, "io")
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
@@ -231,14 +232,16 @@ setup_test_data_io <- function() {
   mktestrds(locus_attrs)
   # load_config
   write(
-    'fp_dataset: "samples.csv"\noutput:\n  fp_rds: "results.rds"',
+    "fp_dataset: \"samples.csv\"\noutput:\n  fp_rds: \"results.rds\"",
     file.path(dirpath, "config.yml"))
   # load config (unexpected entries)
   write(
-    'fp_dataset: "samples.csv"\noutput:\n  fp_rds: "results.rds"\nunrecognized: 10\ndataset_analysis:\n  name_args:\n    unknown: 5',
+    paste0(
+      "fp_dataset: \"samples.csv\"\noutput:\n  fp_rds: \"results.rds\"\n",
+      "unrecognized: 10\ndataset_analysis:\n  name_args:\n    unknown: 5"),
     file.path(dirpath, "config_unrecognized_key.yml"))
   # load_csv (unknown columns)
-  write('Vec1,Vec2,Vec3\nA,B,C\nD,E,F', file.path(dirpath, "misc.csv"))
+  write("Vec1,Vec2,Vec3\nA,B,C\nD,E,F", file.path(dirpath, "misc.csv"))
   misc <- read.csv(file.path(dirpath, "misc.csv"))
   rownames(misc) <- paste0("entry", 1:2)
   mktestrds(misc, "misc.csv")
@@ -279,7 +282,7 @@ setup_test_data_io <- function() {
 # analyze_seqs ------------------------------------------------------------
 
 
-setup_test_data_analyze_seqs <- function() {
+setup_for_analyze_seqs <- function() {
   dirpath <- file.path(DIRPATH, "analyze_seqs")
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
@@ -367,7 +370,7 @@ setup_test_data_analyze_seqs <- function() {
 # analyze_sample ----------------------------------------------------------
 
 
-setup_test_data_analyze_sample <- function() {
+setup_for_analyze_sample <- function() {
   dirpath <- file.path(DIRPATH, "analyze_sample")
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
@@ -384,8 +387,8 @@ setup_test_data_analyze_sample <- function() {
 # categorize --------------------------------------------------------------
 
 
-setup_test_data_categorize <- function(
-  dirpath="tests/testthat/data/categorize") {
+setup_for_categorize <- function(
+  dirpath = "tests/testthat/data/categorize") {
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
   }
@@ -428,8 +431,8 @@ setup_test_data_categorize <- function(
 # summarize_sample --------------------------------------------------------
 
 
-setup_test_data_summarize_sample <- function(
-  dirpath="tests/testthat/data/summarize_sample") {
+setup_for_summarize_sample <- function(
+  dirpath = "tests/testthat/data/summarize_sample") {
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
   }
@@ -543,7 +546,8 @@ setup_test_data_summarize_sample <- function(
   mktestrds(sample_data_guided)
   mktestrds(sample_summary_guided)
   # summarize_sample_guided (empty)
-  sample_data_guided_empty <- analyze_sample_guided(seq_data_empty, list(Locus = "A"), 0.05)
+  sample_data_guided_empty <- analyze_sample_guided(
+    seq_data_empty, list(Locus = "A"), 0.05)
   mktestrds(sample_data_guided_empty)
   sample_summary_guided_empty <- summarize_sample_guided(
     sample_data_guided_empty, list(Locus = "A"), counts.min = 500)
@@ -575,15 +579,14 @@ setup_test_data_summarize_sample <- function(
     sample_data_guided_no_lens, sample_attrs, counts.min = 5000)
   mktestrds(sample_data_guided_no_lens)
   mktestrds(sample_summary_guided_no_lens)
-  
 }
 
 
 # histogram ---------------------------------------------------------------
 
 
-setup_test_data_histogram <- function(
-  dirpath="tests/testthat/data/histogram") {
+setup_for_histogram <- function(
+  dirpath = "tests/testthat/data/histogram") {
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
   }
@@ -606,7 +609,9 @@ setup_test_data_histogram <- function(
   # histogram (empty sample data)
   png(fp_devnull)
   output_empty_sample_data <- histogram(
-    seq_data = seq_data, sample_data = sample_data[0, ], cutoff_fraction = 0.05)
+    seq_data = seq_data,
+    sample_data = sample_data[0, ],
+    cutoff_fraction = 0.05)
   dev.off()
   mktestrds(output_empty_sample_data)
 }
@@ -615,8 +620,8 @@ setup_test_data_histogram <- function(
 # analyze_dataset ---------------------------------------------------------
 
 
-setup_test_data_analyze_dataset <- function(
-  dirpath="tests/testthat/data/analyze_dataset") {
+setup_for_analyze_dataset <- function(
+  dirpath = "tests/testthat/data/analyze_dataset") {
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
   }
@@ -663,8 +668,8 @@ setup_test_data_analyze_dataset <- function(
 # report ------------------------------------------------------------------
 
 
-setup_test_data_report <- function(
-  dirpath="tests/testthat/data/report") {
+setup_for_report <- function(
+  dirpath = "tests/testthat/data/report") {
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
   }
@@ -689,8 +694,8 @@ setup_test_data_report <- function(
 # summarize_dataset -------------------------------------------------------
 
 
-setup_test_data_summarize_dataset <- function(
-  dirpath="tests/testthat/data/summarize_dataset") {
+setup_for_summarize_dataset <- function(
+  dirpath = "tests/testthat/data/summarize_dataset") {
   if (! dir.exists(dirpath)) {
     dir.create(dirpath, recursive = TRUE)
   }
@@ -714,7 +719,7 @@ setup_test_data_summarize_dataset <- function(
   # align_alleles
   alignments <- align_alleles(results$summary)
   mktestrds(alignments)
-  # align_alleles (derep=FALSE)
+  # align_alleles (no derep)
   alignments_no_derep <- align_alleles(results$summary, derep = FALSE)
   mktestrds(alignments_no_derep)
   # tally_cts_per_locus
@@ -726,12 +731,12 @@ setup_test_data_summarize_dataset <- function(
 # all ---------------------------------------------------------------------
 
 
-setup_test_data_io()
-setup_test_data_analyze_seqs()
-setup_test_data_analyze_sample()
-setup_test_data_categorize()
-setup_test_data_summarize_sample()
-setup_test_data_histogram()
-setup_test_data_analyze_dataset()
-setup_test_data_report()
-setup_test_data_summarize_dataset()
+setup_for_io()
+setup_for_analyze_seqs()
+setup_for_analyze_sample()
+setup_for_categorize()
+setup_for_summarize_sample()
+setup_for_histogram()
+setup_for_analyze_dataset()
+setup_for_report()
+setup_for_summarize_dataset()

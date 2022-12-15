@@ -81,12 +81,12 @@ setup_icon <- function() {
   }
 }
 
+# https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
 setup_icon_linux <- function() {
   chiimp_path <- system.file("exec", "chiimp.sh", package = "chiimp")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
   icon_path <- NULL
   if (dir.exists(desktop_path)) {
-    # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
     desktop_file <- paste(
       "[Desktop Entry]",
       "Type=Application",
