@@ -81,11 +81,11 @@ setup_icon <- function() {
   }
 }
 
-# https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
 setup_icon_linux <- function() {
   chiimp_path <- system.file("exec", "chiimp.sh", package = "chiimp")
   desktop_path <- normalizePath("~/Desktop", mustWork = FALSE)
   icon_path <- NULL
+  # https://specifications.freedesktop.org/desktop-entry-spec/latest
   if (dir.exists(desktop_path)) {
     desktop_file <- paste(
       "[Desktop Entry]",
@@ -145,8 +145,8 @@ setup_icon_windows <- function() {
 
 # Should add a log file but R makes it tricky to safely capture stderr.  Maybe
 # just grab messages/warnings/errors specifically.
-# https://stackoverflow.com/questions/45036224/how-to-write-errors-and-warnings-to-a-log-file
-# https://stackoverflow.com/questions/19433848/handling-errors-before-warnings-in-trycatch
+# https://stackoverflow.com/questions/45036224
+# https://stackoverflow.com/questions/19433848
 
 install <- function(path_package) {
 

@@ -103,11 +103,8 @@ load_config_flatten_keys <- function(config) {
 #'
 #' @export
 load_csv <- function(fp, ...) {
-  data <- utils::read.table(fp,
-                            header = TRUE,
-                            sep = ",",
-                            stringsAsFactors = FALSE,
-                            ...)
+  data <- utils::read.table(
+    fp, header = TRUE, sep = ",", stringsAsFactors = FALSE, ...)
   if (! "row.names" %in% names(list(...))) {
     rownames(data) <- make_rownames(data)
   }
@@ -119,12 +116,8 @@ load_csv <- function(fp, ...) {
 #' @export
 save_csv <- function(data, fp, ...) {
   mkparents(fp)
-  utils::write.table(data,
-                     file = fp,
-                     sep = ",",
-                     na = "",
-                     row.names = FALSE,
-                     ...)
+  utils::write.table(
+    data, file = fp, sep = ",", na = "", row.names = FALSE, ...)
   data
 }
 
@@ -311,18 +304,19 @@ save_dataset <- function(data, fp, ...) {
 #' @return data frame of metadata for all files found
 #'
 #' @export
-prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
-                            locusmap=NULL) {
+prepare_dataset <- function(
+    dp, pattern, ord = c(1, 2, 3), autorep = FALSE, locusmap = NULL) {
   if (! dir.exists(dp)) {
     stop(paste("ERROR: directory path for data files does not exist:",
                dp))
   }
   # get all matching filenames and extract substrings
-  seq_files <- list.files(path = dp,
-                          pattern = pattern,
-                          full.names = TRUE,
-                          recursive = TRUE,
-                          include.dirs = FALSE)
+  seq_files <- list.files(
+    path = dp,
+    pattern = pattern,
+    full.names = TRUE,
+    recursive = TRUE,
+    include.dirs = FALSE)
   if (! length(seq_files)) {
     stop(paste("ERROR: no data files found:",
                dp))
@@ -348,7 +342,7 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
   # If specified, map the locus text into multiple loci per sample (e.g.
   # multiplexed)
   if (! is.null(locusmap)) {
-    data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+    data <- do.call(rbind, lapply(seq_len(nrow(data)), function(i) {
       col_locus <- match("Locus", colnames(data))
       cols <- as.list(data[i, -col_locus])
       locus <- data[i, col_locus]
@@ -356,9 +350,7 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
       if (is.null(locus_new)) {
         locus_new <- locus
       }
-      args <- c(cols,
-              Locus = list(locus_new),
-              stringsAsFactors = FALSE)
+      args <- c(cols, Locus = list(locus_new), stringsAsFactors = FALSE)
       do.call(data.frame, args)
     }))
   }
@@ -369,13 +361,10 @@ prepare_dataset <- function(dp, pattern, ord = c(1, 2, 3), autorep=FALSE,
   # If specified, automatically number duplicates as replicates, if they don't
   # have a replicate number already.
   if (autorep) {
-    data <- do.call(rbind, lapply(split(data,
-                                           paste(data$Sample,
-                                                 data$Locus)),
+    data <- do.call(rbind, lapply(split(data, paste(data$Sample, data$Locus)),
            function(chunk) {
-             chunk$Replicate <- ifelse(is.na(chunk$Replicate),
-                                       1:nrow(chunk),
-                                       chunk$Replicate)
+             chunk$Replicate <- ifelse(
+               is.na(chunk$Replicate), seq_len(nrow(chunk)), chunk$Replicate)
              chunk
     }))
     data <- data[order_entries(data), ]
@@ -527,9 +516,7 @@ save_alignments <- function(alignments, dp) {
     if (!is.null(alignments[[loc]])) {
       dna <- as.character(alignments[[loc]])
       fp <- file.path(dp, paste0(loc, ".fasta"))
-      dnar::write.fa(names = names(dna),
-                     dna = dna,
-                     fileName = fp)
+      dnar::write.fa(names = names(dna), dna = dna, fileName = fp)
     }
   }))
 }
@@ -551,8 +538,9 @@ save_alignments <- function(alignments, dp) {
 #' @param res integer resolution of image in PPI.
 #'
 #' @export
-save_alignment_images <- function(alignments, dp, image.func="png",
-                                  width=1600, height=1200, res=150) {
+save_alignment_images <- function(
+    alignments, dp, image.func = "png",
+    width = 1600, height = 1200, res = 150) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(alignments), function(loc) {
@@ -585,24 +573,18 @@ save_alignment_images <- function(alignments, dp, image.func="png",
 #' @param res integer resolution of image in PPI.
 #'
 #' @export
-save_histograms <- function(results, dp, image.func="png",
-                            width=1600, height=1200, res=150) {
+save_histograms <- function(
+    results, dp, image.func = "png", width = 1600, height = 1200, res = 150) {
   if (!dir.exists(dp))
     dir.create(dp, recursive = TRUE)
   invisible(lapply(names(results$samples), function(entry) {
     fp <- file.path(dp, paste(entry, image.func, sep = "."))
-    img.call <- call(image.func,
-                     fp,
-                     width = width,
-                     height = height,
-                     res = res)
+    img.call <- call(image.func, fp, width = width, height = height, res = res)
     fn <- results$summary[entry, "Filename"]
     seq_data <- results$files[[fn]]
     sample_data <- results$samples[[entry]]
     eval(img.call)
-    histogram(seq_data = seq_data,
-              sample_data = sample_data,
-              main = entry)
+    histogram(seq_data = seq_data, sample_data = sample_data, main = entry)
     grDevices::dev.off()
   }))
 }

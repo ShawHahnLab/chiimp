@@ -149,7 +149,7 @@
 #' }
 #'
 #' @export
-full_analysis <- function(config, dataset=NULL) {
+full_analysis <- function(config, dataset = NULL) { # nolint: cyclocomp_linter.
   # Overaly explicit configuration onto the default settings
   config_full <- utils::modifyList(config.defaults, config)
 
@@ -191,23 +191,20 @@ full_analysis <- function(config, dataset=NULL) {
   allele.names <- NULL
   if (!is.null(cfg$fp_allele_names))
     allele.names <- load_allele_names(cfg$fp_allele_names)
-  results <- analyze_dataset(dataset, locus_attrs,
-                             nrepeats = cfg$seq_analysis$nrepeats,
-                             stutter.count.ratio_max = cfg$seq_analysis$
-                               stutter.count.ratio_max,
-                             artifact.count.ratio_max = cfg$seq_analysis$
-                               artifact.count.ratio_max,
-                             use_reverse_primers = cfg$seq_analysis$
-                               use_reverse_primers,
-                             reverse_primer_r1 = cfg$seq_analysis$
-                               reverse_primer_r1,
-                             ncores = cfg$dataset_analysis$ncores,
-                             analysis_opts = cfg$sample_analysis_opts,
-                             summary_opts = cfg$sample_summary_opts,
-                             analysis_function = sample_analysis_func,
-                             summary_function = sample_summary_func,
-                             known_alleles = allele.names,
-                             name_args = cfg$dataset_analysis$name_args)
+  results <- analyze_dataset(
+    dataset, locus_attrs,
+    nrepeats = cfg$seq_analysis$nrepeats,
+    stutter.count.ratio_max = cfg$seq_analysis$stutter.count.ratio_max,
+    artifact.count.ratio_max = cfg$seq_analysis$artifact.count.ratio_max,
+    use_reverse_primers = cfg$seq_analysis$use_reverse_primers,
+    reverse_primer_r1 = cfg$seq_analysis$reverse_primer_r1,
+    ncores = cfg$dataset_analysis$ncores,
+    analysis_opts = cfg$sample_analysis_opts,
+    summary_opts = cfg$sample_summary_opts,
+    analysis_function = sample_analysis_func,
+    summary_function = sample_summary_func,
+    known_alleles = allele.names,
+    name_args = cfg$dataset_analysis$name_args)
   results$allele.names <- allele.names
   results$locus_attrs <- locus_attrs
   if (cfg$verbose) logmsg("Summarizing results...")
@@ -216,9 +213,10 @@ full_analysis <- function(config, dataset=NULL) {
     genotypes.known <- load_genotypes(cfg$fp_genotypes_known)
   results <- summarize_dataset(results, genotypes.known)
   if (!is.null(cfg$fp_genotypes_known))
-    results$closest_matches <- find_closest_matches(results$dist_mat_known,
-                                                range = cfg$report.dist_range,
-                                                maximum = cfg$report.dist_max)
+    results$closest_matches <- find_closest_matches(
+      results$dist_mat_known,
+      range = cfg$report.dist_range,
+      maximum = cfg$report.dist_max)
   results$config <- config_full
   if (cfg$verbose) logmsg("Saving output files...")
     save_data(results, results$config)
@@ -260,7 +258,7 @@ full_analysis <- function(config, dataset=NULL) {
 #' }
 #'
 #' @export
-main <- function(args=NULL) {
+main <- function(args = NULL) {
   if (missing(args))
     args <- commandArgs(trailingOnly = TRUE)
   desc <- "Identify microsatellite alleles fasta/fastq files"

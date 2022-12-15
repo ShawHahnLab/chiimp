@@ -29,7 +29,7 @@ match_known_genotypes <- function(results_summary, genotypes.known) {
                        CorrectAllele2Seq = genotypes.known[idx, "Allele2Seq"],
                        stringsAsFactors = FALSE)
   # Ensure ordering within pairs matches samples, if possible.
-  for (i in 1:nrow(result)) {
+  for (i in seq_len(nrow(result))) {
     a <- results_summary[i, c("Allele1Seq", "Allele2Seq")]
     kg <- result[i, ]
     idx <- match(a, kg)

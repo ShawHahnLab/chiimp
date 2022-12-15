@@ -28,7 +28,7 @@ histogram <- function(seq_data,
   # mark top edges of allele sequences (to handle the same-length case)
   # label bars$topknown by name? positioning may get tricky.
   bars <- str_hist_setup(seq_data, sample_data)
-  if (render & nrow(seq_data) > 0) {
+  if (render && nrow(seq_data) > 0) {
     if (is.null(cutoff_fraction)) {
       cutoff_fraction <- attr(sample_data, "fraction.min")
     }
@@ -47,7 +47,7 @@ histogram <- function(seq_data,
 #' @return list of data frames for the sets of counts-versus-length bars drawn
 #'   in the plot, split by category.
 str_hist_setup <- function(seq_data, sample_data = NULL) {
-  vec_to_df <- function(data, cols=c("Length", "Count")) {
+  vec_to_df <- function(data, cols = c("Length", "Count")) {
     if (length(data) == 0) {
       df <- data.frame(Length = as.integer(NA), Count = as.integer(NA))[0, ]
     } else {
@@ -86,9 +86,9 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
                                                   "Count"])
   }
   bars <- lapply(bars, function(b) {
-      rownames(b) <- NULL
-      b
-    })
+    rownames(b) <- NULL
+    b
+  })
   bars
 }
 
@@ -108,25 +108,27 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
   categories <- str_hist_setup_legend(bars)
 
   ylim <- range(bars$orig$Count)
-  graphics::plot(c(),
-                 c(),
-                 main = main,
-                 xlab = "Length (nt)",
-                 ylab = "Sequence Count",
-                 xlim = xlim,
-                 ylim = ylim)
+  graphics::plot(
+    c(),
+    c(),
+    main = main,
+    xlab = "Length (nt)",
+    ylab = "Sequence Count",
+    xlim = xlim,
+    ylim = ylim)
 
   # How wide should each bar be, in pixels, to be flush with the adjacent bars?
   lwd <- max(1, get_px_width()) # at least one pixel
 
   for (nm in names(bars)) {
     if (nrow(bars[[nm]]) > 0) {
-      graphics::points(bars[[nm]]$Length,
-                       bars[[nm]]$Count,
-                       type = "h",
-                       col = categories[nm, "col"],
-                       lend = 1,
-                       lwd = lwd)
+      graphics::points(
+        bars[[nm]]$Length,
+        bars[[nm]]$Count,
+        type = "h",
+        col = categories[nm, "col"],
+        lend = 1,
+        lwd = lwd)
     }
   }
 
@@ -144,20 +146,18 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
     # Draw domain of sample data
     ymax <- max(bars$orig$Count)
     xlim_filt <- range(as.integer(bars$filt$Length))
-    graphics::polygon(x = rep(xlim_filt, each = 2),
-                      y = c(0, ymax, ymax, 0),
-                      col = "#0000001E",
-                      border = NA)
+    graphics::polygon(
+      x = rep(xlim_filt, each = 2),
+      y = c(0, ymax, ymax, 0),
+      col = "#0000001E",
+      border = NA)
   }
 
   # Draw legend
   leg <- categories[categories$Render, c("legend", "col", "pch", "lty")]
   filt <- sapply(leg, function(x) all(is.na(x)))
   leg <- leg[! filt]
-  do.call(graphics::legend,
-          c(list(x = "topright",
-                 bty = "n"),
-            leg))
+  do.call(graphics::legend, c(list(x = "topright", bty = "n"), leg))
 }
 
 #' Setup display attributes for STR histogram
@@ -181,9 +181,8 @@ str_hist_setup_legend <- function(bars) {
     col = c("black", "gray", "pink", "blue", "red", "#00000080"),
     pch = c(15, 15, 15, 15, 15, NA),
     lty = c(NA, NA, NA, NA, NA, 1),
-    stringsAsFactors = FALSE
-  )
-  categories$Render[1:length(bars)] <- TRUE
+    stringsAsFactors = FALSE)
+  categories$Render[seq_len(length(bars))] <- TRUE
   rownames(categories) <- categories$Name
   categories
 }
