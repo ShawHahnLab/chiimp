@@ -1,4 +1,4 @@
-# chiimp dev
+# chiimp 0.4.1
 
  * Overhauled unit tests with more modular saved inputs and expected outputs
    ([#92])
