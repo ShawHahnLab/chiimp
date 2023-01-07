@@ -7,7 +7,7 @@ OS are given as examples but all steps should also apply under Linux.
 We have a zip file with all the required inputs to CHIIMP (using one dataset
 from the publication as an example) available for download here:
 
-[https://upenn.box.com/chiimp-demo](https://upenn.box.com/chiimp-demo)
+[https://upenn.box.com/chiimp-demo-v1](https://upenn.box.com/chiimp-demo-v1)
 
 ## Sample Details via Spreadsheet
 
@@ -120,7 +120,7 @@ post-processing.
 
 *To add here: instructions for using CHIIMP without a samples.csv spreadsheet.*
 
-[chiimp-demo zip file]: https://upenn.box.com/chiimp-demo
+[chiimp-demo zip file]: https://upenn.box.com/chiimp-demo-v1
 [user guide]: ../GUIDE.pdf
 [report an issue]: https://github.com/ShawHahnLab/chiimp/issues/new
 [Notepad++]: https://notepad-plus-plus.org/
