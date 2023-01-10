@@ -3,7 +3,7 @@
 \docType{data}
 \name{test_data}
 \alias{test_data}
-\title{Helper Data for Tests}
+\title{Helper Data for Examples}
 \format{
 An object of class \code{list} of length 17.
 }
@@ -11,6 +11,6 @@ An object of class \code{list} of length 17.
 test_data
 }
 \description{
-This list is a bundle of shared data and functions for running unit tests.
+This list is a bundle of shared data and functions for CHIIMP examples.
 }
 \keyword{datasets}

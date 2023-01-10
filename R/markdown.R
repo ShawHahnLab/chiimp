@@ -29,7 +29,7 @@ k_row_spec <- function(k, idx.rows, ...) {
 }
 
 # convenience function for post-processing report_genotypes() output
-kable_genotypes <- function(data, group_samples=FALSE) {
+kable_genotypes <- function(data, group_samples = FALSE) {
   bootstrap_options <- c("striped", "hover", "condensed")
   # Group rows by sample.  Assumes they're ordered already.
   if (group_samples) {
@@ -47,21 +47,20 @@ kable_genotypes <- function(data, group_samples=FALSE) {
 }
 
 # Write markdown tables to standard output for report_genotypes()
-rmd_kable_genotypes <- function(results,
-                                na.replicates="",
-                                na.alleles="",
-                                locus_chunks=NULL,
-                                group_samples=FALSE,
-                                closest=NULL) {
-  tbl <- report_genotypes(results = results,
-                   na.replicates = na.replicates,
-                   na.alleles = na.alleles,
-                   closest = closest)
+rmd_kable_genotypes <- function(
+    results, na.replicates = "", na.alleles = "", locus_chunks = NULL,
+    group_samples = FALSE, closest = NULL) {
+  tbl <- report_genotypes(
+    results = results,
+    na.replicates = na.replicates,
+    na.alleles = na.alleles,
+    closest = closest)
   if (!is.null(locus_chunks)) {
-    chunk_up(data = tbl,
-             locus_chunks = locus_chunks,
-             kable_func = kable_genotypes,
-             group_samples = group_samples)
+    chunk_up(
+      data = tbl,
+      locus_chunks = locus_chunks,
+      kable_func = kable_genotypes,
+      group_samples = group_samples)
   } else {
     cat(kable_genotypes(tbl, group_samples = group_samples))
   }
@@ -97,9 +96,7 @@ kable_idents <- function(tbl, closest) {
 }
 
 # Write markdown tables to standard output for report_idents()
-rmd_kable_idents <- function(results,
-                             na.replicates,
-                             locus_chunks=NULL) {
+rmd_kable_idents <- function(results, na.replicates, locus_chunks = NULL) {
   tbl.combo <- report_idents(results,
                              closest = results$closest_matches,
                              na.replicates = na.replicates)
@@ -117,10 +114,8 @@ rmd_kable_idents <- function(results,
 # that we have evenly-distributed numbers of samples across loci, so it will try
 # to group samples into reasonably-sized sets across loci where necessary.
 # max.rows: maximum number of rows in a given chunked heatmap
-rmd_plot_cts_per_locus <- function(results,
-                                   max.rows=30,
-                                   heading_prefix="###",
-                                   ...) {
+rmd_plot_cts_per_locus <- function(
+    results, max.rows = 30, heading_prefix = "###", ...) {
   # Count samples per locus, for breaking big heatmaps into smaller chunks but
   # not splitting loci
   tbl.loci <- table(results$summary$Locus)
@@ -150,24 +145,25 @@ rmd_plot_cts_per_locus <- function(results,
 }
 
 # Insert image links to pre-rendered alignment images.
-rmd_alignments <- function(results, heading_prefix="###") { # nolint
+rmd_alignments <- function(results, heading_prefix = "###") {
   invisible(lapply(names(results$alignments), function(loc) {
     cat(paste0("\n\n", heading_prefix, " Locus ", loc, "\n\n"))
     if (is.null(results$alignments[[loc]])) {
       cat(paste0("No sequences to align for Locus ", loc, "."))
       return()
     }
-    fp <- file.path(results$config$output$dp,
-                    results$config$output$dp_alignment_images,
-                    paste0(loc, ".png"))
+    fp <- file.path(
+      results$config$output$dp,
+      results$config$output$dp_alignment_images,
+      paste0(loc, ".png"))
     cat(paste0("![](", fp, ")"))
   }))
 }
 
 # Util --------------------------------------------------------------------
 
-chunk_up <- function(data, locus_chunks, kable_func, heading_prefix="###",
-                     ...) {
+chunk_up <- function(
+    data, locus_chunks, kable_func, heading_prefix = "###", ...) {
   locus_cols_all <- allelify(locus_chunks)
   for (chunk_name in names(locus_chunks)) {
     # Remove locus columns not present in the current chunk.  It's organized
@@ -183,10 +179,10 @@ chunk_up <- function(data, locus_chunks, kable_func, heading_prefix="###",
     locus_cols_extra <- locus_cols_all[-match(locus_cols, locus_cols_all)]
     idx.extra <- match(locus_cols_extra, colnames(data))
     idx.extra <- idx.extra[!is.na(idx.extra)]
-    if (length(idx.extra) > 0) {
-      tbl.chunk <- data[, -idx.extra]
+    tbl.chunk <- if (length(idx.extra) > 0) {
+      data[, -idx.extra]
     } else {
-      tbl.chunk <- data
+      data
     }
     # Write the table including a heading for the loci
     cat(paste0("\n\n", heading_prefix, " ", "Loci: ", chunk_name, "\n\n"))

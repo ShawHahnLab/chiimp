@@ -54,24 +54,24 @@
 #'
 #' @export
 analyze_dataset <- function(
-  dataset,
-  locus_attrs,
-  nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$
-    stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$
-    artifact.count.ratio_max,
-  use_reverse_primers = config.defaults$seq_analysis$
-    use_reverse_primers,
-  reverse_primer_r1 = config.defaults$seq_analysis$
-    reverse_primer_r1,
-  ncores = 0,
-  analysis_opts,
-  summary_opts,
-  analysis_function=analyze_sample,
-  summary_function=summarize_sample,
-  known_alleles=NULL,
-  name_args=list()) {
+    dataset,
+    locus_attrs,
+    nrepeats,
+    stutter.count.ratio_max = config.defaults$seq_analysis$
+      stutter.count.ratio_max,
+    artifact.count.ratio_max = config.defaults$seq_analysis$
+      artifact.count.ratio_max,
+    use_reverse_primers = config.defaults$seq_analysis$
+      use_reverse_primers,
+    reverse_primer_r1 = config.defaults$seq_analysis$
+      reverse_primer_r1,
+    ncores = 0,
+    analysis_opts,
+    summary_opts,
+    analysis_function = analyze_sample,
+    summary_function = summarize_sample,
+    known_alleles = NULL,
+    name_args = list()) {
   if (! all(dataset$Locus %in% locus_attrs$Locus)) {
     rogue_loci <- unique(dataset$Locus[! dataset$Locus %in% locus_attrs$Locus])
     msg <- paste("ERROR: Locus names in dataset not in attributes table:",
@@ -241,8 +241,8 @@ tidy_analyzed_dataset <- function(dataset, raw.results) {
 #'   name.
 name_known_sequences <- function(results, known_alleles, name_args) {
   # Name all of the called alleles across samples
-  results$summary <- name_alleles_in_table(results$summary, known_alleles,
-                                           name_args)
+  results$summary <- name_alleles_in_table(
+    results$summary, known_alleles, name_args)
 
   # Create table of allele names for current dataset
   a1 <- results$summary[, c("Locus", "Allele1Seq", "Allele1Name")]

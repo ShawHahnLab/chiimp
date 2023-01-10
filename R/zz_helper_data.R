@@ -1,21 +1,18 @@
 # simulated data for testing ----------------------------------------------
 
 
-# I'm shoving all this into a list to keep it separate from the non-test-related
-# objects in the namespace, but still have it available to both the unit tests
-# and regular use.
 # Note that having an object stored directly in the package like this (and
 # forcing it to be the last file loaded when building) isn't ideal since it gets
 # created and stored at build time even though the code is mixed in with the
-# regular R functions.  A better way might be to explicitly build the test_data
+# regular R functions.  A better way would be to explicitly build the test_data
 # list and store it in data/ as Hadley describes:
 # http://r-pkgs.had.co.nz/data.html
 
-#' Helper Data for Tests
+#' Helper Data for Examples
 #'
-#' This list is a bundle of shared data and functions for running unit tests.
+#' This list is a bundle of shared data and functions for CHIIMP examples.
 #' @export
-test_data <- within(list(), {
+test_data <- within(list(), { # nolint: cyclocomp_linter.
   # This is a particularly awkward approach now that in the development branch
   # for version 3.6.0 the random number generator has changed its behavior.
   # The below is a stopgap measure but this should really be reorganized to not
@@ -40,15 +37,13 @@ test_data <- within(list(), {
   # installed copy in /tmp or elsewhere, and probably won't have the "inst"
   # directory anymore.  Alternatively when running with devtools::test() we
   # will.
-  f.locus_attrs <- unique(system.file(c("inst/example_locus_attrs.csv",
-                                        "example_locus_attrs.csv"),
-                                      package = methods::getPackageName()))
-  txt.locus_attrs <- readChar(f.locus_attrs,
-                              nchars = file.info(f.locus_attrs)$size)
-  locus_attrs <- read.table(f.locus_attrs,
-                            header = TRUE,
-                            stringsAsFactors = FALSE,
-                            sep = ",")
+  f.locus_attrs <- unique(system.file(
+    c("inst/example_locus_attrs.csv", "example_locus_attrs.csv"),
+    package = methods::getPackageName()))
+  txt.locus_attrs <- readChar(
+    f.locus_attrs, nchars = file.info(f.locus_attrs)$size)
+  locus_attrs <- read.table(
+    f.locus_attrs, header = TRUE, stringsAsFactors = FALSE, sep = ",")
   rm(f.locus_attrs)
   rownames(locus_attrs) <- locus_attrs$Locus
 
@@ -63,13 +58,14 @@ test_data <- within(list(), {
 
   make.seq_junk <- function(N) {
     nucleotides <- c("A", "T", "C", "G")
-    vapply(runif(N, min = 1, max = 20), function(L)
-      paste0(sample(nucleotides, L, replace = TRUE), collapse = ""),
-      "character")
+    vapply(runif(N, min = 1, max = 20), function(L) {
+      paste0(sample(nucleotides, L, replace = TRUE), collapse = "")
+      }, "character")
   }
 
-  simulate.seqs <- function(locus_name, locus_attrs, homozygous=NULL, N=5000,
-                            off_target_ratio=10, cross_contam_ratio=100) {
+  simulate.seqs <- function(
+      locus_name, locus_attrs, homozygous = NULL, N = 5000,
+      off_target_ratio = 10, cross_contam_ratio = 100) {
     attrs <- locus_attrs[locus_name, ]
     L.min <- attrs$LengthMin - nchar(attrs$Primer)
     L.max <- attrs$LengthMax - nchar(attrs$Primer)
@@ -82,8 +78,9 @@ test_data <- within(list(), {
           L <- as.integer(runif(2, min = L.min, max = L.max))
       }
     }
-    make.reps <- function(motif, len)
+    make.reps <- function(motif, len) {
       paste(rep(motif, floor(len / nchar(motif))), collapse = "")
+    }
     repeats1 <- make.reps(attrs$Motif, L[1])
     repeats2 <- make.reps(attrs$Motif, L[2])
     seq.correct.1 <- paste0(attrs$Primer, repeats1, attrs$ReversePrimer)
@@ -113,13 +110,11 @@ test_data <- within(list(), {
     ## Mix in other loci
     if (cross_contam_ratio > 0) {
       others <- locus_attrs[-match(locus_name, rownames(locus_attrs)), ]
-      for (i in 1:nrow(others)) {
+      for (i in seq_len(nrow(others))) {
         idx <- seq(i, length(seqs), cross_contam_ratio * nrow(others))
-        seqs[idx] <- simulate.seqs(locus_name = others$Locus[i],
-                                   locus_attrs = locus_attrs,
-                                   N = length(idx),
-                                   off_target_ratio = 0,
-                                   cross_contam_ratio = 0)
+        seqs[idx] <- simulate.seqs(
+          locus_name = others$Locus[i], locus_attrs = locus_attrs,
+          N = length(idx), off_target_ratio = 0, cross_contam_ratio = 0)
       }
     }
     ## TODO munge up the reads a bit
@@ -149,9 +144,7 @@ test_data <- within(list(), {
   seqs <- list("1" = seqs1, "2" = seqs2, "3" = seqs3)
 
   # TODO support replicates
-  write_seqs <- function(seq_sets,
-                         outdir,
-                         fmt="%s-%s.fasta") {
+  write_seqs <- function(seq_sets, outdir, fmt = "%s-%s.fasta") {
     if (! dir.exists(outdir))
       dir.create(outdir, recursive = TRUE)
     for (sn in names(seq_sets)) {
@@ -160,9 +153,8 @@ test_data <- within(list(), {
         n <- names(seq_sets[[sn]][[ln]])
         if (is.null(n))
           n <- seq_along(seq_sets[[sn]][[ln]])
-        dnar::write.fa(names = n,
-                       dna = seq_sets[[sn]][[ln]],
-                       fileName = fp)
+        dnar::write.fa(
+          names = n, dna = seq_sets[[sn]][[ln]], fileName = fp)
       }
     }
   }

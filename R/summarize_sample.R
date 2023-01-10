@@ -158,20 +158,3 @@ check_category <- function(category, lvl) {
   # Any index found implies TRUE, NA implies FALSE.
   ! is.na(idx)
 }
-
-#' Check Sample Data for Potential Allele Matches
-#'
-#' Check the entries in a processed sample data frame for potential matches to a
-#' given locus.
-#'
-#' @param sample_data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_seqs}}.
-#' @param locus.name character name of locus to match against.
-#'
-#' @return logical vector of entries for potential alleles.
-allele_match <- function(sample_data, locus.name) {
-  with(sample_data,
-       as.character(MatchingLocus) == locus.name &
-         MotifMatch &
-         LengthMatch)
-}

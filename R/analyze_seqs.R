@@ -66,14 +66,14 @@
 #'                          locus_attrs,
 #'                          num_adjacent_repeats)
 analyze_seqs <- function(
-  seqs, locus_attrs, nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$
-    stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$
-    artifact.count.ratio_max,
-  use_reverse_primers = config.defaults$seq_analysis$
-    use_reverse_primers,
-  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1) {
+    seqs, locus_attrs, nrepeats,
+    stutter.count.ratio_max = config.defaults$seq_analysis$
+      stutter.count.ratio_max,
+    artifact.count.ratio_max = config.defaults$seq_analysis$
+      artifact.count.ratio_max,
+    use_reverse_primers = config.defaults$seq_analysis$
+      use_reverse_primers,
+    reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1) {
   # Dereplicate sequences
   tbl <- table(seqs)
   count <- as.integer(tbl)
@@ -117,8 +117,9 @@ analyze_seqs <- function(
   # subsets of the original sample data.
   data$FractionOfTotal <- data$Count / sum(data$Count)
   data$FractionOfLocus <- with(data, {
-    total_per_locus <- unlist(lapply(levels(MatchingLocus), function(loc)
-      sum(data[MatchingLocus == loc, "Count"], na.rm = TRUE)))
+    total_per_locus <- unlist(lapply(levels(MatchingLocus), function(loc) {
+      sum(data[MatchingLocus == loc, "Count"], na.rm = TRUE)
+      }))
     names(total_per_locus) <- levels(MatchingLocus)
     Count / total_per_locus[MatchingLocus]
   })
@@ -138,8 +139,8 @@ analyze_seqs <- function(
 #'   should be reverse complemented before comparing.
 #'
 #' @return factor of locus names corresponding the matched primer sequences.
-find_matching_primer <- function(sample.data, locus_attrs,
-                                 forward=TRUE, reverse_primer_r1=TRUE) {
+find_matching_primer <- function(
+    sample.data, locus_attrs, forward = TRUE, reverse_primer_r1 = TRUE) {
   seqs <- sample.data$Seq
   if (forward) {
     primercol <- "Primer"
@@ -232,7 +233,7 @@ check_length <- function(sample.data, locus_attrs) {
 #'   entry that may have produced each entry as a stutter band.
 find_stutter <- function(
   sample.data, locus_attrs,
-  count.ratio_max=config.defaults$seq_analysis$stutter.count.ratio_max) {
+  count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max) {
 
   stutter <- integer(nrow(sample.data)) * NA
 
@@ -281,8 +282,8 @@ find_stutter <- function(
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as an artifactual sequence.
 find_artifact <- function(
-  sample.data, locus_attrs,
-  count.ratio_max=config.defaults$seq_analysis$artifact.count.ratio_max) {
+    sample.data, locus_attrs,
+    count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max) {
 
   artifact <- integer(nrow(sample.data)) * NA
 
