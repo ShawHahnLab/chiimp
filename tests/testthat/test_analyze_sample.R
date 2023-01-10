@@ -1,15 +1,12 @@
-context("Test sample analysis")
+testrds <- function(fname) readRDS(test_path("data", "analyze_sample", fname))
 
-with(test_data, {
 
-  test_that("analyze_sample categorizes sequences", {
-    skip("test not yet implemented")
-  })
-
-  test_that("analyze_sample records analysis attributes", {
-    seq_data <- analyze_seqs(seqs1$A, locus_attrs, 3)
-    sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
-    expect_equal(attr(sample_data, "fraction.min"), 0.05)
-  })
-
+test_that("analyze_sample filters and categorizes locus-specific sequences", {
+  # analyze_sample should filter a sequence table to entries matching the
+  # primer(s), length range, and motif of a specific locus, and assign a
+  # category (allele, etc.) to each row.
+  seq_data <- testrds("seq_data.rds")
+  sample_data_expected <- testrds("sample_data.rds")
+  sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
+  expect_equal(sample_data, sample_data_expected)
 })

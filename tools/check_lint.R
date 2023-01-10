@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+options(warn = 1)
+
 # Lint the package that contains this file's directory, minus some lint
 # categories that just annoy me.
 
@@ -62,8 +64,17 @@ linters$combined <- lintr::default_linters[-idx]
 # Add linters
 linters$yes <- paste0(linters$yes, "_linter")
 linters$yes <- linters$yes[linters$yes %in% ls("package:lintr")]
-.names <- names(linters$yes)
-linters$yes <- get(linters$yes, "package:lintr")
+.names <- linters$yes
+# "Warning:  Passing linters as variables was deprecated in lintr version
+# 3.0.0. Use a call to the linters (see ?linters) instead."
+# (What they evidently mean is, use a call to the function for each linter
+# *rather than the function object*.)
+lintr <- as.integer(sub("\\..*", "", installed.packages()["lintr", "Version"]))
+linters$yes <- if (lintr >= 3) {
+  lapply(linters$yes, function(x) get(x, "package:lintr")())
+} else {
+  lapply(linters$yes, function(x) get(x, "package:lintr"))
+}
 names(linters$yes) <- .names
 linters$combined <- c(linters$combined, linters$yes)
 

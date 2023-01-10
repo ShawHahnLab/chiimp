@@ -42,11 +42,11 @@
 #' @return expanded list with additional summaries.
 #'
 #' @export
-summarize_dataset <- function(results, genotypes.known=NULL) {
+summarize_dataset <- function(results, genotypes.known = NULL) {
   results$cts_per_locus <- tally_cts_per_locus(results)
   results$alignments <- align_alleles(results$summary)
   results$dist_mat <- make_dist_mat(results$summary)
-  if (!missing(genotypes.known) & !is.null(genotypes.known)) {
+  if (!missing(genotypes.known) && !is.null(genotypes.known)) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
                                                   genotypes.known)
     results$genotypes.known <- genotypes.known
@@ -81,8 +81,7 @@ summarize_dataset <- function(results, genotypes.known=NULL) {
 #' @return matrix of cross-sample distance values
 #'
 #' @export
-make_dist_mat <- function(results_summary,
-                          dist.func=calc_genotype_distance) {
+make_dist_mat <- function(results_summary, dist.func = calc_genotype_distance) {
   tbl <- summarize_genotypes(results_summary)
   # The entire vector covers all combinations of rows in tbl, filling in a
   # triangle of what would be a distance matrix.
@@ -128,9 +127,8 @@ make_dist_mat <- function(results_summary,
 #'   genotypes.known on rows and samples on columns.
 #'
 #' @export
-make_dist_mat_known <- function(results_summary,
-                                genotypes.known,
-                                dist.func=calc_genotype_distance) {
+make_dist_mat_known <- function(
+    results_summary, genotypes.known, dist.func = calc_genotype_distance) {
   tbl <- summarize_genotypes(results_summary)
   tbl.known <- summarize_genotypes_known(genotypes.known, tbl)
   distances <- outer(rownames(tbl),
@@ -173,8 +171,8 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   }
   if (length(g1) != length(g2)) {
     warning("Input genotype length mismatch; truncating.")
-    g1 <- g1[1:min(length(g1), length(g2))]
-    g2 <- g2[1:min(length(g1), length(g2))]
+    g1 <- g1[seq_len(min(length(g1), length(g2)))]
+    g2 <- g2[seq_len(min(length(g1), length(g2)))]
   }
 
   if (na.reject) {
@@ -185,9 +183,13 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
   alleles2 <- matrix(g2, ncol = 2, byrow = TRUE)
   alleles <- cbind(alleles1, alleles2)
   alleles
-  sum(apply(alleles, 1,
-            function(row) min(sum(row[1:2] != row[3:4], na.rm = TRUE),
-                              sum(row[2:1] != row[3:4]), na.rm = TRUE)))
+  sum(
+    apply(
+      alleles, 1, function(row) {
+        min(sum(row[1:2] != row[3:4], na.rm = TRUE),
+        sum(row[2:1] != row[3:4]), na.rm = TRUE)
+      })
+    )
 }
 
 #' Find closest matches in distance matrix
@@ -204,8 +206,8 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
 #' @return list of named vectors containing distances for each sample.
 #'
 #' @export
-find_closest_matches <- function(dist_mat, range=2, maximum=8) {
-  entries <- lapply(1:nrow(dist_mat), function(nr) {
+find_closest_matches <- function(dist_mat, range = 2, maximum = 8) {
+  entries <- lapply(seq_len(nrow(dist_mat)), function(nr) {
     m <- min(dist_mat[nr, ])
     nearby <- dist_mat[nr, dist_mat[nr, ] < m + range &
                          dist_mat[nr, ] < maximum, drop = FALSE]
@@ -236,7 +238,7 @@ find_closest_matches <- function(dist_mat, range=2, maximum=8) {
 #' @return list of MSA alignment objects, one per locus.
 #'
 #' @export
-align_alleles <- function(results_summary, derep=TRUE, ...) {
+align_alleles <- function(results_summary, derep = TRUE, ...) {
   chunks <- split(results_summary, results_summary$Locus)
   lapply(chunks, function(chunk) {
     if (all(c("Allele1Seq", "Allele2Seq") %in% colnames(results_summary))) {
@@ -303,8 +305,8 @@ align_alleles <- function(results_summary, derep=TRUE, ...) {
 #'   summary.  Defaults to the sequence content for the two alleles.
 #'
 #' @return data frame of genotypes across samples and loci.
-summarize_genotypes <- function(results_summary,
-                                vars=c("Allele1Seq", "Allele2Seq")) {
+summarize_genotypes <- function(
+    results_summary, vars = c("Allele1Seq", "Allele2Seq")) {
   # Create unique (aside from Locus) identifiers for each entry
   results_summary$ID <- make_entry_id(results_summary[,
                               - match("Locus", colnames(results_summary))])
@@ -358,7 +360,7 @@ summarize_genotypes <- function(results_summary,
 #'   selection and column ordering.
 #'
 #' @return data frame of genotypes across individuals and loci.
-summarize_genotypes_known <- function(genotypes_known, tbl_genotypes=NULL) {
+summarize_genotypes_known <- function(genotypes_known, tbl_genotypes = NULL) {
   # Kludgy workaround to make summarize_genotypes handle a different sort of
   # data frame
   genotypes_known$Replicate <- NA
@@ -432,8 +434,8 @@ tally_cts_per_locus <- function(results) {
     fp <- results$summary[id, "Filename"]
     seqs <- results$files[[fp]]
     # Just keep loci actually analyzed in this set
-    seqs$MatchingLocus <- factor(seqs$MatchingLocus,
-                                levels = levels(results$summary$Locus))
+    seqs$MatchingLocus <- factor(
+      seqs$MatchingLocus, levels = levels(results$summary$Locus))
     # Sum counts for each locus
     sapply(split(seqs$Count, seqs$MatchingLocus), sum)
   }))
@@ -442,10 +444,11 @@ tally_cts_per_locus <- function(results) {
   # expected locus.  Bind these to the original data to force the heatmap to use
   # a uniform scale.
   cols.match <- results$summary[rownames(tbl), "Locus"]
-  tbl.anno <- data.frame(Total = rowSums(tbl),
-                         Matching = sapply(seq_along(cols.match),
-                            function(i) tbl[i, as.character(cols.match[i])]),
-                         stringsAsFactors = FALSE)
+  tbl.anno <- data.frame(
+    Total = rowSums(tbl),
+    Matching = sapply(seq_along(cols.match),
+      function(i) tbl[i, as.character(cols.match[i])]),
+    stringsAsFactors = FALSE)
   tbl <- cbind(tbl.anno, tbl)
   tbl
 }

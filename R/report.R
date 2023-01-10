@@ -38,7 +38,7 @@ normalize_alleles <- function(data) {
 #'   locus/sample combinations.
 #'
 #' @export
-tabulate_allele_names <- function(data, extra_cols=NULL) {
+tabulate_allele_names <- function(data, extra_cols = NULL) {
   if (length(extra_cols)) {
     badcols <- extra_cols[! extra_cols %in% colnames(data)]
     if (length(badcols)) {
@@ -52,18 +52,18 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
   # Create unique (aside from Locus) identifiers for each entry
   id <- make_entry_id(data[, -match("Locus", colnames(data))])
   # Our normalized and ordered long-format data frame to be reshaped.
-  long <- data.frame(ID = id,
-                     Locus = data$Locus,
-                     data[, extra_cols, drop = FALSE],
-                     nms,
-                     stringsAsFactors = FALSE)
+  long <- data.frame(
+    ID = id,
+    Locus = data$Locus,
+    data[, extra_cols, drop = FALSE],
+    nms,
+    stringsAsFactors = FALSE)
   long <- long[order_entries(long), ]
   # Switch to wide format, putting the allele names per locus across columns
   # (along with ID and whatever extra_cols were given).
-  tbl <- stats::reshape(long, v.names = c("V1", "V2"),
-                        idvar = "ID",
-                        timevar = "Locus",
-                        direction = "wide")
+  tbl <- stats::reshape(
+    long, v.names = c("V1", "V2"), idvar = "ID", timevar = "Locus",
+    direction = "wide")
   # Fix row and colunn names
   rownames(tbl) <- tbl$ID
   loci <- data$Locus
@@ -101,10 +101,8 @@ tabulate_allele_names <- function(data, extra_cols=NULL) {
 #'
 #' @return data frame showing summary of genotypes.
 #' @export
-report_genotypes <- function(results,
-                             na.replicates="",
-                             na.alleles="",
-                             closest=NULL) {
+report_genotypes <- function(
+    results, na.replicates = "", na.alleles = "", closest = NULL) {
   tbl <- tabulate_allele_names(data = results$summary,
                                extra_cols = c("Sample", "Replicate"))
   tbl <- tbl[, -match("ID", colnames(tbl))]
@@ -165,9 +163,7 @@ report_genotypes <- function(results,
 #'   genotypes for similar known individuals.
 #'
 #' @export
-report_idents <- function(results,
-                          closest,
-                          na.replicates="") {
+report_idents <- function(results, closest, na.replicates = "") {
   # Take the known genotypes table, but keep only those entries relevant to the
   # current loci and match levels.
   gt <- subset(results$genotypes.known,
@@ -248,7 +244,8 @@ report_idents <- function(results,
 #' @seealso \code{\link{align_alleles}}
 #'
 #' @export
-plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
+plot_alignment <- function(
+    alignment, labels = NULL, include.blanks = FALSE, ...) {
   # Convert to character and remove blanks if specified
   if (is.character(alignment))
     seqs <- alignment
@@ -281,7 +278,7 @@ plot_alignment <- function(alignment, labels=NULL, include.blanks=FALSE, ...) {
     graphics::abline(h = i + 0.5, col = grDevices::rgb(0.5, 0.5, 0.5, 0.5))
   if (!is.null(labels))
     graphics::axis(4,
-         at = 1:length(seqs),
+         at = seq_len(length(seqs)),
          labels = labels,
          tick = FALSE,
          padj = -2.5,
@@ -314,9 +311,9 @@ make.dist_scale <- function(n) {
 #' @seealso \code{\link{make_dist_mat}}
 #'
 #' @export
-plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
-                          dist.display_thresh=round(num.alleles * 2 / 3),
-                          ...) {
+plot_dist_mat <- function(
+    dist_mat, num.alleles = max(dist_mat),
+    dist.display_thresh = round(num.alleles * 2 / 3), ...) {
   labels <- matrix(character(length(dist_mat)), nrow = nrow(dist_mat))
   if (is.na(dist.display_thresh))
     dist.display_thresh <- max(dist_mat)
@@ -329,12 +326,13 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
   # Scale font size automatically between min and max values
   fontsize <- min(16, max(4, 17 - 0.11 * max(dim(dist_mat))))
 
-  args <- list(mat = dist_mat,
-               color = color,
-               display_numbers = labels,
-               treeheight_row = 0,
-               breaks = 0:num.alleles,
-               fontsize = fontsize)
+  args <- list(
+    mat = dist_mat,
+    color = color,
+    display_numbers = labels,
+    treeheight_row = 0,
+    breaks = 0:num.alleles,
+    fontsize = fontsize)
   if (nrow(dist_mat) == ncol(dist_mat)) {
     args <- c(args,
               list(clustering_distance_rows = stats::as.dist(dist_mat)),
@@ -370,12 +368,9 @@ plot_dist_mat <- function(dist_mat, num.alleles=max(dist_mat),
 #' @param ... additional arguments to \code{\link[pheatmap]{pheatmap}}.
 #'
 #' @export
-plot_heatmap <- function(results,
-                         attribute,
-                         label.by = c("Allele1Length", "Allele2Length"),
-                         color=c("white", "pink"),
-                         breaks=NA,
-                         ...) {
+plot_heatmap <- function(
+    results, attribute, label.by = c("Allele1Length", "Allele2Length"),
+    color = c("white", "pink"), breaks = NA, ...) {
   tbl <- summarize_attribute(results$summary, attribute)
   data <- tbl[, - (1:2)] + 0
   tbl.labels <- summarize_genotypes(results$summary, vars = label.by)
@@ -389,13 +384,9 @@ plot_heatmap <- function(results,
   if (min(data, na.rm = TRUE) == max(data, na.rm = TRUE))
     breaks <- range(c(0, max(data, na.rm = TRUE), 1))
 
-  pheatmap::pheatmap(data,
-                     cluster_rows = FALSE,
-                     cluster_cols = FALSE,
-                     display_numbers = labels,
-                     breaks = breaks,
-                     color = color,
-                     ...)
+  pheatmap::pheatmap(
+    data, cluster_rows = FALSE, cluster_cols = FALSE, display_numbers = labels,
+    breaks = breaks, color = color, ...)
 }
 
 #' Plot heatmap of suspected PCR stutter
@@ -412,10 +403,7 @@ plot_heatmap <- function(results,
 #'
 #' @export
 plot_heatmap_stutter <- function(results, ...) {
-  plot_heatmap(results,
-               "Stutter",
-               legend = FALSE,
-               ...)
+  plot_heatmap(results, "Stutter", legend = FALSE, ...)
 }
 
 #' Plot heatmap of suspected PCR artifacts
@@ -432,10 +420,7 @@ plot_heatmap_stutter <- function(results, ...) {
 #'
 #' @export
 plot_heatmap_artifacts <- function(results, ...) {
-  plot_heatmap(results,
-               "Artifact",
-               legend = FALSE,
-               ...)
+  plot_heatmap(results, "Artifact", legend = FALSE, ...)
 }
 
 #' Plot heatmap of homozygous samples
@@ -451,10 +436,7 @@ plot_heatmap_artifacts <- function(results, ...) {
 #'
 #' @export
 plot_heatmap_homozygous <- function(results, ...) {
-  plot_heatmap(results,
-               "Homozygous",
-               legend = FALSE,
-               ...)
+  plot_heatmap(results, "Homozygous", legend = FALSE, ...)
 }
 
 #' Plot heatmap of samples with multiple prominent sequences
@@ -514,11 +496,8 @@ plot_heatmap_proportions <- function(results, ...) {
   color_func <- grDevices::colorRampPalette(c("red", "white"))
   breaks <- seq(0, 1, 0.001) ^ 2.5
   colors <- color_func(length(breaks) - 1)
-  plot_heatmap(results,
-               "ProportionCounted",
-               color = colors,
-               breaks = breaks,
-               ...)
+  plot_heatmap(
+    results, "ProportionCounted", color = colors, breaks = breaks, ...)
 }
 
 
@@ -542,7 +521,8 @@ plot_heatmap_proportions <- function(results, ...) {
 #' @seealso \code{\link{plot_heatmap}}
 #'
 #' @export
-plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, render=TRUE, ...) {
+plot_cts_per_locus <- function(
+    cts_per_locus, idx.row = NULL, render = TRUE, ...) {
   # Switch to log scale
   cts_per_locus[cts_per_locus == 0] <- NA
   cts_per_locus <- log10(cts_per_locus)
@@ -557,15 +537,16 @@ plot_cts_per_locus <- function(cts_per_locus, idx.row=NULL, render=TRUE, ...) {
   if (! missing(idx.row)) {
     cts_per_locus <- cts_per_locus[idx.row, ]
   }
-  pheatmap::pheatmap(cts_per_locus,
-                     cluster_rows = FALSE,
-                     cluster_cols = FALSE,
-                     gaps_col = c(1, 2),
-                     color = color,
-                     breaks = breaks,
-                     legend_breaks = breaks,
-                     legend_labels = paste0("10^", breaks),
-                     silent = ! render,
-                     ...)
+  pheatmap::pheatmap(
+    cts_per_locus,
+    cluster_rows = FALSE,
+    cluster_cols = FALSE,
+    gaps_col = c(1, 2),
+    color = color,
+    breaks = breaks,
+    legend_breaks = breaks,
+    legend_labels = paste0("10^", breaks),
+    silent = ! render,
+    ...)
   invisible()
 }

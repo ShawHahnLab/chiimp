@@ -1,3 +1,19 @@
+# chiimp 0.4.1
+
+ * Overhauled unit tests with more modular saved inputs and expected outputs
+   ([#92])
+ * Made warnings encountered in the chiimp script display as they occur, rather
+   than at the end ([#91])
+ * Made `load_dataset` warn about repeated Sample+Replicate+Locus entries
+   across rows ([#90])
+ * Made `load_config` warn about any unrecognized configuration file entries
+   ([#88])
+
+[#92]: https://github.com/ShawHahnLab/chiimp/pull/92
+[#91]: https://github.com/ShawHahnLab/chiimp/pull/91
+[#90]: https://github.com/ShawHahnLab/chiimp/pull/90
+[#88]: https://github.com/ShawHahnLab/chiimp/pull/88
+
 # chiimp 0.4.0
 
  * Fixed desktop icon drag-and-drop for recent Linux distributions ([#85])

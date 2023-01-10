@@ -37,13 +37,13 @@ make_entry_id <- function(data) {
       ! all(is.na(data[, x]))
     }))]
     data_names <- data[, cols_idx, drop = FALSE]
-    sapply(1:nrow(data_names), function(nr) {
+    sapply(seq_len(nrow(data_names)), function(nr) {
       entries <- lapply(data_names[nr, ! is.na(data_names[nr, ])], as.character)
       do.call(paste, as.list(c(entries, sep = "-")))
     })
   } else {
     warning("no recognized columns for entry id")
-    paste0("entry", 1:nrow(data))
+    paste0("entry", seq_len(nrow(data)))
   }
 }
 
@@ -101,7 +101,7 @@ order_entries <- function(data) {
 #'   suffix.  (See \code{\link[openssl]{md5}}.)
 #'
 #' @return vector of short names
-make_allele_name <- function(data, hash_len=6) {
+make_allele_name <- function(data, hash_len = 6) {
   txt <- if (is.character(data)) {
     if (hash_len > 0) {
       paste(nchar(data),
@@ -137,7 +137,8 @@ order_alleles <- function(nms) {
 #' @param name_args list of additional arguments to \code{make_allele_name}.
 #'
 #' @return data frame provided with Allele1Name and Allele2Name columns added
-name_alleles_in_table <- function(data, known_alleles=NULL, name_args=list()) {
+name_alleles_in_table <- function(
+    data, known_alleles = NULL, name_args = list()) {
   # Make names for given seqs, using existing names where available.
   nm <- function(seqs) {
     nms <- do.call(make_allele_name, c(list(data = seqs), name_args))
@@ -193,7 +194,7 @@ fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint
 #' @param msg text to print.
 #' @param col2 extra text to show at right margin; defaults to current time.
 #' @param end ending to concatenate to message; defaults to newline character.
-logmsg <- function(msg, col2=as.character(Sys.time()), end="\n") {
+logmsg <- function(msg, col2 = as.character(Sys.time()), end = "\n") {
   if (!is.null(col2)) {
     # right-justify col2, aim to fit total msg within 80 characters
     pad <- max(1, 80 - nchar(msg) - nchar(col2))
@@ -201,9 +202,4 @@ logmsg <- function(msg, col2=as.character(Sys.time()), end="\n") {
   }
   # stderr: file descriptor 2
   cat(paste0(msg, end), file = 2)
-}
-
-# append an empty string to each the given files
-touch <- function(fps) {
-  lapply(fps, function(fp) cat("", file = fp, append = TRUE))
 }
