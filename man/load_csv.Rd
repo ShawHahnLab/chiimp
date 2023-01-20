@@ -27,8 +27,8 @@ wrapper functions used by more specific loaders like
 }
 \section{Functions}{
 \itemize{
-\item \code{load_csv}: Load CSV
+\item \code{load_csv()}: Load CSV
 
-\item \code{save_csv}: Save CSV
+\item \code{save_csv()}: Save CSV
+
 }}
-

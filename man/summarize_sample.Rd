@@ -62,11 +62,11 @@ contamination or excessive PCR stutter can lead to more than two.
 }
 \section{Functions}{
 \itemize{
-\item \code{summarize_sample}: Default version of sample summary.
+\item \code{summarize_sample()}: Default version of sample summary.
 
-\item \code{summarize_sample_guided}: Summarize a processed STR sample Using known
+\item \code{summarize_sample_guided()}: Summarize a processed STR sample Using known
 lengths.  If \code{ExpectedLength1} and optionally \code{ExpectedLength2}
 are given in \code{sample.attrs}, the \code{counts.min} threshold is
 ignored.  See also \code{\link{analyze_sample_guided}}.
-}}
 
+}}

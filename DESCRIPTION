@@ -33,7 +33,7 @@ Imports:
 Remotes:
   github::sherrillmix/dnar,
   github::sherrillmix/dnaplotr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Suggests:
   testthat,
   roxygen2
