@@ -375,32 +375,6 @@ CMP <- c(
   H = "D",
   V = "B")
 
-#' Reverse complement sequences
-#' 
-#' Each entry in the input character vector is reversed and nucleotide
-#' characters replaced with their complements (leaving any other text characters
-#' unchanged).
-#' 
-#' @param txt character vector of sequences
-#' @returns character vector of reverse complements
-#' @md
-revcmp <- function(txt) {
-  bases <- CMP
-  bases_lower <- tolower(CMP)
-  names(bases_lower) <- tolower(names(bases_lower))
-  bases <- c(bases, bases_lower)
-  nas <- is.na(txt)
-  txt[nas] <- ""
-  out <- vapply(strsplit(txt, ""), function(vec) {
-    vec <- rev(vec)
-    out <- bases[vec]
-    out[is.na(out)] <- vec[is.na(out)]
-    paste(out, collapse = "")
-  }, character(1))
-  out[nas] <- NA
-  out
-}
-
 #' Make matrix of raw bytes from nucleotide sequences
 #' 
 #' Each sequence in the given vector becomes a column of the output matrix, with
