@@ -106,7 +106,8 @@ analyze_seqs <- function(
       Seq = character(),
       Count = integer(),
       Length = integer(),
-      MatchingLocus = factor(c(), levels = unique(locus_attrs$Locus)))
+      MatchingLocus = factor(c(), levels = unique(locus_attrs$Locus)),
+      stringsAsFactors = FALSE)
   }
   rownames(data) <- NULL
 
