@@ -211,7 +211,7 @@ find_primer_matches <- function(seqs_reads, seqs_primers, max_mismatches=NA) {
   seqs_primers[is.na(seqs_primers)] <- ""
   matches <- ordered(
     character(length(seqs_reads)),
-    levels = seqs_primers[seqs_primers != ""])
+    levels = unique(seqs_primers[seqs_primers != ""]))
 
   result_stub <- data.frame(
     SeqIdx = integer(),
