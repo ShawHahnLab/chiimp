@@ -21,7 +21,8 @@ test_that("make_read_primer_table finds locus matches", {
   locus_attrs <- data.frame(
     Locus = c("X", "Y", "Z"),
     Primer = primers,
-    ReversePrimer = primers_rev)
+    ReversePrimer = primers_rev,
+    stringsAsFactors = FALSE)
   # should call match_primer_set for both fwd and rev, and then only keep those
   # with the same locus found for both fwd and reverse.
   result <- make_read_primer_table(
@@ -56,7 +57,8 @@ test_that("make_read_primer_table can handle missing primer seqs", {
   locus_attrs <- data.frame(
     Locus = c("X", "Y", "Z"),
     Primer = primers,
-    ReversePrimer = primers_rev)
+    ReversePrimer = primers_rev,
+    stringsAsFactors = FALSE)
   result <- make_read_primer_table(
     reads, locus_attrs, max_mismatches = 3, primer_action = "none",
     use_reverse_primers = TRUE, reverse_primer_r1 = TRUE)
@@ -79,7 +81,8 @@ test_that("make_read_primer_table understands IUPAC codes in primer seqs", {
     "CCGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC")
   locus_attrs <- data.frame(
     Locus = "X",
-    Primer = "CNGCCAGTGGAGCGGGC") # perfect match at start of all reads
+    Primer = "CNGCCAGTGGAGCGGGC", # perfect match at start of all reads
+    stringsAsFactors = FALSE)
   # basic case, just an N in the second position that should match any base
   result <- make_read_primer_table(
     reads, locus_attrs, max_mismatches = 3,
@@ -102,7 +105,7 @@ test_that("make_read_primer_table understands IUPAC codes in primer seqs", {
 # handle_primers ----------------------------------------------------------
 
 
-test_that("handle_primers modified sequences as directed", {
+test_that("handle_primers modifies sequences as directed", {
   # four cases for both fwd and rev:
   # none, keep, replace, remove
   # The primers don't exactly match what's in the sequences (maybe mismatches,
@@ -110,7 +113,8 @@ test_that("handle_primers modified sequences as directed", {
   locus_attrs <- data.frame(
     Locus = "A",
     Primer = "XQXXX",
-    ReversePrimer = "ZZZWZ")
+    ReversePrimer = "ZZZWZ",
+    stringsAsFactors = FALSE)
   input <- data.frame(
     SeqOrig = "XXXXXYYYYYZZZZZ",
     FwdStart = 1,
@@ -121,29 +125,37 @@ test_that("handle_primers modified sequences as directed", {
     stringsAsFactors = FALSE)
   # general checks
   result <- handle_primers(input, locus_attrs, "none", "none", TRUE)
-  expect_identical(result, cbind(input, Seq = input$SeqOrig))
+  expect_identical(
+    result, cbind(input, Seq = input$SeqOrig, stringsAsFactors = FALSE))
   result <- handle_primers(input, locus_attrs, "keep", "keep", TRUE)
-  expect_identical(result, cbind(input, Seq = input$SeqOrig))
+  expect_identical(
+    result, cbind(input, Seq = input$SeqOrig, stringsAsFactors = FALSE))
   result <- handle_primers(input, locus_attrs, "replace", "remove", TRUE)
-  expect_identical(result, cbind(input, Seq = "XQXXXYYYYY"))
+  expect_identical(
+    result, cbind(input, Seq = "XQXXXYYYYY", stringsAsFactors = FALSE))
   result <- handle_primers(input, locus_attrs, "remove", "replace", TRUE)
-  expect_identical(result, cbind(input, Seq = "YYYYYZZZWZ"))
+  expect_identical(
+    result, cbind(input, Seq = "YYYYYZZZWZ", stringsAsFactors = FALSE))
   result <- handle_primers(input, locus_attrs, "remove", "replace", FALSE)
-  expect_identical(result, cbind(input, Seq = "YYYYYZWZZZ"))
+  expect_identical(
+    result, cbind(input, Seq = "YYYYYZWZZZ", stringsAsFactors = FALSE))
   # check trimming; if primers are set in a bit, that should show in the output
   input$FwdStart <- 2
   input$RevStop <- 12
   result <- handle_primers(input, locus_attrs, "none", "none", TRUE)
-  expect_identical(result, cbind(input, Seq = input$SeqOrig))
+  expect_identical(
+    result, cbind(input, Seq = input$SeqOrig, stringsAsFactors = FALSE))
   result <- handle_primers(input, locus_attrs, "keep", "keep", TRUE)
-  expect_identical(result, cbind(input, Seq = "XXXXYYYYYZZ"))
+  expect_identical(
+    result, cbind(input, Seq = "XXXXYYYYYZZ", stringsAsFactors = FALSE))
 })
 
 test_that("handle_primers handles empty inputs", {
   locus_attrs <- data.frame(
     Locus = "A",
     Primer = "XQXXX",
-    ReversePrimer = "ZZZWZ")
+    ReversePrimer = "ZZZWZ",
+    stringsAsFactors = FALSE)
   input <- data.frame(
     SeqOrig = "",
     FwdStart = NA,
@@ -154,21 +166,26 @@ test_that("handle_primers handles empty inputs", {
     stringsAsFactors = FALSE)
   # empty strings should be fine
   result <- handle_primers(input, locus_attrs, "none", "none", TRUE)
-  expect_identical(result, cbind(input, Seq = input$SeqOrig))
+  expected <- cbind(input, Seq = input$SeqOrig, stringsAsFactors = FALSE)
+  expect_identical(result, expected)
   # or NA
   input$SeqOrig <- as.character(NA)
+  expected <- cbind(input, Seq = input$SeqOrig, stringsAsFactors = FALSE)
   result <- handle_primers(input, locus_attrs, "none", "none", TRUE)
-  expect_identical(result, cbind(input, Seq = input$SeqOrig))
+  expect_identical(result, expected)
   # no rows in, no rows out
   result <- handle_primers(input[0, ], locus_attrs, "none", "none", TRUE)
-  expect_identical(result, cbind(input[0, ], Seq = input$SeqOrig[0]))
+  expected <- cbind(
+    input[0, ], Seq = input$SeqOrig[0], stringsAsFactors = FALSE)
+  expect_identical(result, expected)
 })
 
 test_that("handle_primers handles invalid keywords", {
   locus_attrs <- data.frame(
     Locus = "A",
     Primer = "XQXXX",
-    ReversePrimer = "ZZZWZ")
+    ReversePrimer = "ZZZWZ",
+    stringsAsFactors = FALSE)
   input <- data.frame(
     SeqOrig = "XXXXXYYYYYZZZZZ",
     FwdStart = 1,

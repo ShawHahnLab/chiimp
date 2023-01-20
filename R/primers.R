@@ -5,13 +5,16 @@
 #' 
 #' \code{make_read_primer_table} take read sequences and per-locus primer
 #' information and produces a data frame of matching information for each read.
-#' Mismatches are allowed, but not indels.
+#' Mismatches are allowed, but not indels.  The rows in the output data frame
+#' will correspond exactly to read vector given.
 #' 
 #' Optionally reads can be modified based on the matched primer sequences in one
 #' or both directions.
 #' 
 #' All positions in the returned data frame are indexed from 1 and are oriented
 #' in the same direction as the reads.
+#' 
+#' The comparison of reads to primers is not exhaustive.
 #' 
 #' Output Columns:
 #'
@@ -28,6 +31,7 @@
 #'    \code{use_reverse_primers}) directions
 #'  * Seq: modified sequence based on \code{primer_action} argument(s), if
 #'    applicable
+#' @md
 #' 
 #' @param seqs character vector of read sequences
 #' @param locus_attrs data frame of locus attributes
@@ -59,9 +63,8 @@ make_read_primer_table <- function(
     use_reverse_primers,
   reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1) {
 
-  # Find the closest-matching locus, by primer sequence, for each of a set of
-  # sequences, within a maximum distance.  The output rows will match the input
-  # sequences.
+  # Find matching loci, by primer sequence, for each of a set of sequences,
+  # within a maximum distance.  The output rows will match the input sequences.
   match_primer_set <- function(
     seqs, locus_attrs, max_mismatches, colnm, prefix, do_revcmp) {
     primers <- locus_attrs[[colnm]]
@@ -84,7 +87,7 @@ make_read_primer_table <- function(
     matches
   }
 
-  # Find the best matching locus via forward primers
+  # Find a matching locus via forward primers
   matches_fwd <- match_primer_set(
     seqs, locus_attrs, max_mismatches, "Primer", "Fwd", FALSE)
   result <- matches_fwd
@@ -101,7 +104,7 @@ make_read_primer_table <- function(
     result$MatchingLocus <- result$FwdLocus
   }
   result <- result[order(result$SeqIdx), ]
-  result <- cbind(SeqOrig = seqs, result)
+  result <- cbind(SeqOrig = seqs, result, stringsAsFactors = FALSE)
   result <- subset(result, select = -SeqIdx)
   result <- handle_primers(
     result, locus_attrs,
