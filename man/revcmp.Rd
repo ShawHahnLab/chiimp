@@ -13,6 +13,7 @@ revcmp(txt)
 character vector of reverse complements
 }
 \description{
-Each entry in the input vector is reversed and nucleotide characters replaced
-with their complements (leaving any other text characters unchanged).
+Each entry in the input character vector is reversed and nucleotide
+characters replaced with their complements (leaving any other text characters
+unchanged).
 }

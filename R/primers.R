@@ -253,7 +253,7 @@ find_primer_matches <- function(seqs_reads, seqs_primers, max_mismatches=NA) {
   # In this big matrix, each row is a position, each column a query; in the
   # colSums below, primers are compared as vectors column-wise to this matrix.
   # (Using raw bytes as that makes the comparisons significantly faster)
-  queries <- raw_nt(seqs_reads, map = RAW_NT[1:4])
+  queries <- make_raw_nt(seqs_reads, map = RAW_NT[1:4])
   slices <- seq_len(len_max)
   result <- do.call(rbind, lapply(levels(matches), function(seq_primer) {
     # Each per-primer data frame here will initially have a row for every read.
@@ -265,7 +265,7 @@ find_primer_matches <- function(seqs_reads, seqs_primers, max_mismatches=NA) {
     result <- result_stub[seq_along(seqs_reads), ]
     result$SeqIdx <- seq_along(seqs_reads)
     result$PrimerIdx <- match(seq_primer, seqs_primers)
-    primer <- raw_nt(seq_primer, pad = 0x40)[, 1]
+    primer <- make_raw_nt(seq_primer, pad = 0x40)[, 1]
     if (length(primer) > 1) {
       # If a max mismatch was given, we'll only check the reads that showed a
       # match for this primer.  Otherwise we'll check everything.
@@ -377,8 +377,9 @@ CMP <- c(
 
 #' Reverse complement sequences
 #' 
-#' Each entry in the input vector is reversed and nucleotide characters replaced
-#' with their complements (leaving any other text characters unchanged).
+#' Each entry in the input character vector is reversed and nucleotide
+#' characters replaced with their complements (leaving any other text characters
+#' unchanged).
 #' 
 #' @param txt character vector of sequences
 #' @returns character vector of reverse complements
@@ -415,7 +416,7 @@ revcmp <- function(txt) {
 #' @param other raw value to use for nucleotides not in `map`
 #' @return raw matrix with positions on rows and sequences on columns
 #' @md
-raw_nt <- function(seqs, map = RAW_NT, pad = 0x80, other = 0x00) {
+make_raw_nt <- function(seqs, map = RAW_NT, pad = 0x80, other = 0x00) {
   pad <- as.raw(as.integer(pad))
   other <- as.raw(as.integer(other))
   seq_levels <- names(map)
