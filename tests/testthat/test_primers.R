@@ -428,31 +428,31 @@ test_that("revcmp handles IUPAC", {
 })
 
 
-# raw_nt ------------------------------------------------------------------
+# make_raw_nt -------------------------------------------------------------
 
 
-test_that("raw_nt makes raw matrix from text", {
+test_that("make_raw_nt makes raw matrix from text", {
   # three basic categories are recognized characters, unrecognized characters,
   # and pad positions (for shorter seqs)
   seqs <- c("ACTX", "", "ACG")
-  out <- raw_nt(seqs)
+  out <- make_raw_nt(seqs)
   out_exp <- matrix(as.raw(c(
     0x01, 0x02, 0x08, 0x00,
     0x80, 0x80, 0x80, 0x80,
     0x01, 0x02, 0x04, 0x80)), ncol = 3)
   expect_identical(out, out_exp)
   # The pad and other values can be customized
-  out <- raw_nt(seqs, pad = 0x40, other = 0x80)
+  out <- make_raw_nt(seqs, pad = 0x40, other = 0x80)
   out_exp[out_exp == 0x80] <- as.raw(0x40)
   out_exp[out_exp == 0x00] <- as.raw(0x80)
   expect_identical(out, out_exp)
   # raw input for those should work too
-  out <- raw_nt(seqs, pad = as.raw(0x40), other = as.raw(0x80))
+  out <- make_raw_nt(seqs, pad = as.raw(0x40), other = as.raw(0x80))
   expect_identical(out, out_exp)
   # custom mapping should be supported
   map <- as.raw(1:4)
   names(map) <- c("T", "G", "C", "A")
-  out <- raw_nt(seqs, map)
+  out <- make_raw_nt(seqs, map)
   out_exp <- matrix(as.raw(c(
     0x04, 0x03, 0x01, 0x00,
     0x80, 0x80, 0x80, 0x80,
@@ -460,17 +460,17 @@ test_that("raw_nt makes raw matrix from text", {
   expect_identical(out, out_exp)
 })
 
-test_that("raw_nt handles empty input", {
+test_that("make_raw_nt handles empty input", {
   # empty input, empty output:
   # one sequence (cols) with zero positions (rows)
-  expect_equal(dim(raw_nt("")), c(0, 1))
+  expect_equal(dim(make_raw_nt("")), c(0, 1))
   # zero-length input, zero-length output
-  expect_equal(dim(raw_nt(character())), c(0, 0))
+  expect_equal(dim(make_raw_nt(character())), c(0, 0))
 })
 
-test_that("raw_nt handles IUPAC codes", {
+test_that("make_raw_nt handles IUPAC codes", {
   seqs <- c("SCNG", "", "ACG")
-  out <- raw_nt(seqs)
+  out <- make_raw_nt(seqs)
   out_exp <- matrix(as.raw(c(
     6, 2, 15, 4,
     128, 128, 128, 128,
