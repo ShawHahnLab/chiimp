@@ -64,7 +64,15 @@ config.defaults <- list(
     stutter.count.ratio_max = 1 / 3,
     artifact.count.ratio_max = 1 / 3,
     use_reverse_primers = FALSE,
-    reverse_primer_r1 = TRUE
+    reverse_primer_r1 = TRUE,
+    max_mismatches = 0,
+    primer_action = "none",
+    # individual forward and reverse settings will default to the above values
+    # if left as NULL
+    max_mismatches_fwd = NULL,
+    max_mismatches_rev = NULL,
+    primer_action_fwd = NULL,
+    primer_action_rev = NULL
   ),
   sample_analysis_func = "analyze_sample",
   sample_analysis_opts = list(fraction.min = 0.05),

@@ -59,15 +59,29 @@
 #' @export
 #' @md
 make_read_primer_table <- function(
-  seqs, locus_attrs, max_mismatches=0, primer_action="none",
-  primer_action_fwd=primer_action,
-  primer_action_rev=primer_action,
-  max_mismatches_fwd=max_mismatches,
-  max_mismatches_rev=max_mismatches,
+  seqs, locus_attrs,
+  max_mismatches=config.defaults$seq_analysis$max_mismatches,
+  primer_action=config.defaults$seq_analysis$primer_action,
+  primer_action_fwd=config.defaults$seq_analysis$primer_action_fwd,
+  primer_action_rev=config.defaults$seq_analysis$primer_action_rev,
+  max_mismatches_fwd=config.defaults$seq_analysis$max_mismatches_fwd,
+  max_mismatches_rev=config.defaults$seq_analysis$max_mismatches_rev,
   use_reverse_primers = config.defaults$seq_analysis$
     use_reverse_primers,
   reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1) {
 
+  if (is.null(max_mismatches_fwd)) {
+    max_mismatches_fwd <- max_mismatches
+  }
+  if (is.null(max_mismatches_rev)) {
+    max_mismatches_rev <- max_mismatches
+  }
+  if (is.null(primer_action_fwd)) {
+    primer_action_fwd <- primer_action
+  }
+  if (is.null(primer_action_rev)) {
+    primer_action_rev <- primer_action
+  }
   # Find matching loci, by primer sequence, for each of a set of sequences,
   # within a maximum distance.  The output rows will match the input sequences.
   match_primer_set <- function(
