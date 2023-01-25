@@ -4,5 +4,18 @@
 \alias{CFG_DEFAULTS}
 \title{Default Configuration}
 \description{
-The default configuration
+`CFG_DEFAULTS` is CHIIMP's default configuration options and metadata.  The
+values in this data frame are used unless overridden by custom ones, and the
+parsing of text values into other types is defined by the `Parser` column
+here.
+}
+\details{
+The columns are:
+
+* Key: name of each setting
+* Value: unparsed text value for each setting
+* Description: short description of the setting
+* Example: example value
+* Parser: name of a function to apply to each entry when setting globally for
+  the package (see [apply_config])
 }

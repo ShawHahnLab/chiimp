@@ -17,28 +17,72 @@ dataset_cols <- c("Filename", "Replicate", "Sample", "Locus")
 
 #' Load configuration file
 #'
-#' Load a YAML-formatted text file of configuration options for microsatellite
-#' analysis.  The \code{\link{main}} function loads configuration options with
-#' this for use by \code{\link{full_analysis}}.
+#' Load a CSV or YAML-formatted text file of configuration options for
+#' microsatellite analysis.  The [main] function loads configuration options
+#' with this and sets them package-wide with [apply_config].
 #'
 #' Whatever entries are present in the file will be returned, but names that
-#' don't match known names (see \code{\link{config.defaults}}) will be reported
-#' in a warning.
+#' don't match known names (see [CFG_DEFAULTS]) will be reported in a warning.
 #'
 #' @param fp path to configuration file.
 #'
-#' @return nested list of configuration options
-#'
-#' @export
+#' @return data frame of configuration options
 #'
 #' @examples
 #' filename <- system.file("example_config.yml", package = "chiimp")
 #' config <- load_config(filename)
 #' # And then: full_analysis(config)
+#' @export
+#' @md
 load_config <- function(fp) {
-  if (grepl("\\.csv$", fp, ignore.case = TRUE)) {
-    return(load_config_table(fp))
+  yamls <- c("\\.yml$", "\\.yaml$")
+  if (any(sapply(yamls, function(pat) grepl(pat, fp, ignore.case = TRUE)))) {
+    load_config_yaml(fp)
+  } else {
+    load_config_table(fp)  
   }
+}
+
+# spec for any config table
+CONFIG_TABLE_SPEC <- data.frame(
+  Column = c(
+    "Key", "Value", "Description", "Example", "Parser", "OldName", "Comments"),
+  Class = "character",
+  Required = c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+  stringsAsFactors = FALSE)
+
+apply_spec <- function(obj, spec) {
+  # TODO check obj against spec
+  obj
+}
+
+#' Load configuration file from CSV
+#'
+#' @param fp path to configuration file.
+#'
+#' @return data frame of configuration information
+#'
+#' @md
+load_config_csv <- function(fp) {
+  cfg_table <- load_csv(fp, row.names = NULL, colClasses = "character")
+  cfg_table <- apply_spec(cfg_table, CONFIG_TABLE_SPEC)
+  if (exists("CFG_DEFAULTS")) {
+    # If we have the defaults loaded (if not, this should *be* loading the
+    # defaults) check this file against those values
+    config_check_keys(cfg_table)
+    config_check_version(cfg_table)
+  }
+  cfg_table
+}
+
+#' Load configuration file from YAML
+#'
+#' @param fp path to configuration file.
+#'
+#' @return data frame of configuration information
+#'
+#' @md
+load_config_yaml <- function(fp) {
   if (is.na(fp)) {
     config_list <- list()
   } else {

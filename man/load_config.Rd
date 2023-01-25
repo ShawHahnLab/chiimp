@@ -10,17 +10,16 @@ load_config(fp)
 \item{fp}{path to configuration file.}
 }
 \value{
-nested list of configuration options
+data frame of configuration options
 }
 \description{
-Load a YAML-formatted text file of configuration options for microsatellite
-analysis.  The \code{\link{main}} function loads configuration options with
-this for use by \code{\link{full_analysis}}.
+Load a CSV or YAML-formatted text file of configuration options for
+microsatellite analysis.  The \link{main} function loads configuration options
+with this and sets them package-wide with \link{apply_config}.
 }
 \details{
 Whatever entries are present in the file will be returned, but names that
-don't match known names (see \code{\link{config.defaults}}) will be reported
-in a warning.
+don't match known names (see \link{CFG_DEFAULTS}) will be reported in a warning.
 }
 \examples{
 filename <- system.file("example_config.yml", package = "chiimp")

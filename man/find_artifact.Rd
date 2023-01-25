@@ -7,7 +7,7 @@
 find_artifact(
   sample.data,
   locus_attrs,
-  count.ratio_max = CFG$max_artifact_ratio
+  count.ratio_max = cfg("max_artifact_ratio")
 )
 }
 \arguments{

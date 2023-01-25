@@ -150,9 +150,8 @@
 #'
 #' @export
 full_analysis <- function(config, dataset = NULL) { # nolint: cyclocomp_linter.
-  # Overaly explicit configuration onto the default settings
-  cfg_list <- parse_config(config)
-  apply_config(config_list)
+  # Overlay explicit configuration onto the default settings
+  apply_config(config)
   
   # Make output path absolute
   cfg("output_path",

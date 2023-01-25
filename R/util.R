@@ -234,3 +234,14 @@ revcmp <- function(txt) {
   out[nas] <- NA
   out
 }
+
+
+# Does the given vector look "blank"?
+# NULL: TRUE (caught by length of 0)
+# NA: TRUE
+# "": TRUE
+# any combo of NA and "": TRUE
+# all else: FALSE
+is_blank <- function(vec) {
+  length(vec) == 0 || all(vec %in% c(NA, ""))
+}

@@ -4,7 +4,11 @@
 \alias{find_stutter}
 \title{Check for PCR stutter between sequences}
 \usage{
-find_stutter(sample.data, locus_attrs, count.ratio_max = CFG$max_stutter_ratio)
+find_stutter(
+  sample.data,
+  locus_attrs,
+  count.ratio_max = cfg("max_stutter_ratio")
+)
 }
 \arguments{
 \item{sample.data}{data frame of processed sample data.}
