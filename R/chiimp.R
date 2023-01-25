@@ -199,7 +199,13 @@ full_analysis <- function(config, dataset = NULL) { # nolint: cyclocomp_linter.
     analysis_function = sample_analysis_func,
     summary_function = sample_summary_func,
     known_alleles = allele.names,
-    name_args = list(hash_len = cfg("allele_suffix_len")))
+    name_args = list(hash_len = cfg("allele_suffix_len")),
+    max_mismatches = cfg("max_mismatches"),
+    primer_action = cfg("primer_action"),
+    max_mismatches_fwd = cfg("max_mismatches_fwd"),
+    primer_action_fwd = cfg("primer_action_fwd"),
+    max_mismatches_rev = cfg("max_mismatches_rev"),
+    primer_action_rev = cfg("primer_action_rev"))
   results$allele.names <- allele.names
   results$locus_attrs <- locus_attrs
   logmsg("Summarizing results...")

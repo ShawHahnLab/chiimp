@@ -54,20 +54,26 @@
 #'
 #' @export
 analyze_dataset <- function(
-  dataset,
-  locus_attrs,
-  nrepeats = cfg("min_motif_repeats"),
-  stutter.count.ratio_max = cfg("max_stutter_ratio"),
-  artifact.count.ratio_max = cfg("max_artifact_ratio"),
-  use_reverse_primers = cfg("use_reverse_primers"),
-  reverse_primer_r1 = cfg("reverse_primer_r1"),
-  ncores = cfg("ncores"),
-  analysis_opts,
-  summary_opts,
-  analysis_function = analyze_sample,
-  summary_function = summarize_sample,
-  known_alleles = NULL,
-  name_args = list()) {
+    dataset,
+    locus_attrs,
+    nrepeats = cfg("min_motif_repeats"),
+    stutter.count.ratio_max = cfg("max_stutter_ratio"),
+    artifact.count.ratio_max = cfg("max_artifact_ratio"),
+    use_reverse_primers = cfg("use_reverse_primers"),
+    reverse_primer_r1 = cfg("reverse_primer_r1"),
+    max_mismatches = cfg("max_mismatches"),
+    primer_action = cfg("primer_action"),
+    max_mismatches_fwd = cfg("max_mismatches_fwd"),
+    max_mismatches_rev = cfg("max_mismatches_rev"),
+    primer_action_fwd = cfg("primer_action_fwd"),
+    primer_action_rev = cfg("primer_action_rev"),
+    ncores = cfg("ncores"),
+    analysis_opts,
+    summary_opts,
+    analysis_function = analyze_sample,
+    summary_function = summarize_sample,
+    known_alleles = NULL,
+    name_args = list()) {
   if (! all(dataset$Locus %in% locus_attrs$Locus)) {
     rogue_loci <- unique(dataset$Locus[! dataset$Locus %in% locus_attrs$Locus])
     msg <- paste("ERROR: Locus names in dataset not in attributes table:",
@@ -80,12 +86,25 @@ analyze_dataset <- function(
   analyze.file <- function(fp, locus_attrs, nrepeats,
                            stutter.count.ratio_max, artifact.count.ratio_max,
                            use_reverse_primers,
-                           reverse_primer_r1) {
+                           reverse_primer_r1,
+                           max_mismatches,
+                           primer_action,
+                           max_mismatches_fwd,
+                           max_mismatches_rev,
+                           primer_action_fwd,
+                           primer_action_rev
+                           ) {
     seqs <- load_seqs(fp)
     analyze_seqs(seqs, locus_attrs, nrepeats,
                  stutter.count.ratio_max, artifact.count.ratio_max,
-                 use_reverse_primers,
-                 reverse_primer_r1)
+                 use_reverse_primers = use_reverse_primers,
+                 reverse_primer_r1 = reverse_primer_r1,
+                 max_mismatches = max_mismatches,
+                 primer_action = primer_action,
+                 max_mismatches_fwd = max_mismatches_fwd,
+                 max_mismatches_rev = max_mismatches_rev,
+                 primer_action_fwd = primer_action_fwd,
+                 primer_action_rev = primer_action_rev)
   }
   analyze.entry <- function(entry, analysis_opts, summary_opts,
                             analysis_function, summary_function,
@@ -138,7 +157,13 @@ analyze_dataset <- function(
                                             stutter.count.ratio_max,
                                             artifact.count.ratio_max,
                                             use_reverse_primers,
-                                            reverse_primer_r1)
+                                            reverse_primer_r1,
+                                            max_mismatches,
+                                            primer_action,
+                                            max_mismatches_fwd,
+                                            max_mismatches_rev,
+                                            primer_action_fwd,
+                                            primer_action_rev)
       names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
                                         analysis_opts = analysis_opts,
@@ -158,7 +183,13 @@ analyze_dataset <- function(
                              stutter.count.ratio_max,
                              artifact.count.ratio_max,
                              use_reverse_primers,
-                             reverse_primer_r1)
+                             reverse_primer_r1,
+                             max_mismatches,
+                             primer_action,
+                             max_mismatches_fwd,
+                             max_mismatches_rev,
+                             primer_action_fwd,
+                             primer_action_rev)
     names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
                          analysis_opts = analysis_opts,

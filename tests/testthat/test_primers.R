@@ -202,6 +202,29 @@ test_that("handle_primers handles invalid keywords", {
     "primer_action_rev should be")
 })
 
+test_that("handle_primers handles missing reverse primer info", {
+  # If make_read_primer_table is called with use_reverse_primers=FALSE, all the
+  # Rev* columns will be missing.  handle_primers will need to handle this case.
+  locus_attrs <- data.frame(
+    Locus = "A",
+    Primer = "XQXXX",
+    ReversePrimer = "ZZZWZ",
+    stringsAsFactors = FALSE)
+  input <- data.frame(
+    SeqOrig = "XXXXXYYYYY",
+    FwdStart = 1,
+    FwdStop = 5,
+    MatchingLocus = "A",
+    stringsAsFactors = FALSE)
+  # this should halt and complain
+  expect_error(
+    handle_primers(input, locus_attrs, "remove", "remove"),
+    "can't apply primer_action_rev")
+  # but this should work
+  result <- handle_primers(input, locus_attrs, "remove", "none")
+  expected <- cbind(input, Seq = "YYYYY", stringsAsFactors = FALSE)
+  expect_identical(result, expected)
+})
 
 # find_primer_matches -----------------------------------------------------
 
