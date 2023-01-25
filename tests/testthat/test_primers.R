@@ -219,7 +219,7 @@ test_that("find_primer_matches tabulates all the best primer matches", {
     "CACGTTAGAGCTCATTGT",
     "ACCGTCAAAGCGCTCCGGGAGTACAGA",
     "ATAATACCGCGCCTAAGATTC")
-  result <- find_primer_matches(reads, primers)
+  result <- find_primer_matches(reads, primers, NA)
   expect_identical(
     colnames(result),
     c("SeqIdx", "PrimerIdx", "Start", "Stop", "Mismatches"))
@@ -244,16 +244,16 @@ test_that("find_primer_matches handles empty inputs", {
     "ACCGTCAAAGCGCTCCGGGAGTACAGA",
     "ATAATACCGCGCCTAAGATTC")
   results <- list(
-    find_primer_matches(reads, character()),
-    find_primer_matches(character(), primers),
-    find_primer_matches(character(), character()),
+    find_primer_matches(reads, character(), NA),
+    find_primer_matches(character(), primers, NA),
+    find_primer_matches(character(), character(), NA),
     # NAs and empty strings are excluded
-    find_primer_matches(reads, substr(primers, 0, 0)),
-    find_primer_matches(substr(reads, 0, 0), primers),
-    find_primer_matches(substr(reads, 0, 0), substr(primers, 0, 0)),
-    find_primer_matches(reads, rep(as.character(NA), 3)),
-    find_primer_matches(rep(as.character(NA), 5), primers),
-    find_primer_matches(rep(as.character(NA), 5), rep(as.character(NA), 3)))
+    find_primer_matches(reads, substr(primers, 0, 0), NA),
+    find_primer_matches(substr(reads, 0, 0), primers, NA),
+    find_primer_matches(substr(reads, 0, 0), substr(primers, 0, 0), NA),
+    find_primer_matches(reads, rep(as.character(NA), 3), NA),
+    find_primer_matches(rep(as.character(NA), 5), primers, NA),
+    find_primer_matches(rep(as.character(NA), 5), rep(as.character(NA), 3), NA))
   for (result in results) {
     expect_identical(
       colnames(result),
@@ -266,7 +266,7 @@ test_that("find_primer_matches finds matches at edges", {
   # one match right at the start
   result <- find_primer_matches(
     "TAAGAAATGCTTATATGGCCATAAATCAAC",
-    "TAAGAAA")
+    "TAAGAAA", NA)
   expect_identical(
     result,
     data.frame(
@@ -278,7 +278,7 @@ test_that("find_primer_matches finds matches at edges", {
   # one match right at the end
   result <- find_primer_matches(
     "TAAGAAATGCTTATATGGCCATAAATCAAC",
-                           "AATCAAC")
+                           "AATCAAC", NA)
   expect_identical(
     result,
     data.frame(
@@ -295,7 +295,7 @@ test_that("find_primer_matches finds matches at edges", {
     "TAAGAAATGCTTATATGGCCATAAATCAAC",
     c(
       "AATCAAC",
-      "GCTGTATCTA"))
+      "GCTGTATCTA"), NA)
   expect_identical(
     result,
     data.frame(
@@ -309,7 +309,7 @@ test_that("find_primer_matches finds matches at edges", {
     "TAAGAAATGCTTATATGGCCATAAATCAA",
     c(
       "AATCAAC",
-      "GCTGTATCTA"))
+      "GCTGTATCTA"), NA)
   expect_identical(
     result,
     data.frame(
@@ -324,7 +324,7 @@ test_that("find_primer_matches can use maximum mismatch count", {
   # one match right at the start, searching exhaustively
   result <- find_primer_matches(
     "TAAGAAATGCTTATATGGCCATAAATCAAC",
-    c("TAAGAAA", "ACTGTGA"))
+    c("TAAGAAA", "ACTGTGA"), NA)
   expect_identical(
     result,
     data.frame(
@@ -367,7 +367,7 @@ test_that("find_primer_matches handles IUPAC codes", {
     "CAGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC",
     "CTGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC",
     "CCGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC"),
-    "CNGCCAGTGGAGCGGGC")
+    "CNGCCAGTGGAGCGGGC", NA)
   expect_identical(
     result,
     data.frame(
@@ -380,7 +380,7 @@ test_that("find_primer_matches handles IUPAC codes", {
   # this gets marked as a mismatch
   result <- find_primer_matches(
     "CNGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC",
-    "CNGCCAGTGGAGCGGGC")
+    "CNGCCAGTGGAGCGGGC", NA)
   expect_identical(
     result,
     data.frame(
@@ -395,7 +395,7 @@ test_that("find_primer_matches handles IUPAC codes", {
     "CAGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC",
     "CTGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC",
     "CCGCCAGTGGAGCGGGCAGGTCAATTATTAGAGTCTAGACTC"),
-    "CMGCCAGTGGAGCGGGC")
+    "CMGCCAGTGGAGCGGGC", NA)
   expect_identical(
     result,
     data.frame(

@@ -53,7 +53,8 @@ sample_analysis_funcs <- c("analyze_sample",
 #'   \code{\link{summarize_sample}}.
 #'
 #' @export
-analyze_sample <- function(seq_data, sample.attrs, fraction.min) {
+analyze_sample <- function(
+  seq_data, sample.attrs, fraction.min=cfg("min_allele_abundance")) {
   # Extract sample data entries that meet all criteria for a potential allele.
   locus.name <- unlist(sample.attrs["Locus"])
   idx <- which(allele_match(seq_data, locus.name))
@@ -85,7 +86,8 @@ analyze_sample <- function(seq_data, sample.attrs, fraction.min) {
 #'   \code{\link{summarize_sample_guided}}.
 #'
 #' @export
-analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
+analyze_sample_guided <- function(
+  seq_data, sample.attrs, fraction.min=cfg("min_allele_abundance")) {
   # Extract sample data entries that meet all criteria for a potential allele.
   locus.name <- unlist(sample.attrs["Locus"])
   idx <- which(allele_match(seq_data, locus.name))
@@ -155,7 +157,8 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
 #'   as for \code{analyze_sample}.
 #'
 #' @export
-analyze_sample_naive <- function(seq_data, sample.attrs, fraction.min) {
+analyze_sample_naive <- function(
+  seq_data, sample.attrs, fraction.min=cfg("min_allele_abundance")) {
   idxl <- with(seq_data, LengthMatch & ! is.na(LengthMatch))
   chunk <- seq_data[idxl, ]
   attr(chunk, "fraction.min") <- fraction.min

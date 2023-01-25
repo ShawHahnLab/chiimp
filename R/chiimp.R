@@ -151,80 +151,75 @@
 #' @export
 full_analysis <- function(config, dataset = NULL) { # nolint: cyclocomp_linter.
   # Overaly explicit configuration onto the default settings
-  config_full <- utils::modifyList(config.defaults, config)
-
+  cfg_list <- parse_config(config)
+  apply_config(config_list)
+  
   # Make output path absolute
-  config_full$output$dp <-
-    if (substr(config_full$output$dp, 1, 1) != .Platform$file.sep) {
-      file.path(normalizePath("."), config_full$output$dp)
+  cfg("output_path",
+    if (substr(cfg("output_path"), 1, 1) != .Platform$file.sep) {
+      file.path(normalizePath("."), cfg("output_path"))
     } else {
-      config_full$output$dp
-    }
-
+      cfg("output_path")
+    })
+  
   # Only show identifications if a known genotypes table was supplied
-  config_full$report.sections$identifications <-
-    ! is.null(config_full$fp_genotypes_known) &&
-    config_full$report.sections$identifications
-
-  cfg <- config_full
-  if (cfg$verbose)
-    logmsg(paste0("Loading dataset: ", ifelse(is.null(cfg$fp_dataset),
-                                              cfg$dataset_opts$dp,
-                                              cfg$fp_dataset), "..."))
+  cfg("report_section_identifications", ! is_blank(cfg("genotypes_known")) &&
+    cfg("report_section_identifications"))
+  
+  logmsg(paste0(
+    "Loading dataset: ",
+    ifelse(
+      is_blank(cfg("dataset")),
+      cfg("prep_dataset_path"),
+      cfg("dataset")),
+    "..."))
   if (is.null(dataset)) {
-    if (is.null(cfg$fp_dataset)) {
-      dataset <- do.call(prepare_dataset, cfg$dataset_opts)
+    dataset <- if (is_blank(cfg("dataset"))) {
+      prepare_dataset()
     } else {
-      dataset <- load_dataset(cfg$fp_dataset)
+      load_dataset(cfg("fp_dataset"))
     }
   }
-
-  if (cfg$verbose)
-    logmsg(paste0("Loading locus attrs: ", cfg$fp_locus_attrs, "..."))
-  locus_attrs <- load_locus_attrs(cfg$fp_locus_attrs)
-
-  if (cfg$verbose) logmsg("Analyzing samples...")
-  idx <- match(cfg$sample_summary_func, sample_summary_funcs, nomatch = 1)
+  
+  logmsg(paste0("Loading locus attrs: ", cfg("locus_attrs"), "..."))
+  locus_attrs <- load_locus_attrs(cfg("locus_attrs"))
+  
+  logmsg("Analyzing samples...")
+  idx <- match(cfg("sample_summary_func"), sample_summary_funcs, nomatch = 1)
   sample_summary_func <- get(sample_summary_funcs[idx])
-  idx <- match(cfg$sample_analysis_func, sample_analysis_funcs, nomatch = 1)
+  idx <- match(cfg("sample_analysis_func"), sample_analysis_funcs, nomatch = 1)
   sample_analysis_func <- get(sample_analysis_funcs[idx])
   allele.names <- NULL
-  if (!is.null(cfg$fp_allele_names))
-    allele.names <- load_allele_names(cfg$fp_allele_names)
+  if (!is.null(cfg("allele_names")))
+    allele.names <- load_allele_names(cfg("allele_names"))
   results <- analyze_dataset(
     dataset, locus_attrs,
-    nrepeats = cfg$seq_analysis$nrepeats,
-    stutter.count.ratio_max = cfg$seq_analysis$stutter.count.ratio_max,
-    artifact.count.ratio_max = cfg$seq_analysis$artifact.count.ratio_max,
-    use_reverse_primers = cfg$seq_analysis$use_reverse_primers,
-    reverse_primer_r1 = cfg$seq_analysis$reverse_primer_r1,
-    ncores = cfg$dataset_analysis$ncores,
-    analysis_opts = cfg$sample_analysis_opts,
-    summary_opts = cfg$sample_summary_opts,
+    analysis_opts = list(fraction.min = cfg("min_allele_abundance")),
+    summary_opts = list(counts.min = cfg("min_locus_reads")),
     analysis_function = sample_analysis_func,
     summary_function = sample_summary_func,
     known_alleles = allele.names,
-    name_args = cfg$dataset_analysis$name_args)
+    name_args = list(hash_len = cfg("allele_suffix_len")))
   results$allele.names <- allele.names
   results$locus_attrs <- locus_attrs
-  if (cfg$verbose) logmsg("Summarizing results...")
+  logmsg("Summarizing results...")
   genotypes.known <- NULL
-  if (!is.null(cfg$fp_genotypes_known))
-    genotypes.known <- load_genotypes(cfg$fp_genotypes_known)
+  if (!is.null(cfg("genotypes_known")))
+    genotypes.known <- load_genotypes(cfg("genotypes_known"))
   results <- summarize_dataset(results, genotypes.known)
-  if (!is.null(cfg$fp_genotypes_known))
+  if (!is.null(cfg("genotypes_known")))
     results$closest_matches <- find_closest_matches(
       results$dist_mat_known,
-      range = cfg$report.dist_range,
-      maximum = cfg$report.dist_max)
-  results$config <- config_full
-  if (cfg$verbose) logmsg("Saving output files...")
-    save_data(results, results$config)
-  if (cfg$report) {
-    if (cfg$verbose) logmsg("Creating report...")
+      range = cfg("id_dist_range"),
+      maximum = cfg("id_dist_max"))
+  results$config <- cfg()
+  logmsg("Saving output files...")
+  save_data(results, results$config)
+  if (cfg("report")) {
+    logmsg("Creating report...")
     render_report(results, results$config)
   }
-  if (cfg$verbose) logmsg("Done.")
+  logmsg("Done.")
   return(results)
 }
 
@@ -265,8 +260,8 @@ main <- function(args = NULL) {
   p <- argparser::arg_parser(desc)
   p <- argparser::add_argument(p, "config", help = "configuration file path")
   args_parsed <- argparser::parse_args(p, args)
-  config <- load_config(args_parsed$config)
-  full_analysis(config)
+  config_table <- load_config(args_parsed$config)
+  full_analysis(config_table)
 }
 
 # Util --------------------------------------------------------------------
@@ -306,26 +301,17 @@ render_report <- function(results, config) {
 #' @param config list of configuration options (see
 #'   \code{\link{config.defaults}}).
 save_data <- function(results, config) {
-  save_histograms(results,
-              file.path(config$output$dp, config$output$dp_histograms))
-  save_results_summary(results$summary,
-              file.path(config$output$dp, config$output$fp_summary))
-  save_alignments(results$alignments,
-              file.path(config$output$dp, config$output$dp_alignments))
-  save_alignment_images(results$alignments,
-              file.path(config$output$dp, config$output$dp_alignment_images))
-  save_seqfile_data(results$files,
-              file.path(config$output$dp, config$output$dp_processed_files))
-  save_sample_data(results$samples,
-                    file.path(config$output$dp,
-                              config$output$dp_processed_samples))
-  save_allele_seqs(results$summary,
-              file.path(config$output$dp, config$output$dp_allele_seqs))
-  save_dist_mat(results$dist_mat,
-              file.path(config$output$dp, config$output$fp_dist_mat))
-  if (!is.null(config$output$fp_rds))
-    saveRDS(results,
-              file.path(config$output$dp, config$output$fp_rds))
+  path <- function(thing) file.path(config$output_path, config[[thing]])
+  save_histograms(results, path("output_path_histograms"))
+  save_results_summary(results$summary, path("output_summary"))
+  save_alignments(results$alignments, path("output_path_alignments"))
+  save_alignment_images(results$alignments, path("output_path_alignment_images"))
+  save_seqfile_data(results$files, path("output_path_processed_files"))
+  save_sample_data(results$samples, path("output_path_processed_samples"))
+  save_allele_seqs(results$summary, path("output_path_allele_seqs"))
+  save_dist_mat(results$dist_mat, path("output_dist_mat"))
+  if (! is_blank(config$output_rds))
+    saveRDS(results, path("output_rds"))
 }
 
 #' Create Pandoc Metadata Argument Strings

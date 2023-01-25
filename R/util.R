@@ -195,6 +195,9 @@ fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint
 #' @param col2 extra text to show at right margin; defaults to current time.
 #' @param end ending to concatenate to message; defaults to newline character.
 logmsg <- function(msg, col2 = as.character(Sys.time()), end = "\n") {
+  if (! cfg("verbose")) {
+    return()
+  }
   if (!is.null(col2)) {
     # right-justify col2, aim to fit total msg within 80 characters
     pad <- max(1, 80 - nchar(msg) - nchar(col2))

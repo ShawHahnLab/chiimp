@@ -7,7 +7,7 @@
 find_artifact(
   sample.data,
   locus_attrs,
-  count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max
+  count.ratio_max = CFG$max_artifact_ratio
 )
 }
 \arguments{

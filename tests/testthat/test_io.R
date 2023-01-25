@@ -8,10 +8,12 @@ testrds <- function(fname) readRDS(test_path("data", "io", fname))
 test_that("load_config loads config YAML files", {
   config_path <- testpth("config.yml")
   config <- load_config(config_path)
-  expect_equal(
-    config,
-    list(fp_dataset = "samples.csv", output = list(fp_rds = "results.rds"))
-  )
+  config_expected <- data.frame(
+    OldName = c("fp_dataset", "output:fp_rds"),
+    Value = c("samples.csv", "results.rds"),
+    Key = c("dataset", "output_rds"),
+    stringsAsFactors = FALSE)
+  expect_equal(config, config_expected)
 })
 
 test_that("load_config handles unexpected entries", {
@@ -24,14 +26,16 @@ test_that("load_config handles unexpected entries", {
       "unrecognized config file entries:",
       "  unrecognized",
       "  dataset_analysis:name_args:unknown", sep = "\n"))
-  expect_equal(
-    config,
-    list(
-      fp_dataset = "samples.csv",
-      output = list(fp_rds = "results.rds"),
-      unrecognized = 10,
-      dataset_analysis = list(name_args = list(unknown = 5)))
-  )
+  config_expected <- data.frame(
+    OldName = c(
+      "fp_dataset", "output:fp_rds", "unrecognized",
+      "dataset_analysis:name_args:unknown"),
+    Value = c("samples.csv", "results.rds", "10", "5"),
+    Key = c(
+      "dataset", "output_rds", "unrecognized",
+      "dataset_analysis:name_args:unknown"),
+    stringsAsFactors = FALSE)
+  expect_equal(config, config_expected)
 })
 
 

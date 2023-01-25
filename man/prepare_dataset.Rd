@@ -5,10 +5,10 @@
 \title{Extract Sample Attributes from Filenames}
 \usage{
 prepare_dataset(
-  dp,
-  pattern,
-  ord = c(1, 2, 3),
-  autorep = FALSE,
+  dp = CFG$prep_dataset_path,
+  pattern = CFG$prep_dataset_pattern,
+  ord = CFG$prep_dataset_order,
+  autorep = CFG$prep_dataset_autorep,
   locusmap = NULL
 )
 }

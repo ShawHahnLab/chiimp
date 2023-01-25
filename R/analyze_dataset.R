@@ -54,24 +54,20 @@
 #'
 #' @export
 analyze_dataset <- function(
-    dataset,
-    locus_attrs,
-    nrepeats,
-    stutter.count.ratio_max = config.defaults$seq_analysis$
-      stutter.count.ratio_max,
-    artifact.count.ratio_max = config.defaults$seq_analysis$
-      artifact.count.ratio_max,
-    use_reverse_primers = config.defaults$seq_analysis$
-      use_reverse_primers,
-    reverse_primer_r1 = config.defaults$seq_analysis$
-      reverse_primer_r1,
-    ncores = 0,
-    analysis_opts,
-    summary_opts,
-    analysis_function = analyze_sample,
-    summary_function = summarize_sample,
-    known_alleles = NULL,
-    name_args = list()) {
+  dataset,
+  locus_attrs,
+  nrepeats = cfg("min_motif_repeats"),
+  stutter.count.ratio_max = cfg("max_stutter_ratio"),
+  artifact.count.ratio_max = cfg("max_artifact_ratio"),
+  use_reverse_primers = cfg("use_reverse_primers"),
+  reverse_primer_r1 = cfg("reverse_primer_r1"),
+  ncores = cfg("ncores"),
+  analysis_opts,
+  summary_opts,
+  analysis_function = analyze_sample,
+  summary_function = summarize_sample,
+  known_alleles = NULL,
+  name_args = list()) {
   if (! all(dataset$Locus %in% locus_attrs$Locus)) {
     rogue_loci <- unique(dataset$Locus[! dataset$Locus %in% locus_attrs$Locus])
     msg <- paste("ERROR: Locus names in dataset not in attributes table:",
@@ -171,14 +167,14 @@ analyze_dataset <- function(
                          summary_function = summary_function,
                          analyzed_files = analyzed_files)
   }
-
+  
   # Check if any of the raw data files had no reads to start with.
   empties <- sum(sapply(analyzed_files, nrow) == 0)
   if (empties) {
     logmsg(paste("WARNING: Zero reads for", empties, "of",
                  length(analyzed_files), "data files"))
   }
-
+  
   # Recombined results into a summary data frame and a list of full sample data.
   results <- tidy_analyzed_dataset(dataset, raw.results)
   results$files <- analyzed_files
@@ -243,7 +239,7 @@ name_known_sequences <- function(results, known_alleles, name_args) {
   # Name all of the called alleles across samples
   results$summary <- name_alleles_in_table(
     results$summary, known_alleles, name_args)
-
+  
   # Create table of allele names for current dataset
   a1 <- results$summary[, c("Locus", "Allele1Seq", "Allele1Name")]
   a2 <- results$summary[, c("Locus", "Allele2Seq", "Allele2Name")]
@@ -251,7 +247,7 @@ name_known_sequences <- function(results, known_alleles, name_args) {
   colnames(a2) <- c("Locus", "Seq", "Name")
   a_combo <- rbind(a1, a2)
   a_combo <- unique(a_combo[! is.na(a_combo$Seq), ])
-
+  
   # Merge into given known alleles table (if present)
   known_alleles <- if (is.null(known_alleles)) {
     a_combo
@@ -260,14 +256,14 @@ name_known_sequences <- function(results, known_alleles, name_args) {
     known_alleles$Name <- as.character(known_alleles$Name)
     unique(rbind(known_alleles, a_combo))
   }
-
+  
   # Name recognized sequences in each sample data frame
   results$samples <- lapply(results$samples, function(d) {
     idx <- match(d$Seq, known_alleles$Seq)
     d$SeqName <- known_alleles$Name[idx]
     d
   })
-
+  
   return(results)
 }
 

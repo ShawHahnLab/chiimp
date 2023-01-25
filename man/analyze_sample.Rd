@@ -6,11 +6,19 @@
 \alias{analyze_sample_naive}
 \title{Analyze sequence table and categorize sequences}
 \usage{
-analyze_sample(seq_data, sample.attrs, fraction.min)
+analyze_sample(seq_data, sample.attrs, fraction.min = CFG$min_allele_abundance)
 
-analyze_sample_guided(seq_data, sample.attrs, fraction.min)
+analyze_sample_guided(
+  seq_data,
+  sample.attrs,
+  fraction.min = CFG$min_allele_abundance
+)
 
-analyze_sample_naive(seq_data, sample.attrs, fraction.min)
+analyze_sample_naive(
+  seq_data,
+  sample.attrs,
+  fraction.min = CFG$min_allele_abundance
+)
 }
 \arguments{
 \item{seq_data}{data frame of processed data for sample as produced by

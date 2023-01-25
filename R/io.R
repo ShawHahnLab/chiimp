@@ -36,55 +36,45 @@ dataset_cols <- c("Filename", "Replicate", "Sample", "Locus")
 #' config <- load_config(filename)
 #' # And then: full_analysis(config)
 load_config <- function(fp) {
-  if (is.na(fp))
-    return(list())
-  text <- readChar(fp, file.info(fp)$size)
-  config <- yaml::yaml.load(text)
-  unknown_entries <- config_get_unknown_entries(config)
-  if (length(unknown_entries)) {
-    unknown_txt <- load_config_flatten_keys(unknown_entries)
-    warning(paste0(
-      "unrecognized config file entries:\n",
-      paste(gsub("^", "  ", unknown_txt), collapse = "\n")))
+  if (grepl("\\.csv$", fp, ignore.case = TRUE)) {
+    return(load_config_table(fp))
   }
-  config
+  if (is.na(fp)) {
+    config_list <- list()
+  } else {
+    text <- readChar(fp, file.info(fp)$size)
+    config <- yaml::yaml.load(text)
+  }
+  # Flatten nested config list into table
+  config_flat <- load_config_flatten_lists(config)
+  cfg_table <- data.frame(
+    OldName = names(config_flat),
+    Value = as.character(config_flat),
+    stringsAsFactors = FALSE)
+  for (idx in seq_along(cfg_table$OldName)) {
+    cfg_table$Key[idx] <- CFG_DEFAULTS$Key[
+      grep(cfg_table$OldName[idx], CFG_DEFAULTS$OldName, fixed = TRUE)[1]]
+  }
+  cfg_table$Key[is.na(cfg_table$Key)] <- cfg_table$OldName[is.na(cfg_table$Key)]
+  config_check_keys(cfg_table)
+  cfg_table
 }
 
-config_get_unknown_entries <- function(config) {
-  # make an everything-is-null nested list from a template (which can be used
-  # with the default config to get only those that are *not* mentioned in the
-  # default)
-  blank <- function(obj) {
-    for (nm in names(obj)) {
-      if (is.list(obj[[nm]])) {
-        obj[[nm]] <- blank(obj[[nm]])
-      } else {
-        obj[[nm]] <- NULL
-        entry <- list(NULL)
-        names(entry) <- nm
-        obj <- c(obj, entry)
-      }
+load_config_flatten_lists <- function(config_list, prefix="") {
+  output <- list()
+  for (idx in seq_along(config_list)) {
+    if (is.list(config_list[[idx]])) {
+      output <- c(output, load_config_flatten_lists(
+        config_list[[idx]],
+        paste0(prefix, ":", names(config_list)[[idx]])))
+    } else {
+      output <- c(output, config_list[[idx]])
+      names(output)[length(output)] <- paste0(
+        prefix, ":", names(config_list)[[idx]])
     }
-    obj
   }
-  remaining <- utils::modifyList(config, blank(config.defaults))
-  trim <- function(obj) {
-    for (nm in names(obj)) {
-      obj[[nm]] <- trim(obj[[nm]])
-    }
-    obj <- obj[sapply(obj, length) > 0]
-    obj
-  }
-  trim(remaining)
-}
-
-# take a nested list like list(x=list(y=5)) and return "x:y"
-load_config_flatten_keys <- function(config) {
-  unname(sapply(names(config), function(nm) {
-    result <- load_config_flatten_keys(config[[nm]])
-    result <- paste0(nm, ":", result)
-    sub(":$", "", result)
-  }))
+  names(output) <- sub("^:", "", names(output))
+  output
 }
 
 #' Load and save tables from CSV
@@ -305,7 +295,11 @@ save_dataset <- function(data, fp, ...) {
 #'
 #' @export
 prepare_dataset <- function(
-    dp, pattern, ord = c(1, 2, 3), autorep = FALSE, locusmap = NULL) {
+    dp = cfg("prep_dataset_path"),
+    pattern = cfg("prep_dataset_pattern"),
+    ord = cfg("prep_dataset_order"),
+    autorep = cfg("prep_dataset_autorep"),
+    locusmap = NULL) {
   if (! dir.exists(dp)) {
     stop(paste("ERROR: directory path for data files does not exist:",
                dp))

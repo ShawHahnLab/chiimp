@@ -60,26 +60,25 @@
 #' @md
 make_read_primer_table <- function(
   seqs, locus_attrs,
-  max_mismatches=config.defaults$seq_analysis$max_mismatches,
-  primer_action=config.defaults$seq_analysis$primer_action,
-  primer_action_fwd=config.defaults$seq_analysis$primer_action_fwd,
-  primer_action_rev=config.defaults$seq_analysis$primer_action_rev,
-  max_mismatches_fwd=config.defaults$seq_analysis$max_mismatches_fwd,
-  max_mismatches_rev=config.defaults$seq_analysis$max_mismatches_rev,
-  use_reverse_primers = config.defaults$seq_analysis$
-    use_reverse_primers,
-  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1) {
+  max_mismatches=cfg("max_mismatches"),
+  primer_action=cfg("primer_action"),
+  primer_action_fwd=cfg("primer_action_fwd"),
+  primer_action_rev=cfg("primer_action_rev"),
+  max_mismatches_fwd=cfg("max_mismatches_fwd"),
+  max_mismatches_rev=cfg("max_mismatches_rev"),
+  use_reverse_primers = cfg("use_reverse_primers"),
+  reverse_primer_r1 = cfg("reverse_primer_r1")) {
 
-  if (is.null(max_mismatches_fwd)) {
+  if (is_blank(max_mismatches_fwd)) {
     max_mismatches_fwd <- max_mismatches
   }
-  if (is.null(max_mismatches_rev)) {
+  if (is_blank(max_mismatches_rev)) {
     max_mismatches_rev <- max_mismatches
   }
-  if (is.null(primer_action_fwd)) {
+  if (is_blank(primer_action_fwd)) {
     primer_action_fwd <- primer_action
   }
-  if (is.null(primer_action_rev)) {
+  if (is_blank(primer_action_rev)) {
     primer_action_rev <- primer_action
   }
   # Find matching loci, by primer sequence, for each of a set of sequences,
@@ -219,7 +218,8 @@ handle_primers <- function(
 #'   primers against reads, or `NA` to check all combinations
 #' @returns data frame of read and primer index pairs and match details
 #' @md
-find_primer_matches <- function(seqs_reads, seqs_primers, max_mismatches=NA) {
+find_primer_matches <- function(
+  seqs_reads, seqs_primers, max_mismatches=cfg("max_mismatches")) {
   # Any NAs will be handled in the same way as empty strings
   seqs_reads[is.na(seqs_reads)] <- ""
   seqs_primers[is.na(seqs_primers)] <- ""

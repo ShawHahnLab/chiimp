@@ -153,8 +153,8 @@ rmd_alignments <- function(results, heading_prefix = "###") {
       return()
     }
     fp <- file.path(
-      results$config$output$dp,
-      results$config$output$dp_alignment_images,
+      results$config$output_path,
+      results$config$output_path_alignment_images,
       paste0(loc, ".png"))
     cat(paste0("![](", fp, ")"))
   }))

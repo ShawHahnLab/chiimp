@@ -63,10 +63,8 @@
 #' @md
 analyze_seqs <- function(
   seqs, locus_attrs, nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$
-    stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$
-    artifact.count.ratio_max,
+  stutter.count.ratio_max = cfg("max_stutter_ratio"),
+  artifact.count.ratio_max = cfg("max_artifact_ratio"),
   ...) {
   # Dereplicate sequences
   tbl <- table(seqs)
@@ -196,8 +194,7 @@ check_length <- function(sample.data, locus_attrs) {
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as a stutter band.
 find_stutter <- function(
-  sample.data, locus_attrs,
-  count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max) {
+  sample.data, locus_attrs, count.ratio_max = cfg("max_stutter_ratio")) {
 
   stutter <- integer(nrow(sample.data)) * NA
 
@@ -246,8 +243,7 @@ find_stutter <- function(
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as an artifactual sequence.
 find_artifact <- function(
-    sample.data, locus_attrs,
-    count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max) {
+    sample.data, locus_attrs, count.ratio_max = cfg("max_artifact_ratio")) {
 
   artifact <- integer(nrow(sample.data)) * NA
 

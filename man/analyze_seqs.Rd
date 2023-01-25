@@ -8,8 +8,8 @@ analyze_seqs(
   seqs,
   locus_attrs,
   nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
+  stutter.count.ratio_max = CFG$max_stutter_ratio,
+  artifact.count.ratio_max = CFG$max_artifact_ratio,
   ...
 )
 }
