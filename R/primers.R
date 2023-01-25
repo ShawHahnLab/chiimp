@@ -152,6 +152,13 @@ handle_primers <- function(
   # Handling this as two steps for both forward and reverse parts:
   #  1) substring to appropriate region
   #  2) add any replacement strings, for the special case of "replace"
+  if (primer_action_rev != "none" && ! all(c("RevStart", "RevStop") %in% colnames(result))) {
+    stop(
+      paste0(
+        "can't apply primer_action_rev \"",
+        primer_action_rev,
+        "\" without reverse primer information"))
+  }
   start_poses <- switch(
     primer_action_fwd,
     none = 1,
