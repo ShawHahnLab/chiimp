@@ -65,6 +65,12 @@ analyze_dataset <- function(
       use_reverse_primers,
     reverse_primer_r1 = config.defaults$seq_analysis$
       reverse_primer_r1,
+    max_mismatches = config.defaults$seq_analysis$max_mismatches,
+    primer_action = config.defaults$seq_analysis$primer_action,
+    max_mismatches_fwd = config.defaults$seq_analysis$max_mismatches_fwd,
+    max_mismatches_rev = config.defaults$seq_analysis$max_mismatches_rev,
+    primer_action_fwd = config.defaults$seq_analysis$primer_action_fwd,
+    primer_action_rev = config.defaults$seq_analysis$primer_action_rev,
     ncores = 0,
     analysis_opts,
     summary_opts,
@@ -84,12 +90,25 @@ analyze_dataset <- function(
   analyze.file <- function(fp, locus_attrs, nrepeats,
                            stutter.count.ratio_max, artifact.count.ratio_max,
                            use_reverse_primers,
-                           reverse_primer_r1) {
+                           reverse_primer_r1,
+                           max_mismatches,
+                           primer_action,
+                           max_mismatches_fwd,
+                           max_mismatches_rev,
+                           primer_action_fwd,
+                           primer_action_rev
+                           ) {
     seqs <- load_seqs(fp)
     analyze_seqs(seqs, locus_attrs, nrepeats,
                  stutter.count.ratio_max, artifact.count.ratio_max,
-                 use_reverse_primers,
-                 reverse_primer_r1)
+                 use_reverse_primers = use_reverse_primers,
+                 reverse_primer_r1 = reverse_primer_r1,
+                 max_mismatches = max_mismatches,
+                 primer_action = primer_action,
+                 max_mismatches_fwd = max_mismatches_fwd,
+                 max_mismatches_rev = max_mismatches_rev,
+                 primer_action_fwd = primer_action_fwd,
+                 primer_action_rev = primer_action_rev)
   }
   analyze.entry <- function(entry, analysis_opts, summary_opts,
                             analysis_function, summary_function,
@@ -142,7 +161,13 @@ analyze_dataset <- function(
                                             stutter.count.ratio_max,
                                             artifact.count.ratio_max,
                                             use_reverse_primers,
-                                            reverse_primer_r1)
+                                            reverse_primer_r1,
+                                            max_mismatches,
+                                            primer_action,
+                                            max_mismatches_fwd,
+                                            max_mismatches_rev,
+                                            primer_action_fwd,
+                                            primer_action_rev)
       names(analyzed_files) <- fps
       raw.results <- parallel::parApply(cluster, dataset, 1, analyze.entry,
                                         analysis_opts = analysis_opts,
@@ -162,7 +187,13 @@ analyze_dataset <- function(
                              stutter.count.ratio_max,
                              artifact.count.ratio_max,
                              use_reverse_primers,
-                             reverse_primer_r1)
+                             reverse_primer_r1,
+                             max_mismatches,
+                             primer_action,
+                             max_mismatches_fwd,
+                             max_mismatches_rev,
+                             primer_action_fwd,
+                             primer_action_rev)
     names(analyzed_files) <- fps
     raw.results <- apply(dataset, 1, analyze.entry,
                          analysis_opts = analysis_opts,
