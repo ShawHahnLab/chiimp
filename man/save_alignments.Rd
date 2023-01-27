@@ -8,14 +8,14 @@ save_alignments(alignments, dp)
 }
 \arguments{
 \item{alignments}{list of MSA alignment objects, such as created by
-\code{\link{summarize_dataset}} via \code{\link{align_alleles}}.  The name
-of each alignment will be used for its filename.}
+\link{summarize_dataset} via \link{align_alleles}.  The name of each alignment will
+be used for its filename.}
 
 \item{dp}{output directory path.}
 }
 \description{
 Take a list of alignments, one per locus, and save each to a separate FASTA
 file in a specified directory.  If any of the per-locus alignment objects is
-NA it will be skipped.  These are produced by \code{\link{summarize_dataset}}
-via \code{\link{align_alleles}}.
+NA it will be skipped.  These are produced by \link{summarize_dataset} via
+\link{align_alleles}.
 }

@@ -2,8 +2,8 @@
 
 ```{r identifications, results="asis"}
 rmd_kable_idents(results,
-                 na.replicates = report.na.replicates,
-                 locus_chunks = report.locus_chunks)
+                 na_replicates = report_na_replicates,
+                 locus_chunks = report_locus_chunks)
 ```
 
 ### Distance Matrix for Known Genotypes
@@ -15,5 +15,5 @@ mismatches.
 
 ```{r identifications_distances}
 plot_dist_mat(results$dist_mat_known,
-              dist.display_thresh = report.dist_max)
+              dist_display_thresh = id_dist_max)
 ```

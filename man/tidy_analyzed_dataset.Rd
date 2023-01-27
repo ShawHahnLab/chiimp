@@ -4,19 +4,17 @@
 \alias{tidy_analyzed_dataset}
 \title{Tidy raw analyzed dataset results}
 \usage{
-tidy_analyzed_dataset(dataset, raw.results)
+tidy_analyzed_dataset(dataset, raw_results)
 }
 \arguments{
-\item{dataset}{data frame of sample details as produced by
-\code{\link{prepare_dataset}}.}
+\item{dataset}{data frame of sample details as produced by \link{prepare_dataset}.}
 
-\item{raw.results}{list of pairs of sample summary and sample data data
-frames (from \code{\link{summarize_sample}} and
-\code{\link{analyze_seqs}}).}
+\item{raw_results}{list of pairs of sample summary and sample data data
+frames (from \link{summarize_sample}) and \link{analyze_seqs}).}
 }
 \value{
-list of results, with \code{summary} set to the single summary data
-  frame and \code{data} the per-sample data frames.
+list of results, with \code{summary} set to the single summary data frame
+and \code{data} the per-sample data frames.
 }
 \description{
 Rearrange pairs of sample summary / sample data objects into a single

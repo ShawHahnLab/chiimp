@@ -299,13 +299,13 @@ test_that("report_genotypes produces expected data frame", {
   tbl_known[2:3, 8:9] <- ""
   expect_equivalent(tbl, tbl_known)
   # Blanks are the default for NA here but we can specify something else
-  tbl <- report_genotypes(results, na.alleles = "X")
+  tbl <- report_genotypes(results, na_alleles = "X")
   expect_identical(tbl[, 8], c("250-5dacee", "", "X"))
   expect_identical(tbl[, 9], c("318-35b7b6", "", "X"))
 })
 
 test_that("report_genotypes handles replicates including NA", {
-  # Test for na.replicates argument
+  # Test for na_replicates argument
   results <- testrds("results.rds")
   # Explicitly label Sample 1 with a replicate, which will make that column
   # show up in the output
@@ -313,12 +313,12 @@ test_that("report_genotypes handles replicates including NA", {
   tbl <- report_genotypes(results)
   expect_identical(tbl$Replicate, c("1", "", ""))
   # Blanks are the default for NA here but we can specify something else
-  tbl <- report_genotypes(results, na.replicates = "X")
+  tbl <- report_genotypes(results, na_replicates = "X")
   expect_identical(tbl$Replicate, c("1", "X", "X"))
 })
 
 test_that("report_genotypes uses text for absent sample/locus combos", {
-  # Test for na.alleles argument
+  # Test for na_alleles argument
   # remove one tested combo from the results
   results <- testrds("results.rds")
   results$summary <- subset(results$summary, ! (Sample == 3 & Locus == 2))
@@ -330,9 +330,9 @@ test_that("report_genotypes uses text for absent sample/locus combos", {
   tbl <- report_genotypes(results)
   expect_equal(tbl[["1_2"]], c("280-74dd46", "284-2b3fab", "280-74dd46"))
   expect_equal(tbl[["2_1"]], c("250-5dacee", "266-2aa675", ""))
-  # If we give an na.alleles argument we should be able to get different
+  # If we give an na_alleles argument we should be able to get different
   # placeholder text there.
-  tbl <- report_genotypes(results, na.alleles = "X")
+  tbl <- report_genotypes(results, na_alleles = "X")
   expect_equal(tbl[["1_2"]], c("280-74dd46", "284-2b3fab", "280-74dd46"))
   expect_equal(tbl[["2_1"]], c("250-5dacee", "266-2aa675", "X"))
   # That placeholder text should only be applied to allele columns,
@@ -341,7 +341,7 @@ test_that("report_genotypes uses text for absent sample/locus combos", {
   results$summary$Replicate[results$summary$Sample == 3] <- NA
   tbl <- report_genotypes(results)
   expect_equal(tbl$Replicate, c("1", "1", ""))
-  tbl <- report_genotypes(results, na.alleles = "X")
+  tbl <- report_genotypes(results, na_alleles = "X")
   expect_equal(tbl$Replicate, c("1", "1", ""))
   # That's somewhat a special case, though, since Replicate has some
   # NA-handling logic of its own.  How about the identity columns, if present?
@@ -353,7 +353,7 @@ test_that("report_genotypes uses text for absent sample/locus combos", {
   tbl <- report_genotypes(results, closest = closest)
   expect_equal(tbl[["Distance"]], c("", "", "0"))
   expect_equal(tbl[["Name"]], c("", "", "Bob"))
-  tbl <- report_genotypes(results, closest = closest, na.alleles = "X")
+  tbl <- report_genotypes(results, closest = closest, na_alleles = "X")
   expect_equal(tbl[["Distance"]], c("", "", "0"))
   expect_equal(tbl[["Name"]], c("", "", "Bob"))
 })

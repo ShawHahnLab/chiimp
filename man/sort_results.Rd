@@ -7,18 +7,17 @@
 sort_results(results, locus_attrs)
 }
 \arguments{
-\item{results}{results list as produced by
-\code{\link{tidy_analyzed_dataset}}.}
+\item{results}{results list as produced by \code{tidy_analyzed_dataset}.}
 
 \item{locus_attrs}{data frame of locus attributes as produced by
-\code{\link{load_locus_attrs}}.}
+\code{load_locus_attrs}.}
 }
 \value{
-list of results, with \code{summary} set to the single summary data
-  frame and \code{data} the per-sample data frames.  \code{summary$Locus} is
-  coerced to a factor with levels ordered according to their appearance in
-  \code{locus_attrs$Locus}.  Order of rows in \code{summary} and entries in
-  \code{data} are updated accordingly.
+list of results, with \code{summary} set to the single summary data frame
+and \code{data} the per-sample data frames.  \code{summary$Locus} is coerced to a
+factor with levels ordered according to their appearance in
+\code{locus_attrs$Locus}.  Order of rows in \code{summary} and entries in \code{data} are
+updated accordingly.
 }
 \description{
 Rearrange rows in the summary data frame and corresponding entries in the

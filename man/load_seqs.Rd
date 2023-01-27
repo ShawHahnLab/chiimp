@@ -14,6 +14,6 @@ vector of sequences
 }
 \description{
 Load a vector of character sequences from the given path.  This is just a
-wrapper around \code{\link[dnar:read.fa]{dnar}} to choose the parser based on
-filename.  Only the sequences are returned, not IDs or quality scores.
+wrapper around \link[dnar:read.fa]{dnar::read.fa} to choose the parser based on filename.  Only
+the sequences are returned, not IDs or quality scores.
 }

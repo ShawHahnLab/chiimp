@@ -50,7 +50,7 @@ make_helper_data <- function() {
       f.locus_attrs, header = TRUE, stringsAsFactors = FALSE, sep = ",")
     rm(f.locus_attrs)
     rownames(locus_attrs) <- locus_attrs$Locus
-    
+
     sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
                           "LengthMatch", "Ambiguous", "Stutter", "Artifact",
                           "FractionOfTotal", "FractionOfLocus")
@@ -59,14 +59,14 @@ make_helper_data <- function() {
                              "Allele2Count", "Allele2Length",
                              "Homozygous", "Ambiguous", "Stutter", "Artifact",
                              "CountTotal", "CountLocus", "ProminentSeqs")
-    
+
     make.seq_junk <- function(N) {
       nucleotides <- c("A", "T", "C", "G")
       vapply(runif(N, min = 1, max = 20), function(L) {
         paste0(sample(nucleotides, L, replace = TRUE), collapse = "")
       }, "character")
     }
-    
+
     simulate.seqs <- function(
       locus_name, locus_attrs, homozygous = NULL, N = 5000,
       off_target_ratio = 10, cross_contam_ratio = 100) {
@@ -121,13 +121,12 @@ make_helper_data <- function() {
             N = length(idx), off_target_ratio = 0, cross_contam_ratio = 0)
         }
       }
-      ## TODO munge up the reads a bit
-      
+
       ## Shuffle vector
       seqs <- sample(seqs)
       return(seqs)
     }
-    
+
     simulate.set <- function(locus_attrs) {
       seqs <- lapply(rownames(locus_attrs), function(n) {
         simulate.seqs(n, locus_attrs)
@@ -135,7 +134,7 @@ make_helper_data <- function() {
       names(seqs) <- rownames(locus_attrs)
       return(seqs)
     }
-    
+
     # setting the set to an arbitrary value so the below is all arbitrary but
     # still deterministic.
     set.seed(0)
@@ -146,7 +145,7 @@ make_helper_data <- function() {
     set.seed(NULL)
     # 3 samples, then loci
     seqs <- list("1" = seqs1, "2" = seqs2, "3" = seqs3)
-    
+
     # TODO support replicates
     write_seqs <- function(seq_sets, outdir, fmt = "%s-%s.fasta") {
       if (! dir.exists(outdir))
@@ -162,7 +161,7 @@ make_helper_data <- function() {
         }
       }
     }
-    
+
     prepare_for_summary <- function() {
       data.dir <- tempfile()
       write_seqs(seqs, data.dir)
@@ -183,7 +182,7 @@ make_helper_data <- function() {
                   Sample == 2)[, c("Locus", "Allele1Seq", "Allele2Seq")]
     kg2 <- cbind(Name = "ID001", kg2)
     genotypes_known <- rbind(kg2, kg1)
-    
+
     # reset the RNG behavior
     do.call(RNGkind, as.list(rng_orig))
     rm(rng_orig)

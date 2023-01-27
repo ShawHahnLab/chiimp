@@ -9,18 +9,18 @@ load_dataset(fp, ...)
 \arguments{
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link{load_csv}}.}
+\item{...}{additional arguments passed to \link{load_csv}.}
 }
 \value{
 data frame of sample attributes for the dataset.
 }
 \description{
 Load a comma-separated table of sample attributes for the dataset to be
-analyzed.  Alternatively, use \code{\link{prepare_dataset}} to automatically
+analyzed.  Alternatively, use \link{prepare_dataset} to automatically
 read sample attributes from filenames.  If more than one locus is to be
 analyzed from a single sequencer sample (i.e., multiplexed samples), either
-the \code{locusmap} argument to \code{prepare_dataset} can be used, or
-\code{load_dataset} with an explicit mapping of loci to files.
+the \code{locusmap} argument to \code{prepare_dataset} can be used, or \code{load_dataset}
+with an explicit mapping of loci to files.
 }
 \details{
 Columns Required:
@@ -29,6 +29,6 @@ Columns Required:
 \item Replicate: identifier for repeated samples; use blanks if not applicable
 \item Sample: identifier for a given biological sample
 \item Locus: locus identifier matching that used in the locus attributes table
-(see \code{\link{load_locus_attrs}})
+(see \link{load_locus_attrs})
 }
 }

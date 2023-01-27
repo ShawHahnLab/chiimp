@@ -11,7 +11,7 @@ remove_shared_root_dir(fps_full)
 }
 \value{
 character vector of same length as input, with any common directory
-  structure trimmed off.
+structure trimmed off.
 }
 \description{
 For the given character vector of file paths, create a modified version with

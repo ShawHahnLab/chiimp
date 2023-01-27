@@ -8,7 +8,7 @@ as_integer_vec <- function(txt) {
 }
 
 # parse a single character string as a named list of vectors
-# name=item1/item2/item3;name2=item4/item5;...
+# e.g. "name=item1/item2/item3;name2=item4/item5;..."
 as_locus_vecs <- function(txt) {
   if (length(txt) != 1) {
     stop(paste("txt should be of length 1; received", length(txt)))
@@ -23,21 +23,21 @@ as_locus_vecs <- function(txt) {
 }
 
 #' Compare two version strings
-#' 
+#'
 #' `version_compare` takes two strings for software versions(e.g. "1.0.2") and
 #' returns `>`, `<`, or `=` depending on whether the first version is later,
 #' earlier, or equivalent to the second version.  For example, "1.2.0" >
 #' "1.1.5".
-#' 
+#'
 #' If there are fewer fields in one string than the other, the one with fewer is
 #' padded with zeros for the least-significant positions.  For example 1.2.3 vs
 #' 1.2 is equivalent to 1.2.3 vs 1.2.0.
-#' 
+#'
 #' @param ver1txt single character string for a software version
 #' @param ver2txt single character string for a software version
 #' @returns a single character representing if if the first version is later
 #'   (`>`), earlier (`<`), or equivalent (`=`) to the second version
-#' 
+#'
 #' @md
 version_compare <- function(ver1txt, ver2txt) {
   ver1 <- strsplit(ver1txt, "\\.")[[1]]
@@ -79,19 +79,16 @@ config_check_version <- function(cfg_table) {
 # take a config table, parse each setting, and return a list of key/value pairs.
 
 #' Parse a configuration data frame into list
-#' 
+#'
 #' `parse_config` takes each row of a data frame of configuration options and
 #' defines a list item for it, using the Key column for each name and parsing
 #' each value according to the Parser column.
-#' 
+#'
 #' @param cfg_table data frame of CHIIMP configuration options
 #' @returns list with one item per row in the input data frame, with each value
 #'   parsed according to the function name in the Parser column
 #' @md
 parse_config <- function(cfg_table) {
-  # if (is.null(cfg_env)) {
-  #   cfg_env <- new.env()
-  # }
   cfg_list <- list()
   for (idx in seq_len(nrow(cfg_table))) {
     key <- cfg_table$Key[idx]
@@ -117,17 +114,17 @@ parse_config <- function(cfg_table) {
 }
 
 #' Get/set CHIIMP global configuration options
-#' 
+#'
 #' `cfg` is a helper function to provide a shortcut for the equivalent
 #' `options(chiimp.key = value)`.  With no arguments, all the currently-defined
 #' settings are returned as a list.  With a key given, the corresponding value
 #' is returned.  With both key and value, a new option value is set.
-#' 
+#'
 #' @param key name of a CHIIMP configuration option
 #' @param val value to set for a particular key
 #' @export
 #' @md
-cfg <- function(key=NULL, val=NULL) {
+cfg <- function(key = NULL, val = NULL) {
   if (is.null(key)) {
     opts <- options()
     opts <- opts[grepl("^chiimp\\.", names(opts))]
@@ -144,12 +141,12 @@ cfg <- function(key=NULL, val=NULL) {
 }
 
 #' Apply CHIIMP options globally
-#' 
+#'
 #' `apply_config` parses each row in a configuration options data frame and sets
 #' a corresponding option with `options(name = value)`.  All options are
 #' prefixed with "chiimp." to avoid colliding with options used in other
 #' libraries.
-#' 
+#'
 #' @param config configuration options data frame, as from [load_config]
 #' @param keep keep existing CHIIMP options, or remove them before setting new
 #'   ones?
@@ -159,9 +156,9 @@ apply_config <- function(config, keep = TRUE) {
   if (is.data.frame(config)) {
     # work with either list of already-parsed entries, or data frame of text
     # values
-    config <- parse_config(config) 
+    config <- parse_config(config)
   }
-  
+
   if (! keep) {
     options()
     opts <- options()
@@ -175,21 +172,21 @@ apply_config <- function(config, keep = TRUE) {
 }
 
 #' Default Configuration
-#' 
+#'
 #' `CFG_DEFAULTS` is CHIIMP's default configuration options and metadata.  The
 #' values in this data frame are used unless overridden by custom ones, and the
 #' parsing of text values into other types is defined by the `Parser` column
 #' here.
-#' 
+#'
 #' The columns are:
-#' 
+#'
 #' * Key: name of each setting
 #' * Value: unparsed text value for each setting
 #' * Description: short description of the setting
 #' * Example: example value
 #' * Parser: name of a function to apply to each entry when setting globally for
 #'   the package (see [apply_config])
-#' 
+#'
 #' @name CFG_DEFAULTS
 #' @export CFG_DEFAULTS
 NULL
@@ -199,7 +196,7 @@ NULL
 }
 
 #' Set up CHIIMP package environment
-#' 
+#'
 #' This loads [CFG_DEFAULTS] from a CSV file when the chiimp package is loaded,
 #' and applies the configuration options globally.
 #' @md
@@ -207,7 +204,6 @@ setup_package <- function() {
   pkg_env <- .getenv()
   cfg_table <- load_config_csv(
     system.file("extdata", "config_defaults.csv", package = "chiimp"))
-  cfg_env <- NULL
   for (item in c("CFG_DEFAULTS", "test_data")) {
     if (exists(item, pkg_env)) {
       unlockBinding(item, pkg_env)

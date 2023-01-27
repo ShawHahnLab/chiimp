@@ -9,7 +9,7 @@ load_genotypes(fp, ...)
 \arguments{
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link{load_csv}}.}
+\item{...}{additional arguments passed to [load_csv].}
 }
 \value{
 data frame of genotypes
@@ -17,5 +17,5 @@ data frame of genotypes
 \description{
 Load a comma-separated table of genotypes, one pair of alleles per row.  This
 information is used to compare samples to genotypes of known individuals in
-\code{\link{summarize_dataset}}.
+[summarize_dataset].
 }

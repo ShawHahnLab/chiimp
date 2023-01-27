@@ -6,25 +6,25 @@
 \usage{
 make_dist_mat_known(
   results_summary,
-  genotypes.known,
-  dist.func = calc_genotype_distance
+  genotypes_known,
+  dist_func = calc_genotype_distance
 )
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
-\item{genotypes.known}{data frame of known genotypes, with one row per
+\item{genotypes_known}{data frame of known genotypes, with one row per
 individual per locus, and columns "Name", "Locus", "Allele1Seq",
-"Allele2Seq".  See \code{\link{load_genotypes}}.}
+"Allele2Seq".  See \link{load_genotypes}.}
 
-\item{dist.func}{function to calculate inter-sample distances.  Should take
+\item{dist_func}{function to calculate inter-sample distances.  Should take
 two vectors, one for each genotype, with two values per locus corresponding
 to the two alleles.}
 }
 \value{
 matrix of sample-to-individual distance values, with individuals from
-  genotypes.known on rows and samples on columns.
+genotypes_known on rows and samples on columns.
 }
 \description{
 Compare the genotype of each sample in a given results summary to all known

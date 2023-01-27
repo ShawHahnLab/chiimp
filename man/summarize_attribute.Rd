@@ -8,7 +8,7 @@ summarize_attribute(results_summary, attrib, repeats = 2)
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
 \item{attrib}{name of column from \code{results_summary} to tabulate.}
 
@@ -21,6 +21,6 @@ data frame of attribute across samples and loci.
 \description{
 Tabulate a single arbitrary attribute across loci, assuming repeats by two
 for the alleles.  This is used for color-coding summary heatmaps (see
-\code{\link{plot_heatmap}}) on top of the attribute values, like
-\code{Homozygous} or \code{ProminentSeqs}.
+\link{plot_heatmap}) on top of the attribute values, like \code{Homozygous} or
+\code{ProminentSeqs}.
 }

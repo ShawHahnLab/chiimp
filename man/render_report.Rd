@@ -8,10 +8,9 @@ render_report(results, config)
 }
 \arguments{
 \item{results}{list of microsatellite analysis results as produced by
-\code{\link{full_analysis}}.}
+\link{full_analysis}.}
 
-\item{config}{list of configuration options (see
-\code{\link{config.defaults}}).}
+\item{config}{list of parsed configuration options (see \link{parse_config}).}
 }
 \description{
 Write an HTML report summarizing the results of a full microsatellite

@@ -7,12 +7,12 @@
 save_dataset(data, fp, ...)
 }
 \arguments{
-\item{data}{data frame of sample attributes as produced by
-\code{\link{prepare_dataset}} or \code{\link{load_dataset}}.}
+\item{data}{data frame of sample attributes as produced by \link{prepare_dataset}
+or \link{load_dataset}.}
 
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link{save_csv}}.}
+\item{...}{additional arguments passed to \link{save_csv}.}
 }
 \description{
 Save a comma-separated table of sample attributes.  (This is a convenience

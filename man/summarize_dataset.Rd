@@ -4,48 +4,44 @@
 \alias{summarize_dataset}
 \title{Add further summaries to analyzed dataset}
 \usage{
-summarize_dataset(results, genotypes.known = NULL)
+summarize_dataset(results, genotypes_known = NULL)
 }
 \arguments{
 \item{results}{list containing summary data frame and sample-specific data
-frames as produced by \code{\link{analyze_dataset}}.}
+frames as produced by \link{analyze_dataset}.}
 
-\item{genotypes.known}{optional data frame of known genotypes that should be
+\item{genotypes_known}{optional data frame of known genotypes that should be
 compared to the observed genotypes in the results, as loaded by
-\code{\link{load_genotypes}}.  If provided \code{dist_mat_known} will be
-present in the output.}
+\link{load_genotypes}.  If provided \code{dist_mat_known} will be present in the
+output.}
 }
 \value{
 expanded list with additional summaries.
 }
 \description{
-Take a results list as produced by \code{\link{analyze_dataset}} and add
-additional entries for inter-sample and inter-locus analyses.
+Take a results list as produced by \link{analyze_dataset} and add additional
+entries for inter-sample and inter-locus analyses.
 }
 \details{
 Additional entries in the returned list:
 \itemize{
 \item \code{alignments}: inter-allele alignments for each locus, from
-\code{\link{align_alleles}}.
-\item \code{dist_mat}: inter-sample distance matrix, from
-\code{\link{make_dist_mat}}.
-\item \code{dist_mat_known}: if genotypes.known is given, this distance matrix
-of sample-to-individual values will be present, from
-\code{\link{make_dist_mat_known}}.
+\link{align_alleles}.
+\item \code{dist_mat}: inter-sample distance matrix, from \code{make_dist_mat}.
+\item \code{dist_mat_known}: if genotypes_known is given, this distance matrix
+of sample-to-individual values will be present, from \code{make_dist_mat_known}.
 }
 
-If genotypes.known is given \emph{and} a Name column is present in
+If genotypes_known is given \emph{and} a Name column is present in
 \code{results$summary}, samples will be matched with the genotypes in
-genotypes.known and additional columns will be present in the summary data
+genotypes_known and additional columns will be present in the summary data
 frame:
 \itemize{
-\item \code{CorrectAllele1Seq}: One correct allele sequence for the individual.
-The order of this and \code{CorrectAllele2Seq} will be matched to
-\code{Allele1Seq} and \code{Allele2Seq} if possible.  See
-\code{\link{match_known_genotypes}}.
+\item \code{CorrectAllele1Seq}: One correct allele sequence for the individual. The
+order of this and \code{CorrectAllele2Seq} will be matched to \code{Allele1Seq} and
+\code{Allele2Seq} if possible.  See \link{match_known_genotypes}.
 \item \code{CorrectAllele2Seq}: A second correct allele sequence, as above.
-\item \code{GenotypeResult}: Categorization for each entry as Correct,
-Incorrect, Blank, or Dropped Allele.  See
-\code{\link{categorize_genotype_results}}.
+\item \code{GenotypeResult}: Categorization for each entry as Correct, Incorrect,
+Blank, or Dropped Allele.  See \link{categorize_genotype_results}.
 }
 }

@@ -4,7 +4,7 @@
 \alias{report_idents}
 \title{Create identification summary table}
 \usage{
-report_idents(results, closest, na.replicates = "")
+report_idents(results, closest, na_replicates = "")
 }
 \arguments{
 \item{results}{results list as produced by \code{\link{summarize_dataset}}.}
@@ -12,7 +12,7 @@ report_idents(results, closest, na.replicates = "")
 \item{closest}{list of closest matches as produced by
 \code{\link{find_closest_matches}}.}
 
-\item{na.replicates}{text to replace NA entries with for the Replicates
+\item{na_replicates}{text to replace NA entries with for the Replicates
 column.}
 }
 \value{

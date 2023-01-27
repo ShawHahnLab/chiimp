@@ -4,22 +4,16 @@
 \alias{full_analysis}
 \title{Perform a full microsatellite analysis}
 \usage{
-full_analysis(config, dataset = NULL)
-}
-\arguments{
-\item{config}{list of configuration options.  See the summary for
-\code{\link{config.defaults}} for more details.}
-
-\item{dataset}{optional custom data frame to override the sample attributes
-defined in the config.}
+full_analysis()
 }
 \value{
 list of results, with the full configuration list included as
-  "config."
+"config."
 }
 \description{
-Given a list of configuration options, run all aspects of a microsatellite
-analysis, and save the corresponding output files.
+Run all aspects of a microsatellite analysis, using the currently-defined
+global options (see \link{load_config} and \link{apply_config}), and save the
+corresponding output files.
 }
 \examples{
 \dontrun{
@@ -36,7 +30,8 @@ file.copy(locus_attrs_path, "locus_attrs.csv")
 # Run the example analysis
 config_path <- system.file("example_config.yml", package = "chiimp")
 config <- load_config(config_path)
-results <- full_analysis(config)
+apply_config(config)
+results <- full_analysis()
 }
 
 }

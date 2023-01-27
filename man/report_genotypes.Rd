@@ -4,15 +4,15 @@
 \alias{report_genotypes}
 \title{Create genotype summary table}
 \usage{
-report_genotypes(results, na.replicates = "", na.alleles = "", closest = NULL)
+report_genotypes(results, na_replicates = "", na_alleles = "", closest = NULL)
 }
 \arguments{
 \item{results}{list of results data as produced by \code{analyze_dataset}.}
 
-\item{na.replicates}{text to replace NA entries with for the Replicates
+\item{na_replicates}{text to replace NA entries with for the Replicates
 column.}
 
-\item{na.alleles}{text to replace NA entries with for the allele names}
+\item{na_alleles}{text to replace NA entries with for the allele names}
 
 \item{closest}{list of closest matches as produced by
 \code{\link{find_closest_matches}}.}

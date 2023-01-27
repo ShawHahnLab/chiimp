@@ -8,10 +8,11 @@
 #' given locus.
 #'
 #' @param sample_data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_sample}}.
+#'   [analyze_sample].
 #' @param locus_name character name of locus to match against.
 #'
 #' @return logical vector of entries for potential alleles.
+#' @md
 full_locus_match <- function(sample_data, locus_name) {
   with(sample_data,
        as.character(MatchingLocus) == locus_name &
@@ -24,10 +25,11 @@ full_locus_match <- function(sample_data, locus_name) {
 #' Create entry IDs for the given data frame, using whichever STR-related
 #' metadata columns are available.  These will not necessarily be unique.
 #'
-#' @param data STR data frame, such as produced by \code{\link{prepare_dataset}}
-#'   or \code{summary} from \code{\link{summarize_dataset}}.
+#' @param data STR data frame, such as produced by [prepare_dataset] or a
+#'   summary from [summarize_dataset].
 #'
 #' @return character vector of entry identifiers
+#' @md
 make_entry_id <- function(data) {
   cols_names <- c("Dataset", "Sample", "Name", "Replicate", "Locus")
   cols_idx <- match(cols_names, colnames(data))
@@ -52,30 +54,32 @@ make_entry_id <- function(data) {
 #' Create unique rownames for the given data frame, using whichever STR-related
 #' metadata columns are available.
 #'
-#' @param data STR data frame, such as produced by \code{\link{prepare_dataset}}
-#'   or \code{summary} from \code{\link{summarize_dataset}}.
+#' @param data STR data frame, such as produced by [prepare_dataset] or a
+#'   summary from [summarize_dataset].
 #'
-#' @seealso \code{\link{order_entries}}
+#' @seealso [order_entries]
 #'
 #' @return vector of unique row names
+#' @md
 make_rownames <- function(data) {
   make.unique(make_entry_id(data))
 }
 
 #' Define Ordering for STR Data
 #'
-#' Create a standardized ordering vector (as per \code{\link{order}}) for the
+#' Create a standardized ordering vector (as per [base::order]) for the
 #' rows of the given data frame, using whichever STR-related metadata columns
 #' are available.  Sample identifiers are treated as integers primarily but then
 #' resolved further by character sorting.  Note that the identification-related
 #' report code relies on this to order lowest-distance genotype matches first.
 #'
-#' @seealso \code{\link{make_rownames}}
+#' @seealso [make_rownames]
 #'
-#' @param data STR data frame, such as produced by \code{\link{prepare_dataset}}
-#'   or \code{summary} from \code{\link{summarize_dataset}}.
+#' @param data STR data frame, such as produced by [prepare_dataset] or a
+#'   summary from [summarize_dataset].
 #'
 #' @return integer vector of new row ordering
+#' @md
 order_entries <- function(data) {
   items <- list(data$Locus,
                 as.integer(gsub("[^0-9]+", "", data$Sample)),
@@ -98,10 +102,11 @@ order_entries <- function(data) {
 #'
 #' @param data character vector of sequences
 #' @param hash_len number of characters of alphanumeric hash to include as a
-#'   suffix.  (See \code{\link[openssl]{md5}}.)
+#'   suffix.  (See [openssl::md5].)
 #'
 #' @return vector of short names
-make_allele_name <- function(data, hash_len = 6) {
+#' @md
+make_allele_name <- function(data, hash_len = cfg("allele_suffix_len")) {
   txt <- if (is.character(data)) {
     if (hash_len > 0) {
       paste(nchar(data),
@@ -130,18 +135,19 @@ order_alleles <- function(nms) {
 #' used for recognized sequences.
 #'
 #' @param data data frame containing Allele1Seq and Allele2Seq columns such as
-#'   the first list item produced by \code{\link{analyze_dataset}}.
+#'   the first list item produced by [analyze_dataset].
 #' @param known_alleles data frame of custom allele names as defined for
-#'   \code{\link{load_allele_names}}.  if NULL only automatically generated
-#'   names will be used.
-#' @param name_args list of additional arguments to \code{make_allele_name}.
+#'   [load_allele_names].  if NULL only automatically generated names will be
+#'   used.
+#' @param name_args list of additional arguments to [make_allele_name].
 #'
 #' @return data frame provided with Allele1Name and Allele2Name columns added
+#' @md
 name_alleles_in_table <- function(
-    data, known_alleles = NULL, name_args = list()) {
+    data, known_alleles = NULL, ...) {
   # Make names for given seqs, using existing names where available.
   nm <- function(seqs) {
-    nms <- do.call(make_allele_name, c(list(data = seqs), name_args))
+    nms <- do.call(make_allele_name, c(list(data = seqs), alist(...)))
     if (! is.null(known_alleles)) {
       idx <- match(seqs, known_alleles$Seq)
       nms <- ifelse(is.na(idx),
@@ -169,6 +175,7 @@ name_alleles_in_table <- function(
 #'
 #' @return character vector of same length as input, with any common directory
 #'   structure trimmed off.
+#' @md
 remove_shared_root_dir <- function(fps_full) {
   fps <- gsub("\\\\", "/", fps_full)
   fps <- normalizePath(fps, mustWork = FALSE, winslash = "/")
@@ -194,6 +201,7 @@ fp_devnull <- c(unix = "/dev/null", windows = "nul")[.Platform$OS.type] # nolint
 #' @param msg text to print.
 #' @param col2 extra text to show at right margin; defaults to current time.
 #' @param end ending to concatenate to message; defaults to newline character.
+#' @md
 logmsg <- function(msg, col2 = as.character(Sys.time()), end = "\n") {
   if (! cfg("verbose")) {
     return()
@@ -207,13 +215,12 @@ logmsg <- function(msg, col2 = as.character(Sys.time()), end = "\n") {
   cat(paste0(msg, end), file = 2)
 }
 
-
 #' Reverse complement sequences
-#' 
+#'
 #' Each entry in the input character vector is reversed and nucleotide
 #' characters replaced with their complements (leaving any other text characters
 #' unchanged).
-#' 
+#'
 #' @param txt character vector of sequences
 #' @returns character vector of reverse complements
 #' @export
@@ -234,7 +241,6 @@ revcmp <- function(txt) {
   out[nas] <- NA
   out
 }
-
 
 # Does the given vector look "blank"?
 # NULL: TRUE (caught by length of 0)

@@ -4,29 +4,29 @@
 #'
 #' Using the Name column of the given results summary data frame, pair each
 #' called genotype with the known alleles.  A data frame with two columns,
-#' \code{CorrectAllele1Seq} and \code{CorrectAllele2Seq}, is returned. If
-#' matching entries are found in \code{Allele1Seq} and/or \code{Allele2Seq} the
-#' order will be preserved, and at this point the two allele entries should
-#' match up directly for genotypes that were called correctly.
+#' `CorrectAllele1Seq` and `CorrectAllele2Seq`, is returned. If matching entries
+#' are found in `Allele1Seq` and/or `Allele2Seq` the order will be preserved,
+#' and at this point the two allele entries should match up directly for
+#' genotypes that were called correctly.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
-#'   \code{\link{analyze_dataset}}.
-#' @param genotypes.known data frame of known genotypes that should be compared
-#'   to the observed genotypes in the results, as loaded by
-#'   \code{\link{load_genotypes}}.
+#'   [analyze_dataset].
+#' @param genotypes_known data frame of known genotypes that should be compared
+#'   to the observed genotypes in the results, as loaded by [load_genotypes].
 #'
 #' @return data frame with two columns for the two correct alleles, and rows
 #'   matching the input summary table.
 #'
 #' @export
-match_known_genotypes <- function(results_summary, genotypes.known) {
+#' @md
+match_known_genotypes <- function(results_summary, genotypes_known) {
   # match name/locus combos with genotypes
   id_tbl <- paste(results_summary$Name, results_summary$Locus)
-  id_kg <- paste(genotypes.known$Name, genotypes.known$Locus)
+  id_kg <- paste(genotypes_known$Name, genotypes_known$Locus)
   idx <- match(id_tbl, id_kg)
   # Build data frame of correct allele sequences
-  result <- data.frame(CorrectAllele1Seq = genotypes.known[idx, "Allele1Seq"],
-                       CorrectAllele2Seq = genotypes.known[idx, "Allele2Seq"],
+  result <- data.frame(CorrectAllele1Seq = genotypes_known[idx, "Allele1Seq"],
+                       CorrectAllele2Seq = genotypes_known[idx, "Allele2Seq"],
                        stringsAsFactors = FALSE)
   # Ensure ordering within pairs matches samples, if possible.
   for (i in seq_len(nrow(result))) {
@@ -41,10 +41,10 @@ match_known_genotypes <- function(results_summary, genotypes.known) {
 
 #' Categorize genotyping results
 #'
-#' For a given results summary data frame that has \code{CorrectAllele1Seq} and
-#' \code{CorrectAllele2Seq} columns (such as produced by
-#' \code{\link{match_known_genotypes}}) added, create a factor labeling every
-#' row of the input data frame by its genotyping outcome.
+#' For a given results summary data frame that has `CorrectAllele1Seq` and
+#' `CorrectAllele2Seq` columns (such as produced by [match_known_genotypes])
+#' added, create a factor labeling every row of the input data frame by its
+#' genotyping outcome.
 #'
 #' @details
 #' Levels in the returned factor, in order:
@@ -56,18 +56,18 @@ match_known_genotypes <- function(results_summary, genotypes.known) {
 #' * Dropped Allele: One called allele is correct for a heterozygous individual,
 #'   but no second allele was called.
 #'
-#' Cases that should not occur, such as \code{CorrectAllele1Seq} and
-#' \code{CorrectAllele2Seq} both set to NA, map to NA in the returned factor.
-#' @md
+#' Cases that should not occur, such as `CorrectAllele1Seq` and
+#' `CorrectAllele2Seq` both set to NA, map to NA in the returned factor.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
-#'   \code{\link{analyze_dataset}} with extra columns as produced by
-#'   \code{\link{match_known_genotypes}}.
+#'   [analyze_dataset] with extra columns as produced by
+#'   [match_known_genotypes].
 #'
 #' @return factor defining genotyping result category for every row of the input
 #'   data frame.
 #'
 #' @export
+#' @md
 categorize_genotype_results <- function(results_summary) {
   # Five possibilities for either NA/not NA plus outcome of non-NA pair
   # All five possibilities for a single allele check:

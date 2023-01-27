@@ -4,14 +4,14 @@
 \alias{calc_genotype_distance}
 \title{Calculate distance between two genotypes}
 \usage{
-calc_genotype_distance(g1, g2, na.reject = TRUE)
+calc_genotype_distance(g1, g2, na_reject = TRUE)
 }
 \arguments{
 \item{g1}{vector for genotype.}
 
 \item{g2}{vector for genotype.}
 
-\item{na.reject}{logical; should NA entries be treated as mismatches?  TRUE
+\item{na_reject}{logical; should NA entries be treated as mismatches?  TRUE
 by default.}
 }
 \value{

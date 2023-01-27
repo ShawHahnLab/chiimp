@@ -4,13 +4,13 @@
 \alias{make_dist_mat}
 \title{Make distance matrix for set of samples}
 \usage{
-make_dist_mat(results_summary, dist.func = calc_genotype_distance)
+make_dist_mat(results_summary, dist_func = calc_genotype_distance)
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
-\item{dist.func}{function to calculate inter-sample distances.  Should take
+\item{dist_func}{function to calculate inter-sample distances.  Should take
 two vectors, one for each genotype, with two values per locus corresponding
 to the two alleles.}
 }
@@ -20,6 +20,5 @@ matrix of cross-sample distance values
 \description{
 Compare the genotype of each sample to each other sample in a given results
 summary data frame, and create a between-sample distance matrix.  This will
-be a symmetric matrix, unlike what \code{\link{make_dist_mat_known}}
-produces.
+be a symmetric matrix, unlike what \link{make_dist_mat_known} produces.
 }

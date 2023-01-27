@@ -12,8 +12,8 @@ save_csv(data, fp, ...)
 \arguments{
 \item{fp}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link[utils]{read.table}} or
-\code{\link[utils]{write.table}}.}
+\item{...}{additional arguments passed to \link[utils:read.table]{utils::read.table} or
+\link[utils:write.table]{utils::write.table}.}
 
 \item{data}{data frame to save to CSV file}
 }
@@ -22,8 +22,7 @@ data frame
 }
 \description{
 Load/save a comma-separated table from/to a CSV file.  (These are generic
-wrapper functions used by more specific loaders like
-\code{\link{load_locus_attrs}}.)
+wrapper functions used by more specific loaders like \link{load_locus_attrs}.)
 }
 \section{Functions}{
 \itemize{

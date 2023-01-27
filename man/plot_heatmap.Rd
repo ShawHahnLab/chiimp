@@ -7,7 +7,7 @@
 plot_heatmap(
   results,
   attribute,
-  label.by = c("Allele1Length", "Allele2Length"),
+  label_by = c("Allele1Length", "Allele2Length"),
   color = c("white", "pink"),
   breaks = NA,
   ...
@@ -18,21 +18,20 @@ plot_heatmap(
 
 \item{attribute}{character name of column in results$summary to use.}
 
-\item{label.by}{vector of column names to use when writing the genotype
+\item{label_by}{vector of column names to use when writing the genotype
 summary values on top of the heatmap cells.  Defaults to allele sequence
 lengths.}
 
-\item{color}{vector of colors passed to \code{\link[pheatmap]{pheatmap}}.}
+\item{color}{vector of colors passed to \link[pheatmap:pheatmap]{pheatmap::pheatmap}.}
 
-\item{breaks}{vector of breakpoints passed to
-\code{\link[pheatmap]{pheatmap}}, autocalculated by default.}
+\item{breaks}{vector of breakpoints passed to \code{pheatmap}, autocalculated by
+default.}
 
-\item{...}{additional arguments to \code{\link[pheatmap]{pheatmap}}.}
+\item{...}{additional arguments to \code{pheatmap}.}
 }
 \description{
-Given a cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}} and the name of a column (e.g., \code{Stutter},
-\code{Homozygous}, \code{ProminentSequences}), plot a heatmap of the values
-for that attribute, with sample identifiers on rows and loci on columns.  The
-attribute will be coerced to numeric.
+Given a cross-sample summary data frame as produced by \link{analyze_dataset} and
+the name of a column (e.g., \code{Stutter}, \code{Homozygous}, \code{ProminentSequences}),
+plot a heatmap of the values for that attribute, with sample identifiers on
+rows and loci on columns.  The attribute will be coerced to numeric.
 }

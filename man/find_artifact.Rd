@@ -21,7 +21,7 @@ considered artifactual}
 }
 \value{
 integer vector specifying, for each entry, the row index for another
-  entry that may have produced each entry as an artifactual sequence.
+entry that may have produced each entry as an artifactual sequence.
 }
 \description{
 Searches a processed STR sample for entries that may be PCR artifacts, other
@@ -29,7 +29,7 @@ than stutter, from another entry in the sample.  Potential artifacts are
 sequences with counts lower than another sequence by a given ratio and
 sequence length within 1 nucleotide of the other sequence.  This only
 considers STR-labeled rows and requires a given entry to have counts at most
-\code{count.ratio_max} compared to the candidate "source" entry to be
-considered an artifact.  Sequence content is not currently considered, just
-relative sequence lengths and counts.
+\code{count.ratio_max} compared to the candidate "source" entry to be considered
+an artifact.  Sequence content is not currently considered, just relative
+sequence lengths and counts.
 }

@@ -125,8 +125,9 @@ analyze_seqs <- function(
   # subsets of the original sample data.
   data$FractionOfTotal <- data$Count / sum(data$Count)
   data$FractionOfLocus <- with(data, {
-    total_per_locus <- unlist(lapply(levels(MatchingLocus), function(loc)
-      sum(data[MatchingLocus == loc, "Count"], na.rm = TRUE)))
+    total_per_locus <- unlist(lapply(levels(MatchingLocus), function(loc) {
+      sum(data[MatchingLocus == loc, "Count"], na.rm = TRUE)
+      }))
     names(total_per_locus) <- levels(MatchingLocus)
     Count / total_per_locus[MatchingLocus]
   })
@@ -136,7 +137,7 @@ analyze_seqs <- function(
 #' Check sequences for STR repeats
 #'
 #' Return a logical vector specifying, for each entry, if the sequence contains
-#' at least \code{nrepeats} perfect repeats of the matching locus' motif.
+#' at least `nrepeats` perfect repeats of the matching locus' motif.
 #'
 #' @param sample.data data frame of processed sequence data.
 #' @param locus_attrs data frame of attributes for loci to look for.
@@ -144,6 +145,7 @@ analyze_seqs <- function(
 #'   match.
 #'
 #' @return logical vector indicating where repeats were observed.
+#' @md
 check_motif <- function(sample.data, locus_attrs, nrepeats) {
   with(sample.data, {
     motif <- locus_attrs[MatchingLocus, "Motif"]
@@ -165,6 +167,7 @@ check_motif <- function(sample.data, locus_attrs, nrepeats) {
 #'
 #' @return logical vector specifying, for each entry, if the sequence is within
 #'   the matching locus' expected length range.
+#' @md
 check_length <- function(sample.data, locus_attrs) {
   with(sample.data, {
     Lmin <- locus_attrs[MatchingLocus, "LengthMin"]
@@ -180,7 +183,7 @@ check_length <- function(sample.data, locus_attrs) {
 #'
 #' Searches a processed STR sample for entries that may be artifacts of PCR
 #' stutter from another entry in the sample.  This only considers STR-labeled
-#' rows and requires a given entry to have counts at most \code{count.ratio_max}
+#' rows and requires a given entry to have counts at most `count.ratio_max`
 #' compared to the candidate "source" entry to be considered stutter.  Sequence
 #' content is not currently considered, just relative sequence lengths and
 #' counts.
@@ -193,6 +196,7 @@ check_length <- function(sample.data, locus_attrs) {
 #'
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as a stutter band.
+#' @md
 find_stutter <- function(
   sample.data, locus_attrs, count.ratio_max = cfg("max_stutter_ratio")) {
 
@@ -230,9 +234,9 @@ find_stutter <- function(
 #' sequences with counts lower than another sequence by a given ratio and
 #' sequence length within 1 nucleotide of the other sequence.  This only
 #' considers STR-labeled rows and requires a given entry to have counts at most
-#' \code{count.ratio_max} compared to the candidate "source" entry to be
-#' considered an artifact.  Sequence content is not currently considered, just
-#' relative sequence lengths and counts.
+#' `count.ratio_max` compared to the candidate "source" entry to be considered
+#' an artifact.  Sequence content is not currently considered, just relative
+#' sequence lengths and counts.
 #'
 #' @param sample.data data frame of processed sample data.
 #' @param locus_attrs data frame of attributes for loci to look for.
@@ -242,6 +246,7 @@ find_stutter <- function(
 #'
 #' @return integer vector specifying, for each entry, the row index for another
 #'   entry that may have produced each entry as an artifactual sequence.
+#' @md
 find_artifact <- function(
     sample.data, locus_attrs, count.ratio_max = cfg("max_artifact_ratio")) {
 

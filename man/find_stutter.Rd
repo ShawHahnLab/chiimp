@@ -21,7 +21,7 @@ considered stutter.}
 }
 \value{
 integer vector specifying, for each entry, the row index for another
-  entry that may have produced each entry as a stutter band.
+entry that may have produced each entry as a stutter band.
 }
 \description{
 Searches a processed STR sample for entries that may be artifacts of PCR

@@ -7,8 +7,7 @@
 str_hist_setup_legend(bars)
 }
 \arguments{
-\item{bars}{data frames of counts-vs-lengths as prepared by
-\code{\link{str_hist_setup}}.}
+\item{bars}{data frames of counts-vs-lengths as prepared by \link{str_hist_setup}.}
 }
 \value{
 data frame of plot attributes by category.

@@ -8,7 +8,7 @@ full_locus_match(sample_data, locus_name)
 }
 \arguments{
 \item{sample_data}{data frame of processed data for sample as produced by
-\code{\link{analyze_sample}}.}
+\link{analyze_sample}.}
 
 \item{locus_name}{character name of locus to match against.}
 }

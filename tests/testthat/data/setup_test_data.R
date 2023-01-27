@@ -708,7 +708,7 @@ setup_for_summarize_dataset <- function(
   results_known$summary$Name <- c("ID002", "ID001")[
     as.integer(results$summary$Sample)]
   results_known_mod <- summarize_dataset(
-    results_known, genotypes.known = test_data_for_setup$genotypes_known)
+    results_known, genotypes_known = test_data_for_setup$genotypes_known)
   mktestrds(results_known)
   mktestrds(results_known_mod)
   # make_dist_mat

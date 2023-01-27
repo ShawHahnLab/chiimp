@@ -7,12 +7,11 @@
 save_results_summary(results_summary, fp)
 }
 \arguments{
-\item{results_summary}{summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\item{results_summary}{summary data frame as produced by \link{analyze_dataset}.}
 
 \item{fp}{output file path.}
 }
 \description{
-Save the dataset summary produced by \code{\link{analyze_dataset}} to the
-specified file path in CSV format.
+Save the dataset summary produced by \link{analyze_dataset} to the specified file
+path in CSV format.
 }

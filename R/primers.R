@@ -2,12 +2,12 @@
 
 
 #' Make data frame of primer info for reads
-#' 
+#'
 #' `make_read_primer_table` take read sequences and per-locus primer
 #' information and produces a data frame of matching information for each read.
 #' Mismatches are allowed, but not indels.  The rows in the output data frame
 #' will correspond exactly to the read vector given.
-#' 
+#'
 #' Output Columns:
 #'
 #'  * SeqOrig: Original read sequence
@@ -23,12 +23,12 @@
 #'    `use_reverse_primers`) directions
 #'  * Seq: modified sequence based on `primer_action` argument(s), if
 #'    applicable
-#' 
+#'
 #' Optionally reads can be modified based on the matched primer sequences in one
 #' or both directions; see the `primer_action` arguments for those options.  All
 #' positions in the returned data frame are indexed from 1 and are oriented in
 #' the same direction as the unmodified reads.
-#' 
+#'
 #' The comparison of reads to primers is not exhaustive.  This method gathers
 #' exact matches first and searches the remaining reads for inexact matches in
 #' order of decreasing abundance of exact matches, taking the first
@@ -36,7 +36,7 @@
 #' below the similarity between any two primer sequences (as will typically be
 #' the case) this should result in the best-matching primer being reported for
 #' each read, but is much faster than doing an exhaustive all-to-all comparison.
-#' 
+#'
 #' @param seqs character vector of read sequences
 #' @param locus_attrs data frame of locus attributes
 #' @param max_mismatches integer number of mismatches allowed when checking
@@ -60,12 +60,12 @@
 #' @md
 make_read_primer_table <- function(
   seqs, locus_attrs,
-  max_mismatches=cfg("max_mismatches"),
-  primer_action=cfg("primer_action"),
-  primer_action_fwd=cfg("primer_action_fwd"),
-  primer_action_rev=cfg("primer_action_rev"),
-  max_mismatches_fwd=cfg("max_mismatches_fwd"),
-  max_mismatches_rev=cfg("max_mismatches_rev"),
+  max_mismatches = cfg("max_mismatches"),
+  primer_action = cfg("primer_action"),
+  primer_action_fwd = cfg("primer_action_fwd"),
+  primer_action_rev = cfg("primer_action_rev"),
+  max_mismatches_fwd = cfg("max_mismatches_fwd"),
+  max_mismatches_rev = cfg("max_mismatches_rev"),
   use_reverse_primers = cfg("use_reverse_primers"),
   reverse_primer_r1 = cfg("reverse_primer_r1")) {
 
@@ -131,10 +131,10 @@ make_read_primer_table <- function(
 }
 
 #' Modify reads based on matched primers
-#' 
+#'
 #' `handle_primers` carries out the read modification specified in
 #' [make_read_primer_table].
-#' 
+#'
 #' @param result data frame of read and primer information as from
 #'   [make_read_primer_table]
 #' @param locus_attrs data frame of locus attributes
@@ -147,11 +147,13 @@ make_read_primer_table <- function(
 #' @returns modified data frame with `Seq` column containing modified sequences
 #' @md
 handle_primers <- function(
-  result, locus_attrs, primer_action_fwd, primer_action_rev, reverse_primer_r1) {
+    result, locus_attrs, primer_action_fwd, primer_action_rev,
+    reverse_primer_r1) {
   # Handling this as two steps for both forward and reverse parts:
   #  1) substring to appropriate region
   #  2) add any replacement strings, for the special case of "replace"
-  if (primer_action_rev != "none" && ! all(c("RevStart", "RevStop") %in% colnames(result))) {
+  if (primer_action_rev != "none" && ! all(
+    c("RevStart", "RevStop") %in% colnames(result))) {
     stop(
       paste0(
         "can't apply primer_action_rev \"",
@@ -196,15 +198,15 @@ handle_primers <- function(
 }
 
 #' Find primer matches for reads
-#' 
+#'
 #' Returns a data frame of index values for the two input vectors for each
 #' match, along with start and stop positions within each read and a count of
 #' base mismatches.  There may be zero, one, or multiple output rows per input
 #' read.
-#' 
+#'
 #' Indels are not supported.  Partial matches are supported at the 3' end and
 #' are counted as mismatches.
-#' 
+#'
 #' If `max_mismatches` is `NA`, the best match for every read and primer
 #' combination will be included in the output.  If `max_mismatches` is an
 #' integer, at most one row will be provided for each read (for the first
@@ -226,7 +228,7 @@ handle_primers <- function(
 #' @returns data frame of read and primer index pairs and match details
 #' @md
 find_primer_matches <- function(
-  seqs_reads, seqs_primers, max_mismatches=cfg("max_mismatches")) {
+  seqs_reads, seqs_primers, max_mismatches = cfg("max_mismatches")) {
   # Any NAs will be handled in the same way as empty strings
   seqs_reads[is.na(seqs_reads)] <- ""
   seqs_primers[is.na(seqs_primers)] <- ""
@@ -314,7 +316,8 @@ find_primer_matches <- function(
             is.na(Mismatches[idxl_reads]) | mismatches < Mismatches[idxl_reads])
           result$Start[idxl_reads][idxl_match] <- start_pos
           result$Stop[idxl_reads][idxl_match] <- end_pos
-          result$Mismatches[idxl_reads][idxl_match] <- as.integer(mismatches[idxl_match])
+          result$Mismatches[idxl_reads][idxl_match] <- as.integer(
+            mismatches[idxl_match])
         }
       }
     }
@@ -328,35 +331,35 @@ find_primer_matches <- function(
 # Util --------------------------------------------------------------------
 
 #' IUPAC DNA nucleotides as raw bytes
-#' 
+#'
 #' `RAW_NT` is a named vector of raw bytes allowing fast comparison of IUPAC
 #' DNA nucleotide characters.  A, C, G, and T are assigned single individual
 #' bits, and the standard IUPAC characters are assigned bitwise combinations of
 #' these.  This way `RAW_NT["A"] & RAW_NT["G"]` is zero, while
 #' `RAW_NT["A"] & RAW_NT["R"]` is nonzero.  The gap characters - and . are
 #' assigned one remaining bit, leaving 3 bits unspecified.
-#' 
+#'
 #' ```
 #'      - TGCA
 #' A 0000 0001  01
 #' C 0000 0010  02
 #' G 0000 0100  04
 #' T 0000 1000  08
-#' 
+#'
 #' R 0000 0101  05
 #' Y 0000 1010  0A
 #' S 0000 0110  06
 #' W 0000 1001  09
 #' K 0000 1100  0C
 #' M 0000 0011  03
-#' 
+#'
 #' B 0000 1110  0E
 #' D 0000 1101  0D
 #' H 0000 1011  0B
 #' V 0000 0111  07
-#' 
+#'
 #' N 0000 1111  0F
-#' 
+#'
 #' - 0001 0000  10
 #' . 0001 0000  10
 #' ```
@@ -376,7 +379,7 @@ RAW_NT["V"] <- RAW_NT["A"] | RAW_NT["C"] | RAW_NT["G"]
 RAW_NT["N"] <- RAW_NT["A"] | RAW_NT["C"] | RAW_NT["G"] | RAW_NT["T"]
 
 #' Complements of IUPAC nucleotide codes
-#' 
+#'
 #' `CMP` is a named character vector mapping each IUPAC DNA nucleotide code to
 #' its complement.  For example, `CMP["A"]` is `T`.
 #' @md
@@ -397,14 +400,14 @@ CMP <- c(
   V = "B")
 
 #' Make matrix of raw bytes from nucleotide sequences
-#' 
+#'
 #' Each sequence in the given vector becomes a column of the output matrix, with
 #' a row for each position.  Shorter sequences are padded with a specific value
 #' at bottom of the matrix.  With the defaults (see [RAW_NT]), A, C, G, and T
 #' (case insensitive) are encoded as 01, 02, 03, and 04, IUPAC codes are bitwise
 #' combinations of those values, padding values are 0x80, and any other
 #' character is 0x00.
-#' 
+#'
 #' @param seqs character vector of nucleotide sequences
 #' @param map raw vector with nucleotide names and byte values
 #' @param pad raw value to use for missing positions
@@ -414,13 +417,12 @@ CMP <- c(
 make_raw_nt <- function(seqs, map = RAW_NT, pad = 0x80, other = 0x00) {
   pad <- as.raw(as.integer(pad))
   other <- as.raw(as.integer(other))
-  seq_levels <- names(map)
   if (length(seqs) == 0) {
     return(matrix(raw())[0, 0])
   }
   seqs <- toupper(seqs)
   len <- max(nchar(seqs))
-  out <- do.call(cbind, lapply(strsplit(seqs, ""), function(vec){
+  out <- do.call(cbind, lapply(strsplit(seqs, ""), function(vec) {
     # will put NA for too-short seqs, but we need to distinguish that from NA
     # from unrecognized NTs
     vec <- vec[seq_len(len)]

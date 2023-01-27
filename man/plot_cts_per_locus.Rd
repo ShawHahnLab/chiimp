@@ -4,26 +4,25 @@
 \alias{plot_cts_per_locus}
 \title{Plot heatmap of read counts matching each locus primer}
 \usage{
-plot_cts_per_locus(cts_per_locus, idx.row = NULL, render = TRUE, ...)
+plot_cts_per_locus(cts_per_locus, idx_row = NULL, render = TRUE, ...)
 }
 \arguments{
-\item{cts_per_locus}{data frame as produced by
-\code{\link{tally_cts_per_locus}}.}
+\item{cts_per_locus}{data frame as produced by \link{tally_cts_per_locus}.}
 
-\item{idx.row}{Optional vector of sample row indices to use.  (Using this
+\item{idx_row}{Optional vector of sample row indices to use.  (Using this
 argument rather than filtering the input allows the same plot scale to be
 used across plots.)}
 
 \item{render}{Should the plot be drawn to the display device?}
 
-\item{...}{additional arguments passed to \code{\link[pheatmap]{pheatmap}}.}
+\item{...}{additional arguments passed to \link[pheatmap:pheatmap]{pheatmap::pheatmap}.}
 }
 \description{
-Given a data frame as produced by \code{\link{tally_cts_per_locus}}, plot a
-heatmap showing the number of reads matching the forward primer of each locus
-across samples.  Samples are shown on rows with the reads categorized by
-locus across columns.
+Given a data frame as produced by \link{tally_cts_per_locus}, plot a heatmap
+showing the number of reads matching the forward primer of each locus across
+samples.  Samples are shown on rows with the reads categorized by locus
+across columns.
 }
 \seealso{
-\code{\link{plot_heatmap}}
+\link{plot_heatmap}
 }

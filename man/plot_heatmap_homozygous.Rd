@@ -9,13 +9,13 @@ plot_heatmap_homozygous(results, ...)
 \arguments{
 \item{results}{combined results list}
 
-\item{...}{additional arguments passed to \code{\link{plot_heatmap}}.}
+\item{...}{additional arguments passed to \link{plot_heatmap}.}
 }
 \description{
-Given a cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}}, plot a heatmap showing which samples appear
-homozygous, with sample identifiers on rows and loci on columns.
+Given a cross-sample summary data frame as produced by \link{analyze_dataset},
+plot a heatmap showing which samples appear homozygous, with sample
+identifiers on rows and loci on columns.
 }
 \seealso{
-\code{\link{plot_heatmap}}
+\link{plot_heatmap}
 }

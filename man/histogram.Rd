@@ -15,10 +15,10 @@ histogram(
 }
 \arguments{
 \item{seq_data}{data frame of dereplicated sequences as created by
-\code{\link{analyze_seqs}}.}
+\link{analyze_seqs}.}
 
 \item{sample_data}{data frame of filtered and categorized sequences as
-created by \code{\link{analyze_sample}}.}
+created by \link{analyze_sample}.}
 
 \item{main}{title of the plot.}
 
@@ -32,7 +32,7 @@ counts needed to call an allele.  Used to draw a horizontal line if
 }
 \value{
 list of data frames for the sets of counts-versus-length bars drawn
-  in the plot, split by category.
+in the plot, split by category.
 }
 \description{
 Given processed STR sequences and optionally the filtered version, plot a

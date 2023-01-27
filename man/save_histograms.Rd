@@ -14,7 +14,7 @@ save_histograms(
 )
 }
 \arguments{
-\item{results}{list of results as created by \code{\link{analyze_dataset}}.}
+\item{results}{list of results as created by \link{analyze_dataset}.}
 
 \item{dp}{output directory path.}
 
@@ -27,6 +27,6 @@ save_histograms(
 \item{res}{integer resolution of image in PPI.}
 }
 \description{
-Take a full results list and save a histogram (via \code{\link{histogram}})
+Take a full results list and save a histogram (via \link{histogram})
 of each sample to a separate image file in a specified directory.
 }

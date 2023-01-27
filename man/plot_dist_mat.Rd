@@ -6,28 +6,28 @@
 \usage{
 plot_dist_mat(
   dist_mat,
-  num.alleles = max(dist_mat),
-  dist.display_thresh = round(num.alleles * 2/3),
+  num_alleles = max(dist_mat),
+  dist_display_thresh = round(num_alleles * 2/3),
   ...
 )
 }
 \arguments{
-\item{dist_mat}{distance matrix as produced by
-\code{\link{summarize_dataset}} via \code{\link{make_dist_mat}}.}
+\item{dist_mat}{distance matrix as produced by \link{summarize_dataset} via
+\link{make_dist_mat}.}
 
-\item{num.alleles}{the maximum number of matching/mismatching alleles.  Used
+\item{num_alleles}{the maximum number of matching/mismatching alleles.  Used
 to determine color scaling.  Defaults to the highest observed distance in
 the matrix.}
 
-\item{dist.display_thresh}{distance value at or below which distances will be
+\item{dist_display_thresh}{distance value at or below which distances will be
 explicitly drawn on the heatmap.  Above this value only the color-coding
 will signify distance.  Use \code{NA} to always show numbers.}
 
-\item{...}{additional arguments passed to \code{\link[pheatmap]{pheatmap}}.}
+\item{...}{additional arguments passed to \link[pheatmap:pheatmap]{pheatmap::pheatmap}.}
 }
 \description{
 Plot a heatmap of a distance matrix.
 }
 \seealso{
-\code{\link{make_dist_mat}}
+\link{make_dist_mat}
 }

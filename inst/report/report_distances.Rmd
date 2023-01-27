@@ -6,5 +6,5 @@ white. Entirely missing entries are counted as mismatches.
 
 ```{r distances}
 plot_dist_mat(results$dist_mat,
-              dist.display_thresh = NA)
+              dist_display_thresh = NA)
 ```

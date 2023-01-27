@@ -4,32 +4,30 @@
 #' histogram of counts per sequence length.
 #'
 #' @param seq_data data frame of dereplicated sequences as created by
-#'   \code{\link{analyze_seqs}}.
+#'   [analyze_seqs].
 #' @param sample_data data frame of filtered and categorized sequences as
-#'   created by \code{\link{analyze_sample}}.
+#'   created by [analyze_sample].
 #' @param main title of the plot.
 #' @param xlim numeric range for x-axis.
 #' @param cutoff_fraction numeric threshold for the fraction of locus-matching
 #'   counts needed to call an allele.  Used to draw a horizontal line if
-#'   \code{sample_data} is given.
+#'   `sample_data` is given.
 #' @param render Should the plot be drawn to the display device?
 #'
 #' @return list of data frames for the sets of counts-versus-length bars drawn
 #'   in the plot, split by category.
 #'
 #' @export
-histogram <- function(seq_data,
-                     sample_data = NULL,
-                     main = "Number of Reads by Sequence Length",
-                     xlim = range(seq_data$Length),
-                     cutoff_fraction = NULL,
-                     render = TRUE) {
+#' @md
+histogram <- function(
+    seq_data, sample_data = NULL, main = "Number of Reads by Sequence Length",
+    xlim = range(seq_data$Length), cutoff_fraction = NULL, render = TRUE) {
   # TODO:
   # mark top edges of allele sequences (to handle the same-length case)
   # label bars$topknown by name? positioning may get tricky.
   bars <- str_hist_setup(seq_data, sample_data)
   if (render && nrow(seq_data) > 0) {
-    if (is.null(cutoff_fraction)) {
+    if (is_blank(cutoff_fraction)) {
       cutoff_fraction <- attr(sample_data, "fraction.min")
     }
     str_hist_render(bars, main, xlim, cutoff_fraction)
@@ -40,12 +38,13 @@ histogram <- function(seq_data,
 #' Prepare histogram data
 #'
 #' @param seq_data data frame of dereplicated sequences as created by
-#'   \code{\link{analyze_seqs}}.
+#'   [analyze_seqs].
 #' @param sample_data data frame of filtered and categorized sequences as
-#'   created by \code{\link{analyze_sample}}.
+#'   created by [analyze_sample].
 #'
 #' @return list of data frames for the sets of counts-versus-length bars drawn
 #'   in the plot, split by category.
+#' @md
 str_hist_setup <- function(seq_data, sample_data = NULL) {
   vec_to_df <- function(data, cols = c("Length", "Count")) {
     if (length(data) == 0) {
@@ -60,7 +59,7 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
   bars$orig <- vec_to_df(sapply(split(seq_data, seq_data$Length),
                       function(chunk) sum(chunk$Count)))
 
-  if (!is.null(sample_data)) {
+  if (! is_blank(sample_data)) {
     bars$filt <- vec_to_df(sapply(split(sample_data, sample_data$Length),
                         function(chunk) sum(chunk$Count)))
     bars$topcounts <- vec_to_df(sapply(split(sample_data, sample_data$Length),
@@ -97,12 +96,13 @@ str_hist_setup <- function(seq_data, sample_data = NULL) {
 #' Render prepared histogram data to the display device.
 #'
 #' @param bars list of data frames of counts-vs-lengths as prepared by
-#' \code{\link{str_hist_setup}}.
+#' [str_hist_setup].
 #' @param main title of the plot.
 #' @param xlim numeric range for x-axis.
 #' @param cutoff_fraction numeric threshold for the fraction of locus-matching
 #'   counts needed to call an allele.  Used to draw a horizontal line if
-#'   \code{sample_data} is given.
+#'   `sample_data` is given.
+#' @md
 str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
 
   categories <- str_hist_setup_legend(bars)
@@ -164,10 +164,10 @@ str_hist_render <- function(bars, main, xlim, cutoff_fraction) {
 #'
 #' Create data frame of plot attributes to use in STR histogram.
 #'
-#' @param bars data frames of counts-vs-lengths as prepared by
-#' \code{\link{str_hist_setup}}.
+#' @param bars data frames of counts-vs-lengths as prepared by [str_hist_setup].
 #'
 #' @return data frame of plot attributes by category.
+#' @md
 str_hist_setup_legend <- function(bars) {
   categories <- data.frame(
     Name = c("orig", "filt", "topcounts", "topknown", "allele", "threshold"),

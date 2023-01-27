@@ -8,41 +8,41 @@
 \usage{
 analyze_sample(
   seq_data,
-  sample.attrs,
+  sample_attrs,
   fraction.min = cfg("min_allele_abundance")
 )
 
 analyze_sample_guided(
   seq_data,
-  sample.attrs,
+  sample_attrs,
   fraction.min = cfg("min_allele_abundance")
 )
 
 analyze_sample_naive(
   seq_data,
-  sample.attrs,
+  sample_attrs,
   fraction.min = cfg("min_allele_abundance")
 )
 }
 \arguments{
 \item{seq_data}{data frame of processed data for sample as produced by
-\code{\link{analyze_seqs}}.}
+\link{analyze_seqs}.}
 
-\item{sample.attrs}{list of sample attributes, such as the rows produced by
-\code{\link{prepare_dataset}}.  Used to select the locus name to filter on.}
+\item{sample_attrs}{list of sample attributes, such as the rows produced by
+\link{prepare_dataset}.  Used to select the locus name to filter on.}
 
 \item{fraction.min}{numeric threshold for the minimum proportion of counts a
 given entry must have, compared to the total matching all criteria for that
 locus, to be considered as a potential allele.}
 }
 \value{
-filtered version of \code{seq_data} with added Category column.
+filtered version of \link{seq_data} with added Category column.
 }
 \description{
 Converts a full STR sequence data frame into a per-locus version and adds a
 Category factor column to designate which sequences look like alleles,
 artifacts, etc.  At this stage the summary is prepared for a single specific
-locus, in contrast to \code{\link{analyze_seqs}}.  See the Details section
+locus, in contrast to \link{analyze_seqs}.  See the Details section
 below for a description of the factor levels in the new Category column, and
 see the Functions section below for how specific variants of this function
 behave.
@@ -55,14 +55,12 @@ of these.
 \item Prominent: Any additional sequences beyond two called alleles that match
 all requirements (sequences that match all locus attributes, do not appear
 artifactual, and are above a given fraction of filtered reads).
-\item Insignificant: Sequences with counts below the \code{fraction.min}
-threshold.
+\item Insignificant: Sequences with counts below the \code{fraction.min} threshold.
 \item Ambiguous: Sequences passing the \code{fraction.min} threshold but with
 non-ACTG characters such as N, as defined by the Ambiguous column of
 \code{seq_data}.
 \item Stutter: Sequences passing the \code{fraction.min} threshold but matching
-stutter sequence criteria as defined by the Stutter column of
-\code{seq_data}.
+stutter sequence criteria as defined by the Stutter column of \code{seq_data}.
 \item Artifact: Sequences passing the \code{fraction.min} threshold but matching
 non-stutter artifact sequence criteria as defined by the Artifact column of
 \code{seq_data}.
@@ -71,19 +69,19 @@ non-stutter artifact sequence criteria as defined by the Artifact column of
 \section{Functions}{
 \itemize{
 \item \code{analyze_sample()}: default version of sample analysis.  From here use
-\code{\link{summarize_sample}}.
+\link{summarize_sample}.
 
 \item \code{analyze_sample_guided()}: version of sample analysis guided by expected
 sequence length values.  Additional items \code{ExpectedLength1} and
 optionally \code{ExpectedLength2} can be supplied in the
-\code{sample.attrs} list.  If NA or missing the behavior will match
-\code{analyze_sample}.  If two expected lengths are given, the fraction.min
+\code{sample_attrs} list.  If NA or missing the behavior will match
+\link{analyze_sample}.  If two expected lengths are given, the fraction.min
 argument is ignored.  If at least one expected length is given, the
 stutter/artifact filtering is disabled.  From here use
-\code{\link{summarize_sample_guided}}.
+\link{summarize_sample_guided}.
 
 \item \code{analyze_sample_naive()}: version of sample analysis without
-stutter/artifact filtering.  From here use \code{\link{summarize_sample}}
-as for \code{analyze_sample}.
+stutter/artifact filtering.  From here use \link{summarize_sample} as for
+\code{analyze_sample}.
 
 }}

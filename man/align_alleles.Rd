@@ -12,7 +12,7 @@ align_alleles(results_summary, derep = TRUE, ...)
 \item{derep}{logical; should allele sequences be dereplicated prior to
 alignment?  TRUE by default.}
 
-\item{...}{additional arguments passed to \code{\link[msa]{msa}}.}
+\item{...}{additional arguments passed to \link[msa:msa]{msa::msa}.}
 }
 \value{
 list of MSA alignment objects, one per locus.

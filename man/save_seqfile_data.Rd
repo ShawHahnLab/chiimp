@@ -8,16 +8,15 @@ save_seqfile_data(results_file_data, dp)
 }
 \arguments{
 \item{results_file_data}{list of per-file data frames as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
 \item{dp}{output directory path to use for all files.}
 }
 \description{
-Save each per-file data frame produced by \code{\link{analyze_dataset}} (via
-\code{\link{analyze_seqs}}) to a separate file in the specified directory
-path, in CSV format.  The directory structure will start at the first shared
-directory of the input file paths.
-For example, if the inputs were \code{/data/run1/file.fastq} and
-\code{/data/run2/file.fastq} there will be run1 and run2 directories inside
+Save each per-file data frame produced by \link{analyze_dataset} (via
+\link{analyze_seqs}) to a separate file in the specified directory path, in CSV
+format.  The directory structure will start at the first shared directory of
+the input file paths. For example, if the inputs were \verb{/data/run1/file.fastq}
+and \verb{/data/run2/file.fastq} there will be run1 and run2 directories inside
 the given \code{dp} directory.
 }

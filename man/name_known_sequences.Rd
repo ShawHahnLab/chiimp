@@ -4,30 +4,27 @@
 \alias{name_known_sequences}
 \title{Name known allele sequences}
 \usage{
-name_known_sequences(results, known_alleles, name_args)
+name_known_sequences(results, known_alleles, ...)
 }
 \arguments{
-\item{results}{results list as produced by
-\code{\link{tidy_analyzed_dataset}}.}
+\item{results}{results list as produced by \code{tidy_analyzed_dataset}.}
 
 \item{known_alleles}{data frame of custom allele names as defined for
-\code{\link{load_allele_names}}.  if NULL only the names automatically
-generated for the summary will be used.}
+\code{load_allele_names}.  if NULL only the names automatically generated for
+the summary will be used.}
 
-\item{name_args}{list of additional arguments to
-\code{\link{make_allele_name}}.}
+\item{...}{additional arguments to \code{make_allele_name}.}
 }
 \value{
-list of results, with \code{summary} set to the single summary data
-  frame and \code{data} the per-sample data frames.  A \code{SeqName} column
-  in sample data frames and \code{Allele1Name} and \code{Allele2Name} columns
-  in the summary data frame will associate any sequence matching a known
-  allele (for either the given table or the current dataset) with a text
-  name.
+list of results, with \code{summary} set to the single summary data frame
+and \code{data} the per-sample data frames.  A \code{SeqName} column in sample data
+frames and \code{Allele1Name} and \code{Allele2Name} columns in the summary data
+frame will associate any sequence matching a known allele (for either the
+given table or the current dataset) with a text name.
 }
 \description{
 For the given results list (pair of summary data frame and list of per-sample
-data frames as produced by \code{\link{tidy_analyzed_dataset}}), add columns
+data frames as produced by \link{tidy_analyzed_dataset}), add columns
 to all data frames defining names for recognized sequences.  For the summary
 data frame this will be \code{Allele1Name} and \code{Allele2Name}.  For each
 sample data frame this will be \code{SeqName}, defined for any sequences
