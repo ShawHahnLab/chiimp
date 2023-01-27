@@ -40,7 +40,7 @@ report,TRUE,Create the HTML report file?,TRUE,as.logical,report
 report_show_code,FALSE,Include the code used in report generation within the report?,FALSE,as.logical,report.echo
 report_title,Microsatellite Report,Title to show at the top of the report file,Microsatellite Report,as.character,report.title
 report_author,,Author to show at the top of the report file,Jane G,as.character,report.author
-report_locus_chunks,,Gropuings of locus names to use to break report tables into reasonable sizes and order locus names explicitly,A-D/1-4=A/B/C/D/1/2/3/4;X=X1/X2/X3,as_locus_vecs,report.locus.chunks
+report_locus_chunks,,Gropuings of locus names to use to break report tables into reasonable sizes and order locus names explicitly,A-D/1-4=A/B/C/D/1/2/3/4;X=X1/X2/X3,as_locus_vecs,report.locus_chunks
 report_group_samples,FALSE,Group together genotype table rows in report by sample?,FALSE,as.logical,report.group_samples
 report_na_replicates,,Text to use for NA entries in Replicate column of report tables,Pooled,as.character,report.na.replicates
 report_na_alleles,,Text to use for NA allele entries in tables (when the Sample+Locus combination was no present at all),NA,as.character,report.na.alleles
