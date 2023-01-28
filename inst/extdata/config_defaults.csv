@@ -19,7 +19,7 @@ output_path_alignment_images,alignment-images,Path within output_path to save pe
 output_path_processed_files,processed-files,Path within output_path to save per-input-file data tables to,processed-files,as.character,output:dp_processed_files
 output_path_processed_samples,processed-samples,Path within output_path to save per-sample data tables to,processed-samples,as.character,output:dp_processed_samples
 output_path_allele_seqs,allele-sequences,Path within output_path to save per-allele FASTA files to,allele-sequences,as.character,output:dp_allele_seqs
-ncores,0,Number of cores to use while processing samples in parallel (0 to automatically detect; 1 to disable parallel execution),12,as.integer,dataset_analysis:ncores
+ncores,0,Number of cores to use while processing samples in parallel (0 to automatically detect; 1 to disable parallel execution),12,as_cpu_cores,dataset_analysis:ncores
 allele_suffix_len,6,Length of sequence-based suffix to append to automatic allele names,6,as.integer,dataset_analysis:name_args:hash_len
 min_motif_repeats,3,Minimum number of perfect adjacent motif repeats to recognize a candidate allele,3,as.integer,seq_analysis:nrepeats
 max_stutter_ratio,0.33333,,0.33333,as.numeric,seq_analysis:stutter.count.ratio_max

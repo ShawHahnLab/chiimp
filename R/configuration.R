@@ -22,6 +22,18 @@ as_locus_vecs <- function(txt) {
   vecs
 }
 
+# autodetect CPU cores if 0
+as_cpu_cores <- function(txt) {
+  if (length(txt) != 1) {
+    stop(paste("txt should be of length 1; received", length(txt)))
+  }
+  val <- as.integer(txt)
+  if (val == 0) {
+    val <- max(1, as.integer(parallel::detectCores() / 2) - 1))
+  }
+  val
+}
+
 #' Compare two version strings
 #'
 #' `version_compare` takes two strings for software versions(e.g. "1.0.2") and
