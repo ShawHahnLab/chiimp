@@ -1,31 +1,31 @@
 Key,Value,Description,Example,Parser,OldName
 version,0.5.0,CHIIMP version this config file was prepared for,,as.character,
-dataset,,Path to CSV file with per-sample information,dataset.csv,as.character,fp_dataset
-locus_attrs,locus_attrs.csv,Path to CSV file with per-locus information,locus_attrs.csv,as.character,fp_locus_attrs
-allele_names,,Path to CSV file with per-allele information,allele_names.csv,as.character,fp_allele_names
-gentoypes_known,,Path to CSV file with per-genotype information,genotypes.csv,as.character,fp_genotypes_known
-prep_dataset_path,str-data,Path to search for automatic dataset table preparation,str-data,as.character,dataset_opts:dp
+dataset,,Path to CSV file with per-sample information,dataset.csv,as_abs_path,fp_dataset
+locus_attrs,locus_attrs.csv,Path to CSV file with per-locus information,locus_attrs.csv,as_abs_path,fp_locus_attrs
+allele_names,,Path to CSV file with per-allele information,allele_names.csv,as_abs_path,fp_allele_names
+gentoypes_known,,Path to CSV file with per-genotype information,genotypes.csv,as_abs_path,fp_genotypes_known
+prep_dataset_path,str-data,Path to search for automatic dataset table preparation,str-data,as_abs_path,dataset_opts:dp
 prep_dataset_pattern,(\d+)-(\d+)-([A-Za-z0-9]+).fast[aq](?:\.gz),Regular expression pattern for parsing filenames for automatic dataset table preparation,Sample([0-9]+)-([A-Za-z0-9])().fastq,as.character,dataset_opts:pattern
 prep_dataset_order,1+2+3,Order of Replicate+Sample+Locus fields in prep_dataset_pattern capture groups,2+3+1,as_integer_vec,dataset_opts:ord
-prep_dataset_autorep,FALSE,Should duplicate Sample+Locus entries found during automatic dataset table preparation be automatically labeled as different replicates?,FALSE,as.logical,dataset_opts:autorep
-output_path,str-results,Path to directory to save all output to,str-results,as.character,output:dp
+prep_dataset_autorep,FALSE,Should duplicate Sample+Locus entries found during automatic dataset table preparation be automatically labeled as different replicates?,FALSE,as_bool,dataset_opts:autorep
+output_path,str-results,Path to directory to save all output to,str-results,as_abs_path,output:dp
 output_summary,summary.csv,Filename to write summary CSV file to,summary.csv,as.character,output:fp_summary
 output_report,report.html,Filename to write report HTML file to,report.html,as.character,output:fp_report
 output_dist_mat,sample-distances.csv,FIlename to write sample-to-sample distances CSV file to,sample-distances.csv,as.character,output:fp_dist_mat
 output_rds,,Filename to save RDS data file to,results.rds,as.character,output:fp_rds
-output_path_histograms,histograms,Path within output_path to save histograms to,histograms,as.character,output:dp_histograms
-output_path_alignments,alignments,Path within output_path to save per-locus allele alignment FASTA files to,alignments,as.character,output:dp_alignments
-output_path_alignment_images,alignment-images,Path within output_path to save per-locus allele alignment images to,alignment-images,as.character,output:dp_alignment_images
-output_path_processed_files,processed-files,Path within output_path to save per-input-file data tables to,processed-files,as.character,output:dp_processed_files
-output_path_processed_samples,processed-samples,Path within output_path to save per-sample data tables to,processed-samples,as.character,output:dp_processed_samples
-output_path_allele_seqs,allele-sequences,Path within output_path to save per-allele FASTA files to,allele-sequences,as.character,output:dp_allele_seqs
+output_path_histograms,histograms,Path within output_path to save histograms to,histograms,as_rel_path,output:dp_histograms
+output_path_alignments,alignments,Path within output_path to save per-locus allele alignment FASTA files to,alignments,as_rel_path,output:dp_alignments
+output_path_alignment_images,alignment-images,Path within output_path to save per-locus allele alignment images to,alignment-images,as_rel_path,output:dp_alignment_images
+output_path_processed_files,processed-files,Path within output_path to save per-input-file data tables to,processed-files,as_rel_path,output:dp_processed_files
+output_path_processed_samples,processed-samples,Path within output_path to save per-sample data tables to,processed-samples,as_rel_path,output:dp_processed_samples
+output_path_allele_seqs,allele-sequences,Path within output_path to save per-allele FASTA files to,allele-sequences,as_rel_path,output:dp_allele_seqs
 ncores,0,Number of cores to use while processing samples in parallel (0 to automatically detect; 1 to disable parallel execution),12,as_cpu_cores,dataset_analysis:ncores
 allele_suffix_len,6,Length of sequence-based suffix to append to automatic allele names,6,as.integer,dataset_analysis:name_args:hash_len
 min_motif_repeats,3,Minimum number of perfect adjacent motif repeats to recognize a candidate allele,3,as.integer,seq_analysis:nrepeats
 max_stutter_ratio,0.33333,,0.33333,as.numeric,seq_analysis:stutter.count.ratio_max
 max_artifact_ratio,0.33333,,0.33333,as.numeric,seq_analysis:artifact.count.ratio_max
-use_reverse_primers,FALSE,,FALSE,as.logical,seq_analysis:use_reverse_primers
-reverse_primer_r1,TRUE,,TRUE,as.logical,seq_analysis:reverse_primer_r1
+use_reverse_primers,FALSE,,FALSE,as_bool,seq_analysis:use_reverse_primers
+reverse_primer_r1,TRUE,,TRUE,as_bool,seq_analysis:reverse_primer_r1
 max_mismatches,0,,0,as.integer,seq_analysis:max_mismatches
 primer_action,none,,none,as.character,seq_analysis:primer_action
 max_mismatches_fwd,,,0,as.integer,seq_analysis:max_mismatches_fwd
@@ -36,20 +36,20 @@ sample_analysis_func,analyze_sample,Function to apply for selecting candidate al
 min_allele_abundance,0.05,Minimum fraction of locus-matching reads for candidate alleles,0.05,as.numeric,sample_analysis_opts:fraction.min
 sample_summary_func,summarize_sample,Function to apply for finalizing allele calls per sample,summarize_sample,as.character,sample_summary_func
 min_locus_reads,500,Minimum number of matching reads for a locus to output a genotype,500,as.integer,sample_summary_opts:counts.min
-report,TRUE,Create the HTML report file?,TRUE,as.logical,report
-report_show_code,FALSE,Include the code used in report generation within the report?,FALSE,as.logical,report.echo
+report,TRUE,Create the HTML report file?,TRUE,as_bool,report
+report_show_code,FALSE,Include the code used in report generation within the report?,FALSE,as_bool,report.echo
 report_title,Microsatellite Report,Title to show at the top of the report file,Microsatellite Report,as.character,report.title
 report_author,,Author to show at the top of the report file,Jane G,as.character,report.author
 report_locus_chunks,,Gropuings of locus names to use to break report tables into reasonable sizes and order locus names explicitly,A-D/1-4=A/B/C/D/1/2/3/4;X=X1/X2/X3,as_locus_vecs,report.locus_chunks
-report_group_samples,FALSE,Group together genotype table rows in report by sample?,FALSE,as.logical,report.group_samples
+report_group_samples,FALSE,Group together genotype table rows in report by sample?,FALSE,as_bool,report.group_samples
 report_na_replicates,,Text to use for NA entries in Replicate column of report tables,Pooled,as.character,report.na.replicates
 report_na_alleles,,Text to use for NA allele entries in tables (when the Sample+Locus combination was no present at all),NA,as.character,report.na.alleles
 id_dist_range,2,,2,as.integer,report.dist_range
 id_dist_max,3,,3,as.integer,report.dist_max
-report_section_genotypes,TRUE,Include report section showing observed genotypes?,TRUE,as.logical,report.sections:genotypes
-report_section_identifications,TRUE,Include report section showing identifications based on known genotypes?,TRUE,as.logical,report.sections:identifications
-report_section_distances,TRUE,Include report section showing inter-sample distances?,TRUE,as.logical,report.sections:distances
-report_section_flags,TRUE,Include report section showing heatmaps with noteworthy characteristics of results?,TRUE,as.logical,report.sections:flags
-report_section_alignments,TRUE,Include report section showing per-locus allele alignment images?,TRUE,as.logical,report.sections:alignments
-report_section_contamination,TRUE,Include report section showing heatmap of per-locus abundance values across all loci and samples?,TRUE,as.logical,report.sections:contamination
-verbose,TRUE,Show status messages on the standard error stream?,TRUE,as.logical,verbose
+report_section_genotypes,TRUE,Include report section showing observed genotypes?,TRUE,as_bool,report.sections:genotypes
+report_section_identifications,TRUE,Include report section showing identifications based on known genotypes?,TRUE,as_bool,report.sections:identifications
+report_section_distances,TRUE,Include report section showing inter-sample distances?,TRUE,as_bool,report.sections:distances
+report_section_flags,TRUE,Include report section showing heatmaps with noteworthy characteristics of results?,TRUE,as_bool,report.sections:flags
+report_section_alignments,TRUE,Include report section showing per-locus allele alignment images?,TRUE,as_bool,report.sections:alignments
+report_section_contamination,TRUE,Include report section showing heatmap of per-locus abundance values across all loci and samples?,TRUE,as_bool,report.sections:contamination
+verbose,TRUE,Show status messages on the standard error stream?,TRUE,as_bool,verbose

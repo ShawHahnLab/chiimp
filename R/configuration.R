@@ -18,60 +18,6 @@
 #' @export CFG_DEFAULTS
 NULL
 
-#' Compare two version strings
-#'
-#' `version_compare` takes two strings for software versions(e.g. "1.0.2") and
-#' returns `>`, `<`, or `=` depending on whether the first version is later,
-#' earlier, or equivalent to the second version.  For example, "1.2.0" >
-#' "1.1.5".
-#'
-#' If there are fewer fields in one string than the other, the one with fewer is
-#' padded with zeros for the least-significant positions.  For example 1.2.3 vs
-#' 1.2 is equivalent to 1.2.3 vs 1.2.0.
-#'
-#' @param ver1txt single character string for a software version
-#' @param ver2txt single character string for a software version
-#' @returns a single character representing if if the first version is later
-#'   (`>`), earlier (`<`), or equivalent (`=`) to the second version
-#'
-#' @md
-version_compare <- function(ver1txt, ver2txt) {
-  ver1 <- strsplit(ver1txt, "\\.")[[1]]
-  ver2 <- strsplit(ver2txt, "\\.")[[1]]
-  len <- max(length(ver1), length(ver2))
-  ver_mat <- matrix(as.integer(c(ver1[1:len], ver2[1:len])), ncol = 2)
-  ver_mat[is.na(ver_mat)] <- 0
-  for (idx in seq_len(nrow(ver_mat))) {
-    if (ver_mat[idx, 1] > ver_mat[idx, 2]) {
-      return(">")
-    }
-    if (ver_mat[idx, 1] < ver_mat[idx, 2]) {
-      return("<")
-    }
-  }
-  return("=")
-}
-
-config_check_keys <- function(cfg_table) {
-  unknown_txt <- cfg_table$Key[! cfg_table$Key %in% CFG_DEFAULTS$Key]
-  if (length(unknown_txt) > 0) {
-    warning(paste0(
-      "unrecognized config file entries:\n",
-      paste(gsub("^", "  ", unknown_txt), collapse = "\n")))
-  }
-}
-
-config_check_version <- function(cfg_table) {
-  version <- cfg_table$Value[match("version", cfg_table$Key)]
-  version_pkg <- CFG_DEFAULTS$Value[match("version", CFG_DEFAULTS$Key)]
-  ver_cmp <- version_compare(version, version_pkg)
-  if (ver_cmp == ">") {
-    warning(paste0(
-      "Config file version (", version,
-      ") > package config version (", version_pkg, ")"))
-  }
-}
-
 #' Get/set CHIIMP global configuration options
 #'
 #' `cfg` is a helper function to provide a shortcut for the equivalent
@@ -131,8 +77,65 @@ apply_config <- function(config, keep = TRUE) {
 }
 
 
-# Parsing -----------------------------------------------------------------
+# Config Checking ---------------------------------------------------------
 
+
+#' Compare two version strings
+#'
+#' `version_compare` takes two strings for software versions(e.g. "1.0.2") and
+#' returns `>`, `<`, or `=` depending on whether the first version is later,
+#' earlier, or equivalent to the second version.  For example, "1.2.0" >
+#' "1.1.5".
+#'
+#' If there are fewer fields in one string than the other, the one with fewer is
+#' padded with zeros for the least-significant positions.  For example 1.2.3 vs
+#' 1.2 is equivalent to 1.2.3 vs 1.2.0.
+#'
+#' @param ver1txt single character string for a software version
+#' @param ver2txt single character string for a software version
+#' @returns a single character representing if if the first version is later
+#'   (`>`), earlier (`<`), or equivalent (`=`) to the second version
+#'
+#' @md
+version_compare <- function(ver1txt, ver2txt) {
+  ver1 <- strsplit(ver1txt, "\\.")[[1]]
+  ver2 <- strsplit(ver2txt, "\\.")[[1]]
+  len <- max(length(ver1), length(ver2))
+  ver_mat <- matrix(as.integer(c(ver1[1:len], ver2[1:len])), ncol = 2)
+  ver_mat[is.na(ver_mat)] <- 0
+  for (idx in seq_len(nrow(ver_mat))) {
+    if (ver_mat[idx, 1] > ver_mat[idx, 2]) {
+      return(">")
+    }
+    if (ver_mat[idx, 1] < ver_mat[idx, 2]) {
+      return("<")
+    }
+  }
+  return("=")
+}
+
+config_check_keys <- function(cfg_table) {
+  unknown_txt <- cfg_table$Key[! cfg_table$Key %in% CFG_DEFAULTS$Key]
+  if (length(unknown_txt) > 0) {
+    warning(paste0(
+      "unrecognized config file entries:\n",
+      paste(gsub("^", "  ", unknown_txt), collapse = "\n")))
+  }
+}
+
+config_check_version <- function(cfg_table) {
+  version <- cfg_table$Value[match("version", cfg_table$Key)]
+  version_pkg <- CFG_DEFAULTS$Value[match("version", CFG_DEFAULTS$Key)]
+  ver_cmp <- version_compare(version, version_pkg)
+  if (ver_cmp == ">") {
+    warning(paste0(
+      "Config file version (", version,
+      ") > package config version (", version_pkg, ")"))
+  }
+}
+
+
+# Config Parsing ----------------------------------------------------------
 
 
 # take a config table, parse each setting, and return a list of key/value pairs.
@@ -172,21 +175,38 @@ parse_config <- function(cfg_table) {
   cfg_list
 }
 
-# parse a single character string as a vector of integers separated by
-# non-digits
-as_integer_vec <- function(txt) {
+check_one_val <- function(txt) {
   if (length(txt) != 1) {
     stop(paste("txt should be of length 1; received", length(txt)))
   }
+}
+
+# flexible boolean handling to still act like the old YAML config (well, pre 1.2
+# YAML) plus whatever R recognizes
+as_bool <- function(txt) {
+  check_one_val(txt)
+  txt <- toupper(txt)
+  map <- c(
+    "TRUE" = TRUE, "T" = TRUE, "YES" = TRUE, "ON" = TRUE,
+    "FALSE" = FALSE, "F" = FALSE, "NO" = FALSE, "OFF" = FALSE)
+  if (! txt %in% c("", names(map))) {
+    stop(paste("txt should be TRUE or FALSE; received", txt))
+  }
+  out <- unname(map[txt])
+  out
+}
+
+# parse a single character string as a vector of integers separated by
+# non-digits
+as_integer_vec <- function(txt) {
+  check_one_val(txt)
   as.integer(strsplit(txt, "[^-0-9]+")[[1]])
 }
 
 # parse a single character string as a named list of vectors
 # e.g. "name=item1/item2/item3;name2=item4/item5;..."
 as_locus_vecs <- function(txt) {
-  if (length(txt) != 1) {
-    stop(paste("txt should be of length 1; received", length(txt)))
-  }
+  check_one_val(txt)
   chunks <- strsplit(txt, "; *")[[1]]
   chunk_names <- sub("=.*", "", chunks)
   vecs <- lapply(chunks, function(chunk) {
@@ -198,12 +218,26 @@ as_locus_vecs <- function(txt) {
 
 # autodetect CPU cores if 0
 as_cpu_cores <- function(txt) {
-  if (length(txt) != 1) {
-    stop(paste("txt should be of length 1; received", length(txt)))
-  }
+  check_one_val(txt)
   val <- as.integer(txt)
   if (val == 0) {
     val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
   val
+}
+
+# make designated paths absolute relative to working directory, unless already
+# absolute
+as_abs_path <- function(txt) {
+  check_one_val(txt)
+  if (substr(txt, 1, 1) != .Platform$file.sep) {
+    file.path(normalizePath("."), txt)
+  } else {
+    txt
+  }
+}
+
+as_rel_path <- function(txt) {
+  check_one_val(txt)
+  txt
 }

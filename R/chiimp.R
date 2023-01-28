@@ -140,13 +140,6 @@
 #' @export
 #' @md
 full_analysis <- function() {
-  # Make output path absolute
-  cfg("output_path",
-    if (substr(cfg("output_path"), 1, 1) != .Platform$file.sep) {
-      file.path(normalizePath("."), cfg("output_path"))
-    } else {
-      cfg("output_path")
-    })
   # Only show identifications if a known genotypes table was supplied
   cfg("report_section_identifications", ! is_blank(cfg("genotypes_known")) &&
     cfg("report_section_identifications"))
