@@ -1,38 +1,22 @@
-# parse a single character string as a vector of integers separated by
-# non-digits
-as_integer_vec <- function(txt) {
-  if (length(txt) != 1) {
-    stop(paste("txt should be of length 1; received", length(txt)))
-  }
-  as.integer(strsplit(txt, "[^-0-9]+")[[1]])
-}
-
-# parse a single character string as a named list of vectors
-# e.g. "name=item1/item2/item3;name2=item4/item5;..."
-as_locus_vecs <- function(txt) {
-  if (length(txt) != 1) {
-    stop(paste("txt should be of length 1; received", length(txt)))
-  }
-  chunks <- strsplit(txt, "; *")[[1]]
-  chunk_names <- sub("=.*", "", chunks)
-  vecs <- lapply(chunks, function(chunk) {
-    strsplit(sub(".*=", "", chunk), "/")[[1]]
-  })
-  names(vecs) <- chunk_names
-  vecs
-}
-
-# autodetect CPU cores if 0
-as_cpu_cores <- function(txt) {
-  if (length(txt) != 1) {
-    stop(paste("txt should be of length 1; received", length(txt)))
-  }
-  val <- as.integer(txt)
-  if (val == 0) {
-    val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
-  }
-  val
-}
+#' Default Configuration
+#'
+#' `CFG_DEFAULTS` is CHIIMP's default configuration options and metadata.  The
+#' values in this data frame are used unless overridden by custom ones, and the
+#' parsing of text values into other types is defined by the `Parser` column
+#' here.
+#'
+#' The columns are:
+#'
+#' * Key: name of each setting
+#' * Value: unparsed text value for each setting
+#' * Description: short description of the setting
+#' * Example: example value
+#' * Parser: name of a function to apply to each entry when setting globally for
+#'   the package (see [apply_config])
+#'
+#' @name CFG_DEFAULTS
+#' @export CFG_DEFAULTS
+NULL
 
 #' Compare two version strings
 #'
@@ -86,43 +70,6 @@ config_check_version <- function(cfg_table) {
       "Config file version (", version,
       ") > package config version (", version_pkg, ")"))
   }
-}
-
-# take a config table, parse each setting, and return a list of key/value pairs.
-
-#' Parse a configuration data frame into list
-#'
-#' `parse_config` takes each row of a data frame of configuration options and
-#' defines a list item for it, using the Key column for each name and parsing
-#' each value according to the Parser column.
-#'
-#' @param cfg_table data frame of CHIIMP configuration options
-#' @returns list with one item per row in the input data frame, with each value
-#'   parsed according to the function name in the Parser column
-#' @md
-parse_config <- function(cfg_table) {
-  cfg_list <- list()
-  for (idx in seq_len(nrow(cfg_table))) {
-    key <- cfg_table$Key[idx]
-    val <- cfg_table$Value[idx]
-    idx_default <- match(key, CFG_DEFAULTS$Key)
-    funcname <- cfg_table$Parser[idx]
-    if (is.na(idx_default)) {
-      warning(paste("unrecognized config file entry:", key))
-    }
-    if (is.null(funcname)) {
-      # If this config didn't supply a parser, use the default's
-      funcname <- CFG_DEFAULTS$Parser[idx_default]
-    }
-    if (is.na(funcname)) {
-      # if the default didn't supply a parser (should only happen for
-      # unrecognized entries) use as.character.
-      funcname <- "as.character"
-    }
-    func <- get(funcname)
-    cfg_list[[key]] <- func(val)
-  }
-  cfg_list
 }
 
 #' Get/set CHIIMP global configuration options
@@ -183,51 +130,80 @@ apply_config <- function(config, keep = TRUE) {
   do.call(options, config)
 }
 
-#' Default Configuration
-#'
-#' `CFG_DEFAULTS` is CHIIMP's default configuration options and metadata.  The
-#' values in this data frame are used unless overridden by custom ones, and the
-#' parsing of text values into other types is defined by the `Parser` column
-#' here.
-#'
-#' The columns are:
-#'
-#' * Key: name of each setting
-#' * Value: unparsed text value for each setting
-#' * Description: short description of the setting
-#' * Example: example value
-#' * Parser: name of a function to apply to each entry when setting globally for
-#'   the package (see [apply_config])
-#'
-#' @name CFG_DEFAULTS
-#' @export CFG_DEFAULTS
-NULL
 
-.getenv <- function() {
-  parent.env(parent.frame())
-}
+# Parsing -----------------------------------------------------------------
 
-#' Set up CHIIMP package environment
+
+
+# take a config table, parse each setting, and return a list of key/value pairs.
+
+#' Parse a configuration data frame into list
 #'
-#' This loads [CFG_DEFAULTS] from a CSV file when the chiimp package is loaded,
-#' and applies the configuration options globally.
+#' `parse_config` takes each row of a data frame of configuration options and
+#' defines a list item for it, using the Key column for each name and parsing
+#' each value according to the Parser column.
+#'
+#' @param cfg_table data frame of CHIIMP configuration options
+#' @returns list with one item per row in the input data frame, with each value
+#'   parsed according to the function name in the Parser column
 #' @md
-setup_package <- function() {
-  pkg_env <- .getenv()
-  cfg_table <- load_config_csv(
-    system.file("extdata", "config_defaults.csv", package = "chiimp"))
-  for (item in c("CFG_DEFAULTS", "test_data")) {
-    if (exists(item, pkg_env)) {
-      unlockBinding(item, pkg_env)
+parse_config <- function(cfg_table) {
+  cfg_list <- list()
+  for (idx in seq_len(nrow(cfg_table))) {
+    key <- cfg_table$Key[idx]
+    val <- cfg_table$Value[idx]
+    idx_default <- match(key, CFG_DEFAULTS$Key)
+    funcname <- cfg_table$Parser[idx]
+    if (is.na(idx_default)) {
+      warning(paste("unrecognized config file entry:", key))
     }
+    if (is.null(funcname)) {
+      # If this config didn't supply a parser, use the default's
+      funcname <- CFG_DEFAULTS$Parser[idx_default]
+    }
+    if (is.na(funcname)) {
+      # if the default didn't supply a parser (should only happen for
+      # unrecognized entries) use as.character.
+      funcname <- "as.character"
+    }
+    func <- get(funcname)
+    cfg_list[[key]] <- func(val)
   }
-  assign("CFG_DEFAULTS", cfg_table, pos = pkg_env)
-  apply_config(CFG_DEFAULTS)
-  if (! exists("test_data")) {
-    assign("test_data", make_helper_data(), pos = pkg_env)
-  }
+  cfg_list
 }
 
-.onLoad <- function(libname, pkgname) {
-  setup_package()
+# parse a single character string as a vector of integers separated by
+# non-digits
+as_integer_vec <- function(txt) {
+  if (length(txt) != 1) {
+    stop(paste("txt should be of length 1; received", length(txt)))
+  }
+  as.integer(strsplit(txt, "[^-0-9]+")[[1]])
+}
+
+# parse a single character string as a named list of vectors
+# e.g. "name=item1/item2/item3;name2=item4/item5;..."
+as_locus_vecs <- function(txt) {
+  if (length(txt) != 1) {
+    stop(paste("txt should be of length 1; received", length(txt)))
+  }
+  chunks <- strsplit(txt, "; *")[[1]]
+  chunk_names <- sub("=.*", "", chunks)
+  vecs <- lapply(chunks, function(chunk) {
+    strsplit(sub(".*=", "", chunk), "/")[[1]]
+  })
+  names(vecs) <- chunk_names
+  vecs
+}
+
+# autodetect CPU cores if 0
+as_cpu_cores <- function(txt) {
+  if (length(txt) != 1) {
+    stop(paste("txt should be of length 1; received", length(txt)))
+  }
+  val <- as.integer(txt)
+  if (val == 0) {
+    val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
+  }
+  val
 }

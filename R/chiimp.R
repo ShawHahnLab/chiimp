@@ -309,3 +309,32 @@ format_pandoc_args <- function(metadata) {
   metadata <- paste(names(metadata), metadata, sep = ":")
   paste("--metadata=", metadata, sep = "")
 }
+
+.getenv <- function() {
+  parent.env(parent.frame())
+}
+
+#' Set up CHIIMP package environment
+#'
+#' This loads [CFG_DEFAULTS] from a CSV file when the chiimp package is loaded,
+#' and applies the configuration options globally.
+#' @md
+setup_package <- function() {
+  pkg_env <- .getenv()
+  cfg_table <- load_config_csv(
+    system.file("extdata", "config_defaults.csv", package = "chiimp"))
+  for (item in c("CFG_DEFAULTS", "test_data")) {
+    if (exists(item, pkg_env)) {
+      unlockBinding(item, pkg_env)
+    }
+  }
+  assign("CFG_DEFAULTS", cfg_table, pos = pkg_env)
+  apply_config(CFG_DEFAULTS)
+  if (! exists("test_data")) {
+    assign("test_data", make_helper_data(), pos = pkg_env)
+  }
+}
+
+.onLoad <- function(libname, pkgname) {
+  setup_package()
+}
