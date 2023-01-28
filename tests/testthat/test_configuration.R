@@ -2,59 +2,6 @@ testpth <- function(fname) normalizePath(test_path("data", "configuration", fnam
 testrds <- function(fname) readRDS(test_path("data", "configuration", fname))
 
 
-# as_integer_vec ----------------------------------------------------------
-
-
-test_that("as_integer_vec parses integer vectors from individual strings", {
-  expect_equal(as_integer_vec("1+2+3"), 1:3)
-  expect_equal(as_integer_vec("1;2@@3"), 1:3)
-  expect_equal(as_integer_vec(""), integer())
-  expect_equal(as_integer_vec("-5"), -5L)
-  expect_equal(as_integer_vec("1.2"), 1:2)
-})
-
-test_that("as_integer_vec complains for inputs longer than one", {
-  expect_error(as_integer_vec(c("1", "2")))
-})
-
-
-# as_locus_vecs -----------------------------------------------------------
-
-
-test_that("as_locus_vecs parses lists of locus names from individual strings", {
-  expect_equal(
-    as_locus_vecs("X=1/2/3;Y=A/B"),
-    list(X = c("1", "2", "3"), Y = c("A", "B")))
-  expect_equal(
-    as_locus_vecs("X=1/2/3; Y=A/B"),
-    list(X = c("1", "2", "3"), Y = c("A", "B")))
-  output <- list()
-  # evidently "list()" is a different thing than "named list()"
-  names(output) <- character()
-  expect_equal(as_locus_vecs(""), output)
-})
-
-
-# version_compare ---------------------------------------------------------
-
-
-test_that("version_compare can order two software version strings", {
-  expect_equal(version_compare("1.2.3", "1.4.0"), "<")
-  expect_equal(version_compare("1.4.0", "1.2.3"), ">")
-  expect_equal(version_compare("1.4.0", "1.4.0"), "=")
-  expect_equal(version_compare("0.5.0", "0.5.1"), "<")
-  expect_equal(version_compare("1.2.3", "1"), ">") # treats 1 like 1.0.0
-  expect_equal(version_compare("", ""), "=")
-})
-
-
-# is_blank ----------------------------------------------------------------
-
-
-# TODO put this in util?
-
-
-
 # cfg ---------------------------------------------------------------------
 
 
@@ -75,6 +22,131 @@ test_that("cfg handles chiimp options", {
   # setting a new option
   cfg("something", 5L)
   expect_identical(getOption("chiimp.something"), 5L)
+})
+
+
+# apply_config ------------------------------------------------------------
+
+
+test_that("apply_config loads configuration info into global options", {
+
+})
+
+test_that("apply_config can remove existing global options", {
+
+})
+
+
+# version_compare ---------------------------------------------------------
+
+
+test_that("version_compare can order two software version strings", {
+  expect_equal(version_compare("1.2.3", "1.4.0"), "<")
+  expect_equal(version_compare("1.4.0", "1.2.3"), ">")
+  expect_equal(version_compare("1.4.0", "1.4.0"), "=")
+  expect_equal(version_compare("0.5.0", "0.5.1"), "<")
+  expect_equal(version_compare("1.2.3", "1"), ">") # treats 1 like 1.0.0
+  expect_equal(version_compare("", ""), "=")
+})
+
+
+# config_check_keys -------------------------------------------------------
+
+
+test_that("config_check_keys warns of unrecognized config keys", {
+
+})
+
+
+# config_check_version ----------------------------------------------------
+
+
+test_that("config_check_version warns if config version above pkg version", {
+
+})
+
+
+# parse_config ------------------------------------------------------------
+
+
+test_that("parse_config loads a config data frame from CSV", {
+
+})
+
+
+
+# as_bool -----------------------------------------------------------------
+
+
+test_that("as_bool parses true/false values from text", {
+
+})
+
+
+# as_integer_vec ----------------------------------------------------------
+
+
+test_that("as_integer_vec parses integer vectors from text", {
+  expect_equal(as_integer_vec("1+2+3"), 1:3)
+  expect_equal(as_integer_vec("1;2@@3"), 1:3)
+  expect_equal(as_integer_vec(""), integer())
+  expect_equal(as_integer_vec("-5"), -5L)
+  expect_equal(as_integer_vec("1.2"), 1:2)
+  # only length 1
+  expect_error(as_integer_vec(c("1", "2")))
+  expect_error(as_integer_vec(c()))
+})
+
+
+# as_locus_vecs -----------------------------------------------------------
+
+
+test_that("as_locus_vecs parses lists of locus names from text", {
+  expect_equal(
+    as_locus_vecs("X=1/2/3;Y=A/B"),
+    list(X = c("1", "2", "3"), Y = c("A", "B")))
+  expect_equal(
+    as_locus_vecs("X=1/2/3; Y=A/B"),
+    list(X = c("1", "2", "3"), Y = c("A", "B")))
+  output <- list()
+  # evidently "list()" is a different thing than "named list()"
+  names(output) <- character()
+  expect_equal(as_locus_vecs(""), output)
+  # only length 1
+  expect_error(as_locus_vecs(c("X=1/2/3", "Y=A/B")))
+  expect_error(as_locus_vecs(c()))
+})
+
+
+# as_cpu_cores ------------------------------------------------------------
+
+
+test_that("as_cpu_cores parses number of CPU cores from text", {
+
+})
+
+
+# as_abs_path -------------------------------------------------------------
+
+
+test_that("as_abs_path parses abolute path from text", {
+
+})
+
+
+# as_rel_path -------------------------------------------------------------
+
+
+test_that("as_rel_path parses abolute path from text", {
+
+})
+
+
+# is_blank ----------------------------------------------------------------
+
+
+test_that("is_blank interprets multiple kinds of missing data as TRUE", {
+
 })
 
 

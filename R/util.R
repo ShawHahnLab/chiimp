@@ -2,23 +2,6 @@
 
 # Sample data frame helpers -----------------------------------------------
 
-#' Check Sample Data for Potential Allele Matches
-#'
-#' Check the entries in a processed sample data frame for potential matches to a
-#' given locus.
-#'
-#' @param sample_data data frame of processed data for sample as produced by
-#'   [analyze_sample].
-#' @param locus_name character name of locus to match against.
-#'
-#' @return logical vector of entries for potential alleles.
-#' @md
-full_locus_match <- function(sample_data, locus_name) {
-  with(sample_data,
-       as.character(MatchingLocus) == locus_name &
-         MotifMatch &
-         LengthMatch)
-}
 
 #' Create identifiers for STR Data
 #'
@@ -215,6 +198,27 @@ logmsg <- function(msg, col2 = as.character(Sys.time()), end = "\n") {
   cat(paste0(msg, end), file = 2)
 }
 
+#' Complements of IUPAC nucleotide codes
+#'
+#' `CMP` is a named character vector mapping each IUPAC DNA nucleotide code to
+#' its complement.  For example, `CMP["A"]` is `T`.
+#' @md
+CMP <- c(
+  A = "T",
+  C = "G",
+  T = "A",
+  G = "C",
+  R = "Y",
+  Y = "R",
+  S = "S",
+  W = "W",
+  K = "M",
+  M = "K",
+  B = "V",
+  D = "H",
+  H = "D",
+  V = "B")
+
 #' Reverse complement sequences
 #'
 #' Each entry in the input character vector is reversed and nucleotide
@@ -240,14 +244,4 @@ revcmp <- function(txt) {
   }, character(1))
   out[nas] <- NA
   out
-}
-
-# Does the given vector look "blank"?
-# NULL: TRUE (caught by length of 0)
-# NA: TRUE
-# "": TRUE
-# any combo of NA and "": TRUE
-# all else: FALSE
-is_blank <- function(vec) {
-  length(vec) == 0 || all(vec %in% c(NA, ""))
 }

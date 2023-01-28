@@ -378,27 +378,6 @@ RAW_NT["H"] <- RAW_NT["A"] | RAW_NT["C"] | RAW_NT["T"]
 RAW_NT["V"] <- RAW_NT["A"] | RAW_NT["C"] | RAW_NT["G"]
 RAW_NT["N"] <- RAW_NT["A"] | RAW_NT["C"] | RAW_NT["G"] | RAW_NT["T"]
 
-#' Complements of IUPAC nucleotide codes
-#'
-#' `CMP` is a named character vector mapping each IUPAC DNA nucleotide code to
-#' its complement.  For example, `CMP["A"]` is `T`.
-#' @md
-CMP <- c(
-  A = "T",
-  C = "G",
-  T = "A",
-  G = "C",
-  R = "Y",
-  Y = "R",
-  S = "S",
-  W = "W",
-  K = "M",
-  M = "K",
-  B = "V",
-  D = "H",
-  H = "D",
-  V = "B")
-
 #' Make matrix of raw bytes from nucleotide sequences
 #'
 #' Each sequence in the given vector becomes a column of the output matrix, with

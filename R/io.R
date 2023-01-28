@@ -394,7 +394,7 @@ prepare_dataset <- function(
 
   # If specified, map the locus text into multiple loci per sample (e.g.
   # multiplexed)
-  if (! is_blank(locusmap)) {
+  if (! is.null(locusmap)) {
     data <- do.call(rbind, lapply(seq_len(nrow(data)), function(i) {
       col_locus <- match("Locus", colnames(data))
       cols <- as.list(data[i, -col_locus])

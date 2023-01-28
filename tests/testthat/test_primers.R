@@ -430,27 +430,6 @@ test_that("find_primer_matches handles IUPAC codes", {
 })
 
 
-# revcmp ------------------------------------------------------------------
-
-
-test_that("revcmp reverse complements", {
-  # basic cases
-  expect_identical(revcmp("GCCA"), "TGGC")
-  expect_identical(revcmp("GCca"), "tgGC")
-  expect_identical(revcmp("GCCX"), "XGGC")
-  # empty input, empty output
-  expect_identical(revcmp(""), "")
-  # zero-length input, zero-length output
-  expect_identical(revcmp(character()), character())
-  # NAs are handled
-  expect_identical(revcmp(NA), as.character(NA))
-})
-
-test_that("revcmp handles IUPAC", {
-  expect_identical(revcmp("AYKN"), "NMRT")
-})
-
-
 # make_raw_nt -------------------------------------------------------------
 
 
