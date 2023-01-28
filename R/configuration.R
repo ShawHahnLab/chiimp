@@ -29,7 +29,7 @@ as_cpu_cores <- function(txt) {
   }
   val <- as.integer(txt)
   if (val == 0) {
-    val <- max(1, as.integer(parallel::detectCores() / 2) - 1))
+    val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
   val
 }
