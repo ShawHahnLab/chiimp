@@ -17,21 +17,6 @@
 #' @param dataset data frame of sample details as produced by [prepare_dataset].
 #' @param locus_attrs data frame of locus attributes as produced by
 #'   [load_locus_attrs].
-#' @param nrepeats number of repeats of each locus' motif to require for a
-#'   match (see [analyze_seqs]).
-#' @param stutter.count.ratio_max highest ratio of read counts for second most
-#'   frequent sequence to the most frequent where the second will be considered
-#'   stutter (see [analyze_seqs]).
-#' @param artifact.count.ratio_max as for `stutter.count.ratio_max` but for
-#'   non-stutter artifact sequences.
-#' @param use_reverse_primers consider the ReversePrimer column from the locus
-#'   attributes for locus-matching?
-#' @param reverse_primer_r1 Is each reverse primer given in its orientation on
-#'   the forward read?  (See [analyze_seqs])
-#' @param ncores integer number of CPU cores to use in parallel for sample
-#'   analysis.  Defaults to one less than half the number of detected cores with
-#'   a minimum of 1.  If 1, the function will run without using the
-#'   `parallel` package.
 #' @param analysis_opts list of supplemental arguments to [analysis_function].
 #' @param summary_opts list of supplemental arguments to [summary_function].
 #' @param analysis_function function to use when analyzing each sample's data
@@ -51,22 +36,11 @@
 analyze_dataset <- function(
     dataset,
     locus_attrs,
-    nrepeats = cfg("min_motif_repeats"),
-    stutter.count.ratio_max = cfg("max_stutter_ratio"),
-    artifact.count.ratio_max = cfg("max_artifact_ratio"),
-    use_reverse_primers = cfg("use_reverse_primers"),
-    reverse_primer_r1 = cfg("reverse_primer_r1"),
-    max_mismatches = cfg("max_mismatches"),
-    primer_action = cfg("primer_action"),
-    max_mismatches_fwd = cfg("max_mismatches_fwd"),
-    max_mismatches_rev = cfg("max_mismatches_rev"),
-    primer_action_fwd = cfg("primer_action_fwd"),
-    primer_action_rev = cfg("primer_action_rev"),
-    ncores = cfg("ncores"),
     analysis_opts,
     summary_opts,
     analysis_function = analyze_sample,
     summary_function = summarize_sample,
+    ncores = cfg("ncores"),
     known_alleles = NULL) {
   if (! all(dataset$Locus %in% locus_attrs$Locus)) {
     rogue_loci <- unique(dataset$Locus[! dataset$Locus %in% locus_attrs$Locus])
@@ -74,28 +48,9 @@ analyze_dataset <- function(
                  paste(rogue_loci, collapse = ", "))
     stop(msg)
   }
-  if (ncores == 0) {
-    ncores <- max(1, as.integer(parallel::detectCores() / 2) - 1)
-  }
-  analyze.file <- function(
-      fp, locus_attrs, nrepeats,
-      stutter.count.ratio_max, artifact.count.ratio_max,
-      use_reverse_primers, reverse_primer_r1,
-      max_mismatches, primer_action,
-      max_mismatches_fwd, max_mismatches_rev,
-      primer_action_fwd, primer_action_rev) {
+  analyze.file <- function(fp, locus_attrs) {
     seqs <- load_seqs(fp)
-    analyze_seqs(
-      seqs, locus_attrs, nrepeats,
-      stutter.count.ratio_max, artifact.count.ratio_max,
-      use_reverse_primers = use_reverse_primers,
-      reverse_primer_r1 = reverse_primer_r1,
-      max_mismatches = max_mismatches,
-      primer_action = primer_action,
-      max_mismatches_fwd = max_mismatches_fwd,
-      max_mismatches_rev = max_mismatches_rev,
-      primer_action_fwd = primer_action_fwd,
-      primer_action_rev = primer_action_rev)
+    analyze_seqs(seqs, locus_attrs)
   }
   analyze.entry <- function(
       entry, analysis_opts, summary_opts, analysis_function, summary_function,
@@ -117,7 +72,7 @@ analyze_dataset <- function(
     # Set up the cluster and export required names (those objects used in
     # analyze.entry that are expected from the environment and not passed as
     # arguments).
-    cluster_names <- c("locus_attrs", "nrepeats")
+    cluster_names <- c("locus_attrs")
     cluster <- parallel::makeCluster(ncores)
     # https://stackoverflow.com/a/12232695/6073858
     parallel::clusterEvalQ(cluster, library(dnar))
@@ -142,19 +97,8 @@ analyze_dataset <- function(
       # analyze.entry.
       fps <- unique(dataset$Filename)
       analyzed_files <- parallel::parLapply(
-        cluster, fps, analyze.file,
-        locus_attrs = locus_attrs,
-        nrepeats = nrepeats,
-        stutter.count.ratio_max,
-        artifact.count.ratio_max,
-        use_reverse_primers,
-        reverse_primer_r1,
-        max_mismatches,
-        primer_action,
-        max_mismatches_fwd,
-        max_mismatches_rev,
-        primer_action_fwd,
-        primer_action_rev)
+        cluster, fps,
+        analyze.file, locus_attrs = locus_attrs)
       names(analyzed_files) <- fps
       raw_results <- parallel::parApply(
         cluster, dataset, 1, analyze.entry,
@@ -170,19 +114,8 @@ analyze_dataset <- function(
   } else {
     fps <- unique(dataset$Filename)
     analyzed_files <- lapply(
-      fps, analyze.file,
-      locus_attrs = locus_attrs,
-      nrepeats = nrepeats,
-      stutter.count.ratio_max,
-      artifact.count.ratio_max,
-      use_reverse_primers,
-      reverse_primer_r1,
-      max_mismatches,
-      primer_action,
-      max_mismatches_fwd,
-      max_mismatches_rev,
-      primer_action_fwd,
-      primer_action_rev)
+      fps,
+      analyze.file, locus_attrs = locus_attrs)
     names(analyzed_files) <- fps
     raw_results <- apply(
       dataset, 1, analyze.entry,

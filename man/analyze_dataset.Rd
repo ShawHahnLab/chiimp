@@ -7,22 +7,11 @@
 analyze_dataset(
   dataset,
   locus_attrs,
-  nrepeats = cfg("min_motif_repeats"),
-  stutter.count.ratio_max = cfg("max_stutter_ratio"),
-  artifact.count.ratio_max = cfg("max_artifact_ratio"),
-  use_reverse_primers = cfg("use_reverse_primers"),
-  reverse_primer_r1 = cfg("reverse_primer_r1"),
-  max_mismatches = cfg("max_mismatches"),
-  primer_action = cfg("primer_action"),
-  max_mismatches_fwd = cfg("max_mismatches_fwd"),
-  max_mismatches_rev = cfg("max_mismatches_rev"),
-  primer_action_fwd = cfg("primer_action_fwd"),
-  primer_action_rev = cfg("primer_action_rev"),
-  ncores = cfg("ncores"),
   analysis_opts,
   summary_opts,
   analysis_function = analyze_sample,
   summary_function = summarize_sample,
+  ncores = cfg("ncores"),
   known_alleles = NULL
 )
 }
@@ -31,27 +20,6 @@ analyze_dataset(
 
 \item{locus_attrs}{data frame of locus attributes as produced by
 \link{load_locus_attrs}.}
-
-\item{nrepeats}{number of repeats of each locus' motif to require for a
-match (see \link{analyze_seqs}).}
-
-\item{stutter.count.ratio_max}{highest ratio of read counts for second most
-frequent sequence to the most frequent where the second will be considered
-stutter (see \link{analyze_seqs}).}
-
-\item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
-non-stutter artifact sequences.}
-
-\item{use_reverse_primers}{consider the ReversePrimer column from the locus
-attributes for locus-matching?}
-
-\item{reverse_primer_r1}{Is each reverse primer given in its orientation on
-the forward read?  (See \link{analyze_seqs})}
-
-\item{ncores}{integer number of CPU cores to use in parallel for sample
-analysis.  Defaults to one less than half the number of detected cores with
-a minimum of 1.  If 1, the function will run without using the
-\code{parallel} package.}
 
 \item{analysis_opts}{list of supplemental arguments to \link{analysis_function}.}
 

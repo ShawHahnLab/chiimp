@@ -147,7 +147,10 @@ full_analysis <- function() {
     } else {
       cfg("output_path")
     })
-
+  # autodetect CPU cores
+  if (cfg("ncores") == 0) {
+    cfg("ncores", max(1, as.integer(parallel::detectCores() / 2) - 1))
+  }
   # Only show identifications if a known genotypes table was supplied
   cfg("report_section_identifications", ! is_blank(cfg("genotypes_known")) &&
     cfg("report_section_identifications"))

@@ -7,7 +7,7 @@
 analyze_seqs(
   seqs,
   locus_attrs,
-  nrepeats,
+  nrepeats = cfg("min_motif_repeats"),
   stutter.count.ratio_max = cfg("max_stutter_ratio"),
   artifact.count.ratio_max = cfg("max_artifact_ratio"),
   ...

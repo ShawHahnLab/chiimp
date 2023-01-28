@@ -156,7 +156,7 @@ make_helper_data <- function() {
       data.dir <- tempfile()
       write_seqs(seqs, data.dir)
       dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
-      results <- analyze_dataset(dataset, locus_attrs, nrepeats = 3, ncores = 1,
+      results <- analyze_dataset(dataset, locus_attrs, ncores = 1,
                                  analysis_opts = list(fraction.min = 0.05),
                                  summary_opts = list(counts.min = 500))
       unlink(data.dir, recursive = TRUE)
