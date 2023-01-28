@@ -13,7 +13,7 @@ name_known_sequences(results, known_alleles, ...)
 \code{load_allele_names}.  if NULL only the names automatically generated for
 the summary will be used.}
 
-\item{...}{additional arguments to \code{make_allele_name}.}
+\item{...}{additional arguments to \code{make_allele_names}.}
 }
 \value{
 list of results, with \code{summary} set to the single summary data frame

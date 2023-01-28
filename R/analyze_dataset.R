@@ -249,7 +249,7 @@ tidy_analyzed_dataset <- function(dataset, raw_results) {
 #' @param known_alleles data frame of custom allele names as defined for
 #'   `load_allele_names`.  if NULL only the names automatically generated for
 #'   the summary will be used.
-#' @param ... additional arguments to `make_allele_name`.
+#' @param ... additional arguments to `make_allele_names`.
 #'
 #' @return list of results, with `summary` set to the single summary data frame
 #'   and `data` the per-sample data frames.  A `SeqName` column in sample data

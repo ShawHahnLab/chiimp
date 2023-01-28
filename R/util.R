@@ -106,19 +106,19 @@ order_entries <- function(data) {
 #'
 #' @return vector of short names
 #' @md
-make_allele_name <- function(data, hash_len = cfg("allele_suffix_len")) {
-  txt <- if (is.character(data)) {
+make_allele_names <- function(seqs, hash_len = cfg("allele_suffix_len")) {
+  txt <- if (is.character(seqs)) {
     if (hash_len > 0) {
-      paste(nchar(data),
-            substr(openssl::md5(data), 1, hash_len),
+      paste(nchar(seqs),
+            substr(openssl::md5(seqs), 1, hash_len),
             sep = "-")
     } else {
-      nchar(data)
+      nchar(seqs)
     }
   } else {
-    as.character(data)
+    as.character(seqs)
   }
-  txt[is.na(data)] <- NA
+  txt[is.na(seqs)] <- NA
   txt
 }
 
@@ -139,7 +139,7 @@ order_alleles <- function(nms) {
 #' @param known_alleles data frame of custom allele names as defined for
 #'   [load_allele_names].  if NULL only automatically generated names will be
 #'   used.
-#' @param name_args list of additional arguments to [make_allele_name].
+#' @param name_args list of additional arguments to [make_allele_names].
 #'
 #' @return data frame provided with Allele1Name and Allele2Name columns added
 #' @md
@@ -147,7 +147,7 @@ name_alleles_in_table <- function(
     data, known_alleles = NULL, ...) {
   # Make names for given seqs, using existing names where available.
   nm <- function(seqs) {
-    nms <- do.call(make_allele_name, c(list(data = seqs), alist(...)))
+    nms <- do.call(make_allele_names, c(list(seqs = seqs), alist(...)))
     if (! is.null(known_alleles)) {
       idx <- match(seqs, known_alleles$Seq)
       nms <- ifelse(is.na(idx),

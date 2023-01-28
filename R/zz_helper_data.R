@@ -19,13 +19,13 @@ make_helper_data <- function() {
   test_data <- within(list(), { # nolint: cyclocomp_linter.
     # This is a particularly awkward approach now that in the development branch
     # for version 3.6.0 the random number generator has changed its behavior.
-    # The below is a stopgap measure but this should really be reorganized to not
-    # need to generate the test data at build-time.
+    # The below is a stopgap measure but this should really be reorganized to
+    # not need to generate the test data at build-time.
     # From ?RNGkind:
-    # > sample.kind can be "Rounding" or "Rejection", or partial matches to these.
-    # > The former was the default in versions prior to 3.6.0: it made sample
-    # > noticeably non-uniform on large populations, and should only be used for
-    # > reproduction of old results. See PR#17494 for a discussion."
+    # > sample.kind can be "Rounding" or "Rejection", or partial matches to
+    # > these. The former was the default in versions prior to 3.6.0: it made
+    # > sample noticeably non-uniform on large populations, and should only be
+    # > used for reproduction of old results. See PR#17494 for a discussion."
     # Older R doesn't have have a third argument to RNGkind, so, only run this
     # if needed.  I'll temporarily disable warnings here so that R doesn't warn
     # about the Rounding option's behavior.
@@ -44,21 +44,10 @@ make_helper_data <- function() {
     f.locus_attrs <- unique(system.file(
       c("inst/example_locus_attrs.csv", "example_locus_attrs.csv"),
       package = methods::getPackageName()))
-    txt.locus_attrs <- readChar(
-      f.locus_attrs, nchars = file.info(f.locus_attrs)$size)
     locus_attrs <- read.table(
       f.locus_attrs, header = TRUE, stringsAsFactors = FALSE, sep = ",")
     rm(f.locus_attrs)
     rownames(locus_attrs) <- locus_attrs$Locus
-
-    sample.data.cols <- c("Seq", "Count", "Length", "MatchingLocus", "MotifMatch",
-                          "LengthMatch", "Ambiguous", "Stutter", "Artifact",
-                          "FractionOfTotal", "FractionOfLocus")
-    sample.summary.cols <- c("Allele1Seq", "Allele1Count",
-                             "Allele1Length", "Allele2Seq",
-                             "Allele2Count", "Allele2Length",
-                             "Homozygous", "Ambiguous", "Stutter", "Artifact",
-                             "CountTotal", "CountLocus", "ProminentSeqs")
 
     make.seq_junk <- function(N) {
       nucleotides <- c("A", "T", "C", "G")
@@ -109,7 +98,8 @@ make_helper_data <- function() {
       ## Mix in off target amplification
       if (off_target_ratio > 0) {
         idx <- seq(1, length(seqs), off_target_ratio)
-        seqs[idx] <- paste0(attrs$Primer, make.seq_junk(10), attrs$ReversePrimer)
+        seqs[idx] <- paste0(
+          attrs$Primer, make.seq_junk(10), attrs$ReversePrimer)
       }
       ## Mix in other loci
       if (cross_contam_ratio > 0) {
@@ -172,16 +162,15 @@ make_helper_data <- function() {
       unlink(data.dir, recursive = TRUE)
       return(list(dataset = dataset, results = results))
     }
-    
+
     results_summary_data <- prepare_for_summary()
-    
+
     kg1 <- subset(results_summary_data$results$summary,
                   Sample == 1)[, c("Locus", "Allele1Seq", "Allele2Seq")]
     kg1 <- cbind(Name = "ID002", kg1)
     kg2 <- subset(results_summary_data$results$summary,
                   Sample == 2)[, c("Locus", "Allele1Seq", "Allele2Seq")]
     kg2 <- cbind(Name = "ID001", kg2)
-    genotypes_known <- rbind(kg2, kg1)
 
     # reset the RNG behavior
     do.call(RNGkind, as.list(rng_orig))
