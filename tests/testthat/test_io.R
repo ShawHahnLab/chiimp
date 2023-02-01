@@ -23,7 +23,7 @@ test_that("load_config handles unexpected entries", {
   expect_warning(
     config <- load_config(config_path),
     paste(
-      "unrecognized config file entries:",
+      "unrecognized config entries:",
       "  unrecognized",
       "  dataset_analysis:name_args:unknown", sep = "\n"))
   config_expected <- data.frame(

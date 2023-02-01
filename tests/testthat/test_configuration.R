@@ -54,7 +54,11 @@ test_that("version_compare can order two software version strings", {
 
 
 test_that("config_check_keys warns of unrecognized config keys", {
-
+  expect_no_warning(config_check_keys(CFG_DEFAULTS))
+  alt <- CFG_DEFAULTS
+  alt$Key[1] <- "bad"
+  expect_warning(
+    config_check_keys(alt), "unrecognized config entries")
 })
 
 
@@ -62,7 +66,11 @@ test_that("config_check_keys warns of unrecognized config keys", {
 
 
 test_that("config_check_version warns if config version above pkg version", {
-
+  expect_no_warning(config_check_keys(CFG_DEFAULTS))
+  alt <- CFG_DEFAULTS
+  alt$Value[match("version", alt$Key)] <- "999.1.2"
+  expect_warning(
+    config_check_version(alt), "")
 })
 
 
@@ -79,7 +87,20 @@ test_that("parse_config loads a config data frame from CSV", {
 
 
 test_that("as_bool parses true/false values from text", {
-
+  trues <- c("TRUE", "T", "true", "yes", "on")
+  falses <- c("FALSE", "F", "false", "no", "off")
+  for (txt in trues) {
+    expect_identical(as_bool(txt), TRUE)
+  }
+  for (txt in falses) {
+    expect_identical(as_bool(txt), FALSE)
+  }
+  # empty works
+  expect_identical(as_bool(""), NA)
+  # only length 1
+  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
+  # controlled vocab
+  expect_error(as_bool("NA"))
 })
 
 
@@ -92,9 +113,7 @@ test_that("as_integer_vec parses integer vectors from text", {
   expect_equal(as_integer_vec(""), integer())
   expect_equal(as_integer_vec("-5"), -5L)
   expect_equal(as_integer_vec("1.2"), 1:2)
-  # only length 1
-  expect_error(as_integer_vec(c("1", "2")))
-  expect_error(as_integer_vec(c()))
+  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
 })
 
 
@@ -112,9 +131,7 @@ test_that("as_locus_vecs parses lists of locus names from text", {
   # evidently "list()" is a different thing than "named list()"
   names(output) <- character()
   expect_equal(as_locus_vecs(""), output)
-  # only length 1
-  expect_error(as_locus_vecs(c("X=1/2/3", "Y=A/B")))
-  expect_error(as_locus_vecs(c()))
+  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
 })
 
 
@@ -122,7 +139,13 @@ test_that("as_locus_vecs parses lists of locus names from text", {
 
 
 test_that("as_cpu_cores parses number of CPU cores from text", {
-
+  expect_identical(as_cpu_cores("1"), 1L)
+  expect_true(as_cpu_cores("0") > 0)
+  expect_true(as_cpu_cores("") > 0)
+  expect_error(as_cpu_cores("yes"), "txt should be an integer")
+  expect_error(as_cpu_cores("-1"), "txt should be an integer")
+  expect_error(as_cpu_cores("5.7"), "txt should be an integer")
+  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
 })
 
 
@@ -130,15 +153,20 @@ test_that("as_cpu_cores parses number of CPU cores from text", {
 
 
 test_that("as_abs_path parses abolute path from text", {
-
+  here <- normalizePath(getwd())
+  expect_identical(as_abs_path("/test/path"), "/test/path")
+  expect_identical(as_abs_path(""), here)
+  expect_identical(as_abs_path("test/path"), file.path(here, "test/path"))
+  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
 })
 
 
 # as_rel_path -------------------------------------------------------------
 
 
-test_that("as_rel_path parses abolute path from text", {
-
+test_that("as_rel_path parses relative path from text", {
+  expect_identical(as_rel_path("test/path"), "test/path")
+  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
 })
 
 
@@ -146,7 +174,14 @@ test_that("as_rel_path parses abolute path from text", {
 
 
 test_that("is_blank interprets multiple kinds of missing data as TRUE", {
-
+  expect_true(is_blank(NA))
+  expect_true(is_blank(NULL))
+  expect_true(is_blank(""))
+  expect_true(is_blank(c()))
+  expect_true(is_blank(c(NA, NA)))
+  expect_true(is_blank(c(NA, "")))
+  expect_false(is_blank(5))
+  expect_false(is_blank(c("", "x")))
 })
 
 

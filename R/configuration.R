@@ -118,7 +118,7 @@ config_check_keys <- function(cfg_table) {
   unknown_txt <- cfg_table$Key[! cfg_table$Key %in% CFG_DEFAULTS$Key]
   if (length(unknown_txt) > 0) {
     warning(paste0(
-      "unrecognized config file entries:\n",
+      "unrecognized config entries:\n",
       paste(gsub("^", "  ", unknown_txt), collapse = "\n")))
   }
 }
@@ -158,7 +158,7 @@ parse_config <- function(cfg_table) {
     idx_default <- match(key, CFG_DEFAULTS$Key)
     funcname <- cfg_table$Parser[idx]
     if (is.na(idx_default)) {
-      warning(paste("unrecognized config file entry:", key))
+      warning(paste("unrecognized config entry:", key))
     }
     if (is.null(funcname)) {
       # If this config didn't supply a parser, use the default's
@@ -219,7 +219,14 @@ as_locus_vecs <- function(txt) {
 # autodetect CPU cores if 0
 as_cpu_cores <- function(txt) {
   check_one_val(txt)
-  val <- as.integer(txt)
+  val <- if (txt == "") {
+    0
+  } else {
+    if (! grepl("^[0-9]*$", txt)) {
+      stop(paste("txt should be an integer; received", txt))
+    }
+    as.integer(txt)
+  }
   if (val == 0) {
     val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
@@ -231,7 +238,11 @@ as_cpu_cores <- function(txt) {
 as_abs_path <- function(txt) {
   check_one_val(txt)
   if (substr(txt, 1, 1) != .Platform$file.sep) {
-    file.path(normalizePath("."), txt)
+    if (txt == "") {
+      normalizePath(".")
+    } else {
+      file.path(normalizePath("."), txt)
+    }
   } else {
     txt
   }
