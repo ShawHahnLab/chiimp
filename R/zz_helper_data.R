@@ -79,7 +79,7 @@ make_helper_data <- function() {
       seq.correct.1 <- paste0(attrs$Primer, repeats1, attrs$ReversePrimer)
       seq.correct.2 <- paste0(attrs$Primer, repeats2, attrs$ReversePrimer)
       # The exact correct sequences, either one or two unique
-      N1 <- N / 2 + rnorm(10000) * N / 20
+      N1 <- N / 2 + stats::rnorm(10000) * N / 20
       N1 <- as.integer(max(min(N1, N * 0.9), N * 0.1))
       N2 <- N - N1
       seqs <- c(rep(seq.correct.1, N1),
