@@ -61,7 +61,7 @@ sample-to-known-individual distance matrix via \link{make_dist_mat_known}.
 as well as input.  Some output files are in FASTA format (alignments and
 alleles) or are PNG images (alignment visualization and sequence count
 histograms).  If specified in the configuration, \link{saveRDS} is
-called on the entire output as well, saving to \link{results.rds} by default.
+called on the entire output as well, saving to \code{results.rds} by default.
 \item Create an HTML report document summarizing all results.
 }
 

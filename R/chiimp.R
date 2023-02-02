@@ -53,7 +53,7 @@
 #'   as well as input.  Some output files are in FASTA format (alignments and
 #'   alleles) or are PNG images (alignment visualization and sequence count
 #'   histograms).  If specified in the configuration, [saveRDS] is
-#'   called on the entire output as well, saving to [results.rds] by default.
+#'   called on the entire output as well, saving to `results.rds` by default.
 #' * Create an HTML report document summarizing all results.
 #'
 #' For defaults used in the configuration, see [CFG_DEFAULTS].

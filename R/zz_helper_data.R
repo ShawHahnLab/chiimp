@@ -51,7 +51,7 @@ make_helper_data <- function() {
 
     make.seq_junk <- function(N) {
       nucleotides <- c("A", "T", "C", "G")
-      vapply(runif(N, min = 1, max = 20), function(L) {
+      vapply(stats::runif(N, min = 1, max = 20), function(L) {
         paste0(sample(nucleotides, L, replace = TRUE), collapse = "")
       }, "character")
     }
@@ -62,13 +62,13 @@ make_helper_data <- function() {
       attrs <- locus_attrs[locus_name, ]
       L.min <- attrs$LengthMin - nchar(attrs$Primer)
       L.max <- attrs$LengthMax - nchar(attrs$Primer)
-      L <- as.integer(runif(2, min = L.min, max = L.max))
+      L <- as.integer(stats::runif(2, min = L.min, max = L.max))
       if (!missing(homozygous)) {
         if (homozygous) {
           L[2] <- L[1]
         } else {
           while (L[1] == L[2])
-            L <- as.integer(runif(2, min = L.min, max = L.max))
+            L <- as.integer(stats::runif(2, min = L.min, max = L.max))
         }
       }
       make.reps <- function(motif, len) {
@@ -85,8 +85,8 @@ make_helper_data <- function() {
       seqs <- c(rep(seq.correct.1, N1),
                 rep(seq.correct.2, N2))
       ## Mix in stutter
-      N1.stutter <- as.integer(runif(1, min = N1 / 20, max = N1 / 3))
-      N2.stutter <- as.integer(runif(1, min = N2 / 20, max = N2 / 3))
+      N1.stutter <- as.integer(stats::runif(1, min = N1 / 20, max = N1 / 3))
+      N2.stutter <- as.integer(stats::runif(1, min = N2 / 20, max = N2 / 3))
       seqs[1:N1.stutter] <- paste0(attrs$Primer,
                                    make.reps(attrs$Motif,
                                              L[1] - nchar(attrs$Motif)),
