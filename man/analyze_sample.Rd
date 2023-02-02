@@ -36,7 +36,7 @@ given entry must have, compared to the total matching all criteria for that
 locus, to be considered as a potential allele.}
 }
 \value{
-filtered version of \link{seq_data} with added Category column.
+filtered version of \code{seq_data} with added Category column.
 }
 \description{
 Converts a full STR sequence data frame into a per-locus version and adds a

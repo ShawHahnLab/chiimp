@@ -17,12 +17,16 @@
 #' @param dataset data frame of sample details as produced by [prepare_dataset].
 #' @param locus_attrs data frame of locus attributes as produced by
 #'   [load_locus_attrs].
-#' @param analysis_opts list of supplemental arguments to [analysis_function].
-#' @param summary_opts list of supplemental arguments to [summary_function].
+#' @param analysis_opts list of supplemental arguments to `analysis_function`.
+#' @param summary_opts list of supplemental arguments to `summary_function`.
 #' @param analysis_function function to use when analyzing each sample's data
 #'   frame into the filtered version  Defaults to [analyze_sample].
 #' @param summary_function function to use when summarizing each sample's full
 #'   details into the standard attributes.  Defaults to [summarize_sample].
+#' @param ncores integer number of CPU cores to use in parallel for sample
+#'   analysis.  Defaults to one less than half the number of detected cores with
+#'   a minimum of 1.  If 1, the function will run without using the
+#'   [parallel] package.
 #' @param known_alleles data frame of custom allele names as defined for
 #'   [load_allele_names].  if NULL only the names automatically
 #'   generated for the dataset summary will be used.

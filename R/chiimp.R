@@ -56,7 +56,7 @@
 #'   called on the entire output as well, saving to [results.rds] by default.
 #' * Create an HTML report document summarizing all results.
 #'
-#' For defaults used in the configuration, see [CONFIG_DEFAULTS].
+#' For defaults used in the configuration, see [CFG_DEFAULTS].
 #'
 #' The workflow above outlines CHIIMP's behavior when called as a standalone
 #' program, where [main] loads a configuration file into global options in R and
@@ -96,7 +96,7 @@
 #'      to an R Markdown report as used in [full_analysis].
 #'  * Utility Functions and Configuration:
 #'    * `configuration.R`: Configuration handling helper code and the default
-#'    configuration options [CONFIG_DEFAULTS]) used by many chiimp functions.
+#'    configuration options [CFG_DEFAULTS]) used by many chiimp functions.
 #'    * `io.R`: various helper input/output functions used loading and
 #'      saving sequence data files, spreadsheets, and plots used in multiple
 #'      parts of the package.

@@ -14,7 +14,7 @@ the first list item produced by \link{analyze_dataset}.}
 \link{load_allele_names}.  if NULL only automatically generated names will be
 used.}
 
-\item{name_args}{list of additional arguments to \link{make_allele_names}.}
+\item{...}{additional arguments to \link{make_allele_names}.}
 }
 \value{
 data frame provided with Allele1Name and Allele2Name columns added

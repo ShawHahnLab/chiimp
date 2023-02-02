@@ -7,10 +7,10 @@
 make_allele_names(seqs, hash_len = cfg("allele_suffix_len"))
 }
 \arguments{
+\item{seqs}{character vector of sequences}
+
 \item{hash_len}{number of characters of alphanumeric hash to include as a
 suffix.  (See \link[openssl:hash]{openssl::md5}.)}
-
-\item{data}{character vector of sequences}
 }
 \value{
 vector of short names

@@ -65,7 +65,7 @@ called on the entire output as well, saving to \link{results.rds} by default.
 \item Create an HTML report document summarizing all results.
 }
 
-For defaults used in the configuration, see \link{CONFIG_DEFAULTS}.
+For defaults used in the configuration, see \link{CFG_DEFAULTS}.
 
 The workflow above outlines CHIIMP's behavior when called as a standalone
 program, where \link{main} loads a configuration file into global options in R and
@@ -113,7 +113,7 @@ to an R Markdown report as used in \link{full_analysis}.
 \item Utility Functions and Configuration:
 \itemize{
 \item \code{configuration.R}: Configuration handling helper code and the default
-configuration options \link{CONFIG_DEFAULTS}) used by many chiimp functions.
+configuration options \link{CFG_DEFAULTS}) used by many chiimp functions.
 \item \code{io.R}: various helper input/output functions used loading and
 saving sequence data files, spreadsheets, and plots used in multiple
 parts of the package.

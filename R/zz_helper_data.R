@@ -44,7 +44,7 @@ make_helper_data <- function() {
     f.locus_attrs <- unique(system.file(
       c("inst/example_locus_attrs.csv", "example_locus_attrs.csv"),
       package = methods::getPackageName()))
-    locus_attrs <- read.table(
+    locus_attrs <- utils::read.table(
       f.locus_attrs, header = TRUE, stringsAsFactors = FALSE, sep = ",")
     rm(f.locus_attrs)
     rownames(locus_attrs) <- locus_attrs$Locus

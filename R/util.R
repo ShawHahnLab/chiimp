@@ -83,7 +83,7 @@ order_entries <- function(data) {
 #'
 #' Autogenerate short names for sequences using sequence length and content.
 #'
-#' @param data character vector of sequences
+#' @param seqs character vector of sequences
 #' @param hash_len number of characters of alphanumeric hash to include as a
 #'   suffix.  (See [openssl::md5].)
 #'
@@ -122,7 +122,7 @@ order_alleles <- function(nms) {
 #' @param known_alleles data frame of custom allele names as defined for
 #'   [load_allele_names].  if NULL only automatically generated names will be
 #'   used.
-#' @param name_args list of additional arguments to [make_allele_names].
+#' @param ... additional arguments to [make_allele_names].
 #'
 #' @return data frame provided with Allele1Name and Allele2Name columns added
 #' @md

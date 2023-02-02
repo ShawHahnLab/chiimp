@@ -21,15 +21,20 @@ analyze_dataset(
 \item{locus_attrs}{data frame of locus attributes as produced by
 \link{load_locus_attrs}.}
 
-\item{analysis_opts}{list of supplemental arguments to \link{analysis_function}.}
+\item{analysis_opts}{list of supplemental arguments to \code{analysis_function}.}
 
-\item{summary_opts}{list of supplemental arguments to \link{summary_function}.}
+\item{summary_opts}{list of supplemental arguments to \code{summary_function}.}
 
 \item{analysis_function}{function to use when analyzing each sample's data
 frame into the filtered version  Defaults to \link{analyze_sample}.}
 
 \item{summary_function}{function to use when summarizing each sample's full
 details into the standard attributes.  Defaults to \link{summarize_sample}.}
+
+\item{ncores}{integer number of CPU cores to use in parallel for sample
+analysis.  Defaults to one less than half the number of detected cores with
+a minimum of 1.  If 1, the function will run without using the
+\link{parallel} package.}
 
 \item{known_alleles}{data frame of custom allele names as defined for
 \link{load_allele_names}.  if NULL only the names automatically

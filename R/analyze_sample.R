@@ -46,7 +46,7 @@ sample_analysis_funcs <- c("analyze_sample",
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
 #'
-#' @return filtered version of [seq_data] with added Category column.
+#' @return filtered version of `seq_data` with added Category column.
 #'
 #' @describeIn analyze_sample default version of sample analysis.  From here use
 #'   [summarize_sample].
