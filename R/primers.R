@@ -256,7 +256,7 @@ find_primer_matches <- function(seqs_reads, seqs_primers, max_mismatches=NA) {
       matches[idxl_mask][idx] <- seq_primer
     }
     # reorder levels to prioritize the most abundant for all that follows
-    matches <- reorder(matches, -table(matches)[matches])
+    matches <- stats::reorder(matches, -table(matches)[matches])
     # Second pass: approximate matches, in addition to those exact matches
     for (seq_primer in levels(matches)) {
       idxl_mask <- is.na(matches)
@@ -266,7 +266,7 @@ find_primer_matches <- function(seqs_reads, seqs_primers, max_mismatches=NA) {
         max.distance = list(ins = 0, del = 0, all = max_mismatches))
       matches[idxl_mask][idx] <- seq_primer
     }
-    matches <- reorder(matches, -table(matches)[matches])
+    matches <- stats::reorder(matches, -table(matches)[matches])
   }
 
   # Now check actual mismatch details
