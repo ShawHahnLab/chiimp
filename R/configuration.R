@@ -29,14 +29,14 @@ NULL
 #' @param val value to set for a particular key
 #' @export
 #' @md
-cfg <- function(key = NULL, val = NULL) {
-  if (is.null(key)) {
+cfg <- function(key, val) {
+  if (missing(key)) {
     opts <- options()
     opts <- opts[grepl("^chiimp\\.", names(opts))]
     names(opts) <- sub("^chiimp\\.", "", names(opts))
     return(opts)
   }
-  if (is.null(val)) {
+  if (missing(val)) {
     return(getOption(paste0("chiimp.", key)))
   }
   cfg_list <- list(val)
@@ -72,8 +72,12 @@ apply_config <- function(config, keep = TRUE) {
     opts <- lapply(opts, function(item) NULL)
     do.call(options, opts)
   }
-  names(config) <- paste0("chiimp.", names(config))
-  do.call(options, config)
+  if (length(config) > 0) {
+    names(config) <- paste0("chiimp.", names(config))
+    do.call(options, config)
+  } else {
+    invisible(list())
+  }
 }
 
 
@@ -231,26 +235,6 @@ as_cpu_cores <- function(txt) {
     val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
   }
   val
-}
-
-# make designated paths absolute relative to working directory, unless already
-# absolute
-as_abs_path <- function(txt) {
-  check_one_val(txt)
-  if (substr(txt, 1, 1) != .Platform$file.sep) {
-    if (txt == "") {
-      normalizePath(".")
-    } else {
-      file.path(normalizePath("."), txt)
-    }
-  } else {
-    txt
-  }
-}
-
-as_rel_path <- function(txt) {
-  check_one_val(txt)
-  txt
 }
 
 # Does the given vector look "blank"?

@@ -235,6 +235,7 @@ main <- function(args = NULL) {
   args_parsed <- argparser::parse_args(p, args)
   config_table <- load_config(args_parsed$config)
   apply_config(config_table)
+  setwd(dirname(args_parsed$config))
   full_analysis()
 }
 

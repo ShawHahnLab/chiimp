@@ -1,24 +1,24 @@
 Key,Value,Description,Example,Parser,OldName
 version,0.5.0,CHIIMP version this config file was prepared for,,as.character,
-dataset,,Path to CSV file with per-sample information,dataset.csv,as_abs_path,fp_dataset
-locus_attrs,locus_attrs.csv,Path to CSV file with per-locus information,locus_attrs.csv,as_abs_path,fp_locus_attrs
-allele_names,,Path to CSV file with per-allele information,allele_names.csv,as_abs_path,fp_allele_names
-gentoypes_known,,Path to CSV file with per-genotype information,genotypes.csv,as_abs_path,fp_genotypes_known
-prep_dataset_path,str-data,Path to search for automatic dataset table preparation,str-data,as_abs_path,dataset_opts:dp
+dataset,,Path to CSV file with per-sample information,dataset.csv,as.character,fp_dataset
+locus_attrs,locus_attrs.csv,Path to CSV file with per-locus information,locus_attrs.csv,as.character,fp_locus_attrs
+allele_names,,Path to CSV file with per-allele information,allele_names.csv,as.character,fp_allele_names
+gentoypes_known,,Path to CSV file with per-genotype information,genotypes.csv,as.character,fp_genotypes_known
+prep_dataset_path,str-data,Path to search for automatic dataset table preparation,str-data,as.character,dataset_opts:dp
 prep_dataset_pattern,(\d+)-(\d+)-([A-Za-z0-9]+).fast[aq](?:\.gz),Regular expression pattern for parsing filenames for automatic dataset table preparation,Sample([0-9]+)-([A-Za-z0-9])().fastq,as.character,dataset_opts:pattern
 prep_dataset_order,1+2+3,Order of Replicate+Sample+Locus fields in prep_dataset_pattern capture groups,2+3+1,as_integer_vec,dataset_opts:ord
 prep_dataset_autorep,FALSE,Should duplicate Sample+Locus entries found during automatic dataset table preparation be automatically labeled as different replicates?,FALSE,as_bool,dataset_opts:autorep
-output_path,str-results,Path to directory to save all output to,str-results,as_abs_path,output:dp
+output_path,str-results,Path to directory to save all output to,str-results,as.character,output:dp
 output_summary,summary.csv,Filename to write summary CSV file to,summary.csv,as.character,output:fp_summary
 output_report,report.html,Filename to write report HTML file to,report.html,as.character,output:fp_report
 output_dist_mat,sample-distances.csv,FIlename to write sample-to-sample distances CSV file to,sample-distances.csv,as.character,output:fp_dist_mat
 output_rds,,Filename to save RDS data file to,results.rds,as.character,output:fp_rds
-output_path_histograms,histograms,Path within output_path to save histograms to,histograms,as_rel_path,output:dp_histograms
-output_path_alignments,alignments,Path within output_path to save per-locus allele alignment FASTA files to,alignments,as_rel_path,output:dp_alignments
-output_path_alignment_images,alignment-images,Path within output_path to save per-locus allele alignment images to,alignment-images,as_rel_path,output:dp_alignment_images
-output_path_processed_files,processed-files,Path within output_path to save per-input-file data tables to,processed-files,as_rel_path,output:dp_processed_files
-output_path_processed_samples,processed-samples,Path within output_path to save per-sample data tables to,processed-samples,as_rel_path,output:dp_processed_samples
-output_path_allele_seqs,allele-sequences,Path within output_path to save per-allele FASTA files to,allele-sequences,as_rel_path,output:dp_allele_seqs
+output_path_histograms,histograms,Path within output_path to save histograms to,histograms,as.character,output:dp_histograms
+output_path_alignments,alignments,Path within output_path to save per-locus allele alignment FASTA files to,alignments,as.character,output:dp_alignments
+output_path_alignment_images,alignment-images,Path within output_path to save per-locus allele alignment images to,alignment-images,as.character,output:dp_alignment_images
+output_path_processed_files,processed-files,Path within output_path to save per-input-file data tables to,processed-files,as.character,output:dp_processed_files
+output_path_processed_samples,processed-samples,Path within output_path to save per-sample data tables to,processed-samples,as.character,output:dp_processed_samples
+output_path_allele_seqs,allele-sequences,Path within output_path to save per-allele FASTA files to,allele-sequences,as.character,output:dp_allele_seqs
 ncores,0,Number of cores to use while processing samples in parallel (0 to automatically detect; 1 to disable parallel execution),12,as_cpu_cores,dataset_analysis:ncores
 allele_suffix_len,6,Length of sequence-based suffix to append to automatic allele names,6,as.integer,dataset_analysis:name_args:hash_len
 min_motif_repeats,3,Minimum number of perfect adjacent motif repeats to recognize a candidate allele,3,as.integer,seq_analysis:nrepeats

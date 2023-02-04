@@ -1,6 +1,11 @@
 testpth <- function(fname) normalizePath(test_path("data", "configuration", fname))
 testrds <- function(fname) readRDS(test_path("data", "configuration", fname))
 
+get_chiimp_opts <- function() {
+  chiimp_opts <- options()
+  chiimp_opts <- chiimp_opts[grepl("^chiimp\\.", names(chiimp_opts))]
+  chiimp_opts
+}
 
 # cfg ---------------------------------------------------------------------
 
@@ -19,9 +24,11 @@ test_that("cfg handles chiimp options", {
   }
   chiimp_opts_2 <- cfg()
   expect_identical(chiimp_opts, chiimp_opts_2)
-  # setting a new option
+  # setting a new option (but clean up afterwards)
   cfg("something", 5L)
   expect_identical(getOption("chiimp.something"), 5L)
+  cfg("something", NULL)
+  expect_false("chiimp.something" %in% names(options()))
 })
 
 
@@ -29,11 +36,33 @@ test_that("cfg handles chiimp options", {
 
 
 test_that("apply_config loads configuration info into global options", {
-
+  chiimp_opts <- get_chiimp_opts()
+  apply_config(CFG_DEFAULTS)
+  chiimp_opts_2 <- get_chiimp_opts()
+  expect_identical(chiimp_opts, chiimp_opts_2)
+  cfg_2 <- CFG_DEFAULTS
+  cfg_2$Value[cfg_2$Key == "allele_suffix_len"] <- 12L
+  apply_config(cfg_2)
+  chiimp_opts_3 <- get_chiimp_opts()
+  chiimp_opts_3_exp <- chiimp_opts_2
+  chiimp_opts_3_exp$chiimp.allele_suffix_len <- 12L
+  expect_identical(chiimp_opts_3, chiimp_opts_3_exp)
 })
 
 test_that("apply_config can remove existing global options", {
-
+  cfg_2 <- subset(CFG_DEFAULTS, Key != "allele_suffix_len")
+  # by default, it won't remove, so missing entries have no effect on what's
+  # already there.
+  chiimp_opts <- get_chiimp_opts()
+  apply_config(cfg_2)
+  chiimp_opts_2 <- get_chiimp_opts()
+  expect_identical(chiimp_opts, chiimp_opts_2)
+  # With keep=FALSE, missing entries are removed
+  apply_config(cfg_2, keep = FALSE)
+  chiimp_opts_3 <- get_chiimp_opts()
+  chiimp_opts_3_exp <- chiimp_opts_2
+  chiimp_opts_3_exp$chiimp.allele_suffix_len <- NULL
+  expect_identical(chiimp_opts_3, chiimp_opts_3_exp)
 })
 
 
@@ -77,10 +106,47 @@ test_that("config_check_version warns if config version above pkg version", {
 # parse_config ------------------------------------------------------------
 
 
-test_that("parse_config loads a config data frame from CSV", {
-
+test_that("parse_config loads data structures from a config data frame", {
+  config_table <- data.frame(
+    Key = c("dataset", "ncores", "report"),
+    Value = c("samples.csv", "5", "yes"),
+    stringsAsFactors = FALSE)
+  cfg <- parse_config(config_table)
+  expect_identical(
+    cfg, list(dataset = "samples.csv", ncores = 5L, report = TRUE))
 })
 
+test_that("parse_config handles uncrecognized keys", {
+  config_table <- data.frame(
+    Key = c("dataset", "ncores", "do_the_report"),
+    Value = c("samples.csv", "5", "yes"),
+    stringsAsFactors = FALSE)
+  expect_warning(
+    cfg <- parse_config(config_table)
+  )
+  expect_identical(
+    cfg, list(dataset = "samples.csv", ncores = 5L, do_the_report = "yes"))
+})
+
+test_that("parse_config can use parser specified in input", {
+  config_table <- data.frame(
+    Key = c("dataset", "ncores", "do_the_report"),
+    Value = c("samples.csv", "5", "yes"),
+    Parser = c("as.character", "as.integer", "as_bool"),
+    stringsAsFactors = FALSE)
+  expect_warning(
+    cfg <- parse_config(config_table), "unrecognized config entry")
+  expect_identical(
+    cfg, list(dataset = "samples.csv", ncores = 5L, do_the_report = TRUE))
+})
+
+test_that("parse_config handles invalid input values", {
+  config_table <- data.frame(
+    Key = c("dataset", "ncores"),
+    Value = c("samples.csv", "-5"),
+    stringsAsFactors = FALSE)
+  expect_error(parse_config(config_table), "txt should be an integer")
+})
 
 
 # as_bool -----------------------------------------------------------------
@@ -145,27 +211,6 @@ test_that("as_cpu_cores parses number of CPU cores from text", {
   expect_error(as_cpu_cores("yes"), "txt should be an integer")
   expect_error(as_cpu_cores("-1"), "txt should be an integer")
   expect_error(as_cpu_cores("5.7"), "txt should be an integer")
-  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
-})
-
-
-# as_abs_path -------------------------------------------------------------
-
-
-test_that("as_abs_path parses abolute path from text", {
-  here <- normalizePath(getwd())
-  expect_identical(as_abs_path("/test/path"), "/test/path")
-  expect_identical(as_abs_path(""), here)
-  expect_identical(as_abs_path("test/path"), file.path(here, "test/path"))
-  expect_error(as_locus_vecs(c()),  "txt should be of length 1")
-})
-
-
-# as_rel_path -------------------------------------------------------------
-
-
-test_that("as_rel_path parses relative path from text", {
-  expect_identical(as_rel_path("test/path"), "test/path")
   expect_error(as_locus_vecs(c()),  "txt should be of length 1")
 })
 
