@@ -7,8 +7,8 @@
 make_rownames(data)
 }
 \arguments{
-\item{data}{STR data frame, such as produced by \code{\link{prepare_dataset}}
-or \code{summary} from \code{\link{summarize_dataset}}.}
+\item{data}{STR data frame, such as produced by \link{prepare_dataset} or a
+summary from \link{summarize_dataset}.}
 }
 \value{
 vector of unique row names
@@ -18,5 +18,5 @@ Create unique rownames for the given data frame, using whichever STR-related
 metadata columns are available.
 }
 \seealso{
-\code{\link{order_entries}}
+\link{order_entries}
 }

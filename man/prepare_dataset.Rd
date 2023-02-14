@@ -5,10 +5,10 @@
 \title{Extract Sample Attributes from Filenames}
 \usage{
 prepare_dataset(
-  dp,
-  pattern,
-  ord = c(1, 2, 3),
-  autorep = FALSE,
+  dp = cfg("prep_dataset_path"),
+  pattern = cfg("prep_dataset_pattern"),
+  ord = cfg("prep_dataset_order"),
+  autorep = cfg("prep_dataset_autorep"),
   locusmap = NULL
 )
 }
@@ -38,13 +38,13 @@ loci.)}
 data frame of metadata for all files found
 }
 \description{
-Find files matching a pattern in a given directory, and build a data frame
-of standard sample attributes from fields in the filenames.  Nested
-directory structures are supported.  Alternatively, use
-\code{\link{load_dataset}} to load a spreadsheet of sample attributes
-explicitly.  \code{load_dataset} can be used for cases where more than one
-locus is to be analyzed from a single sequencer sample (i.e., multiplexed
-samples), though the \code{locusmap} argument here can allow automatic
-matching of locus names for multiplexed samples.  If the directory path
-given does not exist or if no matching files are found, an error is thrown.
+Find files matching a pattern in a given directory, and build a data frame of
+standard sample attributes from fields in the filenames.  Nested directory
+structures are supported.  Alternatively, use \link{load_dataset} to load a
+spreadsheet of sample attributes explicitly.  \code{load_dataset} can be used for
+cases where more than one locus is to be analyzed from a single sequencer
+sample (i.e., multiplexed samples), though the \code{locusmap} argument here can
+allow automatic matching of locus names for multiplexed samples.  If the
+directory path given does not exist or if no matching files are found, an
+error is thrown.
 }

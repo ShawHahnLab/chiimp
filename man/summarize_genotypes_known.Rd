@@ -8,7 +8,7 @@ summarize_genotypes_known(genotypes_known, tbl_genotypes = NULL)
 }
 \arguments{
 \item{genotypes_known}{table of known individuals' genotypes as loaded via
-\code{\link{load_genotypes}}.}
+\link{load_genotypes}.}
 
 \item{tbl_genotypes}{existing genotype summary table to use for locus
 selection and column ordering.}

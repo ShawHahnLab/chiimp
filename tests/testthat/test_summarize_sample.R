@@ -108,7 +108,7 @@ test_that("summarize_sample counts prominent sequences", {
 test_that("summarize_sample works with vector for sample attrs", {
   sample_data <- testrds("sample_data.rds")
   sample_summary_expected <- testrds("sample_summary.rds")
-  # sample.attrs argument is a vector this time but the outcome should be
+  # sample_attrs argument is a vector this time but the outcome should be
   # exactly the same
   sample_summary <- summarize_sample(
     sample_data, c(Locus = "A"), counts.min = 500)

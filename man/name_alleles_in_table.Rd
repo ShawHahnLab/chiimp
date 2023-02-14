@@ -4,17 +4,17 @@
 \alias{name_alleles_in_table}
 \title{Name allele sequences in genotype data frame}
 \usage{
-name_alleles_in_table(data, known_alleles = NULL, name_args = list())
+name_alleles_in_table(data, known_alleles = NULL, ...)
 }
 \arguments{
 \item{data}{data frame containing Allele1Seq and Allele2Seq columns such as
-the first list item produced by \code{\link{analyze_dataset}}.}
+the first list item produced by \link{analyze_dataset}.}
 
 \item{known_alleles}{data frame of custom allele names as defined for
-\code{\link{load_allele_names}}.  if NULL only automatically generated
-names will be used.}
+\link{load_allele_names}.  if NULL only automatically generated names will be
+used.}
 
-\item{name_args}{list of additional arguments to \code{make_allele_name}.}
+\item{...}{additional arguments to \link{make_allele_names}.}
 }
 \value{
 data frame provided with Allele1Name and Allele2Name columns added

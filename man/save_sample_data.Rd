@@ -8,12 +8,12 @@ save_sample_data(results_data, dp)
 }
 \arguments{
 \item{results_data}{list of per-sample data frames as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
 \item{dp}{output directory path to use for all files.}
 }
 \description{
-Save each per-sample data frame produced by \code{\link{analyze_dataset}}
-(via \code{\link{analyze_sample}}) to a separate file in the specified
-directory path, in CSV format.
+Save each per-sample data frame produced by \link{analyze_dataset} (via
+\link{analyze_sample}) to a separate file in the specified directory path, in CSV
+format.
 }

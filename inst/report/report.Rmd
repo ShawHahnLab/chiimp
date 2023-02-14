@@ -5,27 +5,27 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = report.echo, fig.width = 8, fig.height = 8)
+knitr::opts_chunk$set(echo = report_show_code, fig.width = 8, fig.height = 8)
 
-num.samples    <- length(unique(results$summary$Sample))
-num.replicates <- length(unique(results$summary$Replicate))
-num.loci       <- length(unique(results$summary$Locus))
+num_samples    <- length(unique(results$summary$Sample))
+num_replicates <- length(unique(results$summary$Replicate))
+num_loci       <- length(unique(results$summary$Locus))
 ```
 
-```{r child="report_genotypes.Rmd", eval=report.sections[["genotypes"]]}
+```{r child="report_genotypes.Rmd", eval=report_section_genotypes}
 ```
 
-```{r child="report_distances.Rmd", eval=report.sections[["distances"]]}
+```{r child="report_distances.Rmd", eval=report_section_distances}
 ```
 
-```{r child="report_identifications.Rmd", eval=report.sections[["identifications"]]}
+```{r child="report_identifications.Rmd", eval=report_section_identifications}
 ```
 
-```{r child="report_flag.Rmd", eval=report.sections[["flags"]]}
+```{r child="report_flag.Rmd", eval=report_section_flags}
 ```
 
-```{r child="report_alignments.Rmd", eval=report.sections[["alignments"]]}
+```{r child="report_alignments.Rmd", eval=report_section_alignments}
 ```
 
-```{r child="report_contamination.Rmd", eval=report.sections[["contamination"]]}
+```{r child="report_contamination.Rmd", eval=report_section_contamination}
 ```

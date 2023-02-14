@@ -1,116 +1,248 @@
-#' Default microsatellite configuration
+#' Default Configuration
 #'
-#' The entries in this list show the build-time configuration defaults for all
-#' aspects of the microsatellite analysis.  These can be overridden by passing a
-#' list to \code{\link{full_analysis}} with entries of the same names, or via
-#' the configuration file passed to \code{\link{main}} and read via
-#' \code{\link{load_config}}.  Check the contents of \code{config.defaults}
-#' itself to see all of the build-time defaults.
+#' `CFG_DEFAULTS` is CHIIMP's default configuration options and metadata.  The
+#' values in this data frame are used unless overridden by custom ones, and the
+#' parsing of text values into other types is defined by the `Parser` column
+#' here.
 #'
-#' Notable Options:
-#'   * \code{dataset_opts}:
-#'     * \code{dp}: directory path to input sequence files
-#'     * \code{pattern}: regular expression for the input filename pattern
-#'     * \code{ord}: order of fields Replicate, Sample, and Locus in in the
-#'     input filename pattern.  For example, if Locus is the first field
-#'     followed by Replicate and Sample, set \code{ord=c(3, 1, 2)}.
-#'   * \code{output}:
-#'     * \code{dp}: directory path for saving output data
-#'   * \code{fp_dataset}: file path to table of sample attributes to use, rather
-#'     than detecting via dataset_opts
-#'   * \code{fp_locus_attrs}: file path to locus attributes CSV file
-#'   * \code{fp_genotypes_known}: file path to known genotypes CSV file
-#' @md
+#' The columns are:
 #'
+#' * Key: name of each setting
+#' * Value: unparsed text value for each setting
+#' * Description: short description of the setting
+#' * Example: example value
+#' * Parser: name of a function to apply to each entry when setting globally for
+#'   the package (see [apply_config])
+#'
+#' @name CFG_DEFAULTS
+#' @export CFG_DEFAULTS
+NULL
+
+#' Get/set CHIIMP global configuration options
+#'
+#' `cfg` is a helper function to provide a shortcut for the equivalent
+#' `options(chiimp.key = value)`.  With no arguments, all the currently-defined
+#' settings are returned as a list.  With a key given, the corresponding value
+#' is returned.  With both key and value, a new option value is set.
+#'
+#' @param key name of a CHIIMP configuration option
+#' @param val value to set for a particular key
 #' @export
-config.defaults <- list(
-  ## Input and output paths
-  fp_dataset = NULL,
-  fp_locus_attrs = "locus_attrs.csv",
-  fp_allele_names = NULL,
-  fp_genotypes_known = NULL,
-  ## Arguments to prepare_dataset
-  dataset_opts = list(
-    dp = "str-data",
-    pattern = "(\\d+)-(\\d+)-([A-Za-z0-9]+).fast[aq](?:\\.gz)",
-    ord = c(1, 2, 3),
-    autorep = FALSE
-  ),
-  ## Names for output files and directories
-  output = list(
-    dp = "str-results",  # Main output directory
-    fp_summary = "summary.csv",  # Dataset summary table
-    fp_report = "report.html",  # Report document
-    fp_dist_mat = "sample-distances.csv",  # Sample-to-sample distances
-    fp_rds = NULL,  # Data file to save results to
-    dp_histograms = "histograms",  # Read count by length histograms
-    dp_alignments = "alignments",  # Sequence alignments across alleles
-    dp_alignment_images = "alignment-images",  # Images of alignments
-    dp_processed_files = "processed-files",  # Per-file data tables
-    dp_processed_samples = "processed-samples",  # Sample data tables
-    dp_allele_seqs = "allele-sequences"  # FASTA sequences for alleles
-  ),
-  ## Options for analyze_dataset
-  dataset_analysis = list(
-    # Number of CPU cores to use while processing samples in parallel.  Set to 0
-    # to automatically select a number, or 1 to disable parallel execution.
-    ncores = 0,
-    # Length of suffix on automated allele names in tables.
-    name_args = list(hash_len = 6)
-  ),
-  ## Sample genotyping settings
-  seq_analysis = list(
-    nrepeats = 3,
-    stutter.count.ratio_max = 1 / 3,
-    artifact.count.ratio_max = 1 / 3,
-    use_reverse_primers = FALSE,
-    reverse_primer_r1 = TRUE,
-    max_mismatches = 0,
-    primer_action = "none",
-    # individual forward and reverse settings will default to the above values
-    # if left as NULL
-    max_mismatches_fwd = NULL,
-    max_mismatches_rev = NULL,
-    primer_action_fwd = NULL,
-    primer_action_rev = NULL
-  ),
-  sample_analysis_func = "analyze_sample",
-  sample_analysis_opts = list(fraction.min = 0.05),
-  sample_summary_func = "summarize_sample",
-  sample_summary_opts = list(counts.min = 500),
-  ## Report generation settings
-  # Should a report be generated?
-  report = TRUE,
-  # Should the code executed in the report generation be included in the report?
-  report.echo = FALSE,
-  # Title and other metadata at top of the report.
-  report.title = "Microsatellite Report",
-  report.author = NULL,
-  # List of vectors of locus names to use to break up tables into reasonable
-  # sizes and/or order locus names explicitly.
-  report.locus_chunks = NULL,
-  # Group together genotype table rows by sample?
-  report.group_samples = FALSE,
-  # Text to use for NA entries in Replicates column of tables (i.e. Pooled)
-  report.na.replicates = "",
-  # Text to use for NA allele enries in tables (when the Sample+Locus
-  # combination was not present at all, as opposed to when a genotype could not
-  # be determined)
-  report.na.alleles = "",
-  # Parameters controlling how identifications are reported: dist_range is how
-  # closeby (to the closest case) the next-nearest individuals must be to be
-  # listed as similar to a sample, and dist_max is the maximum distance for a
-  # given individual to be listed.
-  report.dist_range = 2,
-  report.dist_max = 3,
-  # Sub-sections of the report that can be excluded by overriding these with
-  # FALSE.
-  report.sections = list(genotypes       = TRUE,
-                         identifications = TRUE,
-                         distances       = TRUE,
-                         flags           = TRUE,
-                         alignments      = TRUE,
-                         contamination   = TRUE),
-  ## Other settings
-  # Print status messages to standard error.
-  verbose = TRUE)
+#' @md
+cfg <- function(key, val) {
+  if (missing(key)) {
+    opts <- options()
+    opts <- opts[grepl("^chiimp\\.", names(opts))]
+    names(opts) <- sub("^chiimp\\.", "", names(opts))
+    return(opts)
+  }
+  if (missing(val)) {
+    return(getOption(paste0("chiimp.", key)))
+  }
+  cfg_list <- list(val)
+  names(cfg_list) <- paste0("chiimp.", key)
+  do.call(options, cfg_list)
+  val
+}
+
+#' Apply CHIIMP options globally
+#'
+#' `apply_config` parses each row in a configuration options data frame and sets
+#' a corresponding option with `options(name = value)`.  All options are
+#' prefixed with "chiimp." to avoid colliding with options used in other
+#' libraries.
+#'
+#' @param config configuration options data frame, as from [load_config]
+#' @param keep keep existing CHIIMP options, or remove them before setting new
+#'   ones?
+#' @export
+#' @md
+apply_config <- function(config, keep = TRUE) {
+  if (is.data.frame(config)) {
+    # work with either list of already-parsed entries, or data frame of text
+    # values
+    config <- parse_config(config)
+  }
+
+  if (! keep) {
+    options()
+    opts <- options()
+    opts <- names(opts)[grepl("^chiimp\\.", names(opts))]
+    names(opts) <- opts
+    opts <- lapply(opts, function(item) NULL)
+    do.call(options, opts)
+  }
+  if (length(config) > 0) {
+    names(config) <- paste0("chiimp.", names(config))
+    do.call(options, config)
+  } else {
+    invisible(list())
+  }
+}
+
+
+# Config Checking ---------------------------------------------------------
+
+
+#' Compare two version strings
+#'
+#' `version_compare` takes two strings for software versions(e.g. "1.0.2") and
+#' returns `>`, `<`, or `=` depending on whether the first version is later,
+#' earlier, or equivalent to the second version.  For example, "1.2.0" >
+#' "1.1.5".
+#'
+#' If there are fewer fields in one string than the other, the one with fewer is
+#' padded with zeros for the least-significant positions.  For example 1.2.3 vs
+#' 1.2 is equivalent to 1.2.3 vs 1.2.0.
+#'
+#' @param ver1txt single character string for a software version
+#' @param ver2txt single character string for a software version
+#' @returns a single character representing if if the first version is later
+#'   (`>`), earlier (`<`), or equivalent (`=`) to the second version
+#'
+#' @md
+version_compare <- function(ver1txt, ver2txt) {
+  ver1 <- strsplit(ver1txt, "\\.")[[1]]
+  ver2 <- strsplit(ver2txt, "\\.")[[1]]
+  len <- max(length(ver1), length(ver2))
+  ver_mat <- matrix(as.integer(c(ver1[1:len], ver2[1:len])), ncol = 2)
+  ver_mat[is.na(ver_mat)] <- 0
+  for (idx in seq_len(nrow(ver_mat))) {
+    if (ver_mat[idx, 1] > ver_mat[idx, 2]) {
+      return(">")
+    }
+    if (ver_mat[idx, 1] < ver_mat[idx, 2]) {
+      return("<")
+    }
+  }
+  return("=")
+}
+
+config_check_keys <- function(cfg_table) {
+  unknown_txt <- cfg_table$Key[! cfg_table$Key %in% CFG_DEFAULTS$Key]
+  if (length(unknown_txt) > 0) {
+    warning(paste0(
+      "unrecognized config entries:\n",
+      paste(gsub("^", "  ", unknown_txt), collapse = "\n")))
+  }
+}
+
+config_check_version <- function(cfg_table) {
+  version <- cfg_table$Value[match("version", cfg_table$Key)]
+  version_pkg <- CFG_DEFAULTS$Value[match("version", CFG_DEFAULTS$Key)]
+  ver_cmp <- version_compare(version, version_pkg)
+  if (ver_cmp == ">") {
+    warning(paste0(
+      "Config file version (", version,
+      ") > package config version (", version_pkg, ")"))
+  }
+}
+
+
+# Config Parsing ----------------------------------------------------------
+
+
+# take a config table, parse each setting, and return a list of key/value pairs.
+
+#' Parse a configuration data frame into list
+#'
+#' `parse_config` takes each row of a data frame of configuration options and
+#' defines a list item for it, using the Key column for each name and parsing
+#' each value according to the Parser column.
+#'
+#' @param cfg_table data frame of CHIIMP configuration options
+#' @returns list with one item per row in the input data frame, with each value
+#'   parsed according to the function name in the Parser column
+#' @md
+parse_config <- function(cfg_table) {
+  cfg_list <- list()
+  for (idx in seq_len(nrow(cfg_table))) {
+    key <- cfg_table$Key[idx]
+    val <- cfg_table$Value[idx]
+    idx_default <- match(key, CFG_DEFAULTS$Key)
+    funcname <- cfg_table$Parser[idx]
+    if (is.na(idx_default)) {
+      warning(paste("unrecognized config entry:", key))
+    }
+    if (is.null(funcname)) {
+      # If this config didn't supply a parser, use the default's
+      funcname <- CFG_DEFAULTS$Parser[idx_default]
+    }
+    if (is.na(funcname)) {
+      # if the default didn't supply a parser (should only happen for
+      # unrecognized entries) use as.character.
+      funcname <- "as.character"
+    }
+    func <- get(funcname)
+    cfg_list[[key]] <- func(val)
+  }
+  cfg_list
+}
+
+check_one_val <- function(txt) {
+  if (length(txt) != 1) {
+    stop(paste("txt should be of length 1; received", length(txt)))
+  }
+}
+
+# flexible boolean handling to still act like the old YAML config (well, pre 1.2
+# YAML) plus whatever R recognizes
+as_bool <- function(txt) {
+  check_one_val(txt)
+  txt <- toupper(txt)
+  map <- c(
+    "TRUE" = TRUE, "T" = TRUE, "YES" = TRUE, "ON" = TRUE,
+    "FALSE" = FALSE, "F" = FALSE, "NO" = FALSE, "OFF" = FALSE)
+  if (! txt %in% c("", names(map))) {
+    stop(paste("txt should be TRUE or FALSE; received", txt))
+  }
+  out <- unname(map[txt])
+  out
+}
+
+# parse a single character string as a vector of integers separated by
+# non-digits
+as_integer_vec <- function(txt) {
+  check_one_val(txt)
+  as.integer(strsplit(txt, "[^-0-9]+")[[1]])
+}
+
+# parse a single character string as a named list of vectors
+# e.g. "name=item1/item2/item3;name2=item4/item5;..."
+as_locus_vecs <- function(txt) {
+  check_one_val(txt)
+  chunks <- strsplit(txt, "; *")[[1]]
+  chunk_names <- sub("=.*", "", chunks)
+  vecs <- lapply(chunks, function(chunk) {
+    strsplit(sub(".*=", "", chunk), "/")[[1]]
+  })
+  names(vecs) <- chunk_names
+  vecs
+}
+
+# autodetect CPU cores if 0
+as_cpu_cores <- function(txt) {
+  check_one_val(txt)
+  val <- if (txt == "") {
+    0
+  } else {
+    if (! grepl("^[0-9]*$", txt)) {
+      stop(paste("txt should be an integer; received", txt))
+    }
+    as.integer(txt)
+  }
+  if (val == 0) {
+    val <- max(1, as.integer(parallel::detectCores() / 2) - 1)
+  }
+  val
+}
+
+# Does the given vector look "blank"?
+# NULL: TRUE (caught by length of 0)
+# NA: TRUE
+# "": TRUE
+# any combo of NA and "": TRUE
+# all else: FALSE
+is_blank <- function(vec) {
+  length(vec) == 0 || all(vec %in% c(NA, ""))
+}

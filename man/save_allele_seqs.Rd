@@ -7,14 +7,13 @@
 save_allele_seqs(results_summary, dp)
 }
 \arguments{
-\item{results_summary}{summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\item{results_summary}{summary data frame as produced by \link{analyze_dataset}.}
 
 \item{dp}{output directory path to use for all files.}
 }
 \description{
-Take the alleles identified by \code{\link{analyze_dataset}} in the summary
-data frame and save each entry to a separate FASTA file.  Samples identified
-as homozygous will have one sequence written rather than two.  Entries with
-no identified alleles will be skipped.
+Take the alleles identified by \link{analyze_dataset} in the summary data frame
+and save each entry to a separate FASTA file.  Samples identified as
+homozygous will have one sequence written rather than two.  Entries with no
+identified alleles will be skipped.
 }

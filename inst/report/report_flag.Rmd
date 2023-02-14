@@ -1,7 +1,7 @@
 ## Flagged Values
 
 ```{r report.flag_prep}
-fig.height.flag <- 2 + num.samples * num.replicates / 6
+fig_height_flag <- 2 + num_samples * num_replicates / 6
 ```
 
 ### Possible PCR Stutter Removed
@@ -9,7 +9,7 @@ fig.height.flag <- 2 + num.samples * num.replicates / 6
 These tables show samples that had a candidate allele filtered out because it
 was potential PCR stutter.
 
-```{r report.stutter, fig.height=fig.height.flag}
+```{r report.stutter, fig.height=fig_height_flag}
 plot_heatmap_stutter(results)
 ```
 
@@ -18,7 +18,7 @@ plot_heatmap_stutter(results)
 These tables show samples that had a candidate allele filtered out because it
 was a potential (non-stutter) PCR artifact.
 
-```{r report.artifacts, fig.height=fig.height.flag}
+```{r report.artifacts, fig.height=fig_height_flag}
 plot_heatmap_artifacts(results)
 ```
 
@@ -29,7 +29,7 @@ sequences still present after all filtering. Cases with more than two could
 imply contamination or excessive PCR stutter or artifacts obscuring the correct
 allele sequences.
 
-```{r report.peaks, fig.height=fig.height.flag}
+```{r report.peaks, fig.height=fig_height_flag}
 plot_heatmap_prominent_seqs(results)
 ```
 
@@ -40,7 +40,7 @@ represented by the called alleles per sample, running from red for 0% to white
 for 100%.  The proportion is calculated for both alleles and color-coded with
 the same color for both.
 
-```{r report.prop, fig.height=fig.height.flag}
+```{r report.prop, fig.height=fig_height_flag}
 plot_heatmap_proportions(results)
 ```
 
@@ -48,6 +48,6 @@ plot_heatmap_proportions(results)
 
 These tables show which samples are reported as homozygous.
 
-```{r report.homozygous, fig.height=fig.height.flag}
+```{r report.homozygous, fig.height=fig_height_flag}
 plot_heatmap_homozygous(results)
 ```

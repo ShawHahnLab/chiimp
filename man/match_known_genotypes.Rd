@@ -4,25 +4,24 @@
 \alias{match_known_genotypes}
 \title{Associate known genotypes with samples}
 \usage{
-match_known_genotypes(results_summary, genotypes.known)
+match_known_genotypes(results_summary, genotypes_known)
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
-\item{genotypes.known}{data frame of known genotypes that should be compared
-to the observed genotypes in the results, as loaded by
-\code{\link{load_genotypes}}.}
+\item{genotypes_known}{data frame of known genotypes that should be compared
+to the observed genotypes in the results, as loaded by \link{load_genotypes}.}
 }
 \value{
 data frame with two columns for the two correct alleles, and rows
-  matching the input summary table.
+matching the input summary table.
 }
 \description{
 Using the Name column of the given results summary data frame, pair each
 called genotype with the known alleles.  A data frame with two columns,
-\code{CorrectAllele1Seq} and \code{CorrectAllele2Seq}, is returned. If
-matching entries are found in \code{Allele1Seq} and/or \code{Allele2Seq} the
-order will be preserved, and at this point the two allele entries should
-match up directly for genotypes that were called correctly.
+\code{CorrectAllele1Seq} and \code{CorrectAllele2Seq}, is returned. If matching entries
+are found in \code{Allele1Seq} and/or \code{Allele2Seq} the order will be preserved,
+and at this point the two allele entries should match up directly for
+genotypes that were called correctly.
 }

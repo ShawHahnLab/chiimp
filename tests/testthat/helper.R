@@ -2,11 +2,11 @@
 # afterward
 within_tmpdir <- function(expr) {
   here <- getwd()
-  data.dir <- tempfile()
-  dir.create(data.dir)
-  setwd(data.dir)
+  data_dir <- tempfile()
+  dir.create(data_dir)
+  setwd(data_dir)
   tryCatch(eval(expr), finally = {
-    unlink(x = data.dir, recursive = TRUE)
+    unlink(x = data_dir, recursive = TRUE)
     setwd(here)
   })
 }
@@ -30,5 +30,13 @@ write_seqs <- function(seq_sets, outdir, fmt = "%s-%s.fasta") {
                      dna = seq_sets[[sn]][[ln]],
                      fileName = fp)
     }
+  }
+}
+
+# for testthat pre-3.1.5
+if (! exists("expect_no_warning", envir = as.environment("package:testthat"))) {
+  expect_no_warning <- function(...) {
+    wrns <- testthat::capture_warnings(...)
+    testthat::expect_identical(wrns, character())
   }
 }

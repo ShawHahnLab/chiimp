@@ -8,10 +8,12 @@ testrds <- function(fname) readRDS(test_path("data", "io", fname))
 test_that("load_config loads config YAML files", {
   config_path <- testpth("config.yml")
   config <- load_config(config_path)
-  expect_equal(
-    config,
-    list(fp_dataset = "samples.csv", output = list(fp_rds = "results.rds"))
-  )
+  config_expected <- data.frame(
+    OldName = c("fp_dataset", "output:fp_rds"),
+    Value = c("samples.csv", "results.rds"),
+    Key = c("dataset", "output_rds"),
+    stringsAsFactors = FALSE)
+  expect_equal(config, config_expected)
 })
 
 test_that("load_config handles unexpected entries", {
@@ -21,17 +23,19 @@ test_that("load_config handles unexpected entries", {
   expect_warning(
     config <- load_config(config_path),
     paste(
-      "unrecognized config file entries:",
+      "unrecognized config entries:",
       "  unrecognized",
       "  dataset_analysis:name_args:unknown", sep = "\n"))
-  expect_equal(
-    config,
-    list(
-      fp_dataset = "samples.csv",
-      output = list(fp_rds = "results.rds"),
-      unrecognized = 10,
-      dataset_analysis = list(name_args = list(unknown = 5)))
-  )
+  config_expected <- data.frame(
+    OldName = c(
+      "fp_dataset", "output:fp_rds", "unrecognized",
+      "dataset_analysis:name_args:unknown"),
+    Value = c("samples.csv", "results.rds", "10", "5"),
+    Key = c(
+      "dataset", "output_rds", "unrecognized",
+      "dataset_analysis:name_args:unknown"),
+    stringsAsFactors = FALSE)
+  expect_equal(config, config_expected)
 })
 
 
@@ -231,7 +235,6 @@ test_that("save_seqfile_data saves per-file information", {
       dataset, locus_attrs,
       analysis_opts = list(fraction.min = 0.05),
       summary_opts = list(counts.min = 500),
-      nrepeats = 3,
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
@@ -257,7 +260,6 @@ test_that("save_seqfile_data works with directory trees", {
       dataset, locus_attrs,
       analysis_opts = list(fraction.min = 0.05),
       summary_opts = list(counts.min = 500),
-      nrepeats = 3,
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
@@ -285,7 +287,6 @@ test_that("save_seqfile_data works with Windows-style paths", {
       dataset, locus_attrs,
       analysis_opts = list(fraction.min = 0.05),
       summary_opts = list(counts.min = 500),
-      nrepeats = 3,
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     names(results$files) <- gsub("/", "\\\\", names(results$files))

@@ -4,7 +4,11 @@
 \alias{find_primer_matches}
 \title{Find primer matches for reads}
 \usage{
-find_primer_matches(seqs_reads, seqs_primers, max_mismatches = NA)
+find_primer_matches(
+  seqs_reads,
+  seqs_primers,
+  max_mismatches = cfg("max_mismatches")
+)
 }
 \arguments{
 \item{seqs_reads}{character vector of read sequences}

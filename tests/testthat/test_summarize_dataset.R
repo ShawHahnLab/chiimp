@@ -12,7 +12,7 @@ test_that("summarize_dataset produces additional summaries", {
 })
 
 test_that("summarize_dataset works with known genotypes", {
-  # Several additional things should happen if genotypes.known is given to
+  # Several additional things should happen if genotypes_known is given to
   # summarize_dataset.  The extra data frame should be appended to the results
   # list, and a new distance matrix should be present comparing samples to
   # known genotypes.
@@ -26,7 +26,7 @@ test_that("summarize_dataset works with known genotypes", {
   results <- testrds("results_known.rds")
   results_expected <- testrds("results_known_mod.rds")
   genotypes_known <- testrds("genotypes_known.rds")
-  results_mod <- summarize_dataset(results, genotypes.known = genotypes_known)
+  results_mod <- summarize_dataset(results, genotypes_known = genotypes_known)
   expect_equal(results_mod, results_expected)
 })
 
@@ -94,12 +94,12 @@ test_that("calc_genotype_distance handles NA entries", {
   g3 <- c(NA, NA, 200, 204, 37, 39)
 
   # The two NA entries will by default count towards the distance whether the
-  # other genotype has an NA there or not.  If na.reject is FALSE, NAs are
+  # other genotype has an NA there or not.  If na_reject is FALSE, NAs are
   # treated like any other entry.
   d12 <- calc_genotype_distance(g1, g2)
-  d12.na <- calc_genotype_distance(g1, g2, na.reject = FALSE)
+  d12.na <- calc_genotype_distance(g1, g2, na_reject = FALSE)
   d23 <- calc_genotype_distance(g2, g3)
-  d23.na <- calc_genotype_distance(g2, g3, na.reject = FALSE)
+  d23.na <- calc_genotype_distance(g2, g3, na_reject = FALSE)
   expect_equal(d12,    4)
   expect_equal(d12.na, 2)
   expect_equal(d23,    4)

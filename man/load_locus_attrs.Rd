@@ -4,21 +4,20 @@
 \alias{load_locus_attrs}
 \title{Load table of locus attributes}
 \usage{
-load_locus_attrs(fp.locus_attrs, ...)
+load_locus_attrs(fp_locus_attrs, ...)
 }
 \arguments{
-\item{fp.locus_attrs}{path to text file.}
+\item{fp_locus_attrs}{path to text file.}
 
-\item{...}{additional arguments passed to \code{\link{load_csv}}.}
+\item{...}{additional arguments passed to \link{load_csv}.}
 }
 \value{
 data frame of locus attributes
 }
 \description{
 Load a comma-separated table of locus attributes to use for analysis.  This
-is called automatically during \code{\link{full_analysis}}, with the data
-frame then used by \code{\link{analyze_seqs}} within
-\code{\link{analyze_dataset}}.
+is called automatically during \link{full_analysis}, with the data frame then used
+by \link{analyze_seqs} within \link{analyze_dataset}.
 }
 \details{
 Columns Required:
@@ -26,10 +25,10 @@ Columns Required:
 \item \code{Locus}: Unique identifier for a given locus
 \item \code{LengthMin}: Minimum known allele sequence length for this locus
 \item \code{LengthMax}: Minimum known allele sequence length for this locus
-\item \code{LengthBuffer}: Additional sequence length below \code{LengthMin}
-and above \code{LengthMax} to accept for a candidate allele
-\item \code{Primer}: The forward PCR primer sequence for a given locus, used
-when matching sequences to loci
+\item \code{LengthBuffer}: Additional sequence length below \code{LengthMin} and above
+\code{LengthMax} to accept for a candidate allele
+\item \code{Primer}: The forward PCR primer sequence for a given locus, used when
+matching sequences to loci
 \item \code{ReversePrimer}: The reverse PCR primer sequence
 }
 }

@@ -21,8 +21,8 @@ k_group_rows <- function(k, grouping) {
   k
 }
 
-k_row_spec <- function(k, idx.rows, ...) {
-  for (idx in idx.rows) {
+k_row_spec <- function(k, idx_rows, ...) {
+  for (idx in idx_rows) {
     k <- kableExtra::row_spec(k, idx, ...)
   }
   k
@@ -48,14 +48,14 @@ kable_genotypes <- function(data, group_samples = FALSE) {
 
 # Write markdown tables to standard output for report_genotypes()
 rmd_kable_genotypes <- function(
-    results, na.replicates = "", na.alleles = "", locus_chunks = NULL,
+    results, na_replicates = "", na_alleles = "", locus_chunks = NULL,
     group_samples = FALSE, closest = NULL) {
   tbl <- report_genotypes(
     results = results,
-    na.replicates = na.replicates,
-    na.alleles = na.alleles,
+    na_replicates = na_replicates,
+    na_alleles = na_alleles,
     closest = closest)
-  if (!is.null(locus_chunks)) {
+  if (! is_blank(locus_chunks)) {
     chunk_up(
       data = tbl,
       locus_chunks = locus_chunks,
@@ -70,9 +70,9 @@ rmd_kable_genotypes <- function(
 kable_idents <- function(tbl, closest) {
   # Remove columns that will be represented in other ways (sample/remplicate in
   # row groupings)
-  idx.remove <- match(c("Sample", "Replicate"), colnames(tbl))
-  idx.remove <- idx.remove[!is.na(idx.remove)]
-  tbl <- tbl[, -idx.remove]
+  idx_remove <- match(c("Sample", "Replicate"), colnames(tbl))
+  idx_remove <- idx_remove[!is.na(idx_remove)]
+  tbl <- tbl[, -idx_remove]
 
   # Create basic table
   bootstrap_options <- c("hover", "condensed")
@@ -82,65 +82,65 @@ kable_idents <- function(tbl, closest) {
                                  full_width = FALSE)
 
   # Group rows by sample
-  obs.select <- tbl$Distance == ""
-  names(obs.select) <- paste("Sample", rownames(tbl))
-  k <- k_group_rows(k, obs.select)
+  obs_select <- tbl$Distance == ""
+  names(obs_select) <- paste("Sample", rownames(tbl))
+  k <- k_group_rows(k, obs_select)
 
   # Bold rows containing a single identification per sample
   # (find the original samples, and then go one farther)
   ids <- names(closest[sapply(closest, function(x) length(x) == 1)])
-  idx.rows <- match(ids, rownames(tbl)) + 1
-  k <- k_row_spec(k, idx.rows, bold = TRUE)
+  idx_rows <- match(ids, rownames(tbl)) + 1
+  k <- k_row_spec(k, idx_rows, bold = TRUE)
 
   k
 }
 
 # Write markdown tables to standard output for report_idents()
-rmd_kable_idents <- function(results, na.replicates, locus_chunks = NULL) {
-  tbl.combo <- report_idents(results,
+rmd_kable_idents <- function(results, na_replicates, locus_chunks = NULL) {
+  tbl_combo <- report_idents(results,
                              closest = results$closest_matches,
-                             na.replicates = na.replicates)
-  if (!is.null(locus_chunks)) {
-    chunk_up(data = tbl.combo,
+                             na_replicates = na_replicates)
+  if (! is_blank(locus_chunks)) {
+    chunk_up(data = tbl_combo,
              locus_chunks = locus_chunks,
              kable_func = kable_idents,
              closest = results$closest_matches)
   } else {
-    cat(kable_idents(tbl.combo, results$closest_matches))
+    cat(kable_idents(tbl_combo, results$closest_matches))
   }
 }
 
 # Make chunked heatmaps for the counts-per-locus table.  This does not assume
 # that we have evenly-distributed numbers of samples across loci, so it will try
 # to group samples into reasonably-sized sets across loci where necessary.
-# max.rows: maximum number of rows in a given chunked heatmap
+# max_rows: maximum number of rows in a given chunked heatmap
 rmd_plot_cts_per_locus <- function(
-    results, max.rows = 30, heading_prefix = "###", ...) {
+    results, max_rows = 30, heading_prefix = "###", ...) {
   # Count samples per locus, for breaking big heatmaps into smaller chunks but
   # not splitting loci
-  tbl.loci <- table(results$summary$Locus)
-  tbl.loci <- tbl.loci[match(results$locus_attrs$Locus,
-                             names(tbl.loci))]
-  tbl.loci <- tbl.loci[!is.na(tbl.loci)]
+  tbl_loci <- table(results$summary$Locus)
+  tbl_loci <- tbl_loci[match(results$locus_attrs$Locus,
+                             names(tbl_loci))]
+  tbl_loci <- tbl_loci[!is.na(tbl_loci)]
   # Break loci into chunks to keep heatmap sizes reasonable
-  loci.chunked <- split(names(tbl.loci),
-                        floor(cumsum(tbl.loci) / max.rows))
+  loci_chunked <- split(names(tbl_loci),
+                        floor(cumsum(tbl_loci) / max_rows))
 
 
   # Draw each heatmap across chunks of loci.  Written to assume there will be
   # multiple but this should work fine even if there's only one.  (Note that
   # this is all across rows, not columns like in chunk_up().)
-  for (loci in loci.chunked) {
+  for (loci in loci_chunked) {
     idx <- results$summary$Locus %in% loci
-    idx.row <- rownames(results$summary)[idx]
+    idx_row <- rownames(results$summary)[idx]
     heading <- if (length(loci) > 1) {
       paste("Samples for Loci", loci[1], "-", loci[length(loci)])
     } else {
       paste("Samples for Locus", loci[1])
     }
-    if (length(loci.chunked) > 1)
+    if (length(loci_chunked) > 1)
       cat(paste0("\n\n", heading_prefix, " ", heading, "\n\n"))
-    plot_cts_per_locus(results$cts_per_locus, idx.row, ...)
+    plot_cts_per_locus(results$cts_per_locus, idx_row, ...)
   }
 }
 
@@ -153,8 +153,8 @@ rmd_alignments <- function(results, heading_prefix = "###") {
       return()
     }
     fp <- file.path(
-      results$config$output$dp,
-      results$config$output$dp_alignment_images,
+      results$config$output_path,
+      results$config$output_path_alignment_images,
       paste0(loc, ".png"))
     cat(paste0("![](", fp, ")"))
   }))
@@ -177,16 +177,16 @@ chunk_up <- function(
     }
     # Determine which loci don't apply for this chunk and remove those columns.
     locus_cols_extra <- locus_cols_all[-match(locus_cols, locus_cols_all)]
-    idx.extra <- match(locus_cols_extra, colnames(data))
-    idx.extra <- idx.extra[!is.na(idx.extra)]
-    tbl.chunk <- if (length(idx.extra) > 0) {
-      data[, -idx.extra]
+    idx_extra <- match(locus_cols_extra, colnames(data))
+    idx_extra <- idx_extra[!is.na(idx_extra)]
+    tbl_chunk <- if (length(idx_extra) > 0) {
+      data[, -idx_extra]
     } else {
       data
     }
     # Write the table including a heading for the loci
     cat(paste0("\n\n", heading_prefix, " ", "Loci: ", chunk_name, "\n\n"))
-    cat(kable_func(tbl.chunk, ...))
+    cat(kable_func(tbl_chunk, ...))
   }
 }
 

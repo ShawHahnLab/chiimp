@@ -14,113 +14,106 @@ Microsatellite Profiling.  For a conceptual overview see the latest
 }
 \details{
 Starting from file inputs and producing file outputs, the overall workflow
-(handled by \code{\link{full_analysis}} as a configuration-driven wrapper for
+(handled by \link{full_analysis} as a configuration-driven wrapper for
 the entire process) is:
 \itemize{
 \item Load input data.  The input spreadsheets are text files using
 comma-separated values (CSV).
 \itemize{
 \item Load data frame of sample information from a spreadsheet via
-\code{\link{load_dataset}} or directly from filenames via
-\code{\link{prepare_dataset}}.
-\item Load data frame of locus attributes via \code{\link{load_locus_attrs}}
+\link{load_dataset} or directly from filenames via \link{prepare_dataset}.
+\item Load data frame of locus attributes via \link{load_locus_attrs}
 \item Optionally, load data frame of names for allele sequences via
-\code{\link{load_allele_names}}.
+\link{load_allele_names}.
 \item Optionally, load data frame of known genotypes for named individuals via
-\code{\link{load_genotypes}}.
+\link{load_genotypes}.
 }
-\item Analyze dataset via \code{\link{analyze_dataset}}
+\item Analyze dataset via \link{analyze_dataset}
 \itemize{
 \item Load each sequence data file into a character vector with
-\code{\link{load_seqs}} and process into a dereplicated data frame with
-\code{\link{analyze_seqs}}.
+\link{load_seqs} and process into a dereplicated data frame with
+\link{analyze_seqs}.
 \item For each sample, filter the sequences from the relevant per-file data
 frame to just those matching the expected locus and identify possible
-alleles, via \code{\link{analyze_sample}}.  (There may be a many-to-one
-relationship of samples to files, for example with sequencer
-multiplexing.)
+alleles, via \link{analyze_sample}.  (There may be a many-to-one relationship
+of samples to files, for example with sequencer multiplexing.)
 \item Process each per-sample data frames into a summary list of attributes
 giving alleles identified and related information, via
-\code{\link{summarize_sample}}.
-\item Organize \code{analyze_dataset} results into a list of per-file data
+\link{summarize_sample}.
+\item Organize \link{analyze_dataset} results into a list of per-file data
 frames, a list of per-sample data frames, and a single summary data
 frame across all samples.
 }
 \item Summarize results and add additional comparisons (cross-sample and to
-known-individual) via \code{\link{summarize_dataset}}.
+known-individual) via \link{summarize_dataset}.
 \itemize{
 \item Tabulate sequence counts per sample matching each locus' primer via
-\code{\link{tally_cts_per_locus}}.
-\item Align identified alleles for each locus via
-\code{\link{align_alleles}}.
+\link{tally_cts_per_locus}.
+\item Align identified alleles for each locus via \link{align_alleles}.
 \item Create a sample-to-sample distance matrix of allele mismatches via
-\code{\link{make_dist_mat}}.
+\link{make_dist_mat}.
 \item If genotypes for known individuals were provided, create a
-sample-to-known-individual distance matrix via
-\code{\link{make_dist_mat_known}}.
+sample-to-known-individual distance matrix via \link{make_dist_mat_known}.
 \item If identities of samples were provided, score genotyping success via
-\code{\link{match_known_genotypes}} and
-\code{\link{categorize_genotype_results}}.
+\link{match_known_genotypes} and \link{categorize_genotype_results}.
 }
 \item Save analysis results to files.  Spreadsheets are in CSV format for output
 as well as input.  Some output files are in FASTA format (alignments and
 alleles) or are PNG images (alignment visualization and sequence count
-histograms).  If specified in the configuration, \code{\link{saveRDS}} is
-called on the entire output as well, saving to \code{results.rds} by
-default.
+histograms).  If specified in the configuration, \link{saveRDS} is
+called on the entire output as well, saving to \code{results.rds} by default.
 \item Create an HTML report document summarizing all results.
 }
 
-For defaults used in the configuration, see \code{\link{config.defaults}}.
+For defaults used in the configuration, see \link{CFG_DEFAULTS}.
 
 The workflow above outlines CHIIMP's behavior when called as a standalone
-program, where \code{\link{main}} loads a configuration file into a nested
-list of options and calls \code{\link{full_analysis}}.  The public functions
-linked above can also be used independently; see the documentation and code
-examples for the individual functions for more information.
+program, where \link{main} loads a configuration file into global options in R and
+calls \link{full_analysis}.  The public functions linked above can also be used
+independently; see the documentation and code examples for the individual
+functions for more information.
 
 \strong{The Package structure of the source files, grouped by topic:}
 \itemize{
 \item Main Interface:
 \itemize{
-\item \code{chiimp.R}: Main entry point for command-line usage
-(\code{\link{main}}) and R usage (\code{\link{full_analysis}}).
+\item \code{chiimp.R}: Main entry point for command-line usage (\link{main}) and R usage
+(\link{full_analysis}).
 }
 \item Data Analysis:
 \itemize{
 \item \code{analyze_dataset.R}: High-level interface to analyze all samples
-across a given dataset (\code{\link{analyze_dataset}}); used by
-\code{\link{full_analysis}} to manage the main part of the processing.
+across a given dataset (\link{analyze_dataset}); used by \link{full_analysis} to
+manage the main part of the processing.
 \item \code{summarize_dataset.R}: High-level interface to provide inter-sample
-and inter-locus analyses (\code{\link{summarize_dataset}}); used by
-\code{\link{full_analysis}} to manage the second stage of the
-processing.
+and inter-locus analyses (\link{summarize_dataset}); used by \link{full_analysis}
+to manage the second stage of the processing.
 \item \code{analyze_seqs.R}: Low-level interface to convert raw sequence input
-to a data frame of unique sequences (\code{\link{analyze_seqs}}); used
-by \code{\link{analyze_dataset}}.
+to a data frame of unique sequences (\link{analyze_seqs}); used
+by \link{analyze_dataset}.
 \item \code{analyze_sample.R}: Low-level interface to extract per-locus
 details from a data frame of unique sequences
-(\code{\link{analyze_sample}}); used by \code{\link{analyze_dataset}}.
+(\link{analyze_sample}); used by \link{analyze_dataset}.
 \item \code{summarize_sample.R}: Low-level interface to condense each sample
 data frame into a a concise list of consistent attributes, suitable for
-binding together across samples for a dataset
-(\code{\link{summarize_sample}}); used by \code{\link{analyze_dataset}}.
-\item \code{categorize.R}: Low-level helper functions used by
-\code{\link{summarize_dataset}} for samples with known identity.
+binding together across samples for a dataset (\link{summarize_sample}); used
+by \link{analyze_dataset}.
+\item \code{categorize.R}: Low-level helper functions used by \link{summarize_dataset}
+for samples with known identity.
 }
 \item Plotting and reporting:
 \itemize{
 \item \code{report.R}: Various plotting and summarizing functions used when
-rendering a report in \code{\link{full_analysis}}.
-\item \code{histogram.R}: Sequence histogram plotting tools
-(\code{\link{histogram}}) as used during \code{\link{full_analysis}}.
+rendering a report in \link{full_analysis}.
+\item \code{histogram.R}: Sequence histogram plotting tools \link{histogram}) as used
+during \link{full_analysis}.
 \item \code{markdown.R}: Various helper functions for adding tables and plots
-to an R Markdown report as used in \code{\link{full_analysis}}.
+to an R Markdown report as used in \link{full_analysis}.
 }
 \item Utility Functions and Configuration:
 \itemize{
-\item \code{configuration.R}: The default configuration options
-(\code{\link{config.defaults}}) used by \code{\link{full_analysis}}.
+\item \code{configuration.R}: Configuration handling helper code and the default
+configuration options \link{CFG_DEFAULTS}) used by many chiimp functions.
 \item \code{io.R}: various helper input/output functions used loading and
 saving sequence data files, spreadsheets, and plots used in multiple
 parts of the package.

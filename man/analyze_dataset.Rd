@@ -7,78 +7,43 @@
 analyze_dataset(
   dataset,
   locus_attrs,
-  nrepeats,
-  stutter.count.ratio_max = config.defaults$seq_analysis$stutter.count.ratio_max,
-  artifact.count.ratio_max = config.defaults$seq_analysis$artifact.count.ratio_max,
-  use_reverse_primers = config.defaults$seq_analysis$use_reverse_primers,
-  reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1,
-  max_mismatches = config.defaults$seq_analysis$max_mismatches,
-  primer_action = config.defaults$seq_analysis$primer_action,
-  max_mismatches_fwd = config.defaults$seq_analysis$max_mismatches_fwd,
-  max_mismatches_rev = config.defaults$seq_analysis$max_mismatches_rev,
-  primer_action_fwd = config.defaults$seq_analysis$primer_action_fwd,
-  primer_action_rev = config.defaults$seq_analysis$primer_action_rev,
-  ncores = 0,
   analysis_opts,
   summary_opts,
   analysis_function = analyze_sample,
   summary_function = summarize_sample,
-  known_alleles = NULL,
-  name_args = list()
+  ncores = cfg("ncores"),
+  known_alleles = NULL
 )
 }
 \arguments{
-\item{dataset}{data frame of sample details as produced by
-\code{\link{prepare_dataset}}.}
+\item{dataset}{data frame of sample details as produced by \link{prepare_dataset}.}
 
 \item{locus_attrs}{data frame of locus attributes as produced by
-\code{\link{load_locus_attrs}}.}
+\link{load_locus_attrs}.}
 
-\item{nrepeats}{number of repeats of each locus' motif to require for a
-match (see \code{\link{analyze_seqs}}).}
+\item{analysis_opts}{list of supplemental arguments to \code{analysis_function}.}
 
-\item{stutter.count.ratio_max}{highest ratio of read counts for second most
-frequent sequence to the most frequent where the second will be
-considered stutter (see \code{\link{analyze_seqs}}).}
+\item{summary_opts}{list of supplemental arguments to \code{summary_function}.}
 
-\item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
-non-stutter artifact sequences.}
+\item{analysis_function}{function to use when analyzing each sample's data
+frame into the filtered version  Defaults to \link{analyze_sample}.}
 
-\item{use_reverse_primers}{consider the ReversePrimer column from the locus
-attributes for locus-matching?}
-
-\item{reverse_primer_r1}{Is each reverse primer given in its orientation on
-the forward read?  (See \code{\link{analyze_seqs}})}
+\item{summary_function}{function to use when summarizing each sample's full
+details into the standard attributes.  Defaults to \link{summarize_sample}.}
 
 \item{ncores}{integer number of CPU cores to use in parallel for sample
 analysis.  Defaults to one less than half the number of detected cores with
 a minimum of 1.  If 1, the function will run without using the
-\code{parallel} package.}
-
-\item{analysis_opts}{list of supplemental arguments to
-\code{analysis_function}.}
-
-\item{summary_opts}{list of supplemental arguments to
-\code{summary_function}.}
-
-\item{analysis_function}{function to use when analyzing each sample's data
-frame into the filtered version  Defaults to \code{\link{analyze_sample}}.}
-
-\item{summary_function}{function to use when summarizing each sample's full
-details into the standard attributes.  Defaults to
-\code{\link{summarize_sample}}.}
+\link{parallel} package.}
 
 \item{known_alleles}{data frame of custom allele names as defined for
-\code{\link{load_allele_names}}.  if NULL only the names automatically
+\link{load_allele_names}.  if NULL only the names automatically
 generated for the dataset summary will be used.}
-
-\item{name_args}{list of additional arguments to
-\code{\link{make_allele_name}}.}
 }
 \value{
-list of results, with \code{summary} set to the single summary data
-  frame, \code{files} the processed sequence files, and \code{samples} the
-  per-sample data frames.
+list of results, with \code{summary} set to the single summary data frame,
+\code{files} the processed sequence files, and \code{samples} the per-sample data
+frames.
 }
 \description{
 Load all samples for a given dataset and produce a summary data frame showing

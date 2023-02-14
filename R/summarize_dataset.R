@@ -4,52 +4,47 @@
 
 #' Add further summaries to analyzed dataset
 #'
-#' Take a results list as produced by \code{\link{analyze_dataset}} and add
-#' additional entries for inter-sample and inter-locus analyses.
+#' Take a results list as produced by [analyze_dataset] and add additional
+#' entries for inter-sample and inter-locus analyses.
 #'
 #' @details
 #' Additional entries in the returned list:
-#'   * \code{alignments}: inter-allele alignments for each locus, from
-#'     \code{\link{align_alleles}}.
-#'   * \code{dist_mat}: inter-sample distance matrix, from
-#'   \code{\link{make_dist_mat}}.
-#'   * \code{dist_mat_known}: if genotypes.known is given, this distance matrix
-#'   of sample-to-individual values will be present, from
-#'   \code{\link{make_dist_mat_known}}.
+#'   * `alignments`: inter-allele alignments for each locus, from
+#'     [align_alleles].
+#'   * `dist_mat`: inter-sample distance matrix, from `make_dist_mat`.
+#'   * `dist_mat_known`: if genotypes_known is given, this distance matrix
+#'   of sample-to-individual values will be present, from `make_dist_mat_known`.
 #'
-#' If genotypes.known is given *and* a Name column is present in
-#' \code{results$summary}, samples will be matched with the genotypes in
-#' genotypes.known and additional columns will be present in the summary data
+#' If genotypes_known is given *and* a Name column is present in
+#' `results$summary`, samples will be matched with the genotypes in
+#' genotypes_known and additional columns will be present in the summary data
 #' frame:
-#'   * \code{CorrectAllele1Seq}: One correct allele sequence for the individual.
-#'   The order of this and \code{CorrectAllele2Seq} will be matched to
-#'   \code{Allele1Seq} and \code{Allele2Seq} if possible.  See
-#'   \code{\link{match_known_genotypes}}.
-#'   * \code{CorrectAllele2Seq}: A second correct allele sequence, as above.
-#'   * \code{GenotypeResult}: Categorization for each entry as Correct,
-#'   Incorrect, Blank, or Dropped Allele.  See
-#'   \code{\link{categorize_genotype_results}}.
-#'
-#' @md
+#'   * `CorrectAllele1Seq`: One correct allele sequence for the individual. The
+#'     order of this and `CorrectAllele2Seq` will be matched to `Allele1Seq` and
+#'     `Allele2Seq` if possible.  See [match_known_genotypes].
+#'   * `CorrectAllele2Seq`: A second correct allele sequence, as above.
+#'   * `GenotypeResult`: Categorization for each entry as Correct, Incorrect,
+#'     Blank, or Dropped Allele.  See [categorize_genotype_results].
 #'
 #' @param results list containing summary data frame and sample-specific data
-#'   frames as produced by \code{\link{analyze_dataset}}.
-#' @param genotypes.known optional data frame of known genotypes that should be
+#'   frames as produced by [analyze_dataset].
+#' @param genotypes_known optional data frame of known genotypes that should be
 #'   compared to the observed genotypes in the results, as loaded by
-#'   \code{\link{load_genotypes}}.  If provided \code{dist_mat_known} will be
-#'   present in the output.
+#'   [load_genotypes].  If provided `dist_mat_known` will be present in the
+#'   output.
 #'
 #' @return expanded list with additional summaries.
 #'
 #' @export
-summarize_dataset <- function(results, genotypes.known = NULL) {
+#' @md
+summarize_dataset <- function(results, genotypes_known = NULL) {
   results$cts_per_locus <- tally_cts_per_locus(results)
   results$alignments <- align_alleles(results$summary)
   results$dist_mat <- make_dist_mat(results$summary)
-  if (!missing(genotypes.known) && !is.null(genotypes.known)) {
+  if (! is_blank(genotypes_known)) {
     results$dist_mat_known <- make_dist_mat_known(results$summary,
-                                                  genotypes.known)
-    results$genotypes.known <- genotypes.known
+                                                  genotypes_known)
+    results$genotypes.known <- genotypes_known
     if ("Name" %in% colnames(results$summary)) {
       results$summary <- cbind(results$summary,
                 match_known_genotypes(results$summary, results$genotypes.known))
@@ -69,43 +64,43 @@ summarize_dataset <- function(results, genotypes.known = NULL) {
 #'
 #' Compare the genotype of each sample to each other sample in a given results
 #' summary data frame, and create a between-sample distance matrix.  This will
-#' be a symmetric matrix, unlike what \code{\link{make_dist_mat_known}}
-#' produces.
+#' be a symmetric matrix, unlike what [make_dist_mat_known] produces.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
-#'   \code{\link{analyze_dataset}}.
-#' @param dist.func function to calculate inter-sample distances.  Should take
+#'   [analyze_dataset].
+#' @param dist_func function to calculate inter-sample distances.  Should take
 #'   two vectors, one for each genotype, with two values per locus corresponding
 #'   to the two alleles.
 #'
 #' @return matrix of cross-sample distance values
 #'
 #' @export
-make_dist_mat <- function(results_summary, dist.func = calc_genotype_distance) {
+#' @md
+make_dist_mat <- function(results_summary, dist_func = calc_genotype_distance) {
   tbl <- summarize_genotypes(results_summary)
   # The entire vector covers all combinations of rows in tbl, filling in a
   # triangle of what would be a distance matrix.
   distances <- utils::combn(nrow(tbl), 2,
         function(nr) {
-          dist.func(tbl[nr[1], - (1:2)],
+          dist_func(tbl[nr[1], - (1:2)],
                     tbl[nr[2], - (1:2)])
         })
   # Trick from SO to funnel it through a dist object to get it into matrix form.
   # https://stackoverflow.com/a/5598824/6073858
-  dist.mat <- distances
-  class(dist.mat) <- "dist"
-  attr(dist.mat, "Labels") <- rownames(tbl)
-  attr(dist.mat, "Size") <- nrow(tbl)
-  attr(dist.mat, "Diag") <- attr(dist.mat, "Upper") <- FALSE
-  dist.mat <- as.matrix(dist.mat)
+  dist_mat <- distances
+  class(dist_mat) <- "dist"
+  attr(dist_mat, "Labels") <- rownames(tbl)
+  attr(dist_mat, "Size") <- nrow(tbl)
+  attr(dist_mat, "Diag") <- attr(dist_mat, "Upper") <- FALSE
+  dist_mat <- as.matrix(dist_mat)
   # set the diagonal explicitly, since the distance function may possibly return
   # non-zero values for a distance between an entry and itself.
-  diag(dist.mat) <- apply(tbl, 1, function(row) {
-    dist.func(row[- (1:2)], row[- (1:2)])
+  diag(dist_mat) <- apply(tbl, 1, function(row) {
+    dist_func(row[- (1:2)], row[- (1:2)])
   })
   # This all ends up being pretty roundabout.  Should I instead use outer() or
   # something to build the matrix?
-  dist.mat
+  dist_mat
 }
 
 #' Make distance matrix for samples to known genotypes
@@ -115,33 +110,34 @@ make_dist_mat <- function(results_summary, dist.func = calc_genotype_distance) {
 #' distance matrix.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
-#'   \code{\link{analyze_dataset}}.
-#' @param genotypes.known data frame of known genotypes, with one row per
+#'   [analyze_dataset].
+#' @param genotypes_known data frame of known genotypes, with one row per
 #'   individual per locus, and columns "Name", "Locus", "Allele1Seq",
-#'   "Allele2Seq".  See \code{\link{load_genotypes}}.
-#' @param dist.func function to calculate inter-sample distances.  Should take
+#'   "Allele2Seq".  See [load_genotypes].
+#' @param dist_func function to calculate inter-sample distances.  Should take
 #'   two vectors, one for each genotype, with two values per locus corresponding
 #'   to the two alleles.
 #'
 #' @return matrix of sample-to-individual distance values, with individuals from
-#'   genotypes.known on rows and samples on columns.
+#'   genotypes_known on rows and samples on columns.
 #'
 #' @export
+#' @md
 make_dist_mat_known <- function(
-    results_summary, genotypes.known, dist.func = calc_genotype_distance) {
+    results_summary, genotypes_known, dist_func = calc_genotype_distance) {
   tbl <- summarize_genotypes(results_summary)
-  tbl.known <- summarize_genotypes_known(genotypes.known, tbl)
+  tbl_known <- summarize_genotypes_known(genotypes_known, tbl)
   distances <- outer(rownames(tbl),
-                     rownames(tbl.known),
-                     function(nr, nr.known) {
-                       apply(cbind(nr, nr.known), 1,
+                     rownames(tbl_known),
+                     function(nr, nr_known) {
+                       apply(cbind(nr, nr_known), 1,
                              function(row) {
-                               dist.func(tbl[row[1], - (1:2)],
-                                         tbl.known[row[2], - (1:2)])
+                               dist_func(tbl[row[1], - (1:2)],
+                                         tbl_known[row[2], - (1:2)])
                              })
   })
   rownames(distances) <- rownames(tbl)
-  colnames(distances) <- rownames(tbl.known)
+  colnames(distances) <- rownames(tbl_known)
   distances
 }
 
@@ -155,13 +151,13 @@ make_dist_mat_known <- function(
 #'
 #' @param g1 vector for genotype.
 #' @param g2 vector for genotype.
-#' @param na.reject logical; should NA entries be treated as mismatches?  TRUE
+#' @param na_reject logical; should NA entries be treated as mismatches?  TRUE
 #'   by default.
 #'
 #' @return numeric distance score for the pair of input genotypes.
 #'
 #' @export
-calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
+calc_genotype_distance <- function(g1, g2, na_reject = TRUE) {
   g1 <- unlist(g1)
   g2 <- unlist(g2)
   if (length(g1) %% 2 != 0 || length(g2) %% 2 != 0) {
@@ -175,7 +171,7 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
     g2 <- g2[seq_len(min(length(g1), length(g2)))]
   }
 
-  if (na.reject) {
+  if (na_reject) {
     g1[is.na(g1)] <- -1
     g2[is.na(g2)] <- -2
   }
@@ -198,7 +194,7 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
 #' list of vectors with the closest-matching names for each sample.
 #'
 #' @param dist_mat matrix of distance values, such as produced by
-#'   \code{\link{make_dist_mat}} and \code{\link{make_dist_mat_known}}.
+#'   [make_dist_mat] and [make_dist_mat_known].
 #' @param range optional numeric for distances to each set of nearby names,
 #'   relative to the closest match.
 #' @param maximum optional numeric maximum value for any distance.
@@ -206,6 +202,7 @@ calc_genotype_distance <- function(g1, g2, na.reject = TRUE) {
 #' @return list of named vectors containing distances for each sample.
 #'
 #' @export
+#' @md
 find_closest_matches <- function(dist_mat, range = 2, maximum = 8) {
   entries <- lapply(seq_len(nrow(dist_mat)), function(nr) {
     m <- min(dist_mat[nr, ])
@@ -233,11 +230,12 @@ find_closest_matches <- function(dist_mat, range = 2, maximum = 8) {
 #' @param results_summary cross-sample summary data frame.
 #' @param derep logical; should allele sequences be dereplicated prior to
 #'   alignment?  TRUE by default.
-#' @param ... additional arguments passed to \code{\link[msa]{msa}}.
+#' @param ... additional arguments passed to [msa::msa].
 #'
 #' @return list of MSA alignment objects, one per locus.
 #'
 #' @export
+#' @md
 align_alleles <- function(results_summary, derep = TRUE, ...) {
   chunks <- split(results_summary, results_summary$Locus)
   lapply(chunks, function(chunk) {
@@ -300,11 +298,12 @@ align_alleles <- function(results_summary, derep = TRUE, ...) {
 #' configurable.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
-#'   \code{\link{analyze_dataset}}.
-#' @param vars vector of column names in \code{results_summary} to use for the
+#'   [analyze_dataset].
+#' @param vars vector of column names in `results_summary` to use for the
 #'   summary.  Defaults to the sequence content for the two alleles.
 #'
 #' @return data frame of genotypes across samples and loci.
+#' @md
 summarize_genotypes <- function(
     results_summary, vars = c("Allele1Seq", "Allele2Seq")) {
   # Create unique (aside from Locus) identifiers for each entry
@@ -355,11 +354,12 @@ summarize_genotypes <- function(
 #' configurable.
 #'
 #' @param genotypes_known table of known individuals' genotypes as loaded via
-#'   \code{\link{load_genotypes}}.
+#'   [load_genotypes].
 #' @param tbl_genotypes existing genotype summary table to use for locus
 #'   selection and column ordering.
 #'
 #' @return data frame of genotypes across individuals and loci.
+#' @md
 summarize_genotypes_known <- function(genotypes_known, tbl_genotypes = NULL) {
   # Kludgy workaround to make summarize_genotypes handle a different sort of
   # data frame
@@ -378,18 +378,19 @@ summarize_genotypes_known <- function(genotypes_known, tbl_genotypes = NULL) {
 #'
 #' Tabulate a single arbitrary attribute across loci, assuming repeats by two
 #' for the alleles.  This is used for color-coding summary heatmaps (see
-#' \code{\link{plot_heatmap}}) on top of the attribute values, like
-#' \code{Homozygous} or \code{ProminentSeqs}.
+#' [plot_heatmap]) on top of the attribute values, like `Homozygous` or
+#' `ProminentSeqs`.
 #'
 #' @param results_summary cross-sample summary data frame as produced by
-#'   \code{\link{analyze_dataset}}.
-#' @param attrib name of column from \code{results_summary} to tabulate.
+#'   [analyze_dataset].
+#' @param attrib name of column from `results_summary` to tabulate.
 #' @param repeats number of times to repeat each column, for matching with two
 #'   alleles per entry.
 #'
 #' @return data frame of attribute across samples and loci.
 #'
 #' @export
+#' @md
 summarize_attribute <- function(results_summary, attrib, repeats = 2) {
   attrib_rep <- rep(attrib, repeats)
   combo <- results_summary[, c("Sample", "Replicate", "Locus", attrib_rep)]
@@ -416,15 +417,16 @@ summarize_attribute <- function(results_summary, attrib, repeats = 2) {
 #' Produce a table of read counts matching (by primer) each locus per sample.
 #'
 #' @param results list containing summary data frame and sample-specific data
-#'   frames as produced by \code{\link{analyze_dataset}}.
+#'   frames as produced by [analyze_dataset].
 #'
 #' @return Data frame of read counts with samples on rows and loci on columns.
 #'   Additional columns at the left specify the number of reads matching any
-#'   known locus (\code{Total}) and the number of reads matching the expected
-#'   locus (\code{Matching}).  Note that this data frame is per-sample rather
+#'   known locus (`Total`) and the number of reads matching the expected
+#'   locus (`Matching`).  Note that this data frame is per-sample rather
 #'   than per-file, so multiplexed samples will have sets of identical rows.
 #'
 #' @export
+#' @md
 tally_cts_per_locus <- function(results) {
   # Create table of counts of sequences that match each possible locus across
   # samples.  Only include loci we expect from the metadata, rather than any
@@ -443,21 +445,15 @@ tally_cts_per_locus <- function(results) {
   # Make some extra columns for total sequences and sequences matching the
   # expected locus.  Bind these to the original data to force the heatmap to use
   # a uniform scale.
-  cols.match <- results$summary[rownames(tbl), "Locus"]
-  tbl.anno <- data.frame(
+  cols_match <- results$summary[rownames(tbl), "Locus"]
+  tbl_anno <- data.frame(
     Total = rowSums(tbl),
-    Matching = sapply(seq_along(cols.match),
-      function(i) tbl[i, as.character(cols.match[i])]),
+    Matching = sapply(seq_along(cols_match),
+      function(i) tbl[i, as.character(cols_match[i])]),
     stringsAsFactors = FALSE)
-  tbl <- cbind(tbl.anno, tbl)
+  tbl <- cbind(tbl_anno, tbl)
   tbl
 }
-
-# Locus Performance -------------------------------------------------------
-
-# TODO: functions to evaluate the level of genotyping success and allele
-# diversity across loci.
-
 
 # Util --------------------------------------------------------------------
 

@@ -8,7 +8,7 @@ summarize_genotypes(results_summary, vars = c("Allele1Seq", "Allele2Seq"))
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}}.}
+\link{analyze_dataset}.}
 
 \item{vars}{vector of column names in \code{results_summary} to use for the
 summary.  Defaults to the sequence content for the two alleles.}

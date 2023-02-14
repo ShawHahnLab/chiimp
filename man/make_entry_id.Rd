@@ -7,8 +7,8 @@
 make_entry_id(data)
 }
 \arguments{
-\item{data}{STR data frame, such as produced by \code{\link{prepare_dataset}}
-or \code{summary} from \code{\link{summarize_dataset}}.}
+\item{data}{STR data frame, such as produced by \link{prepare_dataset} or a
+summary from \link{summarize_dataset}.}
 }
 \value{
 character vector of entry identifiers

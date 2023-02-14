@@ -8,14 +8,14 @@ tally_cts_per_locus(results)
 }
 \arguments{
 \item{results}{list containing summary data frame and sample-specific data
-frames as produced by \code{\link{analyze_dataset}}.}
+frames as produced by \link{analyze_dataset}.}
 }
 \value{
 Data frame of read counts with samples on rows and loci on columns.
-  Additional columns at the left specify the number of reads matching any
-  known locus (\code{Total}) and the number of reads matching the expected
-  locus (\code{Matching}).  Note that this data frame is per-sample rather
-  than per-file, so multiplexed samples will have sets of identical rows.
+Additional columns at the left specify the number of reads matching any
+known locus (\code{Total}) and the number of reads matching the expected
+locus (\code{Matching}).  Note that this data frame is per-sample rather
+than per-file, so multiplexed samples will have sets of identical rows.
 }
 \description{
 Produce a table of read counts matching (by primer) each locus per sample.

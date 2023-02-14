@@ -11,8 +11,8 @@ An object of class \code{character} of length 2.
 sample_summary_funcs
 }
 \description{
-This list shows the different versions of \code{\link{summarize_sample}}
-recognized for use via configuration in full_analysis.  See also
-\code{\link{sample_analysis_funcs}} and \code{\link{config.defaults}}.
+This list shows the different versions of \link{summarize_sample} recognized for
+use via configuration in full_analysis.  See also \link{sample_analysis_funcs} and
+\link{CFG_DEFAULTS}.
 }
 \keyword{datasets}

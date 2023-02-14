@@ -1,10 +1,11 @@
 #' Versions of analyze_sample
 #'
-#' This list shows the different versions of \code{\link{analyze_sample}}
+#' This list shows the different versions of [analyze_sample]
 #' recognized for use via configuration in full_analysis.  See also
-#' \code{\link{sample_summary_funcs}} and \code{\link{config.defaults}}.
+#' [sample_summary_funcs] and [CFG_DEFAULTS].
 #'
 #' @export
+#' @md
 sample_analysis_funcs <- c("analyze_sample",
                            "analyze_sample_guided",
                            "analyze_sample_naive")
@@ -14,7 +15,7 @@ sample_analysis_funcs <- c("analyze_sample",
 #' Converts a full STR sequence data frame into a per-locus version and adds a
 #' Category factor column to designate which sequences look like alleles,
 #' artifacts, etc.  At this stage the summary is prepared for a single specific
-#' locus, in contrast to \code{\link{analyze_seqs}}.  See the Details section
+#' locus, in contrast to [analyze_seqs].  See the Details section
 #' below for a description of the factor levels in the new Category column, and
 #' see the Functions section below for how specific variants of this function
 #' behave.
@@ -26,36 +27,36 @@ sample_analysis_funcs <- c("analyze_sample",
 #'  * Prominent: Any additional sequences beyond two called alleles that match
 #'  all requirements (sequences that match all locus attributes, do not appear
 #'  artifactual, and are above a given fraction of filtered reads).
-#'  * Insignificant: Sequences with counts below the \code{fraction.min}
-#'  threshold.
-#'  * Ambiguous: Sequences passing the \code{fraction.min} threshold but with
+#'  * Insignificant: Sequences with counts below the `fraction.min` threshold.
+#'  * Ambiguous: Sequences passing the `fraction.min` threshold but with
 #'  non-ACTG characters such as N, as defined by the Ambiguous column of
-#'  \code{seq_data}.
-#'  * Stutter: Sequences passing the \code{fraction.min} threshold but matching
-#'  stutter sequence criteria as defined by the Stutter column of
-#'  \code{seq_data}.
-#'  * Artifact: Sequences passing the \code{fraction.min} threshold but matching
+#'  `seq_data`.
+#'  * Stutter: Sequences passing the `fraction.min` threshold but matching
+#'  stutter sequence criteria as defined by the Stutter column of `seq_data`.
+#'  * Artifact: Sequences passing the `fraction.min` threshold but matching
 #'  non-stutter artifact sequence criteria as defined by the Artifact column of
-#'  \code{seq_data}.
+#'  `seq_data`.
 #' @md
 #'
 #' @param seq_data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_seqs}}.
-#' @param sample.attrs list of sample attributes, such as the rows produced by
-#'   \code{\link{prepare_dataset}}.  Used to select the locus name to filter on.
+#'   [analyze_seqs].
+#' @param sample_attrs list of sample attributes, such as the rows produced by
+#'   [prepare_dataset].  Used to select the locus name to filter on.
 #' @param fraction.min numeric threshold for the minimum proportion of counts a
 #'   given entry must have, compared to the total matching all criteria for that
 #'   locus, to be considered as a potential allele.
 #'
-#' @return filtered version of \code{seq_data} with added Category column.
+#' @return filtered version of `seq_data` with added Category column.
 #'
 #' @describeIn analyze_sample default version of sample analysis.  From here use
-#'   \code{\link{summarize_sample}}.
+#'   [summarize_sample].
 #'
 #' @export
-analyze_sample <- function(seq_data, sample.attrs, fraction.min) {
+#' @md
+analyze_sample <- function(
+  seq_data, sample_attrs, fraction.min = cfg("min_allele_abundance")) {
   # Extract sample data entries that meet all criteria for a potential allele.
-  locus.name <- unlist(sample.attrs["Locus"])
+  locus.name <- unlist(sample_attrs["Locus"])
   idx <- which(allele_match(seq_data, locus.name))
   chunk <- seq_data[idx, ]
   attr(chunk, "fraction.min") <- fraction.min
@@ -76,18 +77,20 @@ analyze_sample <- function(seq_data, sample.attrs, fraction.min) {
 }
 
 #' @describeIn analyze_sample version of sample analysis guided by expected
-#'   sequence length values.  Additional items \code{ExpectedLength1} and
-#'   optionally \code{ExpectedLength2} can be supplied in the
-#'   \code{sample.attrs} list.  If NA or missing the behavior will match
-#'   \code{analyze_sample}.  If two expected lengths are given, the fraction.min
+#'   sequence length values.  Additional items `ExpectedLength1` and
+#'   optionally `ExpectedLength2` can be supplied in the
+#'   `sample_attrs` list.  If NA or missing the behavior will match
+#'   [analyze_sample].  If two expected lengths are given, the fraction.min
 #'   argument is ignored.  If at least one expected length is given, the
 #'   stutter/artifact filtering is disabled.  From here use
-#'   \code{\link{summarize_sample_guided}}.
+#'   [summarize_sample_guided].
 #'
 #' @export
-analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
+#' @md
+analyze_sample_guided <- function(
+  seq_data, sample_attrs, fraction.min = cfg("min_allele_abundance")) {
   # Extract sample data entries that meet all criteria for a potential allele.
-  locus.name <- unlist(sample.attrs["Locus"])
+  locus.name <- unlist(sample_attrs["Locus"])
   idx <- which(allele_match(seq_data, locus.name))
   chunk <- seq_data[idx, ]
   attr(chunk, "fraction.min") <- fraction.min
@@ -100,7 +103,7 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
   # alleles present at that same length.
 
   # Tidy up expected lengths.
-  expected_lengths <- as.integer(unlist(sample.attrs[c("ExpectedLength1",
+  expected_lengths <- as.integer(unlist(sample_attrs[c("ExpectedLength1",
                                                        "ExpectedLength2")]))
   expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
 
@@ -109,7 +112,7 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
 
   switch(length(expected_lengths) + 1,
          # Zero expected lengths: analyze as usual
-         analyze_sample(seq_data, sample.attrs, fraction.min), {
+         analyze_sample(seq_data, sample_attrs, fraction.min), {
          # One expected length: may be homozygous or heterozygous.
            # Find rows of interest, matching expected length.
            idxl <- chunk$Length == expected_lengths
@@ -151,11 +154,13 @@ analyze_sample_guided <- function(seq_data, sample.attrs, fraction.min) {
 }
 
 #' @describeIn analyze_sample version of sample analysis without
-#'   stutter/artifact filtering.  From here use \code{\link{summarize_sample}}
-#'   as for \code{analyze_sample}.
+#'   stutter/artifact filtering.  From here use [summarize_sample] as for
+#'   `analyze_sample`.
 #'
 #' @export
-analyze_sample_naive <- function(seq_data, sample.attrs, fraction.min) {
+#' @md
+analyze_sample_naive <- function(
+  seq_data, sample_attrs, fraction.min = cfg("min_allele_abundance")) {
   idxl <- with(seq_data, LengthMatch & ! is.na(LengthMatch))
   chunk <- seq_data[idxl, ]
   attr(chunk, "fraction.min") <- fraction.min
@@ -177,10 +182,11 @@ analyze_sample_naive <- function(seq_data, sample.attrs, fraction.min) {
 #' given locus.
 #'
 #' @param sample_data data frame of processed data for sample as produced by
-#'   \code{\link{analyze_seqs}}.
+#'   [analyze_seqs].
 #' @param locus.name character name of locus to match against.
 #'
 #' @return logical vector of entries for potential alleles.
+#' @md
 allele_match <- function(sample_data, locus.name) {
   with(sample_data,
        as.character(MatchingLocus) == locus.name &

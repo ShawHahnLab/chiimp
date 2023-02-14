@@ -8,16 +8,16 @@ main(args = NULL)
 }
 \arguments{
 \item{args}{optional character vector of arguments to use rather than those
-detected with \code{\link[base]{commandArgs}}.}
+detected with \link[base:commandArgs]{base::commandArgs}.}
 }
 \value{
 list of results, with the full configuration list included as
-  "config."
+"config."
 }
 \description{
 A small wrapper function to read a configuration file path from command-line
-arguments, load the configuration data (see \code{\link{load_config}}), and
-run \code{\link{full_analysis}}.
+arguments, load the configuration data (see \link{load_config}), and run
+\link{full_analysis}.
 }
 \examples{
 \dontrun{

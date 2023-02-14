@@ -4,31 +4,30 @@
 \alias{plot_alignment}
 \title{Plot Sequence Alignments}
 \usage{
-plot_alignment(alignment, labels = NULL, include.blanks = FALSE, ...)
+plot_alignment(alignment, labels = NULL, include_blanks = FALSE, ...)
 }
 \arguments{
-\item{alignment}{MSA alignment object as produced by
-\code{\link{align_alleles}}, or character vector of the corresponding
-sequences.}
+\item{alignment}{MSA alignment object as produced by \link{align_alleles}, or
+character vector of the corresponding sequences.}
 
 \item{labels}{custom labels to draw for each entry in \code{alignment}.  By
 default it's assumed that \code{align_alleles} was called with
 \code{derep=TRUE} and sequences are labeled by number of occurrences.}
 
-\item{include.blanks}{should blank sequences present in the alignment be
+\item{include_blanks}{should blank sequences present in the alignment be
 included in the plot?  \code{FALSE} by default.  If TRUE and \code{labels}
 is left at the default, the extra axis labels will add up to a full count
 of the number of alleles observed.}
 
-\item{...}{additional arguments passed to \code{\link[dnaplotr]{plotDNA}}.}
+\item{...}{additional arguments passed to \link[dnaplotr:plotDNA]{dnaplotr::plotDNA}.}
 }
 \value{
 list of the sequence, sequence group, and label character vectors
-  used in the plot.
+used in the plot.
 }
 \description{
 Plot an MSA alignment object.
 }
 \seealso{
-\code{\link{align_alleles}}
+\link{align_alleles}
 }

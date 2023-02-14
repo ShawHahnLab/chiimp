@@ -5,16 +5,16 @@
 \alias{summarize_sample_guided}
 \title{Summarize a processed STR sample}
 \usage{
-summarize_sample(sample_data, sample.attrs, counts.min)
+summarize_sample(sample_data, sample_attrs, counts.min)
 
-summarize_sample_guided(sample_data, sample.attrs, counts.min)
+summarize_sample_guided(sample_data, sample_attrs, counts.min)
 }
 \arguments{
 \item{sample_data}{data frame of processed data for one sample as produced by
-\code{\link{analyze_sample}}.}
+\link{analyze_sample}.}
 
-\item{sample.attrs}{list of sample attributes, such as the rows produced by
-\code{\link{prepare_dataset}}.}
+\item{sample_attrs}{list of sample attributes, such as the rows produced by
+\link{prepare_dataset}.}
 
 \item{counts.min}{numeric threshold for the minimum number of counts that
 must be present, in total across entries passing all filters, for potential
@@ -24,14 +24,13 @@ alleles to be considered.}
 list of attributes describing the sample.
 }
 \description{
-Converts an STR sample data frame as produced by
-\code{\link{analyze_sample}} into a concise list of consistent attributes,
-suitable for binding together across samples for a dataset.  At this stage
-the summary is prepared for a single specific locus as in
-\code{\link{analyze_sample}} but as a list with a fixed length.  The Allele1
-entries correspond to the sequence with the highest count, Allele2 the
-second highest.  See the Functions section below for how specific variants
-of this function behave.
+Converts an STR sample data frame as produced by \link{analyze_sample} into a
+concise list of consistent attributes, suitable for binding together across
+samples for a dataset.  At this stage the summary is prepared for a single
+specific locus as in \link{analyze_sample} but as a list with a fixed length.  The
+Allele1 entries correspond to the sequence with the highest count, Allele2
+the second highest.  See the Functions section below for how specific
+variants of this function behave.
 }
 \details{
 Entries in the returned list:
@@ -42,21 +41,19 @@ Entries in the returned list:
 \item \code{Count}: integer count of occurrences of this exact sequence.
 \item \code{Length}: integer sequence length.
 }
-\item \code{Homozygous}: If the sample appears homozygous (if so, the Allele2
-entries will be NA).
-\item \code{Ambiguous}: If a potential allele was ignored due to ambiguous bases
-in sequence content (such as "N").
-\item \code{Stutter}: If a potential allele was ignored due to apparent PCR
-stutter.
-\item \code{Artifact}: If a potential allele was ignored due to apparent PCR
-artifact (other than stutter).
-\item \code{CountTotal}: The total number of sequences in the original sample
-data.
+\item \code{Homozygous}: If the sample appears homozygous (if so, the Allele2 entries
+will be NA).
+\item \code{Ambiguous}: If a potential allele was ignored due to ambiguous bases in
+sequence content (such as "N").
+\item \code{Stutter}: If a potential allele was ignored due to apparent PCR stutter.
+\item \code{Artifact}: If a potential allele was ignored due to apparent PCR artifact
+(other than stutter).
+\item \code{CountTotal}: The total number of sequences in the original sample data.
 \item \code{CountLocus}: The number of sequences matching all criteria for the
 specified locus in the original sample data.
-\item \code{ProminentSeqs}: The number of entries above the specified threshold
-after all filtering.  This should be either one (for a homozygous sample) or
-two (for a heterozygous sample) but conditions such as cross-sample
+\item \code{ProminentSeqs}: The number of entries above the specified threshold after
+all filtering.  This should be either one (for a homozygous sample) or two
+(for a heterozygous sample) but conditions such as cross-sample
 contamination or excessive PCR stutter can lead to more than two.
 }
 }
@@ -65,8 +62,8 @@ contamination or excessive PCR stutter can lead to more than two.
 \item \code{summarize_sample()}: Default version of sample summary.
 
 \item \code{summarize_sample_guided()}: Summarize a processed STR sample Using known
-lengths.  If \code{ExpectedLength1} and optionally \code{ExpectedLength2}
-are given in \code{sample.attrs}, the \code{counts.min} threshold is
-ignored.  See also \code{\link{analyze_sample_guided}}.
+lengths.  If \code{ExpectedLength1} and optionally \code{ExpectedLength2} are given
+in \code{sample_attrs}, the \code{counts.min} threshold is ignored.  See also
+\link{analyze_sample_guided}.
 
 }}

@@ -238,7 +238,7 @@ The primer matching recognizes IUPAC ambiguity codes in the primer sequences
 By default no mismatches are allowed, but a maximum number of mismatches per
 comparison can be defined in the configuration.  The default behavior will not
 modify the reads based on matched primers, but several read-modifying actions
-are available via the `seq_analysis$primer_action` keyword:
+are available via the `primer_action` configuration option:
 
  * `none`: no change (the default).  This is reasonable if adapter sequences
    have already been trimmed, but otherwise one of the below should be used.
@@ -286,17 +286,17 @@ two candidate allele sequences are extracted from each table and reported as the
 genotype.
 
 First, the table rows are restricted to just those matching the expected locus' 
-primer, motif, and length range (using the MatchingLocus, MotifMatch, and 
-LengthMatch columns).  If the resulting total read count is below a minimum 
-value (by default `r config.defaults$sample_summary$counts.min`, customizable
-via the `sample_summary: counts.min` setting) no genotyping will be attempted. 
-Next only those sequences accounting for at least a minimum fraction of the
+primer, motif, and length range (using the MatchingLocus, MotifMatch, and
+LengthMatch columns).  If the resulting total read count is below a minimum
+value (by default `r cfg("min_locus_reads")`, customizable via the
+`sample_summary: counts.min` setting) no genotyping will be attempted.  Next
+only those sequences accounting for at least a minimum fraction of the
 remaining reads are considered.  (The default value is
-`r config.defaults$sample_analysis$fraction.min`.  This can be changed via the 
-`sample_analysis: fraction.min` setting.)  Sequences that are marked as
-potential stutter or other artifacts (via the Stutter and Artifact columns of 
-the table) or contain ambiguous sequence content (via the Ambiguous column) are
-excluded next.
+`r cfg("min_allele_abundance")`.  This can be changed via the
+`min_allele_abundance` setting.)  Sequences that are marked as potential stutter
+or other artifacts (via the Stutter and Artifact columns of the table) or
+contain ambiguous sequence content (via the Ambiguous column) are excluded
+next.
 
 After these filters are applied, the top one or two remaining sequences are 
 labeled as the alleles.  (If only one sequence remains, the sample is labeled 
@@ -341,14 +341,19 @@ These steps are handled by the `full_analysis` function in the R package.
 CHIIMP takes a configuration file as input and saves all output to a 
 folder.  The configuration file points to all of the input data described above,
 and specifies options for the analysis and output.  All options have defaults,
-so the file may be very brief or even empty.  The file format is 
-[YAML](http://yaml.org/), with a simple text layout using nested lists.
+so the file may be very brief or even empty.  The file format a simple
+two-column CSV spreadsheet, with a "Key" column storing the names of
+configuration options and a "Value" column storing each associated value.
+(The [YAML](http://yaml.org/) file used in previous CHIIMP versions is still
+supported, but the new CSV format should be easier to to manage for those
+unfamiliar with YAML.)
 
 For example, a configuration file might have just two entries, showing the
 spreadsheets to use for the samples and loci to analyze:
 
-    fp_dataset: samples.csv
-    fp_locus_attrs: locus_attrs.csv
+    Key,Value
+    dataset,samples.csv
+    locus_attrs,locus_attrs.csv
 
 The configuration file can be dragged and dropped onto the desktop icon
 created during installation.
@@ -364,35 +369,45 @@ To run the same analysis within R, pass a list of configuration options to the
 The text in the example configuration file included here shows a slightly more
 complex case:
 
-```{r, echo=FALSE, results="asis"}
+```{r, echo=FALSE}
 # Show example configuration file text
-fp <- "inst/example_config.yml"
-txt <- strsplit(readChar(fp, file.info(fp)$size), "\n")[[1]]
-cat("\n\n")
-cat(sub("^", "    ", txt), sep="\n")
-cat("\n\n")
+fp <- "inst/example_config.csv"
+config_example <- load_config(fp)
+kableExtra::kable_styling(knitr::kable(config_example, booktabs = TRUE, linesep = ""))
 ```
 
 ### Common Options
 
-Below is a list of commonly-customized options.  Nested lists imply nested
-options in the configuration file; see the "Example Configuration File" section
-above for more information.  (See also the end of this document for a full list
-with all default settings.)  For more information on the format of the
-spreadsheets listed here, see the "Input Data Organization" section above.
+Below is a list of a few commonly-customized options.  (See also the end of
+this document for a full list with all default settings.)  For more information
+on the format of the spreadsheets listed here, see the "Input Data
+Organization" section above.
 
-  * `fp_dataset`: file path to table of sample attributes to use (rather than 
-    detecting sample attributes via dataset_opts)
-  * `fp_locus_attrs`: file path to locus attributes CSV file
-  * `fp_allele_names`: file path to known alleles CSV file
-  * `fp_genotypes_known`: file path to known genotypes CSV file
-  * `dataset_opts`: Options related to automatically detecting sample attributes
-    for a dataset (rather than loading a spreadsheet via fp_dataset)
-    * `dp`: directory path to input sequence files
-    * `pattern`: regular expression for the input filename pattern
-    * `ord`: order of fields in the input filename pattern
-  * `output`: Options related to how program output is saved
-    * `dp`: directory path for saving output data
+  * `dataset`: file path to table of sample attributes to use (rather than
+    detecting sample attributes based on filenames)
+  * `locus_attrs`: file path to locus attributes CSV file
+  * `allele_names`: file path to known alleles CSV file
+  * `genotypes_known`: file path to known genotypes CSV file
+  * `output_path`: directory path for saving output data
+  * `min_motif_repeats`: minimum number of perfect tandem motif repeats to
+    accept a read as a match for an STR locus.  For example, if the `Motif`
+    specified for a locus (in the `locus_attrs` file) is `ACTC`, a setting of 3
+    here will require `ACTCACTCACTC` somewhere in each read.
+  * `max_stutter_ratio`: when considering a second-most-abundant sequence as
+    a possible allele, if it is one repeat shorter than the most abundant
+    sequence, it must exceed this fraction of the primer sequence abundance
+  * `max_artifact_ratio`: like `max_stutter_ratio`, but for secondary sequences
+    with lengths within 1 bp of the primary sequence.
+  * `use_reverse_primers`: should reverse primers be used for matching reads to
+    loci, or just forward?
+  * `reverse_primer_r1`: if using reverse primers, are the sequences given in
+    the locus attributes table oriented in the direction of the forward reads?
+  * `primer_action`: a key word for how to modify each read based on the
+    matched primer.  (See Sample Processing section above.)
+  * `min_allele_abundance`: minimum fraction of locus-matched reads for a
+    sequence to be considered a candidate allele
+  * `min_locus_reads`: minimum number of locus-matched reads to attempt to call
+    a genotype
 
 ## Output Data Organization
 
@@ -429,7 +444,7 @@ A the end of an analysis CHIIMP creates a directory of files with all results.
  * `report.html`: report document summarizing the genotyping results, 
  inter-sample comparisons, and (if known genotypes were provided), a comparison
  of samples with known individuals.
- 
+
 An additional file will be created if `fp_rds` is defined in the `output` 
 setting of the configuration.  This file contains all analysis results in a 
 single R object using R's native data serialization format for easy
@@ -440,32 +455,16 @@ configuration.
 
 ## Full Configuration Options List
 
-Configuration options list for CHIIMP version
-`r devtools::as.package(".")$version`.
+Configuration options and their defaults for CHIIMP version
+`r devtools::as.package(".")$version`:
 
-```{r echo=FALSE, results='asis'}
-# Show all configuration defaults
-pretty_list <- function(data, indent="") {
-  sapply(names(data), function(n) {
-    cat(indent, "*", "`", n, "`")
-    if (is.list(data[[n]])) {
-      cat("\n")
-      pretty_list(data[[n]], indent = paste0(indent, "    "))
-    } else {
-      #cat(": ", gsub("\\", "\\\\", as.character(data[[n]]), fixed = TRUE))
-      txt <- if (is.null(data[[n]])) {
-        "NULL"
-      } else {
-        as.character(data[[n]])
-      }
-      cat(": ", "`", txt, "`")
-      cat("\n")
-    }
-  })
-}
-invisible(pretty_list(chiimp::config.defaults))
+```{r echo=FALSE}
+cfg_defaults <- subset(CFG_DEFAULTS, select = -c(Parser, OldName))
+colnames(cfg_defaults)[colnames(cfg_defaults) == "Value"] <- "Default Value"
+kableExtra::landscape(kableExtra::kable_styling(
+  knitr::kable(cfg_defaults,
+  booktabs = TRUE, linesep = ""), latex_options = "scale_down"))
 ```
-
 
 [R]: https://www.r-project.org/
 [RStudio]: https://www.rstudio.com/

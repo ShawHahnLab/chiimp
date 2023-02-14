@@ -93,16 +93,16 @@ tabulate_allele_names <- function(data, extra_cols = NULL) {
 #' untested sample/locus combinations) other custom placeholder text.
 #'
 #' @param results list of results data as produced by \code{analyze_dataset}.
-#' @param na.replicates text to replace NA entries with for the Replicates
+#' @param na_replicates text to replace NA entries with for the Replicates
 #'     column.
-#' @param na.alleles text to replace NA entries with for the allele names
+#' @param na_alleles text to replace NA entries with for the allele names
 #' @param closest list of closest matches as produced by
 #'   \code{\link{find_closest_matches}}.
 #'
 #' @return data frame showing summary of genotypes.
 #' @export
 report_genotypes <- function(
-    results, na.replicates = "", na.alleles = "", closest = NULL) {
+    results, na_replicates = "", na_alleles = "", closest = NULL) {
   tbl <- tabulate_allele_names(data = results$summary,
                                extra_cols = c("Sample", "Replicate"))
   tbl <- tbl[, -match("ID", colnames(tbl))]
@@ -125,7 +125,7 @@ report_genotypes <- function(
   if (all(is.na(tbl$Replicate)))
     tbl <- tbl[, -2]
   else
-    tbl$Replicate[is.na(tbl$Replicate)] <- na.replicates
+    tbl$Replicate[is.na(tbl$Replicate)] <- na_replicates
 
   # Put placeholder text for any untested sample/locus combinations
   # (This is a clumsy way of handling different columns differently, and is
@@ -137,7 +137,7 @@ report_genotypes <- function(
     expand.grid(unique(results$summary$Locus), c("_1", "_2")))
   for (colnm in colnames(tbl)) {
       if (colnm %in% locus_cols) {
-        tbl[[colnm]][is.na(tbl[[colnm]])] <- na.alleles
+        tbl[[colnm]][is.na(tbl[[colnm]])] <- na_alleles
       }
   }
 
@@ -156,14 +156,14 @@ report_genotypes <- function(
 #' @param results results list as produced by \code{\link{summarize_dataset}}.
 #' @param closest list of closest matches as produced by
 #'   \code{\link{find_closest_matches}}.
-#' @param na.replicates text to replace NA entries with for the Replicates
+#' @param na_replicates text to replace NA entries with for the Replicates
 #'     column.
 #'
 #' @return data frame showing summary of sample genotypes with interleaved
 #'   genotypes for similar known individuals.
 #'
 #' @export
-report_idents <- function(results, closest, na.replicates = "") {
+report_idents <- function(results, closest, na_replicates = "") {
   # Take the known genotypes table, but keep only those entries relevant to the
   # current loci and match levels.
   gt <- subset(results$genotypes.known,
@@ -212,7 +212,7 @@ report_idents <- function(results, closest, na.replicates = "") {
   if (all(is.na(tbl_combo$Replicate)))
     tbl_combo <- tbl_combo[, -match("Replicate", colnames(tbl_combo))]
   else
-    tbl_combo$Replicate[is.na(tbl_combo$Replicate)] <- na.replicates
+    tbl_combo$Replicate[is.na(tbl_combo$Replicate)] <- na_replicates
   # Blank out any remaining NA values
   tbl_combo[is.na(tbl_combo)] <- ""
 
@@ -226,32 +226,32 @@ report_idents <- function(results, closest, na.replicates = "") {
 #'
 #' Plot an MSA alignment object.
 #'
-#' @param alignment MSA alignment object as produced by
-#'   \code{\link{align_alleles}}, or character vector of the corresponding
-#'   sequences.
-#' @param labels custom labels to draw for each entry in \code{alignment}.  By
-#'   default it's assumed that \code{align_alleles} was called with
-#'   \code{derep=TRUE} and sequences are labeled by number of occurrences.
-#' @param include.blanks should blank sequences present in the alignment be
-#'   included in the plot?  \code{FALSE} by default.  If TRUE and \code{labels}
+#' @param alignment MSA alignment object as produced by [align_alleles], or
+#'   character vector of the corresponding sequences.
+#' @param labels custom labels to draw for each entry in `alignment`.  By
+#'   default it's assumed that `align_alleles` was called with
+#'   `derep=TRUE` and sequences are labeled by number of occurrences.
+#' @param include_blanks should blank sequences present in the alignment be
+#'   included in the plot?  `FALSE` by default.  If TRUE and `labels`
 #'   is left at the default, the extra axis labels will add up to a full count
 #'   of the number of alleles observed.
-#' @param ... additional arguments passed to \code{\link[dnaplotr]{plotDNA}}.
+#' @param ... additional arguments passed to [dnaplotr::plotDNA].
 #'
 #' @return list of the sequence, sequence group, and label character vectors
 #'   used in the plot.
 #'
-#' @seealso \code{\link{align_alleles}}
+#' @seealso [align_alleles]
 #'
 #' @export
+#' @md
 plot_alignment <- function(
-    alignment, labels = NULL, include.blanks = FALSE, ...) {
+    alignment, labels = NULL, include_blanks = FALSE, ...) {
   # Convert to character and remove blanks if specified
   if (is.character(alignment))
     seqs <- alignment
   else
     seqs <- as.character(alignment)
-  if (! include.blanks)
+  if (! include_blanks)
     seqs <- seqs[grep("^-+$", seqs, invert = TRUE)]
   # Create grouping factor using sequence length (just strip out the gap
   # character to get the original length back).  Make sure we're using a
@@ -290,7 +290,7 @@ plot_alignment <- function(
 
 
 # A skewed 0 -> 1 scale for color-coding distance tables
-make.dist_scale <- function(n) {
+make_dist_scale <- function(n) {
   ((0:n) / n) ** (1 / 3)
 }
 
@@ -298,29 +298,30 @@ make.dist_scale <- function(n) {
 #'
 #' Plot a heatmap of a distance matrix.
 #'
-#' @param dist_mat distance matrix as produced by
-#'   \code{\link{summarize_dataset}} via \code{\link{make_dist_mat}}.
-#' @param num.alleles the maximum number of matching/mismatching alleles.  Used
+#' @param dist_mat distance matrix as produced by [summarize_dataset] via
+#'   [make_dist_mat].
+#' @param num_alleles the maximum number of matching/mismatching alleles.  Used
 #'   to determine color scaling.  Defaults to the highest observed distance in
 #'   the matrix.
-#' @param dist.display_thresh distance value at or below which distances will be
+#' @param dist_display_thresh distance value at or below which distances will be
 #'   explicitly drawn on the heatmap.  Above this value only the color-coding
-#'   will signify distance.  Use \code{NA} to always show numbers.
-#' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
+#'   will signify distance.  Use `NA` to always show numbers.
+#' @param ... additional arguments passed to [pheatmap::pheatmap].
 #'
-#' @seealso \code{\link{make_dist_mat}}
+#' @seealso [make_dist_mat]
 #'
 #' @export
+#' @md
 plot_dist_mat <- function(
-    dist_mat, num.alleles = max(dist_mat),
-    dist.display_thresh = round(num.alleles * 2 / 3), ...) {
+    dist_mat, num_alleles = max(dist_mat),
+    dist_display_thresh = round(num_alleles * 2 / 3), ...) {
   labels <- matrix(character(length(dist_mat)), nrow = nrow(dist_mat))
-  if (is.na(dist.display_thresh))
-    dist.display_thresh <- max(dist_mat)
-  idx <- dist_mat <= dist.display_thresh
+  if (is.na(dist_display_thresh))
+    dist_display_thresh <- max(dist_mat)
+  idx <- dist_mat <= dist_display_thresh
   labels[idx] <- dist_mat[idx]
   diag(labels) <- ""
-  dist_scale <- make.dist_scale(num.alleles)
+  dist_scale <- make_dist_scale(num_alleles)
   color <- grDevices::rgb(red = 1, green = dist_scale, blue = dist_scale)
 
   # Scale font size automatically between min and max values
@@ -331,7 +332,7 @@ plot_dist_mat <- function(
     color = color,
     display_numbers = labels,
     treeheight_row = 0,
-    breaks = 0:num.alleles,
+    breaks = 0:num_alleles,
     fontsize = fontsize)
   if (nrow(dist_mat) == ncol(dist_mat)) {
     args <- c(args,
@@ -351,30 +352,30 @@ plot_dist_mat <- function(
 
 #' Render heatmap of STR attribute across samples and loci
 #'
-#' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}} and the name of a column (e.g., \code{Stutter},
-#' \code{Homozygous}, \code{ProminentSequences}), plot a heatmap of the values
-#' for that attribute, with sample identifiers on rows and loci on columns.  The
-#' attribute will be coerced to numeric.
+#' Given a cross-sample summary data frame as produced by [analyze_dataset] and
+#' the name of a column (e.g., `Stutter`, `Homozygous`, `ProminentSequences`),
+#' plot a heatmap of the values for that attribute, with sample identifiers on
+#' rows and loci on columns.  The attribute will be coerced to numeric.
 #'
 #' @param results combined results list
 #' @param attribute character name of column in results$summary to use.
-#' @param label.by vector of column names to use when writing the genotype
+#' @param label_by vector of column names to use when writing the genotype
 #'   summary values on top of the heatmap cells.  Defaults to allele sequence
 #'   lengths.
-#' @param color vector of colors passed to \code{\link[pheatmap]{pheatmap}}.
-#' @param breaks vector of breakpoints passed to
-#'   \code{\link[pheatmap]{pheatmap}}, autocalculated by default.
-#' @param ... additional arguments to \code{\link[pheatmap]{pheatmap}}.
+#' @param color vector of colors passed to [pheatmap::pheatmap].
+#' @param breaks vector of breakpoints passed to `pheatmap`, autocalculated by
+#'   default.
+#' @param ... additional arguments to `pheatmap`.
 #'
 #' @export
+#' @md
 plot_heatmap <- function(
-    results, attribute, label.by = c("Allele1Length", "Allele2Length"),
+    results, attribute, label_by = c("Allele1Length", "Allele2Length"),
     color = c("white", "pink"), breaks = NA, ...) {
   tbl <- summarize_attribute(results$summary, attribute)
   data <- tbl[, - (1:2)] + 0
-  tbl.labels <- summarize_genotypes(results$summary, vars = label.by)
-  labels <- tbl.labels[, - (1:2)]
+  tbl_labels <- summarize_genotypes(results$summary, vars = label_by)
+  labels <- tbl_labels[, - (1:2)]
   data[is.na(labels)] <- NA
   labels[is.na(labels)] <- ""
 
@@ -391,67 +392,68 @@ plot_heatmap <- function(
 
 #' Plot heatmap of suspected PCR stutter
 #'
-#' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}}, plot a heatmap showing which samples had
-#' alleles ignored due to suspected PCR stutter, with sample identifiers on rows
-#' and loci on columns.
+#' Given a cross-sample summary data frame as produced by [analyze_dataset],
+#' plot a heatmap showing which samples had alleles ignored due to suspected PCR
+#' stutter, with sample identifiers on rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#' @param ... additional arguments passed to [plot_heatmap].
 #'
-#' @seealso \code{\link{plot_heatmap}}
+#' @seealso [plot_heatmap]
 #'
 #' @export
+#' @md
 plot_heatmap_stutter <- function(results, ...) {
   plot_heatmap(results, "Stutter", legend = FALSE, ...)
 }
 
 #' Plot heatmap of suspected PCR artifacts
 #'
-#' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}}, plot a heatmap showing which samples had
-#' alleles ignored due to a suspected PCR artifact, with sample identifiers on
-#' rows and loci on columns.
+#' Given a cross-sample summary data frame as produced by [analyze_dataset],
+#' plot a heatmap showing which samples had alleles ignored due to a suspected
+#' PCR artifact, with sample identifiers on rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#' @param ... additional arguments passed to [plot_heatmap].
 #'
-#' @seealso \code{\link{plot_heatmap}}
+#' @seealso [plot_heatmap]
 #'
 #' @export
+#' @md
 plot_heatmap_artifacts <- function(results, ...) {
   plot_heatmap(results, "Artifact", legend = FALSE, ...)
 }
 
 #' Plot heatmap of homozygous samples
 #'
-#' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}}, plot a heatmap showing which samples appear
-#' homozygous, with sample identifiers on rows and loci on columns.
+#' Given a cross-sample summary data frame as produced by [analyze_dataset],
+#' plot a heatmap showing which samples appear homozygous, with sample
+#' identifiers on rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#' @param ... additional arguments passed to [plot_heatmap].
 #'
-#' @seealso \code{\link{plot_heatmap}}
+#' @seealso [plot_heatmap]
 #'
 #' @export
+#' @md
 plot_heatmap_homozygous <- function(results, ...) {
   plot_heatmap(results, "Homozygous", legend = FALSE, ...)
 }
 
 #' Plot heatmap of samples with multiple prominent sequences
 #'
-#' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}}, plot a heatmap showing samples with more than
-#' two prominent sequences in their analysis output, with sample identifiers on
-#' rows and loci on columns.
+#' Given a cross-sample summary data frame as produced by [analyze_dataset],
+#' plot a heatmap showing samples with more than two prominent sequences in
+#' their analysis output, with sample identifiers on rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#' @param ... additional arguments passed to [plot_heatmap].
 #'
-#' @seealso \code{\link{plot_heatmap}}
+#' @seealso [plot_heatmap]
 #'
 #' @export
+#' @md
 plot_heatmap_prominent_seqs <- function(results, ...) {
   # Create a color ramp going from white for 0, 1, or 2 prominent seqs, and
   # shades of red for higher numbers.
@@ -476,21 +478,22 @@ plot_heatmap_prominent_seqs <- function(results, ...) {
 
 #' Plot heatmap of proportion of allele sequence counts
 #'
-#' Given a cross-sample summary data frame as produced by
-#' \code{\link{analyze_dataset}}, plot a heatmap showing the proportion of
-#' matching sequences for the identified alleles versus all matching sequences,
-#' with sample identifiers on rows and loci on columns.
+#' Given a cross-sample summary data frame as produced by [analyze_dataset],
+#' plot a heatmap showing the proportion of matching sequences for the
+#' identified alleles versus all matching sequences, with sample identifiers on
+#' rows and loci on columns.
 #'
 #' @param results combined results list
-#' @param ... additional arguments passed to \code{\link{plot_heatmap}}.
+#' @param ... additional arguments passed to [plot_heatmap].
 #'
-#' @seealso \code{\link{plot_heatmap}}
+#' @seealso [plot_heatmap]
 #'
 #' @export
+#' @md
 plot_heatmap_proportions <- function(results, ...) {
   cts <- results$summary[, c("Allele1Count", "Allele2Count")]
-  prop.counted <- rowSums(cts, na.rm = TRUE) / results$summary$CountLocus
-  results$summary$ProportionCounted <- prop.counted
+  prop_counted <- rowSums(cts, na.rm = TRUE) / results$summary$CountLocus
+  results$summary$ProportionCounted <- prop_counted
   # A color scale going from red at 0 to white at 1, but values skewed toward
   # white.
   color_func <- grDevices::colorRampPalette(c("red", "white"))
@@ -505,24 +508,24 @@ plot_heatmap_proportions <- function(results, ...) {
 
 #' Plot heatmap of read counts matching each locus primer
 #'
-#' Given a data frame as produced by \code{\link{tally_cts_per_locus}}, plot a
-#' heatmap showing the number of reads matching the forward primer of each locus
-#' across samples.  Samples are shown on rows with the reads categorized by
-#' locus across columns.
+#' Given a data frame as produced by [tally_cts_per_locus], plot a heatmap
+#' showing the number of reads matching the forward primer of each locus across
+#' samples.  Samples are shown on rows with the reads categorized by locus
+#' across columns.
 #'
-#' @param cts_per_locus data frame as produced by
-#'   \code{\link{tally_cts_per_locus}}.
-#' @param idx.row Optional vector of sample row indices to use.  (Using this
+#' @param cts_per_locus data frame as produced by [tally_cts_per_locus].
+#' @param idx_row Optional vector of sample row indices to use.  (Using this
 #'   argument rather than filtering the input allows the same plot scale to be
 #'   used across plots.)
 #' @param render Should the plot be drawn to the display device?
-#' @param ... additional arguments passed to \code{\link[pheatmap]{pheatmap}}.
+#' @param ... additional arguments passed to [pheatmap::pheatmap].
 #'
-#' @seealso \code{\link{plot_heatmap}}
+#' @seealso [plot_heatmap]
 #'
 #' @export
+#' @md
 plot_cts_per_locus <- function(
-    cts_per_locus, idx.row = NULL, render = TRUE, ...) {
+    cts_per_locus, idx_row = NULL, render = TRUE, ...) {
   # Switch to log scale
   cts_per_locus[cts_per_locus == 0] <- NA
   cts_per_locus <- log10(cts_per_locus)
@@ -534,8 +537,8 @@ plot_cts_per_locus <- function(
   }
   color <- viridis::viridis(max(breaks))
 
-  if (! missing(idx.row)) {
-    cts_per_locus <- cts_per_locus[idx.row, ]
+  if (! missing(idx_row)) {
+    cts_per_locus <- cts_per_locus[idx_row, ]
   }
   pheatmap::pheatmap(
     cts_per_locus,

@@ -187,7 +187,7 @@ make_test_data <- function() {
         write_seqs(seqs, "data")
         dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
         results <- analyze_dataset(
-          dataset, locus_attrs, nrepeats = 3, ncores = 1,
+          dataset, locus_attrs, ncores = 1,
           analysis_opts = list(fraction.min = 0.05),
           summary_opts = list(counts.min = 500))
       })
@@ -652,7 +652,7 @@ setup_for_analyze_dataset <- function(
       write_seqs(seqs, "data")
       dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
       analyze_dataset(
-        dataset, locus_attrs, nrepeats = 3, ncores = 1,
+        dataset, locus_attrs, ncores = 1,
         analysis_opts = list(fraction.min = 0.05),
         summary_opts = list(counts.min = 500), known_alleles = known_alleles)
     })
@@ -708,7 +708,7 @@ setup_for_summarize_dataset <- function(
   results_known$summary$Name <- c("ID002", "ID001")[
     as.integer(results$summary$Sample)]
   results_known_mod <- summarize_dataset(
-    results_known, genotypes.known = test_data_for_setup$genotypes_known)
+    results_known, genotypes_known = test_data_for_setup$genotypes_known)
   mktestrds(results_known)
   mktestrds(results_known_mod)
   # make_dist_mat

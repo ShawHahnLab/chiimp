@@ -8,8 +8,8 @@ categorize_genotype_results(results_summary)
 }
 \arguments{
 \item{results_summary}{cross-sample summary data frame as produced by
-\code{\link{analyze_dataset}} with extra columns as produced by
-\code{\link{match_known_genotypes}}.}
+\link{analyze_dataset} with extra columns as produced by
+\link{match_known_genotypes}.}
 }
 \value{
 factor defining genotyping result category for every row of the input
@@ -17,9 +17,9 @@ data frame.
 }
 \description{
 For a given results summary data frame that has \code{CorrectAllele1Seq} and
-\code{CorrectAllele2Seq} columns (such as produced by
-\code{\link{match_known_genotypes}}) added, create a factor labeling every
-row of the input data frame by its genotyping outcome.
+\code{CorrectAllele2Seq} columns (such as produced by \link{match_known_genotypes})
+added, create a factor labeling every row of the input data frame by its
+genotyping outcome.
 }
 \details{
 Levels in the returned factor, in order:

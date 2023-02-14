@@ -8,8 +8,7 @@ format_pandoc_args(metadata)
 }
 \arguments{
 \item{metadata}{named list of
-\href{http://pandoc.org/MANUAL.html#metadata-blocks}{pandoc metadata
-options}.}
+\href{http://pandoc.org/MANUAL.html#metadata-blocks}{pandoc metadata options}.}
 }
 \value{
 list of \code{--metadata} argument strings
