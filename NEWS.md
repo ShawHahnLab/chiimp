@@ -1,3 +1,10 @@
+# chiimp dev
+
+ * Added support for imperfect primer matches, IUPAC ambiguity codes in
+   primers, and read modification actions based on matched primers ([#97])
+
+[#97]: https://github.com/ShawHahnLab/chiimp/pull/97
+
 # chiimp 0.4.1
 
  * Overhauled unit tests with more modular saved inputs and expected outputs
