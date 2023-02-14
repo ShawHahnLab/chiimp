@@ -131,7 +131,7 @@
 #'                                 package = "chiimp")
 #' file.copy(locus_attrs_path, "locus_attrs.csv")
 #' # Run the example analysis
-#' config_path <- system.file("example_config.yml", package = "chiimp")
+#' config_path <- system.file("example_config.csv", package = "chiimp")
 #' config <- load_config(config_path)
 #' apply_config(config)
 #' results <- full_analysis()
@@ -220,7 +220,7 @@ full_analysis <- function() {
 #'                                 package = "chiimp")
 #' file.copy(locus_attrs_path, "locus_attrs.csv")
 #' # Run the example analysis
-#' config_path <- system.file("example_config.yml", package = "chiimp")
+#' config_path <- system.file("example_config.csv", package = "chiimp")
 #' results <- main(config_path)
 #' }
 #'

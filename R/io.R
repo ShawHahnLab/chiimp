@@ -29,7 +29,7 @@ dataset_cols <- c("Filename", "Replicate", "Sample", "Locus")
 #' @return data frame of configuration options
 #'
 #' @examples
-#' filename <- system.file("example_config.yml", package = "chiimp")
+#' filename <- system.file("example_config.csv", package = "chiimp")
 #' config <- load_config(filename)
 #' # And then: full_analysis(config)
 #' @export

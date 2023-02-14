@@ -9,8 +9,6 @@ These aren't relevant within an installation or for regular users.
  * `conda_install.sh`: Conda install wrapper.
  * `install.R`: Small wrapper script to call installation code from within the
    package.
- * `travis_install_test.sh` Script to manage testing the various installers
-   under Travis.
  * `check_lint.R`: Checks for R code quality
  * `check_spelling.R` Checks for spelling in documentation.  Add extra words to
    `inst/WORDLIST`.  Note that it's clever about code encapsulated in backticks

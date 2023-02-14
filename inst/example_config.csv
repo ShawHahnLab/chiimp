@@ -1,0 +1,6 @@
+Key,Value
+prep_dataset_path,str-dataset
+prep_dataset_pattern,Replicate(\d+)-Sample(\d+)-([A-Za-z0-9]+)
+ncores,1
+output_path,str-results
+locus_attrs,locus_attrs.csv

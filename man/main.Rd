@@ -32,7 +32,7 @@ locus_attrs_path <- system.file("example_locus_attrs.csv",
                                 package = "chiimp")
 file.copy(locus_attrs_path, "locus_attrs.csv")
 # Run the example analysis
-config_path <- system.file("example_config.yml", package = "chiimp")
+config_path <- system.file("example_config.csv", package = "chiimp")
 results <- main(config_path)
 }
 
