@@ -391,9 +391,14 @@ RAW_NT["N"] <- RAW_NT["A"] | RAW_NT["C"] | RAW_NT["G"] | RAW_NT["T"]
 #' @param map raw vector with nucleotide names and byte values
 #' @param pad raw value to use for missing positions
 #' @param other raw value to use for nucleotides not in `map`
+#' @param chunksize integer number of sequences to process at a time.  For large
+#'   (hundreds of thousands on up) numbers of input sequences this function can
+#'   use a lot of memory, but limiting the number of sequences processed at once
+#'   limits memory usage.
 #' @return raw matrix with positions on rows and sequences on columns
 #' @md
-make_raw_nt <- function(seqs, map = RAW_NT, pad = 0x80, other = 0x00) {
+make_raw_nt <- function(
+    seqs, map = RAW_NT, pad = 0x80, other = 0x00, chunksize = 8000) {
   pad <- as.raw(as.integer(pad))
   other <- as.raw(as.integer(other))
   if (length(seqs) == 0) {
@@ -401,17 +406,25 @@ make_raw_nt <- function(seqs, map = RAW_NT, pad = 0x80, other = 0x00) {
   }
   seqs <- toupper(seqs)
   len <- max(nchar(seqs))
-  out <- do.call(cbind, lapply(strsplit(seqs, ""), function(vec) {
-    # will put NA for too-short seqs, but we need to distinguish that from NA
-    # from unrecognized NTs
-    vec <- vec[seq_len(len)]
-    pads <- is.na(vec)
-    # First set all NA entries to "other" value, but mask the missing cases with
-    # the pad value
-    vec <- map[vec]
-    vec[is.na(names(vec))] <- other
-    vec[pads] <- pad
-    unname(vec)
-  }))
+  idxs <- seq_len(len)
+  out <- NULL
+  for (idx in seq(1, length(seqs), chunksize)) {
+    out_chunk <- do.call(cbind, lapply(
+      strsplit(seqs[idx:min(length(seqs), (idx + chunksize - 1))], ""),
+      function(vec) {
+        # will put NA for too-short seqs, but we need to distinguish that from
+        # NA from unrecognized NTs
+        vec <- vec[idxs]
+        pads <- is.na(vec)
+        # First set all NA entries to "other" value, but mask the missing cases
+        # with the pad value
+        vec <- map[vec]
+        vec[is.na(names(vec))] <- other
+        vec[pads] <- pad
+        unname(vec)
+      }))
+    out <- cbind(out, out_chunk)
+    gc()
+  }
   out
 }
