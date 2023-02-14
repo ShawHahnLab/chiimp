@@ -68,34 +68,18 @@ analyze_seqs <- function(
   artifact.count.ratio_max = config.defaults$seq_analysis$
     artifact.count.ratio_max,
   ...) {
-  # Dereplicate sequences
-  tbl <- table(seqs)
-  count <- as.integer(tbl)
-  seqs <- as.character(names(tbl))
-  # Combine into initial data frame.  Leave character vectors as-is here since
-  # they"re unique anyway.  Sort by number of occurrences, decreasing. Renumber
-  # rows.
-  data <- data.frame(Seq = seqs,
-                     Count = count,
-                     stringsAsFactors = FALSE)
-  data <- data[order(data$Count, decreasing = TRUE), ]
-  rownames(data) <- NULL
-  # Label rows with the apparent locus by checking primer sequences.  Note that
-  # this uses the first matching locus for each row.
 
-  # In the next major release we can add these into the returned data frame, but
-  # for now they can stay internal for compatibility.
-  primer_info <- make_read_primer_table(data$Seq, locus_attrs, ...)
-  data$Seq <- primer_info$Seq
-  data$MatchingLocus <- factor(
+  primer_info <- make_read_primer_table(seqs, locus_attrs, ...)
+  primer_info$MatchingLocus <- factor(
     primer_info$MatchingLocus, levels = unique(locus_attrs$Locus))
 
-  # re-deprelicate
-  if (nrow(data) > 0) {
-    data <- do.call(rbind, lapply(split(data, data$Seq), function(chunk) {
+  # Dereplicate
+  if (nrow(primer_info) > 0) {
+    data <- do.call(rbind, lapply(
+        split(primer_info, primer_info$Seq), function(chunk) {
       data.frame(
         Seq = chunk$Seq[1],
-        Count = sum(chunk$Count),
+        Count = nrow(chunk),
         Length = nchar(chunk$Seq[1]),
         MatchingLocus = chunk$MatchingLocus[1],
         stringsAsFactors = FALSE)
