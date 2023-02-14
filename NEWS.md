@@ -1,8 +1,11 @@
 # chiimp dev
 
+ * Switched from YAML-based to CSV-based configuration system, now using R
+   `options()` ([#98])
  * Added support for imperfect primer matches, IUPAC ambiguity codes in
    primers, and read modification actions based on matched primers ([#97])
 
+[#98]: https://github.com/ShawHahnLab/chiimp/pull/98
 [#97]: https://github.com/ShawHahnLab/chiimp/pull/97
 
 # chiimp 0.4.1
