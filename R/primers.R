@@ -428,8 +428,9 @@ make_raw_nt <- function(
   seqs <- toupper(seqs)
   len <- max(nchar(seqs))
   idxs <- seq_len(len)
+  idx_chunks <- seq(1, length(seqs), chunksize)
   out <- NULL
-  for (idx in seq(1, length(seqs), chunksize)) {
+  for (idx in idx_chunks) {
     out_chunk <- do.call(cbind, lapply(
       strsplit(seqs[idx:min(length(seqs), (idx + chunksize - 1))], ""),
       function(vec) {
@@ -444,8 +445,24 @@ make_raw_nt <- function(
         vec[pads] <- pad
         unname(vec)
       }))
-    out <- cbind(out, out_chunk)
-    gc()
+    if (is.null(out)) {
+      out <- out_chunk
+    } else {
+      out <- cbind(out, out_chunk)
+    }
+    if (length(idx_chunks) > 1) {
+      # Hadley says you never need to do this.
+      # http://adv-r.had.co.nz/memory.html
+      # > Despite what you might have read elsewhere, there’s never any need to
+      # > call gc() yourself. R will automatically run garbage collection
+      # > whenever it needs more space.
+      # But in my testing there is a substantial difference in total memory
+      # usage observed from the OS if I explicitly force a gc() here at the end
+      # of each iteration versus just relying on R to decide.  I'd rather have
+      # it take slightly longer and avoid using another GB or more of RAM when
+      # handling larger files.
+      gc()
+    }
   }
   out
 }
