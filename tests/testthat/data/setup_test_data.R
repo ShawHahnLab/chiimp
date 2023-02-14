@@ -317,9 +317,7 @@ setup_for_analyze_seqs <- function() {
   mktestrds(seq_data_rev_primers_mod)
   # analyze_seqs (reverse primers with revcmp)
   locus_attrs_revcmp <- locus_attrs
-  locus_attrs_revcmp$ReversePrimer <- as.character(
-    Biostrings::reverseComplement(Biostrings::DNAStringSet(
-      locus_attrs_revcmp$ReversePrimer)))
+  locus_attrs_revcmp$ReversePrimer <- revcmp(locus_attrs_revcmp$ReversePrimer)
   mktestrds(locus_attrs_revcmp, "locus_attrs_rev_primer_revcmp")
   seq_data_rev_primers_revcmp <- analyze_seqs(
     seqs, locus_attrs_revcmp, 3,
