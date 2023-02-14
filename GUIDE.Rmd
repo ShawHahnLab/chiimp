@@ -225,13 +225,33 @@ content, length, and read counts observed.  These are the Seq, Count, and Length
 columns.  The sequences are ordered by count with the most abundant first.
 
 Additional columns associate each sequence with a particular locus, using the 
-locus attributes described above.  First each locus' forward primer is compared 
-with the sequence and the matching locus name is stored in a MatchingLocus 
-column.  The sequence is then checked for several tandem repeats of the motif 
-for that locus, and compared to the length range expected for that locus. 
-TRUE/FALSE values for these are stored in MotifMatch and LengthMatch columns 
-respectively.  The Ambiguous column marks any sequences containing bases outside
-of A, C, T, and G (such as N).
+locus attributes described above.  First each locus' forward primer (and
+optionally reverse as well) is compared with the sequence and the matching
+locus name is stored in a MatchingLocus column.  The sequence is then checked
+for several tandem repeats of the motif for that locus, and compared to the
+length range expected for that locus.  TRUE/FALSE values for these are stored
+in MotifMatch and LengthMatch columns respectively.  The Ambiguous column marks
+any sequences containing bases outside of A, C, T, and G (such as N).
+
+The primer matching recognizes IUPAC ambiguity codes in the primer sequences
+(e.g.  an "N" signifies any of A, C, T, or G) but not in the read sequences.
+By default no mismatches are allowed, but a maximum number of mismatches per
+comparison can be defined in the configuration.  The default behavior will not
+modify the reads based on matched primers, but several read-modifying actions
+are available via the `seq_analysis$primer_action` keyword:
+
+ * `none`: no change (the default).  This is reasonable if adapter sequences
+   have already been trimmed, but otherwise one of the below should be used.
+ * `keep`: trim each reads to the primer but keep the primer region as-is.
+   Note that this would not work will with primer sequences containing IUPAC
+   ambiguity codes; in that situation use `replace` or `remove` to ensure that
+   reads with equivalent primer regions are grouped together.
+ * `replace`: trim each read *and* replace the matched primer region with the
+   sequence from the locus attributes table.
+  * `remove`: trim reads to exclude the primer regions.
+
+These can also be specified for forward and reverse primers only with
+`primer_action_fwd` and `primer_action_rev`, respectively.
 
 PCR artifacts can obscure real allele sequences with incorrect sequences.  There 
 are extra filters to attempt to remove these if possible or highlight cases that
