@@ -7,12 +7,12 @@
 make_read_primer_table(
   seqs,
   locus_attrs,
-  max_mismatches = 0,
-  primer_action = "none",
-  primer_action_fwd = primer_action,
-  primer_action_rev = primer_action,
-  max_mismatches_fwd = max_mismatches,
-  max_mismatches_rev = max_mismatches,
+  max_mismatches = config.defaults$seq_analysis$max_mismatches,
+  primer_action = config.defaults$seq_analysis$primer_action,
+  primer_action_fwd = config.defaults$seq_analysis$primer_action_fwd,
+  primer_action_rev = config.defaults$seq_analysis$primer_action_rev,
+  max_mismatches_fwd = config.defaults$seq_analysis$max_mismatches_fwd,
+  max_mismatches_rev = config.defaults$seq_analysis$max_mismatches_rev,
   use_reverse_primers = config.defaults$seq_analysis$use_reverse_primers,
   reverse_primer_r1 = config.defaults$seq_analysis$reverse_primer_r1
 )
