@@ -4,7 +4,7 @@
 \alias{make_raw_nt}
 \title{Make matrix of raw bytes from nucleotide sequences}
 \usage{
-make_raw_nt(seqs, map = RAW_NT, pad = 128, other = 0)
+make_raw_nt(seqs, map = RAW_NT, pad = 128, other = 0, chunksize = 8000)
 }
 \arguments{
 \item{seqs}{character vector of nucleotide sequences}
@@ -14,6 +14,11 @@ make_raw_nt(seqs, map = RAW_NT, pad = 128, other = 0)
 \item{pad}{raw value to use for missing positions}
 
 \item{other}{raw value to use for nucleotides not in \code{map}}
+
+\item{chunksize}{integer number of sequences to process at a time.  For large
+(hundreds of thousands on up) numbers of input sequences this function can
+use a lot of memory, but limiting the number of sequences processed at once
+limits memory usage.}
 }
 \value{
 raw matrix with positions on rows and sequences on columns

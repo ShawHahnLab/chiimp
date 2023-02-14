@@ -4,7 +4,7 @@
 \alias{cfg}
 \title{Get/set CHIIMP global configuration options}
 \usage{
-cfg(key = NULL, val = NULL)
+cfg(key, val)
 }
 \arguments{
 \item{key}{name of a CHIIMP configuration option}
