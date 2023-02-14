@@ -5,6 +5,10 @@
 #
 # Special case: all empty input files
 
+if [[ "$2" == "strict" ]]; then
+	set -e
+fi
+
 cd "$(dirname $BASH_SOURCE)"
 dir=$(pwd -P)
 inst="../inst"
