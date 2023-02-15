@@ -189,7 +189,7 @@ full_analysis <- function() {
   save_data(results, results$config)
   if (cfg("report")) {
     logmsg("Creating report...")
-    render_report(results, results$config)
+    render_report(results)
   }
   logmsg("Done.")
   return(results)
@@ -250,20 +250,23 @@ main <- function(args = NULL) {
 #'   [full_analysis].
 #' @param config list of parsed configuration options (see [parse_config]).
 #' @md
-render_report <- function(results, config) {
-  with(config, {
-    fp_report_in <- system.file("report", "report.Rmd", package = "chiimp")
-    fp_report_out <- file.path(output_path, output_report)
-    if (!dir.exists(dirname(fp_report_out)))
-      dir.create(dirname(fp_report_out), recursive = TRUE)
-    pandoc_metadata <- c(title = report_title,
-                         author = report_author,
-                         date = format(Sys.Date(), "%Y-%m-%d"))
-    pandoc_args <- format_pandoc_args(pandoc_metadata)
-    pandoc_args <- c(pandoc_args, paste0("--css=", "report.css"))
-    rmarkdown::render(fp_report_in, quiet = TRUE, output_file = fp_report_out,
-                      output_options = list(pandoc_args = pandoc_args))
-  })
+render_report <- function(results) {
+  # Once we're inside rmarkdown::render, the output paths must be absolute,
+  # as the render function temporarily changes the working directory
+  # internally.
+  # See: https://stackoverflow.com/a/75465471/4499968
+  results$output_path_full = file.path(normalizePath("."), cfg("output_path"))
+  fp_report_in <- system.file("report", "report.Rmd", package = "chiimp")
+  fp_report_out <- file.path(results$output_path_full, cfg("output_report"))
+  if (!dir.exists(dirname(fp_report_out)))
+    dir.create(dirname(fp_report_out), recursive = TRUE)
+  pandoc_metadata <- c(title = cfg("report_title"),
+                       author = cfg("report_author"),
+                       date = format(Sys.Date(), "%Y-%m-%d"))
+  pandoc_args <- format_pandoc_args(pandoc_metadata)
+  pandoc_args <- c(pandoc_args, paste0("--css=", "report.css"))
+  rmarkdown::render(fp_report_in, quiet = TRUE, output_file = fp_report_out,
+                    output_options = list(pandoc_args = pandoc_args))
 }
 
 #' Save Microsatellite Analysis to Disk

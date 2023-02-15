@@ -2,9 +2,9 @@
 
 ```{r genotypes, results="asis"}
 rmd_kable_genotypes(results,
-                    na_replicates = report_na_replicates,
-                    na_alleles = report_na_alleles,
-                    locus_chunks = report_locus_chunks,
-                    group_samples = report_group_samples,
+                    na_replicates = cfg("report_na_replicates"),
+                    na_alleles = cfg("report_na_alleles"),
+                    locus_chunks = cfg("report_locus_chunks"),
+                    group_samples = cfg("report_group_samples"),
                     closest = results$closest_matches)
 ```
