@@ -102,7 +102,9 @@ tabulate_allele_names <- function(data, extra_cols = NULL) {
 #' @return data frame showing summary of genotypes.
 #' @export
 report_genotypes <- function(
-    results, na_replicates = "", na_alleles = "", closest = NULL) {
+    results, closest = NULL,
+    na_replicates = cfg("report_na_replicates"),
+    na_alleles = cfg("report_na_alleles")) {
   tbl <- tabulate_allele_names(data = results$summary,
                                extra_cols = c("Sample", "Replicate"))
   tbl <- tbl[, -match("ID", colnames(tbl))]
