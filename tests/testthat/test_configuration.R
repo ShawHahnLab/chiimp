@@ -247,6 +247,6 @@ test_that("CHIIMP package config updates work", {
   result <- find_primer_matches("TAAGAAATGCTTATATGGCCATAAATCAAC", "TAAGAAT")
   expect_identical(result$Mismatches, 1L)
   # can reset to get the defaults again
-  setup_package()
+  apply_config(CFG_DEFAULTS)
   expect_identical(cfg("max_mismatches"), 0L)
 })

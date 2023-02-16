@@ -248,7 +248,6 @@ main <- function(args = NULL) {
 #'
 #' @param results list of microsatellite analysis results as produced by
 #'   [full_analysis].
-#' @param config list of parsed configuration options (see [parse_config]).
 #' @md
 render_report <- function(results) {
   # Once we're inside rmarkdown::render, the output paths must be absolute,
@@ -318,18 +317,12 @@ format_pandoc_args <- function(metadata) {
 #' @md
 setup_package <- function() {
   pkg_env <- .getenv()
-  cfg_table <- load_config_csv(
-    system.file("extdata", "config_defaults.csv", package = "chiimp"))
-  for (item in c("CFG_DEFAULTS", "test_data")) {
-    if (exists(item, pkg_env)) {
-      unlockBinding(item, pkg_env)
-    }
+  if (! exists("CFG_DEFAULTS", pkg_env)) {
+    cfg_table <- load_config_csv(
+      system.file("extdata", "config_defaults.csv", package = "chiimp"))
+    assign("CFG_DEFAULTS", cfg_table, pos = pkg_env)
   }
-  assign("CFG_DEFAULTS", cfg_table, pos = pkg_env)
   apply_config(CFG_DEFAULTS)
-  if (! exists("test_data")) {
-    assign("test_data", make_helper_data(), pos = pkg_env)
-  }
 }
 
 .onLoad <- function(libname, pkgname) {
