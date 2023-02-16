@@ -235,7 +235,7 @@ test_that("save_seqfile_data saves per-file information", {
     results <- analyze_dataset(
       dataset, locus_attrs,
       analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(counts.min = 500),
+      summary_opts = list(min_locus_reads = 500),
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
@@ -260,7 +260,7 @@ test_that("save_seqfile_data works with directory trees", {
     results <- analyze_dataset(
       dataset, locus_attrs,
       analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(counts.min = 500),
+      summary_opts = list(min_locus_reads = 500),
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
@@ -287,7 +287,7 @@ test_that("save_seqfile_data works with Windows-style paths", {
     results <- analyze_dataset(
       dataset, locus_attrs,
       analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(counts.min = 500),
+      summary_opts = list(min_locus_reads = 500),
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     names(results$files) <- gsub("/", "\\\\", names(results$files))

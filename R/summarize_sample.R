@@ -44,7 +44,7 @@ sample_summary_funcs <- c("summarize_sample",
 #'   [analyze_sample].
 #' @param sample_attrs list of sample attributes, such as the rows produced by
 #'   [prepare_dataset].
-#' @param counts.min numeric threshold for the minimum number of counts that
+#' @param min_locus_reads numeric threshold for the minimum number of counts that
 #'   must be present, in total across entries passing all filters, for potential
 #'   alleles to be considered.
 #'
@@ -54,7 +54,7 @@ sample_summary_funcs <- c("summarize_sample",
 #'
 #' @export
 #' @md
-summarize_sample <- function(sample_data, sample_attrs, counts.min) {
+summarize_sample <- function(sample_data, sample_attrs, min_locus_reads) {
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent_seqs <- sum(sample_data$Category %in% c("Allele", "Prominent"))
@@ -64,7 +64,7 @@ summarize_sample <- function(sample_data, sample_attrs, counts.min) {
   if (is.na(count_total))
     count_total <- 0
   count_locus <- sum(sample_data$Count)
-  if (count_locus < counts.min) {
+  if (count_locus < min_locus_reads) {
     sample_data <- sample_data[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected
@@ -89,12 +89,13 @@ summarize_sample <- function(sample_data, sample_attrs, counts.min) {
 
 #' @describeIn summarize_sample Summarize a processed STR sample Using known
 #'   lengths.  If `ExpectedLength1` and optionally `ExpectedLength2` are given
-#'   in `sample_attrs`, the `counts.min` threshold is ignored.  See also
+#'   in `sample_attrs`, the `min_locus_reads` threshold is ignored.  See also
 #'   [analyze_sample_guided].
 #'
 #' @export
 #' @md
-summarize_sample_guided <- function(sample_data, sample_attrs, counts.min) {
+summarize_sample_guided <- function(
+    sample_data, sample_attrs, min_locus_reads = cfg("min_locus_reads")) {
   expected_lengths <- as.integer(unlist(sample_attrs[c("ExpectedLength1",
                                                        "ExpectedLength2")]))
   expected_lengths <- unique(expected_lengths[! is.na(expected_lengths)])
@@ -107,7 +108,7 @@ summarize_sample_guided <- function(sample_data, sample_attrs, counts.min) {
   if (is.na(count_total))
     count_total <- 0
   count_locus <- sum(sample_data$Count)
-  if (length(expected_lengths) == 0 && count_locus < counts.min) {
+  if (length(expected_lengths) == 0 && count_locus < min_locus_reads) {
     sample_data <- sample_data[0, ]
   }
   # Take top to remaining entries as the two alleles and keep selected

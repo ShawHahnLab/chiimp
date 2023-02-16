@@ -36,6 +36,20 @@ test_that("plot_dist_mat plots heatmap of distance matrix", {
     c("col_tree", "matrix", "col_names", "row_names", "legend"))
 })
 
+test_that("plot_dist_mat works on a 1x1 matrix", {
+  # TODO
+  # dist_mat <- testrds("dist_mat.rds")[1, 1, drop = FALSE]
+  # fp_img <- tempfile()
+  # png(fp_img)
+  # plot_data <- plot_dist_mat(dist_mat)
+  # dev.off()
+  # unlink(x = fp_img)
+  # expect_equal(class(plot_data), "pheatmap")
+  # expect_equal(
+  #   plot_data$gtable$layout$name,
+  #   c("col_tree", "matrix", "col_names", "row_names", "legend"))
+})
+
 test_that("plot_dist_mat can take pheatmap arguments", {
   dist_mat <- testrds("dist_mat.rds")
   fp_img <- tempfile()

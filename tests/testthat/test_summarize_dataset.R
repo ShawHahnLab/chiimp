@@ -50,6 +50,15 @@ test_that("make_dist_mat produces a valid distance matrix", {
   expect_true(all(dist_mat == dists))
 })
 
+test_that("make_dist_mat can handle just one sample", {
+  # TODO
+  # results <- testrds("results.rds")
+  # summary_stub <- subset(results$summary, Sample == 1)
+  # dist_mat <- make_dist_mat(summary_stub)
+  # dist_mat_expected <- NULL # TODO
+  # expect_identical(dist_mat, dist_mat_expected)
+})
+
 test_that(
   "make_dist_mat_known produces sample-to-individual distance matrix", {
   skip("test not yet implemented")

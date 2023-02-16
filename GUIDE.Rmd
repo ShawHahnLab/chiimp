@@ -285,18 +285,17 @@ described in a table, but no filtering or genotyping occurred.  Now just one or
 two candidate allele sequences are extracted from each table and reported as the
 genotype.
 
-First, the table rows are restricted to just those matching the expected locus' 
+First, the table rows are restricted to just those matching the expected locus'
 primer, motif, and length range (using the MatchingLocus, MotifMatch, and
 LengthMatch columns).  If the resulting total read count is below a minimum
 value (by default `r cfg("min_locus_reads")`, customizable via the
-`sample_summary: counts.min` setting) no genotyping will be attempted.  Next
-only those sequences accounting for at least a minimum fraction of the
-remaining reads are considered.  (The default value is
-`r cfg("min_allele_abundance")`.  This can be changed via the
-`min_allele_abundance` setting.)  Sequences that are marked as potential stutter
-or other artifacts (via the Stutter and Artifact columns of the table) or
-contain ambiguous sequence content (via the Ambiguous column) are excluded
-next.
+`min_locus_reads` setting) no genotyping will be attempted.  Next only those
+sequences accounting for at least a minimum fraction of the remaining reads are
+considered.  (The default value is `r cfg("min_allele_abundance")`.  This can
+be changed via the `min_allele_abundance` setting.)  Sequences that are marked
+as potential stutter or other artifacts (via the Stutter and Artifact columns
+of the table) or contain ambiguous sequence content (via the Ambiguous column)
+are excluded next.
 
 After these filters are applied, the top one or two remaining sequences are 
 labeled as the alleles.  (If only one sequence remains, the sample is labeled 

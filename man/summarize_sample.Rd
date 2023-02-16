@@ -5,9 +5,13 @@
 \alias{summarize_sample_guided}
 \title{Summarize a processed STR sample}
 \usage{
-summarize_sample(sample_data, sample_attrs, counts.min)
+summarize_sample(sample_data, sample_attrs, min_locus_reads)
 
-summarize_sample_guided(sample_data, sample_attrs, counts.min)
+summarize_sample_guided(
+  sample_data,
+  sample_attrs,
+  min_locus_reads = cfg("min_locus_reads")
+)
 }
 \arguments{
 \item{sample_data}{data frame of processed data for one sample as produced by
@@ -16,7 +20,7 @@ summarize_sample_guided(sample_data, sample_attrs, counts.min)
 \item{sample_attrs}{list of sample attributes, such as the rows produced by
 \link{prepare_dataset}.}
 
-\item{counts.min}{numeric threshold for the minimum number of counts that
+\item{min_locus_reads}{numeric threshold for the minimum number of counts that
 must be present, in total across entries passing all filters, for potential
 alleles to be considered.}
 }
@@ -63,7 +67,7 @@ contamination or excessive PCR stutter can lead to more than two.
 
 \item \code{summarize_sample_guided()}: Summarize a processed STR sample Using known
 lengths.  If \code{ExpectedLength1} and optionally \code{ExpectedLength2} are given
-in \code{sample_attrs}, the \code{counts.min} threshold is ignored.  See also
+in \code{sample_attrs}, the \code{min_locus_reads} threshold is ignored.  See also
 \link{analyze_sample_guided}.
 
 }}

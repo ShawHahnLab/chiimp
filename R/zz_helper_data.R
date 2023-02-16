@@ -159,7 +159,7 @@ make_helper_data <- function() {
       results <- analyze_dataset(dataset, locus_attrs, ncores = 1,
                                  analysis_opts = list(
                                    min_allele_abundance = 0.05),
-                                 summary_opts = list(counts.min = 500))
+                                 summary_opts = list(min_locus_reads = 500))
       unlink(data.dir, recursive = TRUE)
       return(list(dataset = dataset, results = results))
     }
