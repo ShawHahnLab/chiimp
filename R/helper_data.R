@@ -1,20 +1,14 @@
 # simulated data for testing ----------------------------------------------
 
 
-# Note that having an object stored directly in the package like this (and
-# forcing it to be the last file loaded when building) isn't ideal since it gets
-# created and stored at build time even though the code is mixed in with the
-# regular R functions.  A better way would be to explicitly build the test_data
-# list and store it in data/ as Hadley describes:
-# http://r-pkgs.had.co.nz/data.html
-
 #' Helper Data for Examples
 #'
 #' This list is a bundle of shared data and functions for CHIIMP examples.
-#' @export test_data
 #' @name test_data
 NULL
 
+# This is saved via:
+#     save(test_data, file = "data/test_data.rda", compress = "bzip2")
 make_helper_data <- function() {
   test_data <- within(list(), { # nolint: cyclocomp_linter.
     # This is a particularly awkward approach now that in the development branch
