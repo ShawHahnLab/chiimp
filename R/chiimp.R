@@ -248,7 +248,6 @@ main <- function(args = NULL) {
 #'
 #' @param results list of microsatellite analysis results as produced by
 #'   [full_analysis].
-#' @param config list of parsed configuration options (see [parse_config]).
 #' @md
 render_report <- function(results) {
   # Once we're inside rmarkdown::render, the output paths must be absolute,
