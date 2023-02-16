@@ -5,6 +5,10 @@
 #
 # Special case: all empty input files
 
+if [[ "$2" == "strict" ]]; then
+	set -e
+fi
+
 cd "$(dirname $BASH_SOURCE)"
 dir=$(pwd -P)
 inst="../inst"
@@ -22,7 +26,7 @@ for samp in {1..3}; do
 	done
 done
 cp "$dir/$inst/example_locus_attrs.csv" "$scratch/locus_attrs.csv"
-cp "$dir/$inst/example_config.yml" "$scratch/config.yml"
+cp "$dir/$inst/example_config.csv" "$scratch/config.csv"
 cd "$scratch"
-"$dir/chiimp" "config.yml"
+"$dir/chiimp" "config.csv"
 echo "Demo files and output stored in $(pwd -P)"

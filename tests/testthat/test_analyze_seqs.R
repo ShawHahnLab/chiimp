@@ -85,7 +85,7 @@ test_that("analyze_seqs works with varied threshold for stutter counts", {
   seq_data <- analyze_seqs(seqs, locus_attrs, 3)
   expect_equal(seq_data, seq_data_expected)
   seq_data_mod <- analyze_seqs(
-    seqs, locus_attrs, 3, stutter.count.ratio_max = 1 / 2)
+    seqs, locus_attrs, 3, max_stutter_ratio = 1 / 2)
   expect_equal(seq_data_mod, seq_data_expected_mod)
 })
 

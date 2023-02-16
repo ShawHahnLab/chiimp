@@ -27,24 +27,26 @@ sample_analysis_funcs <- c("analyze_sample",
 #'  * Prominent: Any additional sequences beyond two called alleles that match
 #'  all requirements (sequences that match all locus attributes, do not appear
 #'  artifactual, and are above a given fraction of filtered reads).
-#'  * Insignificant: Sequences with counts below the `fraction.min` threshold.
-#'  * Ambiguous: Sequences passing the `fraction.min` threshold but with
+#'  * Insignificant: Sequences with counts below the `min_allele_abundance`
+#'  threshold.
+#'  * Ambiguous: Sequences passing the `min_allele_abundance` threshold but with
 #'  non-ACTG characters such as N, as defined by the Ambiguous column of
 #'  `seq_data`.
-#'  * Stutter: Sequences passing the `fraction.min` threshold but matching
-#'  stutter sequence criteria as defined by the Stutter column of `seq_data`.
-#'  * Artifact: Sequences passing the `fraction.min` threshold but matching
-#'  non-stutter artifact sequence criteria as defined by the Artifact column of
+#'  * Stutter: Sequences passing the `min_allele_abundance` threshold but
+#'  matching stutter sequence criteria as defined by the Stutter column of
 #'  `seq_data`.
+#'  * Artifact: Sequences passing the `min_allele_abundance` threshold but
+#'  matching non-stutter artifact sequence criteria as defined by the Artifact
+#'  column of `seq_data`.
 #' @md
 #'
 #' @param seq_data data frame of processed data for sample as produced by
 #'   [analyze_seqs].
 #' @param sample_attrs list of sample attributes, such as the rows produced by
 #'   [prepare_dataset].  Used to select the locus name to filter on.
-#' @param fraction.min numeric threshold for the minimum proportion of counts a
-#'   given entry must have, compared to the total matching all criteria for that
-#'   locus, to be considered as a potential allele.
+#' @param min_allele_abundance numeric threshold for the minimum proportion of
+#'   counts a given entry must have, compared to the total matching all criteria
+#'   for that locus, to be considered as a potential allele.
 #'
 #' @return filtered version of `seq_data` with added Category column.
 #'
@@ -54,17 +56,17 @@ sample_analysis_funcs <- c("analyze_sample",
 #' @export
 #' @md
 analyze_sample <- function(
-  seq_data, sample_attrs, fraction.min = cfg("min_allele_abundance")) {
+  seq_data, sample_attrs, min_allele_abundance = cfg("min_allele_abundance")) {
   # Extract sample data entries that meet all criteria for a potential allele.
-  locus.name <- unlist(sample_attrs["Locus"])
-  idx <- which(allele_match(seq_data, locus.name))
+  locus_name <- unlist(sample_attrs["Locus"])
+  idx <- which(allele_match(seq_data, locus_name))
   chunk <- seq_data[idx, ]
-  attr(chunk, "fraction.min") <- fraction.min
+  attr(chunk, "min_allele_abundance") <- min_allele_abundance
   within(chunk, {
     Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
                                     "Ambiguous", "Stutter", "Artifact"))
     # Threshold potential alleles at minimum count
-    Category[Count < fraction.min * sum(Count)] <- "Insignificant"
+    Category[Count < min_allele_abundance * sum(Count)] <- "Insignificant"
     # Label ambiguous, stutter, artifact sequences, if present.
     Category[is.na(Category) & Ambiguous] <- "Ambiguous"
     Category[is.na(Category) & ! is.na(Stutter)] <- "Stutter"
@@ -80,20 +82,20 @@ analyze_sample <- function(
 #'   sequence length values.  Additional items `ExpectedLength1` and
 #'   optionally `ExpectedLength2` can be supplied in the
 #'   `sample_attrs` list.  If NA or missing the behavior will match
-#'   [analyze_sample].  If two expected lengths are given, the fraction.min
-#'   argument is ignored.  If at least one expected length is given, the
-#'   stutter/artifact filtering is disabled.  From here use
+#'   [analyze_sample].  If two expected lengths are given, the
+#'   min_allele_abundance argument is ignored.  If at least one expected length
+#'   is given, the stutter/artifact filtering is disabled.  From here use
 #'   [summarize_sample_guided].
 #'
 #' @export
 #' @md
 analyze_sample_guided <- function(
-  seq_data, sample_attrs, fraction.min = cfg("min_allele_abundance")) {
+  seq_data, sample_attrs, min_allele_abundance = cfg("min_allele_abundance")) {
   # Extract sample data entries that meet all criteria for a potential allele.
-  locus.name <- unlist(sample_attrs["Locus"])
-  idx <- which(allele_match(seq_data, locus.name))
+  locus_name <- unlist(sample_attrs["Locus"])
+  idx <- which(allele_match(seq_data, locus_name))
   chunk <- seq_data[idx, ]
-  attr(chunk, "fraction.min") <- fraction.min
+  attr(chunk, "min_allele_abundance") <- min_allele_abundance
 
   # If specified, take the top two matching entries at the given expected
   # lengths.  If there's just one length expected, this should be two entries at
@@ -112,7 +114,7 @@ analyze_sample_guided <- function(
 
   switch(length(expected_lengths) + 1,
          # Zero expected lengths: analyze as usual
-         analyze_sample(seq_data, sample_attrs, fraction.min), {
+         analyze_sample(seq_data, sample_attrs, min_allele_abundance), {
          # One expected length: may be homozygous or heterozygous.
            # Find rows of interest, matching expected length.
            idxl <- chunk$Length == expected_lengths
@@ -123,7 +125,8 @@ analyze_sample_guided <- function(
              # Assign top seq at expected length as first allele.
              Category[is.na(Category) & idxl][1] <- "Allele"
              # Threshold potential alleles at minimum count.
-             Category[is.na(Category) & Count < fraction.min * sum(Count)] <-
+             Category[
+               is.na(Category) & Count < min_allele_abundance * sum(Count)] <-
                "Insignificant"
              # Assign second seq at expected length as second allele, if there
              # is one.
@@ -160,15 +163,15 @@ analyze_sample_guided <- function(
 #' @export
 #' @md
 analyze_sample_naive <- function(
-  seq_data, sample_attrs, fraction.min = cfg("min_allele_abundance")) {
+  seq_data, sample_attrs, min_allele_abundance = cfg("min_allele_abundance")) {
   idxl <- with(seq_data, LengthMatch & ! is.na(LengthMatch))
   chunk <- seq_data[idxl, ]
-  attr(chunk, "fraction.min") <- fraction.min
+  attr(chunk, "min_allele_abundance") <- min_allele_abundance
   within(chunk, {
     Category <- factor(, levels = c("Allele", "Prominent", "Insignificant",
                                     "Ambiguous", "Stutter", "Artifact"))
     # Threshold potential alleles at minimum count
-    Category[Count < fraction.min * sum(Count)] <- "Insignificant"
+    Category[Count < min_allele_abundance * sum(Count)] <- "Insignificant"
     # Top two remaining will be called alleles
     Category[is.na(Category)][0:min(2, sum(is.na(Category)))] <- "Allele"
     # The rest are prominent but not allele-level
@@ -183,13 +186,13 @@ analyze_sample_naive <- function(
 #'
 #' @param sample_data data frame of processed data for sample as produced by
 #'   [analyze_seqs].
-#' @param locus.name character name of locus to match against.
+#' @param locus_name character name of locus to match against.
 #'
 #' @return logical vector of entries for potential alleles.
 #' @md
-allele_match <- function(sample_data, locus.name) {
+allele_match <- function(sample_data, locus_name) {
   with(sample_data,
-       as.character(MatchingLocus) == locus.name &
+       as.character(MatchingLocus) == locus_name &
          MotifMatch &
          LengthMatch)
 }

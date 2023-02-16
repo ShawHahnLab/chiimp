@@ -50,6 +50,15 @@ test_that("make_dist_mat produces a valid distance matrix", {
   expect_true(all(dist_mat == dists))
 })
 
+test_that("make_dist_mat can handle just one sample", {
+  # TODO
+  # results <- testrds("results.rds")
+  # summary_stub <- subset(results$summary, Sample == 1)
+  # dist_mat <- make_dist_mat(summary_stub)
+  # dist_mat_expected <- NULL # TODO
+  # expect_identical(dist_mat, dist_mat_expected)
+})
+
 test_that(
   "make_dist_mat_known produces sample-to-individual distance matrix", {
   skip("test not yet implemented")
@@ -69,14 +78,14 @@ test_that("calc_genotype_distance scores genotypes correctly", {
 test_that("calc_genotype_distance handles multiple data types", {
   # As written it should work with character, numeric, whatever-- it just uses
   # the not-equal operator.
-  g.num <- c(1, 2, 3, 4)
-  g.alpha <- c("a", "b", "c", "d")
-  d <- calc_genotype_distance(g.num, g.alpha)
-  d.num <- calc_genotype_distance(g.num, g.num)
-  d.alpha <- calc_genotype_distance(g.alpha, g.alpha)
+  g_num <- c(1, 2, 3, 4)
+  g_alpha <- c("a", "b", "c", "d")
+  d <- calc_genotype_distance(g_num, g_alpha)
+  d_num <- calc_genotype_distance(g_num, g_num)
+  d_alpha <- calc_genotype_distance(g_alpha, g_alpha)
   expect_equal(d, 4)
-  expect_equal(d.num, 0)
-  expect_equal(d.alpha, 0)
+  expect_equal(d_num, 0)
+  expect_equal(d_alpha, 0)
 })
 
 test_that("calc_genotype_distance is commutative", {
@@ -97,13 +106,13 @@ test_that("calc_genotype_distance handles NA entries", {
   # other genotype has an NA there or not.  If na_reject is FALSE, NAs are
   # treated like any other entry.
   d12 <- calc_genotype_distance(g1, g2)
-  d12.na <- calc_genotype_distance(g1, g2, na_reject = FALSE)
+  d12_na <- calc_genotype_distance(g1, g2, na_reject = FALSE)
   d23 <- calc_genotype_distance(g2, g3)
-  d23.na <- calc_genotype_distance(g2, g3, na_reject = FALSE)
+  d23_na <- calc_genotype_distance(g2, g3, na_reject = FALSE)
   expect_equal(d12,    4)
-  expect_equal(d12.na, 2)
+  expect_equal(d12_na, 2)
   expect_equal(d23,    4)
-  expect_equal(d23.na, 2)
+  expect_equal(d23_na, 2)
 })
 
 test_that("calc_genotype_distance invalid genotype lengths", {

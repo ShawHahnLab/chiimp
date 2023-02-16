@@ -4,7 +4,7 @@
 \alias{render_report}
 \title{Render Microsatellite Report Document}
 \usage{
-render_report(results, config)
+render_report(results)
 }
 \arguments{
 \item{results}{list of microsatellite analysis results as produced by

@@ -35,10 +35,10 @@
 #' @param locus_attrs data frame of attributes for loci to look for.
 #' @param nrepeats number of repeats of each locus' motif to require for a
 #'   match.
-#' @param stutter.count.ratio_max highest ratio of read counts for second most
+#' @param max_stutter_ratio highest ratio of read counts for second most
 #'   frequent sequence to the most frequent where the second will be
 #'   considered stutter.
-#' @param artifact.count.ratio_max as for `stutter.count.ratio_max` but for
+#' @param artifact.count.ratio_max as for `max_stutter_ratio` but for
 #'   non-stutter artifact sequences.
 #' @param ... additional arguments for [make_read_primer_table]
 #'
@@ -63,7 +63,7 @@
 #' @md
 analyze_seqs <- function(
   seqs, locus_attrs, nrepeats = cfg("min_motif_repeats"),
-  stutter.count.ratio_max = cfg("max_stutter_ratio"),
+  max_stutter_ratio = cfg("max_stutter_ratio"),
   artifact.count.ratio_max = cfg("max_artifact_ratio"),
   ...) {
 
@@ -102,7 +102,7 @@ analyze_seqs <- function(
   # Label rows that contain unexpected characters in the sequence content.
   data$Ambiguous <- ! grepl("^[ACGT]*$", data$Seq, ignore.case = TRUE)
   # Label rows that look like PCR stutter or other artifacts of other rows.
-  data$Stutter <- find_stutter(data, locus_attrs, stutter.count.ratio_max)
+  data$Stutter <- find_stutter(data, locus_attrs, max_stutter_ratio)
   data$Artifact <- find_artifact(data, locus_attrs, artifact.count.ratio_max)
   # Add columns for the proportion of counts out of the total and out of those
   # for the matching locus.  This way this information is preserved even in

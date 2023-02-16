@@ -229,12 +229,13 @@ test_that("save_seqfile_data saves per-file information", {
   locus_attrs <- testrds("locus_attrs.rds")
   seqs <- testrds("seqs.rds")
   within_tmpdir({
+    # TODO just load results from canned .rds
     write_seqs(seqs, "data")
     dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
     results <- analyze_dataset(
       dataset, locus_attrs,
-      analysis_opts = list(fraction.min = 0.05),
-      summary_opts = list(counts.min = 500),
+      analysis_opts = list(min_allele_abundance = 0.05),
+      summary_opts = list(min_locus_reads = 500),
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
@@ -258,8 +259,8 @@ test_that("save_seqfile_data works with directory trees", {
       "data", pattern = "()(\\d+)-([A-Za-z0-9]+).fasta", autorep = TRUE)
     results <- analyze_dataset(
       dataset, locus_attrs,
-      analysis_opts = list(fraction.min = 0.05),
-      summary_opts = list(counts.min = 500),
+      analysis_opts = list(min_allele_abundance = 0.05),
+      summary_opts = list(min_locus_reads = 500),
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
@@ -285,8 +286,8 @@ test_that("save_seqfile_data works with Windows-style paths", {
       "data", pattern = "()(\\d+)-([A-Za-z0-9]+).fasta", autorep = TRUE)
     results <- analyze_dataset(
       dataset, locus_attrs,
-      analysis_opts = list(fraction.min = 0.05),
-      summary_opts = list(counts.min = 500),
+      analysis_opts = list(min_allele_abundance = 0.05),
+      summary_opts = list(min_locus_reads = 500),
       ncores = 1)
     dp_out <- file.path("results", "processed_files")
     names(results$files) <- gsub("/", "\\\\", names(results$files))

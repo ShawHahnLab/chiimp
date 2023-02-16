@@ -188,8 +188,8 @@ make_test_data <- function() {
         dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
         results <- analyze_dataset(
           dataset, locus_attrs, ncores = 1,
-          analysis_opts = list(fraction.min = 0.05),
-          summary_opts = list(counts.min = 500))
+          analysis_opts = list(min_allele_abundance = 0.05),
+          summary_opts = list(min_locus_reads = 500))
       })
       return(list(dataset = dataset, results = results))
     }
@@ -341,7 +341,7 @@ setup_for_analyze_seqs <- function() {
   mktestrds(seqs_stutter, "seqs_stutter_threshold_check")
   seq_data_stutter_thresh <- analyze_seqs(seqs_stutter_thresh, locus_attrs, 3)
   seq_data_stutter_thresh_mod <- analyze_seqs(
-    seqs_stutter_thresh, locus_attrs, 3, stutter.count.ratio_max = 1 / 2)
+    seqs_stutter_thresh, locus_attrs, 3, max_stutter_ratio = 1 / 2)
   mktestrds(seq_data_stutter_thresh, "seq_data_stutter_threshold_orig")
   mktestrds(seq_data_stutter_thresh_mod, "seq_data_stutter_threshold_mod")
   # analyze_seqs (artifact)
@@ -439,14 +439,14 @@ setup_for_summarize_sample <- function(
     test_data_for_setup, analyze_seqs(seqs$`1`$A, locus_attrs, 3))
   sample_data <- analyze_sample(seq_data, list(Locus = "A"), 0.05)
   sample_summary <- summarize_sample(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   mktestrds(sample_data)
   mktestrds(sample_summary)
   # summarize_sample (empty)
   seq_data_empty <- analyze_seqs(c(), test_data_for_setup$locus_attrs, 3)
   sample_data_empty <- analyze_sample(seq_data_empty, list(Locus = "A"), 0.05)
   sample_summary_empty <- summarize_sample(
-    sample_data_empty, list(Locus = "A"), counts.min = 500)
+    sample_data_empty, list(Locus = "A"), min_locus_reads = 500)
   mktestrds(sample_data_empty)
   mktestrds(sample_summary_empty)
   # summarize_sample (stubs)
@@ -457,7 +457,7 @@ setup_for_summarize_sample <- function(
     analyze_sample(seq_data, list(Locus = "A"), 0.05)
   })
   sample_summary_stubs <- summarize_sample(
-    sample_data_stubs, list(Locus = "A"), counts.min = 500)
+    sample_data_stubs, list(Locus = "A"), min_locus_reads = 500)
   mktestrds(sample_data_stubs)
   mktestrds(sample_summary_stubs)
   # summarize_sample (stutter)
@@ -467,7 +467,7 @@ setup_for_summarize_sample <- function(
     analyze_sample(seq_data, list(Locus = "A"), 0.05)
   })
   sample_summary_stutter <- summarize_sample(
-    sample_data_stutter, list(Locus = "A"), counts.min = 500)
+    sample_data_stutter, list(Locus = "A"), min_locus_reads = 500)
   mktestrds(sample_data_stutter)
   mktestrds(sample_summary_stutter)
   # summarize_sample (multi artifact)
@@ -479,7 +479,7 @@ setup_for_summarize_sample <- function(
     analyze_sample(seq_data, list(Locus = "2"), 0.05)
   })
   sample_summary_multi_artifact <- summarize_sample(
-    sample_data_multi_artifact, counts.min = 500)
+    sample_data_multi_artifact, min_locus_reads = 500)
   mktestrds(sample_data_multi_artifact)
   mktestrds(sample_summary_multi_artifact)
   # summarize_sample (multi stutter)
@@ -499,7 +499,7 @@ setup_for_summarize_sample <- function(
     analyze_sample(seq_data, list(Locus = "A"), 0.05)
   })
   sample_summary_multi_stutter <- summarize_sample(
-    sample_data_multi_stutter, counts.min = 500)
+    sample_data_multi_stutter, min_locus_reads = 500)
   mktestrds(sample_data_multi_stutter)
   mktestrds(sample_summary_multi_stutter)
   # summarize_sample (ambig)
@@ -512,7 +512,8 @@ setup_for_summarize_sample <- function(
     seq_data <- analyze_seqs(seqs, locus_attrs, 3)
     analyze_sample(seq_data, list(Locus = "A"), 0.05)
   })
-  sample_summary_ambig <- summarize_sample(sample_data_ambig, counts.min = 500)
+  sample_summary_ambig <- summarize_sample(
+    sample_data_ambig, min_locus_reads = 500)
   mktestrds(sample_data_ambig)
   mktestrds(sample_summary_ambig)
   # summarize_sample (low)
@@ -523,7 +524,7 @@ setup_for_summarize_sample <- function(
     seq_data$Count <- round(seq_data$Count / 100)
     analyze_sample(seq_data, list(Locus = "A"), 0.05)
   })
-  sample_summary_low <- summarize_sample(sample_data_low, counts.min = 500)
+  sample_summary_low <- summarize_sample(sample_data_low, min_locus_reads = 500)
   mktestrds(sample_data_low)
   mktestrds(sample_summary_low)
   # summarize_sample (prominent seqs)
@@ -534,13 +535,13 @@ setup_for_summarize_sample <- function(
     })
   })
   sample_summaries_b <- lapply(
-    sample_datas_b, summarize_sample, list(Locus = "B"), counts.min = 500)
+    sample_datas_b, summarize_sample, list(Locus = "B"), min_locus_reads = 500)
   mktestrds(sample_datas_b)
   mktestrds(sample_summaries_b)
   # summarize_sample_guided
   sample_data_guided <- analyze_sample_guided(seq_data, list(Locus = "A"), 0.05)
   sample_summary_guided <- summarize_sample_guided(
-    sample_data_guided, list(Locus = "A"), counts.min = 500)
+    sample_data_guided, list(Locus = "A"), min_locus_reads = 500)
   mktestrds(sample_data_guided)
   mktestrds(sample_summary_guided)
   # summarize_sample_guided (empty)
@@ -548,7 +549,7 @@ setup_for_summarize_sample <- function(
     seq_data_empty, list(Locus = "A"), 0.05)
   mktestrds(sample_data_guided_empty)
   sample_summary_guided_empty <- summarize_sample_guided(
-    sample_data_guided_empty, list(Locus = "A"), counts.min = 500)
+    sample_data_guided_empty, list(Locus = "A"), min_locus_reads = 500)
   mktestrds(sample_data_guided_empty)
   mktestrds(sample_summary_guided_empty)
   # summarize_sample_guided (expected lengths)
@@ -556,7 +557,7 @@ setup_for_summarize_sample <- function(
     Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162)
   sample_data_guided_flip <- analyze_sample_guided(seq_data, sample_attrs, 0.05)
   sample_summary_guided_flip <- summarize_sample_guided(
-    sample_data_guided_flip, sample_attrs, counts.min = 500)
+    sample_data_guided_flip, sample_attrs, min_locus_reads = 500)
   mktestrds(sample_data_guided_flip)
   mktestrds(sample_summary_guided_flip)
   # summarize_sample_guided (one length)
@@ -565,7 +566,7 @@ setup_for_summarize_sample <- function(
   sample_data_guided_one_len <- analyze_sample_guided(
     seq_data, sample_attrs, 0.05)
   sample_summary_guided_one_len <- summarize_sample_guided(
-    sample_data_guided_one_len, sample_attrs, counts.min = 5000)
+    sample_data_guided_one_len, sample_attrs, min_locus_reads = 5000)
   mktestrds(sample_data_guided_one_len)
   mktestrds(sample_summary_guided_one_len)
   # summarize_sample_guided (no lengths)
@@ -574,7 +575,7 @@ setup_for_summarize_sample <- function(
   sample_data_guided_no_lens <- analyze_sample_guided(
     seq_data, sample_attrs, 0.05)
   sample_summary_guided_no_lens <- summarize_sample_guided(
-    sample_data_guided_no_lens, sample_attrs, counts.min = 5000)
+    sample_data_guided_no_lens, sample_attrs, min_locus_reads = 5000)
   mktestrds(sample_data_guided_no_lens)
   mktestrds(sample_summary_guided_no_lens)
 }
@@ -653,8 +654,9 @@ setup_for_analyze_dataset <- function(
       dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
       analyze_dataset(
         dataset, locus_attrs, ncores = 1,
-        analysis_opts = list(fraction.min = 0.05),
-        summary_opts = list(counts.min = 500), known_alleles = known_alleles)
+        analysis_opts = list(min_allele_abundance = 0.05),
+        summary_opts = list(min_locus_reads = 500),
+        known_alleles = known_alleles)
     })
   })
   mktestrds(known_alleles)

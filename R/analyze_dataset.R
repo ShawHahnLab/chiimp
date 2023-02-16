@@ -52,11 +52,11 @@ analyze_dataset <- function(
                  paste(rogue_loci, collapse = ", "))
     stop(msg)
   }
-  analyze.file <- function(fp, locus_attrs) {
+  analyze_file <- function(fp, locus_attrs) {
     seqs <- load_seqs(fp)
     analyze_seqs(seqs, locus_attrs)
   }
-  analyze.entry <- function(
+  analyze_entry <- function(
       entry, analysis_opts, summary_opts, analysis_function, summary_function,
       analyzed_files) {
     # Get all data from the relevant file
@@ -68,13 +68,13 @@ analyze_dataset <- function(
     # Process into single-sample summary list
     summary_args <- c(
       list(sample_data = sample_data, sample_attrs = entry), summary_opts)
-    sample.summary <- do.call(summary_function, summary_args)
+    sample_summary <- do.call(summary_function, summary_args)
     # Return the processed per-sample data
-    return(list(summary = sample.summary, data = sample_data))
+    return(list(summary = sample_summary, data = sample_data))
   }
   if (ncores > 1) {
     # Set up the cluster and export required names (those objects used in
-    # analyze.entry that are expected from the environment and not passed as
+    # analyze_entry that are expected from the environment and not passed as
     # arguments).
     cluster_names <- c("locus_attrs")
     cluster <- parallel::makeCluster(ncores)
@@ -98,14 +98,14 @@ analyze_dataset <- function(
     tryCatch({
       # Load, analyze, and summarize each sample across the cluster.  Each row
       # in the dataset data frame will be given as the entry argument to
-      # analyze.entry.
+      # analyze_entry.
       fps <- unique(dataset$Filename)
       analyzed_files <- parallel::parLapply(
         cluster, fps,
-        analyze.file, locus_attrs = locus_attrs)
+        analyze_file, locus_attrs = locus_attrs)
       names(analyzed_files) <- fps
       raw_results <- parallel::parApply(
-        cluster, dataset, 1, analyze.entry,
+        cluster, dataset, 1, analyze_entry,
         analysis_opts = analysis_opts,
         summary_opts = summary_opts,
         analysis_function = analysis_function,
@@ -119,10 +119,10 @@ analyze_dataset <- function(
     fps <- unique(dataset$Filename)
     analyzed_files <- lapply(
       fps,
-      analyze.file, locus_attrs = locus_attrs)
+      analyze_file, locus_attrs = locus_attrs)
     names(analyzed_files) <- fps
     raw_results <- apply(
-      dataset, 1, analyze.entry,
+      dataset, 1, analyze_entry,
       analysis_opts = analysis_opts,
       summary_opts = summary_opts,
       analysis_function = analysis_function,

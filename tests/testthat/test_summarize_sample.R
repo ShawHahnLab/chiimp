@@ -7,7 +7,7 @@ test_that("summarize_sample summarizes sample attributes", {
   sample_data <- testrds("sample_data.rds")
   sample_summary_expected <- testrds("sample_summary.rds")
   sample_summary <- summarize_sample(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -15,7 +15,7 @@ test_that("summarize_sample handles completely empty sample data", {
   sample_data <- testrds("sample_data_empty.rds")
   sample_summary_expected <- testrds("sample_summary_empty.rds")
   sample_summary <- summarize_sample(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   # A zero-row data frame in should work here, just producing a list with a
   # bunch of 0/NA/FALSE entries.
   expect_equal(sample_summary, sample_summary_expected)
@@ -25,7 +25,7 @@ test_that("summarize_sample handles empty sequences in input sample data", {
   sample_data <- testrds("sample_data_stubs.rds")
   sample_summary_expected <- testrds("sample_summary_stubs.rds")
   sample_summary <- summarize_sample(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   # Nothing should change in the output, except that we zeroed out 90 reads
   # that would otherwise get counted (the rest were already set to off-target
   # junk during setup).
@@ -38,7 +38,7 @@ test_that("summarize_sample marks stutter removal", {
   sample_data <- testrds("sample_data_stutter.rds")
   sample_summary_expected <- testrds("sample_summary_stutter.rds")
   sample_summary <- summarize_sample(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   # Here an entry that could have been called as an allele was rejected as
   # presumed stutter, so the Stutter value in the summary list should now be
   # TRUE.
@@ -56,7 +56,7 @@ test_that("summarize_sample marks removal of multiple artifact types", {
   # place.
   sample_data <- testrds("sample_data_multi_artifact.rds")
   sample_summary_expected <- testrds("sample_summary_multi_artifact.rds")
-  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  sample_summary <- summarize_sample(sample_data, min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -67,7 +67,7 @@ test_that("summarize_sample handles multiple stutter sequences", {
   # should be recognized as stutter.
   sample_data <- testrds("sample_data_multi_stutter.rds")
   sample_summary_expected <- testrds("sample_summary_multi_stutter.rds")
-  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  sample_summary <- summarize_sample(sample_data, min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -79,7 +79,7 @@ test_that("summarize_sample handles ambiguous sequences", {
   # ambiguous base near the end.
   sample_data <- testrds("sample_data_ambig.rds")
   sample_summary_expected <- testrds("sample_summary_ambig.rds")
-  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  sample_summary <- summarize_sample(sample_data, min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -89,7 +89,7 @@ test_that("summarize_sample rejects low-count samples", {
   # stats but should leave out the allele1/allele2 information
   sample_data <- testrds("sample_data_low.rds")
   sample_summary_expected <- testrds("sample_summary_low.rds")
-  sample_summary <- summarize_sample(sample_data, counts.min = 500)
+  sample_summary <- summarize_sample(sample_data, min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -111,7 +111,7 @@ test_that("summarize_sample works with vector for sample attrs", {
   # sample_attrs argument is a vector this time but the outcome should be
   # exactly the same
   sample_summary <- summarize_sample(
-    sample_data, c(Locus = "A"), counts.min = 500)
+    sample_data, c(Locus = "A"), min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -119,7 +119,7 @@ test_that("summarize_sample works with vector for sample attrs", {
 # test summarize_sample_guided --------------------------------------------
 
 
-sample.summary.cols <- c("Allele1Seq", "Allele1Count",
+sample_summary_cols <- c("Allele1Seq", "Allele1Count",
                          "Allele1Length", "Allele2Seq",
                          "Allele2Count", "Allele2Length",
                          "Homozygous", "Ambiguous", "Stutter", "Artifact",
@@ -139,7 +139,7 @@ check_seqs1a_summary <- function(data,
                                  allele1_count = 2783,
                                  allele2_count = 1290,
                                  ord = 1:2) {
-  expect_equal(names(data), sample.summary.cols)
+  expect_equal(names(data), sample_summary_cols)
   with(data, {
     alleles <- c(Allele1Seq, Allele2Seq)[ord]
     counts  <- c(Allele1Count, Allele2Count)[ord]
@@ -175,7 +175,7 @@ test_that("summarize_sample_guided summarizes sample attributes", {
   sample_data <- testrds("sample_data_guided.rds")
   sample_summary_expected <- testrds("sample_summary_guided.rds")
   sample_summary <- summarize_sample_guided(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -185,7 +185,7 @@ test_that("summarize_sample_guided handles completely empty sample data", {
   sample_summary_empty_expected <- testrds(
     "sample_summary_empty.rds")
   sample_summary <- summarize_sample_guided(
-    sample_data, list(Locus = "A"), counts.min = 500)
+    sample_data, list(Locus = "A"), min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_empty_expected)
 })
 
@@ -198,44 +198,44 @@ test_that("summarize_sample_guided uses expected_lengths", {
   sample_attrs <- list(
     Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162)
   sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                            counts.min = 500)
+                                            min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
-test_that("summarize_sample_guided ignores counts.min for expected lengths", {
+test_that("summarize_sample_guided ignores min_locus_reads for exp. lengths", {
   # This should give allele sequences matching the given expected_lengths,
-  # including order, despite the counts.min value.
+  # including order, despite the min_locus_reads value.
   # Flip the order of alleles here to check that aspect
   sample_data <- testrds("sample_data_guided_flip.rds")
   sample_summary_expected <- testrds("sample_summary_guided_flip.rds")
   sample_attrs <- list(
     Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 162)
   sample_summary <- summarize_sample_guided(sample_data, sample_attrs,
-                                            counts.min = 5000)
+                                            min_locus_reads = 5000)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
-test_that("summarize_sample_guided ignores counts.min for one exp. length", {
+test_that("summarize_sample_guided ignores min_locus_reads w/ 1 exp. length", {
   # This should give allele sequences matching the given expected_lengths,
-  # including order, despite the counts.min value.
+  # including order, despite the min_locus_reads value.
   sample_data <- testrds("sample_data_guided_one_len.rds")
   sample_summary_expected <- testrds("sample_summary_guided_one_len.rds")
   sample_attrs <- list(
     Locus = "A", ExpectedLength1 = 194, ExpectedLength2 = 194)
   sample_summary <- summarize_sample_guided(
-    sample_data, sample_attrs, counts.min = 5000)
+    sample_data, sample_attrs, min_locus_reads = 5000)
   # There should be one and only one called allele.
   expect_equal(sample_summary, sample_summary_expected)
 })
 
-test_that("summarize_sample_guided uses counts.min if no expected lengths", {
+test_that("summarize_sample_guided uses min_locus_reads if 0 exp. lengths", {
   # This should not report alleles if total filtered read count is below
-  # counts.min threshold.
+  # min_locus_reads threshold.
   sample_attrs <- list(Locus = "A", ExpectedLength1 = NA, ExpectedLength2 = NA)
   sample_data <- testrds("sample_data_guided_no_lens.rds")
   sample_summary_expected <- testrds("sample_summary_guided_no_lens.rds")
   sample_summary <- summarize_sample_guided(
-    sample_data, sample_attrs, counts.min = 5000)
+    sample_data, sample_attrs, min_locus_reads = 5000)
   expect_equal(sample_summary, sample_summary_expected)
 })
 
@@ -249,6 +249,6 @@ test_that("summarize_sample_guided works with vector for sample attrs", {
   sample_data <- testrds("sample_data_guided_flip.rds")
   sample_summary_expected <- testrds("sample_summary_guided_flip.rds")
   sample_summary <- summarize_sample_guided(
-    sample_data, sample_attrs, counts.min = 500)
+    sample_data, sample_attrs, min_locus_reads = 500)
   expect_equal(sample_summary, sample_summary_expected)
 })

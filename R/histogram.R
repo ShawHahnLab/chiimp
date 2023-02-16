@@ -28,7 +28,7 @@ histogram <- function(
   bars <- str_hist_setup(seq_data, sample_data)
   if (render && nrow(seq_data) > 0) {
     if (is_blank(cutoff_fraction)) {
-      cutoff_fraction <- attr(sample_data, "fraction.min")
+      cutoff_fraction <- attr(sample_data, "min_allele_abundance")
     }
     str_hist_render(bars, main, xlim, cutoff_fraction)
   }

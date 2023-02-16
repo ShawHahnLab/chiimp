@@ -8,7 +8,7 @@ analyze_seqs(
   seqs,
   locus_attrs,
   nrepeats = cfg("min_motif_repeats"),
-  stutter.count.ratio_max = cfg("max_stutter_ratio"),
+  max_stutter_ratio = cfg("max_stutter_ratio"),
   artifact.count.ratio_max = cfg("max_artifact_ratio"),
   ...
 )
@@ -21,11 +21,11 @@ analyze_seqs(
 \item{nrepeats}{number of repeats of each locus' motif to require for a
 match.}
 
-\item{stutter.count.ratio_max}{highest ratio of read counts for second most
+\item{max_stutter_ratio}{highest ratio of read counts for second most
 frequent sequence to the most frequent where the second will be
 considered stutter.}
 
-\item{artifact.count.ratio_max}{as for \code{stutter.count.ratio_max} but for
+\item{artifact.count.ratio_max}{as for \code{max_stutter_ratio} but for
 non-stutter artifact sequences.}
 
 \item{...}{additional arguments for \link{make_read_primer_table}}

@@ -4,13 +4,13 @@
 \alias{allele_match}
 \title{Check Sample Data for Potential Allele Matches}
 \usage{
-allele_match(sample_data, locus.name)
+allele_match(sample_data, locus_name)
 }
 \arguments{
 \item{sample_data}{data frame of processed data for sample as produced by
 \link{analyze_seqs}.}
 
-\item{locus.name}{character name of locus to match against.}
+\item{locus_name}{character name of locus to match against.}
 }
 \value{
 logical vector of entries for potential alleles.

@@ -4,18 +4,23 @@
 \alias{report_genotypes}
 \title{Create genotype summary table}
 \usage{
-report_genotypes(results, na_replicates = "", na_alleles = "", closest = NULL)
+report_genotypes(
+  results,
+  closest = NULL,
+  na_replicates = cfg("report_na_replicates"),
+  na_alleles = cfg("report_na_alleles")
+)
 }
 \arguments{
 \item{results}{list of results data as produced by \code{analyze_dataset}.}
+
+\item{closest}{list of closest matches as produced by
+\code{\link{find_closest_matches}}.}
 
 \item{na_replicates}{text to replace NA entries with for the Replicates
 column.}
 
 \item{na_alleles}{text to replace NA entries with for the allele names}
-
-\item{closest}{list of closest matches as produced by
-\code{\link{find_closest_matches}}.}
 }
 \value{
 data frame showing summary of genotypes.

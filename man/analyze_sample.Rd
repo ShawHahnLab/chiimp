@@ -9,19 +9,19 @@
 analyze_sample(
   seq_data,
   sample_attrs,
-  fraction.min = cfg("min_allele_abundance")
+  min_allele_abundance = cfg("min_allele_abundance")
 )
 
 analyze_sample_guided(
   seq_data,
   sample_attrs,
-  fraction.min = cfg("min_allele_abundance")
+  min_allele_abundance = cfg("min_allele_abundance")
 )
 
 analyze_sample_naive(
   seq_data,
   sample_attrs,
-  fraction.min = cfg("min_allele_abundance")
+  min_allele_abundance = cfg("min_allele_abundance")
 )
 }
 \arguments{
@@ -31,9 +31,9 @@ analyze_sample_naive(
 \item{sample_attrs}{list of sample attributes, such as the rows produced by
 \link{prepare_dataset}.  Used to select the locus name to filter on.}
 
-\item{fraction.min}{numeric threshold for the minimum proportion of counts a
-given entry must have, compared to the total matching all criteria for that
-locus, to be considered as a potential allele.}
+\item{min_allele_abundance}{numeric threshold for the minimum proportion of
+counts a given entry must have, compared to the total matching all criteria
+for that locus, to be considered as a potential allele.}
 }
 \value{
 filtered version of \code{seq_data} with added Category column.
@@ -55,15 +55,17 @@ of these.
 \item Prominent: Any additional sequences beyond two called alleles that match
 all requirements (sequences that match all locus attributes, do not appear
 artifactual, and are above a given fraction of filtered reads).
-\item Insignificant: Sequences with counts below the \code{fraction.min} threshold.
-\item Ambiguous: Sequences passing the \code{fraction.min} threshold but with
+\item Insignificant: Sequences with counts below the \code{min_allele_abundance}
+threshold.
+\item Ambiguous: Sequences passing the \code{min_allele_abundance} threshold but with
 non-ACTG characters such as N, as defined by the Ambiguous column of
 \code{seq_data}.
-\item Stutter: Sequences passing the \code{fraction.min} threshold but matching
-stutter sequence criteria as defined by the Stutter column of \code{seq_data}.
-\item Artifact: Sequences passing the \code{fraction.min} threshold but matching
-non-stutter artifact sequence criteria as defined by the Artifact column of
+\item Stutter: Sequences passing the \code{min_allele_abundance} threshold but
+matching stutter sequence criteria as defined by the Stutter column of
 \code{seq_data}.
+\item Artifact: Sequences passing the \code{min_allele_abundance} threshold but
+matching non-stutter artifact sequence criteria as defined by the Artifact
+column of \code{seq_data}.
 }
 }
 \section{Functions}{
@@ -75,9 +77,9 @@ non-stutter artifact sequence criteria as defined by the Artifact column of
 sequence length values.  Additional items \code{ExpectedLength1} and
 optionally \code{ExpectedLength2} can be supplied in the
 \code{sample_attrs} list.  If NA or missing the behavior will match
-\link{analyze_sample}.  If two expected lengths are given, the fraction.min
-argument is ignored.  If at least one expected length is given, the
-stutter/artifact filtering is disabled.  From here use
+\link{analyze_sample}.  If two expected lengths are given, the
+min_allele_abundance argument is ignored.  If at least one expected length
+is given, the stutter/artifact filtering is disabled.  From here use
 \link{summarize_sample_guided}.
 
 \item \code{analyze_sample_naive()}: version of sample analysis without

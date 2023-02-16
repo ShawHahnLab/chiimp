@@ -22,7 +22,7 @@ Whatever entries are present in the file will be returned, but names that
 don't match known names (see \link{CFG_DEFAULTS}) will be reported in a warning.
 }
 \examples{
-filename <- system.file("example_config.yml", package = "chiimp")
+filename <- system.file("example_config.csv", package = "chiimp")
 config <- load_config(filename)
 # And then: full_analysis(config)
 }

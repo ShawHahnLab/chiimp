@@ -29,7 +29,7 @@ k_row_spec <- function(k, idx_rows, ...) {
 }
 
 # convenience function for post-processing report_genotypes() output
-kable_genotypes <- function(data, group_samples = FALSE) {
+kable_genotypes <- function(data, group_samples = cfg("report_group_samples")) {
   bootstrap_options <- c("striped", "hover", "condensed")
   # Group rows by sample.  Assumes they're ordered already.
   if (group_samples) {
@@ -48,13 +48,11 @@ kable_genotypes <- function(data, group_samples = FALSE) {
 
 # Write markdown tables to standard output for report_genotypes()
 rmd_kable_genotypes <- function(
-    results, na_replicates = "", na_alleles = "", locus_chunks = NULL,
-    group_samples = FALSE, closest = NULL) {
-  tbl <- report_genotypes(
-    results = results,
-    na_replicates = na_replicates,
-    na_alleles = na_alleles,
-    closest = closest)
+    results, closest = NULL,
+    locus_chunks = cfg("report_locus_chunks"),
+    group_samples = cfg("report_group_samples")) {
+
+  tbl <- report_genotypes(results = results, closest = closest)
   if (! is_blank(locus_chunks)) {
     chunk_up(
       data = tbl,
@@ -153,8 +151,8 @@ rmd_alignments <- function(results, heading_prefix = "###") {
       return()
     }
     fp <- file.path(
-      results$config$output_path,
-      results$config$output_path_alignment_images,
+      results$output_path_full,
+      cfg("output_path_alignment_images"),
       paste0(loc, ".png"))
     cat(paste0("![](", fp, ")"))
   }))
