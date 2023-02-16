@@ -22,7 +22,7 @@ test_that("analyze_dataset produces outputs across samples", {
   within_tmpdir({
     write_seqs(seqs, "data")
     results <- analyze_dataset(
-      dataset, locus_attrs, analysis_opts = list(fraction.min = 0.05),
+      dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
       summary_opts = list(counts.min = 500), ncores = 1)
   })
   expect_equal(results, results_expected)
@@ -39,7 +39,7 @@ test_that("analyze_dataset names known alleles", {
   within_tmpdir({
     write_seqs(seqs, "data")
     results <- analyze_dataset(
-      dataset, locus_attrs, analysis_opts = list(fraction.min = 0.05),
+      dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
       summary_opts = list(counts.min = 500), ncores = 1,
       known_alleles = known_alleles)
   })
@@ -92,7 +92,7 @@ test_that("analyze_dataset handles missing loci", {
   dataset$Locus[dataset$Locus == "B"] <- "b"
   expect_error(
     analyze_dataset(
-      dataset, locus_attrs, analysis_opts = list(fraction.min = 0.05),
+      dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
       summary_opts = list(counts.min = 500), ncores = 1),
     "ERROR: Locus names in dataset not in attributes table: a, b")
 })
@@ -110,7 +110,7 @@ test_that("analyze_dataset warns of empty input files", {
     touch(fps[1])
     msg <- capture.output({
       results <- analyze_dataset(
-        dataset, locus_attrs, analysis_opts = list(fraction.min = 0.05),
+        dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
         summary_opts = list(counts.min = 500), ncores = 1)
     }, type = "message")
     msg_exp <- "WARNING: Zero reads for 1 of 12 data files"

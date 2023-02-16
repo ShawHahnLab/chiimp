@@ -188,7 +188,7 @@ make_test_data <- function() {
         dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
         results <- analyze_dataset(
           dataset, locus_attrs, ncores = 1,
-          analysis_opts = list(fraction.min = 0.05),
+          analysis_opts = list(min_allele_abundance = 0.05),
           summary_opts = list(counts.min = 500))
       })
       return(list(dataset = dataset, results = results))
@@ -653,7 +653,7 @@ setup_for_analyze_dataset <- function(
       dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
       analyze_dataset(
         dataset, locus_attrs, ncores = 1,
-        analysis_opts = list(fraction.min = 0.05),
+        analysis_opts = list(min_allele_abundance = 0.05),
         summary_opts = list(counts.min = 500), known_alleles = known_alleles)
     })
   })
