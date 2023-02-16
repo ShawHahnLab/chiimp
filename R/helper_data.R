@@ -7,8 +7,7 @@
 #' @name test_data
 NULL
 
-# This is saved via:
-#     save(test_data, file = "data/test_data.rda", compress = "bzip2")
+# Saved via: save(test_data, file = "data/test_data.rda", compress = "bzip2")
 make_helper_data <- function() {
   test_data <- within(list(), { # nolint: cyclocomp_linter.
     # This is a particularly awkward approach now that in the development branch
