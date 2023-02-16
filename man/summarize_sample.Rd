@@ -20,9 +20,9 @@ summarize_sample_guided(
 \item{sample_attrs}{list of sample attributes, such as the rows produced by
 \link{prepare_dataset}.}
 
-\item{min_locus_reads}{numeric threshold for the minimum number of counts that
-must be present, in total across entries passing all filters, for potential
-alleles to be considered.}
+\item{min_locus_reads}{numeric threshold for the minimum number of counts
+that must be present, in total across entries passing all filters, for
+potential alleles to be considered.}
 }
 \value{
 list of attributes describing the sample.

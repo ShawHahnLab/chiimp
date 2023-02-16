@@ -44,9 +44,9 @@ sample_summary_funcs <- c("summarize_sample",
 #'   [analyze_sample].
 #' @param sample_attrs list of sample attributes, such as the rows produced by
 #'   [prepare_dataset].
-#' @param min_locus_reads numeric threshold for the minimum number of counts that
-#'   must be present, in total across entries passing all filters, for potential
-#'   alleles to be considered.
+#' @param min_locus_reads numeric threshold for the minimum number of counts
+#'   that must be present, in total across entries passing all filters, for
+#'   potential alleles to be considered.
 #'
 #' @return list of attributes describing the sample.
 #'

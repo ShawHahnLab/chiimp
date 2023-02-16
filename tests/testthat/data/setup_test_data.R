@@ -341,7 +341,7 @@ setup_for_analyze_seqs <- function() {
   mktestrds(seqs_stutter, "seqs_stutter_threshold_check")
   seq_data_stutter_thresh <- analyze_seqs(seqs_stutter_thresh, locus_attrs, 3)
   seq_data_stutter_thresh_mod <- analyze_seqs(
-    seqs_stutter_thresh, locus_attrs, 3, stutter.count.ratio_max = 1 / 2)
+    seqs_stutter_thresh, locus_attrs, 3, max_stutter_ratio = 1 / 2)
   mktestrds(seq_data_stutter_thresh, "seq_data_stutter_threshold_orig")
   mktestrds(seq_data_stutter_thresh_mod, "seq_data_stutter_threshold_mod")
   # analyze_seqs (artifact)

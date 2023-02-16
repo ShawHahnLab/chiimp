@@ -119,7 +119,7 @@ test_that("summarize_sample works with vector for sample attrs", {
 # test summarize_sample_guided --------------------------------------------
 
 
-sample.summary.cols <- c("Allele1Seq", "Allele1Count",
+sample_summary_cols <- c("Allele1Seq", "Allele1Count",
                          "Allele1Length", "Allele2Seq",
                          "Allele2Count", "Allele2Length",
                          "Homozygous", "Ambiguous", "Stutter", "Artifact",
@@ -139,7 +139,7 @@ check_seqs1a_summary <- function(data,
                                  allele1_count = 2783,
                                  allele2_count = 1290,
                                  ord = 1:2) {
-  expect_equal(names(data), sample.summary.cols)
+  expect_equal(names(data), sample_summary_cols)
   with(data, {
     alleles <- c(Allele1Seq, Allele2Seq)[ord]
     counts  <- c(Allele1Count, Allele2Count)[ord]
@@ -202,7 +202,7 @@ test_that("summarize_sample_guided uses expected_lengths", {
   expect_equal(sample_summary, sample_summary_expected)
 })
 
-test_that("summarize_sample_guided ignores min_locus_reads for expected lengths", {
+test_that("summarize_sample_guided ignores min_locus_reads for exp. lengths", {
   # This should give allele sequences matching the given expected_lengths,
   # including order, despite the min_locus_reads value.
   # Flip the order of alleles here to check that aspect
@@ -215,7 +215,7 @@ test_that("summarize_sample_guided ignores min_locus_reads for expected lengths"
   expect_equal(sample_summary, sample_summary_expected)
 })
 
-test_that("summarize_sample_guided ignores min_locus_reads for one exp. length", {
+test_that("summarize_sample_guided ignores min_locus_reads w/ 1 exp. length", {
   # This should give allele sequences matching the given expected_lengths,
   # including order, despite the min_locus_reads value.
   sample_data <- testrds("sample_data_guided_one_len.rds")
@@ -228,7 +228,7 @@ test_that("summarize_sample_guided ignores min_locus_reads for one exp. length",
   expect_equal(sample_summary, sample_summary_expected)
 })
 
-test_that("summarize_sample_guided uses min_locus_reads if no expected lengths", {
+test_that("summarize_sample_guided uses min_locus_reads if 0 exp. lengths", {
   # This should not report alleles if total filtered read count is below
   # min_locus_reads threshold.
   sample_attrs <- list(Locus = "A", ExpectedLength1 = NA, ExpectedLength2 = NA)

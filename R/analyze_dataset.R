@@ -68,9 +68,9 @@ analyze_dataset <- function(
     # Process into single-sample summary list
     summary_args <- c(
       list(sample_data = sample_data, sample_attrs = entry), summary_opts)
-    sample.summary <- do.call(summary_function, summary_args)
+    sample_summary <- do.call(summary_function, summary_args)
     # Return the processed per-sample data
-    return(list(summary = sample.summary, data = sample_data))
+    return(list(summary = sample_summary, data = sample_data))
   }
   if (ncores > 1) {
     # Set up the cluster and export required names (those objects used in

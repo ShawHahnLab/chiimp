@@ -255,7 +255,7 @@ render_report <- function(results) {
   # as the render function temporarily changes the working directory
   # internally.
   # See: https://stackoverflow.com/a/75465471/4499968
-  results$output_path_full = file.path(normalizePath("."), cfg("output_path"))
+  results$output_path_full <- file.path(normalizePath("."), cfg("output_path"))
   fp_report_in <- system.file("report", "report.Rmd", package = "chiimp")
   fp_report_out <- file.path(results$output_path_full, cfg("output_report"))
   if (!dir.exists(dirname(fp_report_out)))
