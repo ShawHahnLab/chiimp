@@ -54,7 +54,8 @@ sample_summary_funcs <- c("summarize_sample",
 #'
 #' @export
 #' @md
-summarize_sample <- function(sample_data, sample_attrs, min_locus_reads) {
+summarize_sample <- function(
+    sample_data, sample_attrs, min_locus_reads = cfg("min_locus_reads")) {
   # How many entries ended up above the threshold, after all filtering?  Ideally
   # this will be either one or two.
   prominent_seqs <- sum(sample_data$Category %in% c("Allele", "Prominent"))

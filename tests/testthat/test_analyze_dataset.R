@@ -3,13 +3,13 @@ testrds <- function(fname) readRDS(test_path("data", "analyze_dataset", fname))
 
 # Currently if I try to run analyze_dataset with the parallel package the tests
 # fail when run under R CMD check but work fine when run interactively.  For now
-# I'm just sticking with ncores = 1 here and in test_summarize_dataset.R to
-# avoid calling parallel:: functions.
+# I'm just sticking with ncores = 1 here to avoid calling parallel:: functions.
 # Possibly relevant:
 #  * https://github.com/r-lib/testthat/issues/602
 #  * https://github.com/hadley/devtools/issues/1526
 #  * https://github.com/r-lib/testthat/issues/86
-
+.ncores_old <- cfg("ncores")
+cfg("ncores", 1)
 
 # test analyze_dataset ----------------------------------------------------
 
@@ -21,9 +21,7 @@ test_that("analyze_dataset produces outputs across samples", {
   results_expected <- testrds("results.rds")
   within_tmpdir({
     write_seqs(seqs, "data")
-    results <- analyze_dataset(
-      dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(min_locus_reads = 500), ncores = 1)
+    results <- analyze_dataset(dataset, locus_attrs)
   })
   expect_equal(results, results_expected)
 })
@@ -39,9 +37,7 @@ test_that("analyze_dataset names known alleles", {
   within_tmpdir({
     write_seqs(seqs, "data")
     results <- analyze_dataset(
-      dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(min_locus_reads = 500), ncores = 1,
-      known_alleles = known_alleles)
+      dataset, locus_attrs, known_alleles = known_alleles)
   })
   expect_equal(results, results_expected)
 
@@ -91,9 +87,7 @@ test_that("analyze_dataset handles missing loci", {
   dataset$Locus[dataset$Locus == "A"] <- "a"
   dataset$Locus[dataset$Locus == "B"] <- "b"
   expect_error(
-    analyze_dataset(
-      dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(min_locus_reads = 500), ncores = 1),
+    analyze_dataset(dataset, locus_attrs),
     "ERROR: Locus names in dataset not in attributes table: a, b")
 })
 
@@ -109,11 +103,11 @@ test_that("analyze_dataset warns of empty input files", {
     unlink(fps[1])
     touch(fps[1])
     msg <- capture.output({
-      results <- analyze_dataset(
-        dataset, locus_attrs, analysis_opts = list(min_allele_abundance = 0.05),
-        summary_opts = list(min_locus_reads = 500), ncores = 1)
+      results <- analyze_dataset(dataset, locus_attrs)
     }, type = "message")
     msg_exp <- "WARNING: Zero reads for 1 of 12 data files"
     expect_true(length(grep(msg_exp, msg)) == 1)
   })
 })
+
+cfg("ncores", .ncores_old)

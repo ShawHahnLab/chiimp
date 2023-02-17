@@ -149,10 +149,7 @@ make_helper_data <- function() {
       data.dir <- tempfile()
       write_seqs(seqs, data.dir)
       dataset <- prepare_dataset(data.dir, "()(\\d+)-([A-Za-z0-9]+).fasta")
-      results <- analyze_dataset(dataset, locus_attrs, ncores = 1,
-                                 analysis_opts = list(
-                                   min_allele_abundance = 0.05),
-                                 summary_opts = list(min_locus_reads = 500))
+      results <- analyze_dataset(dataset, locus_attrs, ncores = 1)
       unlink(data.dir, recursive = TRUE)
       return(list(dataset = dataset, results = results))
     }

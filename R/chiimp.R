@@ -167,8 +167,6 @@ full_analysis <- function() {
     allele_names <- load_allele_names(cfg("allele_names"))
   results <- analyze_dataset(
     dataset, locus_attrs,
-    analysis_opts = list(min_allele_abundance = cfg("min_allele_abundance")),
-    summary_opts = list(min_locus_reads = cfg("min_locus_reads")),
     analysis_function = sample_analysis_func,
     summary_function = sample_summary_func,
     known_alleles = allele_names)
