@@ -7,8 +7,6 @@
 analyze_dataset(
   dataset,
   locus_attrs,
-  analysis_opts,
-  summary_opts,
   analysis_function = analyze_sample,
   summary_function = summarize_sample,
   ncores = cfg("ncores"),
@@ -20,10 +18,6 @@ analyze_dataset(
 
 \item{locus_attrs}{data frame of locus attributes as produced by
 \link{load_locus_attrs}.}
-
-\item{analysis_opts}{list of supplemental arguments to \code{analysis_function}.}
-
-\item{summary_opts}{list of supplemental arguments to \code{summary_function}.}
 
 \item{analysis_function}{function to use when analyzing each sample's data
 frame into the filtered version  Defaults to \link{analyze_sample}.}

@@ -17,8 +17,6 @@
 #' @param dataset data frame of sample details as produced by [prepare_dataset].
 #' @param locus_attrs data frame of locus attributes as produced by
 #'   [load_locus_attrs].
-#' @param analysis_opts list of supplemental arguments to `analysis_function`.
-#' @param summary_opts list of supplemental arguments to `summary_function`.
 #' @param analysis_function function to use when analyzing each sample's data
 #'   frame into the filtered version  Defaults to [analyze_sample].
 #' @param summary_function function to use when summarizing each sample's full
@@ -40,8 +38,6 @@
 analyze_dataset <- function(
     dataset,
     locus_attrs,
-    analysis_opts,
-    summary_opts,
     analysis_function = analyze_sample,
     summary_function = summarize_sample,
     ncores = cfg("ncores"),
@@ -57,18 +53,14 @@ analyze_dataset <- function(
     analyze_seqs(seqs, locus_attrs)
   }
   analyze_entry <- function(
-      entry, analysis_opts, summary_opts, analysis_function, summary_function,
-      analyzed_files) {
+      entry, analysis_function, summary_function, analyzed_files) {
     # Get all data from the relevant file
     seq_data <- analyzed_files[[entry["Filename"]]]
     # Process into single-sample data frame
-    analysis_args <- c(
-      list(seq_data = seq_data, sample_attrs = entry), analysis_opts)
-    sample_data <- do.call(analysis_function, analysis_args)
+    sample_data <- analysis_function(seq_data = seq_data, sample_attrs = entry)
     # Process into single-sample summary list
-    summary_args <- c(
-      list(sample_data = sample_data, sample_attrs = entry), summary_opts)
-    sample_summary <- do.call(summary_function, summary_args)
+    sample_summary <- summary_function(
+      sample_data = sample_data, sample_attrs = entry)
     # Return the processed per-sample data
     return(list(summary = sample_summary, data = sample_data))
   }
@@ -106,8 +98,6 @@ analyze_dataset <- function(
       names(analyzed_files) <- fps
       raw_results <- parallel::parApply(
         cluster, dataset, 1, analyze_entry,
-        analysis_opts = analysis_opts,
-        summary_opts = summary_opts,
         analysis_function = analysis_function,
         summary_function = summary_function,
         analyzed_files = analyzed_files)
@@ -123,8 +113,6 @@ analyze_dataset <- function(
     names(analyzed_files) <- fps
     raw_results <- apply(
       dataset, 1, analyze_entry,
-      analysis_opts = analysis_opts,
-      summary_opts = summary_opts,
       analysis_function = analysis_function,
       summary_function = summary_function,
       analyzed_files = analyzed_files)

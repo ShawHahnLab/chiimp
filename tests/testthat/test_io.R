@@ -226,17 +226,8 @@ test_that("save_seqfile_data saves per-file information", {
   # Just make sure the expected files are created based on the existing
   # filenames.  The names should be the existing names with an added csv
   # extension with a flat directory structure.
-  locus_attrs <- testrds("locus_attrs.rds")
-  seqs <- testrds("seqs.rds")
+  results <- testrds("results.rds")
   within_tmpdir({
-    # TODO just load results from canned .rds
-    write_seqs(seqs, "data")
-    dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
-    results <- analyze_dataset(
-      dataset, locus_attrs,
-      analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(min_locus_reads = 500),
-      ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
     fps_expected <- sort(file.path(
@@ -249,19 +240,11 @@ test_that("save_seqfile_data saves per-file information", {
 })
 
 test_that("save_seqfile_data works with directory trees", {
-  # In this case we should get two sub-directories in the output.
-  locus_attrs <- testrds("locus_attrs.rds")
-  seqs <- testrds("seqs.rds")
+  # In this case we should get three sub-directories in the output.
+  results <- testrds("results.rds")
+  names(results$files) <- gsub(
+    "data/(.)", "data/set\\1/\\1", names(results$files))
   within_tmpdir({
-    write_seqs(seqs, file.path("data", "set1"))
-    write_seqs(seqs, file.path("data", "set2"))
-    dataset <- prepare_dataset(
-      "data", pattern = "()(\\d+)-([A-Za-z0-9]+).fasta", autorep = TRUE)
-    results <- analyze_dataset(
-      dataset, locus_attrs,
-      analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(min_locus_reads = 500),
-      ncores = 1)
     dp_out <- file.path("results", "processed_files")
     save_seqfile_data(results$files, dp_out)
     fps_expected <- sort(file.path(
@@ -271,39 +254,30 @@ test_that("save_seqfile_data works with directory trees", {
     fps_observed <- sort(list.files(
       dp_out, recursive = TRUE, full.names = TRUE))
   })
-  expect_equal(fps_observed, fps_expected)
+  expect_identical(fps_observed, fps_expected)
 })
 
 test_that("save_seqfile_data works with Windows-style paths", {
   # This should behave the same as the above test despite the backslashes
   # substituted in for path separators.
-  locus_attrs <- testrds("locus_attrs.rds")
-  seqs <- testrds("seqs.rds")
+  results <- testrds("results.rds")
   within_tmpdir({
-    write_seqs(seqs, file.path("data", "set1"))
-    write_seqs(seqs, file.path("data", "set2"))
-    dataset <- prepare_dataset(
-      "data", pattern = "()(\\d+)-([A-Za-z0-9]+).fasta", autorep = TRUE)
-    results <- analyze_dataset(
-      dataset, locus_attrs,
-      analysis_opts = list(min_allele_abundance = 0.05),
-      summary_opts = list(min_locus_reads = 500),
-      ncores = 1)
     dp_out <- file.path("results", "processed_files")
     names(results$files) <- gsub("/", "\\\\", names(results$files))
     save_seqfile_data(results$files, dp_out)
     names(results$files) <- gsub("\\\\", "/", names(results$files))
-    fps_expected <- sort(file.path(
-      dp_out,
-      basename(dirname(names(results$files))),
-      paste0(basename(names(results$files)), ".csv")))
+    fps_expected <- sort(with(results$summary, file.path(
+      "results", "processed_files", paste0(Sample, "-", Locus, ".fasta.csv"))))
     fps_observed <- sort(list.files(
       dp_out, recursive = TRUE, full.names = TRUE))
-    fps_expected <- normalizePath(fps_expected)
-    fps_observed <- normalizePath(fps_observed)
+    fps_observed <- gsub(".*/results/", "results/", fps_observed)
+    # Normalize any lingering \ or / inconsistencies, so this test should also
+    # pass on Windows itself.  (Previously used normalizePath, but that fails if
+    # the path doesn't exist, which could cause the test to fail weirdly if the
+    # paths don't actually match as expected.)
+    fps_expected <- gsub("\\\\", "/", fps_expected)
+    fps_observed <- gsub("\\\\", "/", fps_observed)
   })
-  # Normalize any lingering \ or / inconsistencies, so this test should also
-  # pass on Windows itself.
   expect_equal(fps_observed, fps_expected)
 })
 

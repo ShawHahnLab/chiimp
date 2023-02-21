@@ -5,7 +5,11 @@
 \alias{summarize_sample_guided}
 \title{Summarize a processed STR sample}
 \usage{
-summarize_sample(sample_data, sample_attrs, min_locus_reads)
+summarize_sample(
+  sample_data,
+  sample_attrs,
+  min_locus_reads = cfg("min_locus_reads")
+)
 
 summarize_sample_guided(
   sample_data,

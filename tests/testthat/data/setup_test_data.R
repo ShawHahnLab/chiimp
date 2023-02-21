@@ -186,10 +186,7 @@ make_test_data <- function() {
       within_tmpdir({
         write_seqs(seqs, "data")
         dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
-        results <- analyze_dataset(
-          dataset, locus_attrs, ncores = 1,
-          analysis_opts = list(min_allele_abundance = 0.05),
-          summary_opts = list(min_locus_reads = 500))
+        results <- analyze_dataset(dataset, locus_attrs, ncores = 1)
       })
       return(list(dataset = dataset, results = results))
     }
@@ -230,6 +227,7 @@ setup_for_io <- function() {
     overwrite = TRUE)
   locus_attrs <- load_locus_attrs(file.path(dirpath, "locus_attrs.csv"))
   mktestrds(locus_attrs)
+  mktestrds(test_data_for_setup$results_summary_data$results)
   # load_config
   write(
     "fp_dataset: \"samples.csv\"\noutput:\n  fp_rds: \"results.rds\"",
@@ -274,8 +272,6 @@ setup_for_io <- function() {
   dataset_dups <- rbind(dataset, extras)
   mktestrds(dataset_dups)
   mktestcsv(dataset_dups)
-  # save_seqfile_data
-  mktestrds(test_data_for_setup$seqs)
 }
 
 
@@ -653,10 +649,7 @@ setup_for_analyze_dataset <- function(
       write_seqs(seqs, "data")
       dataset <- prepare_dataset("data", "()(\\d+)-([A-Za-z0-9]+).fasta")
       analyze_dataset(
-        dataset, locus_attrs, ncores = 1,
-        analysis_opts = list(min_allele_abundance = 0.05),
-        summary_opts = list(min_locus_reads = 500),
-        known_alleles = known_alleles)
+        dataset, locus_attrs, ncores = 1, known_alleles = known_alleles)
     })
   })
   mktestrds(known_alleles)
