@@ -27,7 +27,7 @@ jobs:
           # isn't providing these old packages anymore (which is probably a
           # strong hint to give up and drop support here too).
           name: Pull from real CRAN for R 3
-          command: R --version | grep -q "R version 3" && echo 'local({r<-getOption("repos"); r["CRANCLOUD"]<-"https://cloud.r-project.org";options(repos=r)})}' > ~/.RProfile
+          command: R --version | grep -q "R version 3" && echo 'local({r<-getOption("repos"); r["CRANCLOUD"]<-"https://cloud.r-project.org";options(repos=r)})' > ~/.Rprofile
       - run:
           name: Install package dependencies
           command: R -e "devtools::install_deps(dep = TRUE)"
