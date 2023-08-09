@@ -151,7 +151,7 @@ full_analysis <- function() {
   dataset <- if (is_blank(cfg("dataset"))) {
     prepare_dataset()
   } else {
-    load_dataset(cfg("fp_dataset"))
+    load_dataset(cfg("dataset"))
   }
 
   logmsg(paste0("Loading locus attrs: ", cfg("locus_attrs"), "..."))
