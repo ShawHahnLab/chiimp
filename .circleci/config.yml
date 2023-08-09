@@ -30,7 +30,7 @@ jobs:
           command: R --version | grep -q "R version 3" && echo 'local({r<-getOption("repos"); r["CRANCLOUD"]<-"https://cloud.r-project.org";options(repos=r)})' > ~/.Rprofile || echo "R not version 3"
       - run:
           name: Install package dependencies
-          command: R -e "devtools::install_deps(dep = TRUE)"
+          command: R -e "devtools::install_deps(dep = TRUE, upgrade = 'never')"
       - save_cache:
           key: cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
           paths:
