@@ -80,4 +80,10 @@ workflows:
       - build:
           matrix:
             parameters:
-              rversion: ["4.2.3", "4.3.3", "4.4.3", "4.5.1"]
+              rversion:
+                - "4.2.3"
+                - "4.3.3"
+                # disabling tests for 4.4 until I sort out r-lib/remotes #798
+                # messing up the install of bioconductor dependencies here
+                #- "4.4.3"
+                - "4.5.1"
