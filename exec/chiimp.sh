@@ -18,7 +18,7 @@ if [[ $# -eq 0 ]]; then
 else
 	export RSTUDIO_PANDOC=$(Rscript "$dir/find_pandoc.R")
 	cd "$cfg_dir"
-	Rscript "$dir/chiimp" $*
+	Rscript "$dir/chiimp" "$@"
 fi
 read -p "Press any key to continue... " -n1 -s
 echo
