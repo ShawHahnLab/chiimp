@@ -24,7 +24,7 @@ jobs:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
       - run:
           name: Install package dependencies
-          command: R -e "devtools::install_deps(dep = TRUE)"
+          command: R -e "devtools::install_deps(dep = TRUE); quit(status=sum(grepl('non-zero exit status', names(warnings()))))"
       - save_cache:
           key: cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
           paths:
