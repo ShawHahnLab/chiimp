@@ -23,6 +23,10 @@ jobs:
           keys:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
       - run:
+          # see https://github.com/r-lib/remotes/issues/798
+          name: Update remotes pkg if on R 4.4
+          command: R --version | grep -qF 'version 4.4' && R -e 'devtools::install_git("https://github.com/r-lib/remotes.git")'
+      - run:
           name: Install package dependencies
           command: R -e "devtools::install_deps(dep = TRUE); quit(status=sum(grepl('non-zero exit status', names(warnings()))))"
       - save_cache:
@@ -33,6 +37,7 @@ jobs:
           name: Check versions
           command: |
             which R
+            R --version
             R --quiet -e 'installed.packages()[, "Version"]'
             which pandoc
             pandoc --version
@@ -83,7 +88,5 @@ workflows:
               rversion:
                 - "4.2.3"
                 - "4.3.3"
-                # disabling tests for 4.4 until I sort out r-lib/remotes #798
-                # messing up the install of bioconductor dependencies here
-                #- "4.4.3"
+                - "4.4.3"
                 - "4.5.1"
