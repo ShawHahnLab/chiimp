@@ -80,4 +80,8 @@ workflows:
       - build:
           matrix:
             parameters:
-              rversion: ["3.6.3", "4.2.1", "4.2.2"]
+              rversion:
+                - "4.2.3"
+                - "4.3.3"
+                - "4.4.3"
+                - "4.5.1"
