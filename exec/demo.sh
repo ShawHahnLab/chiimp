@@ -3,6 +3,10 @@
 # Wrapper script to set up and execute a demo, using the "chiimp" executable
 # R script and the test data.
 
+if [[ "$2" == "strict" ]]; then
+	set -e
+fi
+
 cd "$(dirname $BASH_SOURCE)"
 dir=$(pwd -P)
 inst="../inst"
