@@ -23,8 +23,12 @@ jobs:
           keys:
             - cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
       - run:
+          # see https://github.com/r-lib/remotes/issues/798
+          name: Update remotes pkg if on R 4.4
+          command: R --version | grep -qF 'version 4.4' && R -e 'devtools::install_git("https://github.com/r-lib/remotes.git")' || true
+      - run:
           name: Install package dependencies
-          command: R -e "devtools::install_deps(dep = TRUE)"
+          command: R -e "devtools::install_deps(dep = TRUE); quit(status=sum(grepl('non-zero exit status', names(warnings()))))"
       - save_cache:
           key: cache-{{ .Environment.CIRCLE_JOB }}-{{ checksum "DESCRIPTION" }}
           paths:
@@ -33,6 +37,7 @@ jobs:
           name: Check versions
           command: |
             which R
+            R --version
             R --quiet -e 'installed.packages()[, "Version"]'
             which pandoc
             pandoc --version
