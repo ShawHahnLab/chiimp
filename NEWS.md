@@ -1,3 +1,8 @@
+# chiimp 0.4.2
+
+ * Updated software dependency handling to use generic git URLs
+ * Enforce strict error handling in test scripts
+
 # chiimp 0.4.1
 
  * Overhauled unit tests with more modular saved inputs and expected outputs
